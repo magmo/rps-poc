@@ -36,6 +36,18 @@ a:hover {
 	box-shadow: 0px 0px 1px;
 }
 
+table, td {
+   border: 1px solid black;
+}
+
+td, th {
+  padding: 16px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
 .button:hover {
 	text-decoration-line: underline;
 	background-color: brandColor;
