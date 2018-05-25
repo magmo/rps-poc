@@ -9,8 +9,6 @@ import OpponentSelectionPage from './components/OpponentSelectionPage';
 import AboutPage from './components/AboutPage';
 import { ROUTE_PATHS } from './constants';
 
-import 'bootstrap';
-
 class App extends React.Component {
   render() {
     return (

@@ -1,21 +1,21 @@
-import React from "react";
+import React from 'react';
 
-import Button from "./Button";
+import Button from './Button';
 
-import { ROUTE_PATHS } from "../constants";
+import { ROUTE_PATHS } from '../constants';
 
 export default function HomePage() {
   return (
-    <div style={{ maxWidth: "90%", margin: "auto" }}>
+    <div style={{ maxWidth: '90%', margin: 'auto' }}>
       <div>
         <h1>How it works</h1>
       </div>
-      <div style={{ width: "100%" }}>
+      <div style={{ width: '100%' }}>
         <div
           style={{
-            width: "50%",
-            display: "inline-block",
-            verticalAlign: "top"
+            width: '50%',
+            display: 'inline-block',
+            verticalAlign: 'top',
           }}
         >
           <div style={{ paddingRight: 8 }}>
@@ -30,19 +30,19 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        <div style={{ width: "50%", display: "inline-block" }}>
+        <div style={{ width: '50%', display: 'inline-block' }}>
           <div
             style={{
-              width: "100%",
+              width: '100%',
               height: 350,
-              backgroundColor: "antiquewhite"
+              backgroundColor: 'antiquewhite',
             }}
           >
             *** gif or video of game goes here **
           </div>
         </div>
       </div>
-      <div style={{ textAlign: "center", paddingTop: 40 }}>
+      <div style={{ textAlign: 'center', paddingTop: 40 }}>
         <Button href={ROUTE_PATHS.OPPONENT_SELECTION}>Continue</Button>
       </div>
     </div>
