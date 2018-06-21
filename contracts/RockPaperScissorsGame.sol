@@ -67,7 +67,7 @@ contract RockPaperScissorsGame {
 
     // transition validations
     function validateStartToRoundProposed(bytes _old, bytes _new) private pure {
-        require(_new.stake() > 0);
+        require(_new.stake() == _old.stake());
         require(_old.aResolution() >= _new.stake()); // avoid integer overflow attacks
         require(_old.bResolution() >= _new.stake()); // avoid integer overflow attacks
         require(_new.aResolution() == _old.aResolution()); // resolution unchanged
@@ -77,11 +77,13 @@ contract RockPaperScissorsGame {
     }
 
     function validateStartToConcluded(bytes _old, bytes _new) private pure {
+        require(_new.stake() == _old.stake());
         require(_new.aResolution() == _old.aResolution());
         require(_new.bResolution() == _old.bResolution());
     }
 
     function validateRoundProposedToRejected(bytes _old, bytes _new) private pure {
+        require(_new.stake() == _old.stake());
         require(_new.aResolution() == _old.aResolution()); // resolution unchanged
         require(_new.bResolution() == _old.bResolution()); // resolution unchanged
     }
@@ -114,6 +116,7 @@ contract RockPaperScissorsGame {
     }
 
     function validateRevealToStart(bytes _old, bytes _new) private pure {
+        require(_new.stake() == _old.stake());
         assert(_new.aResolution() == _old.aResolution());
         assert(_new.bResolution() == _old.bResolution());
     }
