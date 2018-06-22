@@ -11,7 +11,10 @@
     "react-dom": "^16.3.2",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "fmg-core": "^0.0.2",
+    "sha3": "^1.2.2",
+    "web3-utils": "^1.0.0-beta.30"
   },
   "scripts": {
     "start": "react-scripts start",
