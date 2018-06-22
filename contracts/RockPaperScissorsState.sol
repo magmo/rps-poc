@@ -15,6 +15,7 @@ library RockPaperScissorsState {
     // [ 96 - 127] enum bPlay
     // [128 - 159] enum aPlay
     // [160 - 191] bytes32 salt
+    // [192 - 223] uint256 roundNum
 
     function positionType(bytes _state) public pure returns (PositionType _positionType) {
         uint offset = State.gameStateOffset(_state);
@@ -55,6 +56,13 @@ library RockPaperScissorsState {
         uint offset = State.gameStateOffset(_state) + 160;
         assembly {
             _salt := mload(add(_state, offset))
+        }
+    }
+
+    function roundNum(bytes _state) public pure returns (uint256 _roundNum) {
+        uint offset = State.gameStateOffset(_state) + 192;
+        assembly {
+            _roundNum := mload(add(_state, offset))
         }
     }
 
