@@ -12,7 +12,7 @@ contract('RockPaperScissors', (accounts) => {
   const stake = 2;
   const initBals = [5, 4];
   const aAhead = [7, 2];
-  const bAhead = [3, 6]
+  const bAhead = [3, 6];
   let initialState;
   let proposeState;
   let acceptState;
@@ -24,12 +24,12 @@ contract('RockPaperScissors', (accounts) => {
 
     let channel = new Channel(rpsContract.address, 0, [accounts[0], accounts[1]]);
 
-    initialState = RpsGame.restingState({ channel, turnNum: 0, resolution: initBals });
+    initialState = RpsGame.restingState({ channel, turnNum: 0, resolution: initBals, stake});
     proposeState = RpsGame.proposeState({ channel, turnNum: 1, resolution: initBals, stake, aPlay, salt});
     let preCommit = proposeState.preCommit;
     acceptState = RpsGame.acceptState({ channel, turnNum: 2, stake, preCommit, bPlay, resolution: bAhead });
     revealState = RpsGame.revealState({ channel, turnNum: 3, stake, aPlay, bPlay, salt, resolution: aAhead });
-    restState = RpsGame.restingState({ channel, turnNum: 4, resolution: aAhead });
+    restState = RpsGame.restingState({ channel, turnNum: 4, stake, resolution: aAhead });
   });
 
 
