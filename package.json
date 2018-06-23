@@ -2,6 +2,8 @@
   "name": "rps",
   "version": "0.1.0",
   "private": true,
+  "main": "index.js",
+  "module": "src/index.js",
   "dependencies": {
     "enum": "^2.5.0",
     "firebase": "^5.0.4",
