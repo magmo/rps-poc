@@ -66,4 +66,9 @@ contract('RockPaperScissors', (accounts) => {
   it("allows REVEAL -> (updated) START", async () => {
     assert(await validTransition(revealState, restState));
   });
+
+  it("disallows transitions where the stake changes", async () => {
+    revealState.stake = revealState.stake + 1;
+    assertRevert(validTransition(revealState, restState));
+  });
 });
