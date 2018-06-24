@@ -2,7 +2,7 @@ import { Channel, State, toHex32, padBytes32 } from 'fmg-core';
 import { soliditySha3 } from 'web3-utils';
 
 class RpsGame {
-  static restingState({ channnel, resolution, turnNum }) {
+  static restingState({ channnel, resolution, turnNum, stake }) {
     return new RestState(...arguments);
   }
   static proposeState({ channel, resolution, turnNum, stake, aPlay, salt }) {
