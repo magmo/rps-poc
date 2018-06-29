@@ -4,11 +4,12 @@ import React from 'react';
 import fire from '../gateways/firebase';
 import Opponent from '../domain/opponent';
 import OpponentSelectionStep from './OpponentSelectionStep';
-import SelectMoveStep from './SelectMoveStep';
+import SelectPlayStep from './SelectPlayStep';
 import WaitForOpponentStep from './WaitForOpponentStep';
 import RevealStep from './RevealStep';
 import ConfirmWagerStep from './ConfirmWagerStep';
 import GameCancelledStep from './GameCancelledStep';
+import GameEngine from '../game-engine/GameEngine';
 
 import { GAME_STAGES } from '../constants';
 
@@ -16,11 +17,13 @@ export default class PlayPage extends React.PureComponent {
   constructor(props) {
     super(props);
 
+
+    this.ge = new GameEngine();
+
     this.state = {
+      // any frontend only state goes here...
       opponents: [],
-      selectedMoveId: null,
-      opponentMoveId: null,
-      stage: GAME_STAGES.SELECT_CHALLENGER,
+      ...this.ge.start(),
     };
 
     _.bindAll(this, [
@@ -28,7 +31,7 @@ export default class PlayPage extends React.PureComponent {
       'opponentsListener',
       'postNewChallenge',
       'selectChallenge',
-      'selectMove',
+      'selectPlay',
       'confirmWager',
       'cancelGame',
       'returnToStart',
@@ -47,12 +50,14 @@ export default class PlayPage extends React.PureComponent {
   }
 
   selectChallenge() {
-    console.log('TODO (select): DO SOMETHING HERE');
-    this.setState({ stage: GAME_STAGES.SELECT_MOVE });
+    const updateObj = this.ge.selectChallenge();
+
+    this.setState(updateObj);
   }
 
-  selectMove(selectedMove) {
-    this.setState({ stage: GAME_STAGES.WAIT_FOR_OPPONENT_MOVE, selectedMoveId: selectedMove });
+  selectPlay(selectedPlay) {
+
+    this.setState({ stage: GAME_STAGES.WAITING_FOR_PLAYER, selectedPlayId: selectedPlay });
   }
 
   confirmWager() {
@@ -92,9 +97,8 @@ export default class PlayPage extends React.PureComponent {
   }
 
   render() {
-    const { stage, selectedMoveId, opponentMoveId, opponents } = this.state;
+    const { stage, selectedPlayId, opponentPlayId, opponents } = this.state;
 
-    // TODO: order these as done in constants.js
     switch (stage) {
       case GAME_STAGES.SELECT_CHALLENGER:
         return (
@@ -104,14 +108,15 @@ export default class PlayPage extends React.PureComponent {
             opponents={opponents}
           />
         );
-      case GAME_STAGES.SELECT_MOVE:
-        return <SelectMoveStep handleSelectMove={this.selectMove} />;
-      case GAME_STAGES.SELECT_MOVE_AFTER_OPPONENT:
-        return <SelectMoveStep handleSelectMove={this.selectMove} />;
-      case GAME_STAGES.WAITING_FOR_PLAYER:
-        return <WaitForOpponentStep selectedMoveId={selectedMoveId} />;
-      case GAME_STAGES.REVEAL_WINNER_WITH_PROMPT:
-        return <RevealStep selectedMoveId={selectedMoveId} opponentMoveId={opponentMoveId} />;
+      case GAME_STAGES.INITIALIZE_SETUP:
+        // TODO: add component
+        return null;
+      case GAME_STAGES.CHOOSE_WAGER:
+        // TODO: add component
+        return null;
+      case GAME_STAGES.GAME_ACCEPT_RECEIVED:
+        // TODO: add component
+        return null;
       case GAME_STAGES.CONFIRM_WAGER:
         return (
           <ConfirmWagerStep
@@ -120,6 +125,20 @@ export default class PlayPage extends React.PureComponent {
             handleConfirm={this.confirmWager}
           />
         );
+      case GAME_STAGES.SELECT_PLAY:
+        return <SelectPlayStep handleSelectPlay={this.selectPlay} />;
+      case GAME_STAGES.SELECT_PLAY_AFTER_OPPONENT:
+        return <SelectPlayStep handleSelectPlay={this.selectPlay} />;
+      case GAME_STAGES.REVEAL_WINNER_WITH_PROMPT:
+        return <RevealStep selectedPlayId={selectedPlayId} opponentPlayId={opponentPlayId} />;
+      case GAME_STAGES.CONCLUDE_GAME:
+        // TODO: add component
+        return null;
+      case GAME_STAGES.WAITING_FOR_PLAYER:
+        return <WaitForOpponentStep selectedPlayId={selectedPlayId} />;
+      case GAME_STAGES.WAITING_FOR_CHAIN:
+        // TODO: add component
+        return null;
       case GAME_STAGES.GAME_CANCELLED_BY_YOU:
         return <GameCancelledStep cancelledBySelf returnToStart={this.returnToStart} />;
       case GAME_STAGES.GAME_CANCELLED_BY_OPPONENT:
@@ -130,3 +149,5 @@ export default class PlayPage extends React.PureComponent {
     }
   }
 }
+
+
