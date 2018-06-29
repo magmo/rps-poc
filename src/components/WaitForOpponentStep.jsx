@@ -11,9 +11,11 @@ export default class WaitForOpponent extends React.PureComponent {
         <div>
           <h1>Waiting for opponent...</h1>
         </div>
-        <div style={{ width: '100%' }}>
-          You've chosen {PLAY_OPTIONS.find(option => option.id === selectedPlayId).name}
-        </div>
+        {selectedPlayId && (
+          <div style={{ width: '100%' }}>
+            You've chosen {PLAY_OPTIONS.find(option => option.id === selectedPlayId).name}
+          </div>
+        )}
       </div>
     );
   }

@@ -1,49 +1,71 @@
-import { GAME_STAGES } from '../constants';
+import { GE_STAGES, GE_COMMANDS, GE_TO_AC_MAPPING } from '../constants';
 
 export default class GameEngine {
   constructor(props) {
     this.state = {
-      opponents: [],
       selectedPlayId: null,
       opponentMoveId: null,
+      opponentId: null,
       stage: null,
+      stake: null,
     };
   }
 
-  start() {
-    this.state.stage = GAME_STAGES.SELECT_CHALLENGER;
+  init() {
+    this.state.stage = GE_STAGES.SELECT_CHALLENGER;
+    const updateObj = {
+      stage: GE_TO_AC_MAPPING[this.state.stage],
+    };
+
     return {
-      stage: this.state.stage,
+      updateObj,
     };
   }
 
-  selectChallenge() {
+  selectChallenge({ stake, opponentId }) {
+    this.state.stage = GE_STAGES.READY_TO_SEND_PREFUND;
+    this.state.stake = stake;
+    this.state.opponentId = opponentId;
+
+    const updateObj = {
+      stage: GE_TO_AC_MAPPING[this.state.stage],
+    };
+
     return {
-      stage: GAME_STAGES.SELECT_PLAY,
-    }
+      updateObj,
+      command: GE_COMMANDS.SEND_PRE_FUND_MESSAGE,
+    };
   }
 
-  choose() {
+  preFundProposalSent() {
+    this.state.stage = GE_STAGES.PREFUND_SENT;
 
+    const updateObj = {
+      stage: GE_TO_AC_MAPPING[this.state.stage],
+    };
+
+    return {
+      updateObj,
+    };
   }
 
   selectPlay(selectedPlay) {
-    this.setState({ stage: GAME_STAGES.WAIT_FOR_OPPONENT_PLAY, selectedPlayId: selectedPlay });
+    this.setState({ stage: GE_STAGES.WAIT_FOR_OPPONENT_PLAY, selectedPlayId: selectedPlay });
   }
 
   confirmWager() {
     // TODO: Send message to player A
-    this.setState({ stage: GAME_STAGES.WAIT_FOR_PLAYER });
+    this.setState({ stage: GE_STAGES.WAIT_FOR_PLAYER });
   }
 
   cancelGame() {
     // TODO: Send message to opponent
-    this.setState({ stage: GAME_STAGES.GAME_CANCELLED_BY_YOU });
+    this.setState({ stage: GE_STAGES.GAME_CANCELLED_BY_YOU });
   }
 
   returnToStart() {
     // TODO: Send message to opponent
-    this.setState({ stage: GAME_STAGES.SELECT_CHALLENGER });
+    this.setState({ stage: GE_STAGES.SELECT_CHALLENGER });
   }
 }
 

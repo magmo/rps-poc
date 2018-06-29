@@ -4,12 +4,16 @@ import { PLAY_OPTIONS } from '../constants';
 
 export default class SelecPlayStep extends React.PureComponent {
   render() {
-    const { handleSelectPlay } = this.props;
+    const { handleSelectPlay, afterOpponent } = this.props;
 
     return (
       <div style={{ maxWidth: '90%', margin: 'auto' }}>
         <div>
-          <h1>Choose your move:</h1>
+          <h1>
+            {afterOpponent
+              ? 'Your opponent has chosen a move, now choose yours:'
+              : 'Choose your move:'}
+          </h1>
         </div>
         <div style={{ width: '100%' }}>
           {PLAY_OPTIONS.map(option => (
