@@ -25,10 +25,10 @@ export const GAME_STAGES = new Enum([
   'CONFIRM_WAGER',
 
   // Player A Play states
-  'SELECT_MOVE',
+  'SELECT_PLAY',
 
   // Player B Play states
-  'SELECT_MOVE_AFTER_OPPONENT',
+  'SELECT_PLAY_AFTER_OPPONENT',
 
   // Play states used by both players
   'REVEAL_WINNER_WITH_PROMPT',
@@ -43,7 +43,7 @@ export const GAME_STAGES = new Enum([
   'GAME_CANCELLED_BY_OPPONENT',
 ]);
 
-export const MOVE_OPTIONS = [
+export const PLAY_OPTIONS = [
   {
     name: 'ROCK',
     id: 0,

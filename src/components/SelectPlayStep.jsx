@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { MOVE_OPTIONS } from '../constants';
+import { PLAY_OPTIONS } from '../constants';
 
-export default class SelectMoveStep extends React.PureComponent {
+export default class SelecPlayStep extends React.PureComponent {
   render() {
-    const { handleSelectMove } = this.props;
+    const { handleSelectPlay } = this.props;
 
     return (
       <div style={{ maxWidth: '90%', margin: 'auto' }}>
@@ -12,9 +12,9 @@ export default class SelectMoveStep extends React.PureComponent {
           <h1>Choose your move:</h1>
         </div>
         <div style={{ width: '100%' }}>
-          {MOVE_OPTIONS.map(option => (
+          {PLAY_OPTIONS.map(option => (
             <a
-              onClick={() => handleSelectMove(option.id)}
+              onClick={() => handleSelectPlay(option.id)}
               style={{ display: 'inline-block', width: '33%' }}
               key={option.id}
             >
