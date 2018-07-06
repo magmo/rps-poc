@@ -3,16 +3,20 @@ import React from 'react';
 
 import fire from '../gateways/firebase';
 import Opponent from '../domain/opponent';
-import OpponentSelectionStep from './OpponentSelectionStep';
-import SelectPlayStep from './SelectPlayStep';
-import WaitForOpponentStep from './WaitForOpponentStep';
-import SendingMessageStep from './SendingMessageStep';
-import RevealStep from './RevealStep';
+
+// Views
+import ConcludeStep from './ConcludeStep';
 import ConfirmWagerStep from './ConfirmWagerStep';
 import GameCancelledStep from './GameCancelledStep';
+import OpponentSelectionStep from './OpponentSelectionStep';
+import RevealStep from './RevealStep';
+import SelectPlayStep from './SelectPlayStep';
+import SendingMessageStep from './SendingMessageStep';
+import WaitingStep from './WaitingStep';
+
 import GameEngine from '../game-engine/GameEngine';
 
-import { AC_VIEWS, GE_COMMANDS } from '../constants';
+import { AC_VIEWS, GE_COMMANDS, GE_TO_AC_MAPPING } from '../constants';
 
 function postNewChallenge(newOpponent) {
   fire
@@ -68,14 +72,16 @@ export default class PlayPage extends React.PureComponent {
   }
 
   selectChallenge({ stake, opponentId }) {
-    const returnMessage = this.ge.selectChallenge({ stake, opponentId });
+    const returnMessage = GE_TO_AC_MAPPING[this.ge.selectChallenge({ stake, opponentId })];
     this.handleReturnMessage(returnMessage);
   }
 
   sendPreFundMessage() {
     // TODO: Send pre-fund proposal message
     console.log('sending pre-fund proposal message');
-    const returnMessage = this.ge.preFundProposalSent();
+
+    const returnMessage = GE_TO_AC_MAPPING[this.ge.preFundProposalSent()];
+    // This is just to add a delay so that we can see the various states
     setTimeout(() => this.handleReturnMessage(returnMessage), 1500);
   }
 
@@ -83,7 +89,12 @@ export default class PlayPage extends React.PureComponent {
     // TODO: Send pre-fund proposal message
     console.log('sending post-fund message');
 
-    const returnMessage = this.ge.preFundProposalSent();
+    const returnMessage = GE_TO_AC_MAPPING[this.ge.preFundProposalSent()];
+    this.handleReturnMessage(returnMessage);
+  }
+
+  handleReturnToOpponentSelection() {
+    const returnMessage = GE_TO_AC_MAPPING[this.ge.returnToOpponentSelection()];
     this.handleReturnMessage(returnMessage);
   }
 
@@ -159,13 +170,16 @@ export default class PlayPage extends React.PureComponent {
       case AC_VIEWS.REVEAL_WINNER_WITH_PROMPT:
         return <RevealStep selectedPlayId={selectedPlayId} opponentPlayId={opponentPlayId} />;
       case AC_VIEWS.CONCLUDE_GAME:
-        // TODO: add component
-        return null;
+        return (
+          <ConcludeStep
+            handleReturnToOpponentSelection={this.handleReturnToOpponentSelection}
+            winnings={50}
+          />
+        );
       case AC_VIEWS.WAITING_FOR_PLAYER:
-        return <WaitForOpponentStep selectedPlayId={selectedPlayId} />;
+        return <WaitingStep selectedPlayId={selectedPlayId} />;
       case AC_VIEWS.WAITING_FOR_CHAIN:
-        // TODO: add component
-        return null;
+        return <WaitingStep forChain selectedPlayId={selectedPlayId} />;
       case AC_VIEWS.SENDING_MESSAGE:
         return <SendingMessageStep />;
       case AC_VIEWS.GAME_CANCELLED_BY_YOU:
