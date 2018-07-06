@@ -1,4 +1,4 @@
-import { GE_STAGES, GE_COMMANDS, GE_TO_AC_MAPPING } from '../constants';
+import { GE_STAGES, GE_COMMANDS } from '../constants';
 
 export default class GameEngine {
   constructor(props) {
@@ -12,9 +12,10 @@ export default class GameEngine {
   }
 
   init() {
-    this.state.stage = GE_STAGES.SELECT_CHALLENGER;
+    this.state.stage = GE_STAGES.GAME_CONCLUDED;
+
     const updateObj = {
-      stage: GE_TO_AC_MAPPING[this.state.stage],
+      stage: this.state.stage,
     };
 
     return {
@@ -28,7 +29,7 @@ export default class GameEngine {
     this.state.opponentId = opponentId;
 
     const updateObj = {
-      stage: GE_TO_AC_MAPPING[this.state.stage],
+      stage: this.state.stage,
     };
 
     return {
@@ -41,9 +42,23 @@ export default class GameEngine {
     this.state.stage = GE_STAGES.PREFUND_SENT;
 
     const updateObj = {
-      stage: GE_TO_AC_MAPPING[this.state.stage],
+      stage: this.state.stage,
     };
 
+    return {
+      updateObj,
+    };
+  }
+
+  returnToOpponentSelection() {
+    this.state.stage = GE_STAGES.SELECT_CHALLENGER;
+
+    const updateObj = {
+      stage: this.state.stage,
+    };
+
+    // TODO: should we clear all other competitor info so that the state isn't dirty with the
+    // previous opponent's data?
     return {
       updateObj,
     };
