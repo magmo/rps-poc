@@ -16,13 +16,6 @@ class RpsGame {
   static revealState({ channel, resolution, turnNum, stake, aPlay, bPlay, salt}) {
     return new RevealState(...arguments);
   }
-
-  // Returns 2 if playerA won, 1 if a draw, 0 if playerB won
-  static aWinningsMultiplier(aPlay, bPlay) {
-    const diff = aPlay - bPlay;
-    // if diff == 1 (mod 3) => a won, 0 (mod 3) => draw, -1 (mod 3) => b won
-    return (diff + 4) % 3;
-  }
 }
 
 RpsGame.Plays = new Enum(['NONE', 'ROCK', 'PAPER', 'SCISSORS', 'NONE']);
