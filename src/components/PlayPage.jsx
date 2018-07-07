@@ -35,7 +35,7 @@ export default class PlayPage extends React.PureComponent {
     this.state = {
       // any frontend only state goes here...
       opponents: [],
-      stage: GE_TO_AC_MAPPING[this.ge.init().updateObj.state],
+      stage: GE_TO_AC_MAPPING[this.ge.init().updateObj.stage],
     };
 
     _.bindAll(this, [
@@ -46,7 +46,7 @@ export default class PlayPage extends React.PureComponent {
       'confirmWager',
       'cancelGame',
       'returnToStart',
-      'handleReturnMessage',
+      'handleGameEngineMessage',
 
       // command handlers
       'sendPreFundMessage',
@@ -72,49 +72,71 @@ export default class PlayPage extends React.PureComponent {
   }
 
   selectChallenge({ stake, opponentId }) {
-    const returnMessage = GE_TO_AC_MAPPING[this.ge.selectChallenge({ stake, opponentId })];
-    this.handleReturnMessage(returnMessage);
+    const gameEngineMessage = this.ge.selectChallenge({ stake, opponentId });
+    this.handleGameEngineMessage(gameEngineMessage);
   }
 
   sendPreFundMessage() {
     // TODO: Send pre-fund proposal message
     console.log('sending pre-fund proposal message');
 
-    const returnMessage = GE_TO_AC_MAPPING[this.ge.preFundProposalSent()];
+    const gameEngineMessage = this.ge.preFundProposalSent();
     // This is just to add a delay so that we can see the various states
-    setTimeout(() => this.handleReturnMessage(returnMessage), 1500);
+    setTimeout(() => this.handleGameEngineMessage(gameEngineMessage), 1500);
   }
 
   sendPostFundMessage() {
-    // TODO: Send pre-fund proposal message
+    // TODO: Send post-fund proposal message
     console.log('sending post-fund message');
 
-    const returnMessage = GE_TO_AC_MAPPING[this.ge.preFundProposalSent()];
-    this.handleReturnMessage(returnMessage);
+    const gameEngineMessage = this.ge.preFundProposalSent();
+    this.handleGameEngineMessage(gameEngineMessage);
   }
 
   handleReturnToOpponentSelection() {
-    const returnMessage = GE_TO_AC_MAPPING[this.ge.returnToOpponentSelection()];
-    this.handleReturnMessage(returnMessage);
+    const gameEngineMessage = this.ge.returnToOpponentSelection();
+    this.handleGameEngineMessage(gameEngineMessage);
   }
 
   selectPlay(selectedPlay) {
+    // TODO: Convert to new game engine method
     this.setState({ stage: AC_VIEWS.WAITING_FOR_PLAYER, selectedPlayId: selectedPlay });
   }
 
   confirmWager() {
     // TODO: Send message to player A
+    // TODO: Convert to new game engine method
     this.setState({ stage: AC_VIEWS.WAIT_FOR_PLAYER });
   }
 
   cancelGame() {
     // TODO: Send message to opponent
+    // TODO: Convert to new game engine method
     this.setState({ stage: AC_VIEWS.GAME_CANCELLED_BY_YOU });
   }
 
   returnToStart() {
     // TODO: Send message to opponent
+    // TODO: Convert to new game engine method
     this.setState({ stage: AC_VIEWS.SELECT_CHALLENGER });
+  }
+
+  handleGameEngineMessage(gameEngineMessage) {
+    if (!gameEngineMessage) {
+      console.error('gameEngineMessage from Game Engine passed as null');
+      return;
+    }
+
+    if (gameEngineMessage.updateObj) {
+      this.setState(gameEngineMessage.updateObj);
+    }
+
+    if (gameEngineMessage.command) {
+      if (!this.commandMapping[gameEngineMessage.command]) {
+        console.error('command from Game Engine not found in mapping');
+      }
+      this.commandMapping[gameEngineMessage.command]();
+    }
   }
 
   // Firebase API calls
@@ -130,23 +152,12 @@ export default class PlayPage extends React.PureComponent {
     });
   }
 
-  handleReturnMessage(returnMessage) {
-    if (returnMessage.updateObj) {
-      this.setState(returnMessage.updateObj);
-    }
-
-    if (returnMessage.command) {
-      if (!this.commandMapping[returnMessage.command]) {
-        console.error('command from Game Engine not found in mapping');
-      }
-      this.commandMapping[returnMessage.command]();
-    }
-  }
-
   render() {
     const { stage, selectedPlayId, opponentPlayId, opponents } = this.state;
 
-    switch (stage) {
+    const stageView = GE_TO_AC_MAPPING[stage];
+
+    switch (stageView) {
       case AC_VIEWS.SELECT_CHALLENGER:
         return (
           <OpponentSelectionStep

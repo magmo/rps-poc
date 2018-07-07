@@ -12,7 +12,7 @@ export default class GameEngine {
   }
 
   init() {
-    this.state.stage = GE_STAGES.GAME_CONCLUDED;
+    this.state.stage = GE_STAGES.SELECT_CHALLENGER;
 
     const updateObj = {
       stage: this.state.stage,
@@ -62,25 +62,6 @@ export default class GameEngine {
     return {
       updateObj,
     };
-  }
-
-  selectPlay(selectedPlay) {
-    this.setState({ stage: GE_STAGES.WAIT_FOR_OPPONENT_PLAY, selectedPlayId: selectedPlay });
-  }
-
-  confirmWager() {
-    // TODO: Send message to player A
-    this.setState({ stage: GE_STAGES.WAIT_FOR_PLAYER });
-  }
-
-  cancelGame() {
-    // TODO: Send message to opponent
-    this.setState({ stage: GE_STAGES.GAME_CANCELLED_BY_YOU });
-  }
-
-  returnToStart() {
-    // TODO: Send message to opponent
-    this.setState({ stage: GE_STAGES.SELECT_CHALLENGER });
   }
 }
 
