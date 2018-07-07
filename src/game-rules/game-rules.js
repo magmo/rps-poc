@@ -41,9 +41,9 @@ class RpsState extends State {
     this.stake = stake;
   }
 
-  isPreReveal() { return true; }
+  _isPreReveal() { return true; }
 
-  static hashCommitment(play, salt) {
+  static _hashCommitment(play, salt) {
     return soliditySha3(
       { type: 'uint256', value: play.value },
       { type: 'bytes32', value: padBytes32(salt) }
@@ -57,8 +57,8 @@ class RpsState extends State {
       toHex32(this.stake || 0).substr(2) +
       padBytes32(this.preCommit || "0x0").substr(2) +
       toHex32(this.bPlay.value).substr(2) +
-      toHex32(this.isPreReveal() ? 0 : this.aPlay.value).substr(2) +
-      padBytes32(this.isPreReveal() ? "0x0" : this.salt || "0x0").substr(2)
+      toHex32(this._isPreReveal() ? 0 : this.aPlay.value).substr(2) +
+      padBytes32(this._isPreReveal() ? "0x0" : this.salt || "0x0").substr(2)
     );
   }
 }
@@ -85,7 +85,7 @@ class ProposeState extends RpsState {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
     this.positionType = RpsGame.PositionTypes.ROUNDPROPOSED;
-    this.preCommit = this.constructor.hashCommitment(aPlay, salt);
+    this.preCommit = this.constructor._hashCommitment(aPlay, salt);
   }
 }
 
@@ -103,7 +103,7 @@ class RevealState extends RpsState {
     this.stateType = State.StateTypes.GAME;
     this.positionType = RpsGame.PositionTypes.REVEAL;
   }
-  isPreReveal() { return false; };
+  _isPreReveal() { return false; };
 }
 
 class RestState extends RpsState {
@@ -112,7 +112,7 @@ class RestState extends RpsState {
     this.stateType = State.StateTypes.GAME;
     this.positionType = RpsGame.PositionTypes.RESTING;
   }
-  isPreReveal() { return false; };
+  _isPreReveal() { return false; };
 }
 
 class ConclusionState extends RpsState {
