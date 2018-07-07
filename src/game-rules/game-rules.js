@@ -31,7 +31,7 @@ RpsGame.PositionTypes = new Enum(['NONE', 'RESTING', 'ROUNDPROPOSED', 'ROUNDACCE
 
 export { RpsGame };
 
-class RpsBaseState extends State {
+class RpsState extends State {
   constructor({ channel, stateType, stateCount, resolution, turnNum, preCommit, stake, aPlay, bPlay, salt }) {
     super({ channel, stateCount, resolution, turnNum });
     this.preCommit = preCommit;
@@ -64,7 +64,7 @@ class RpsBaseState extends State {
 }
 
 // needs to store/copy game-specific attributes, but needs to behave like a framework state
-class InitializationState extends RpsBaseState {
+class InitializationState extends RpsState {
   constructor({ channel, stateCount, resolution, turnNum }) {
     super(...arguments);
     this.stateType = State.StateTypes.PREFUNDSETUP;
@@ -72,7 +72,7 @@ class InitializationState extends RpsBaseState {
   }
 }
 
-class FundConfirmationState extends RpsBaseState {
+class FundConfirmationState extends RpsState {
   constructor({ channel, stateCount, resolution, turnNum }) {
     super(...arguments);
     this.stateType = State.StateTypes.POSTFUNDSETUP;
@@ -80,7 +80,7 @@ class FundConfirmationState extends RpsBaseState {
   }
 }
 
-class ProposeState extends RpsBaseState {
+class ProposeState extends RpsState {
   constructor({ channel, resolution, turnNum, stake, aPlay, salt }) {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
@@ -89,7 +89,7 @@ class ProposeState extends RpsBaseState {
   }
 }
 
-class AcceptState extends RpsBaseState {
+class AcceptState extends RpsState {
   constructor({ channel, resolution, turnNum, stake, preCommit, bPlay }) {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
@@ -97,7 +97,7 @@ class AcceptState extends RpsBaseState {
   }
 }
 
-class RevealState extends RpsBaseState {
+class RevealState extends RpsState {
   constructor({ channel, resolution, turnNum, stake, aPlay, bPlay, salt}) {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
@@ -106,7 +106,7 @@ class RevealState extends RpsBaseState {
   isPreReveal() { return false; };
 }
 
-class RestState extends RpsBaseState {
+class RestState extends RpsState {
   constructor({ channnel, resolution, turnNum }) {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
@@ -115,7 +115,7 @@ class RestState extends RpsBaseState {
   isPreReveal() { return false; };
 }
 
-class ConclusionState extends RpsBaseState {
+class ConclusionState extends RpsState {
   constructor({ channel, resolution, turnNum }) {
     super(...arguments);
     this.stateType = State.StateTypes.CONCLUDE;
