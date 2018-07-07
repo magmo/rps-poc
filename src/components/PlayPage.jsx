@@ -35,7 +35,7 @@ export default class PlayPage extends React.PureComponent {
     this.state = {
       // any frontend only state goes here...
       opponents: [],
-      ...this.ge.init().updateObj,
+      stage: GE_TO_AC_MAPPING[this.ge.init().updateObj.state],
     };
 
     _.bindAll(this, [
