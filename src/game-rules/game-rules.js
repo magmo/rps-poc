@@ -65,10 +65,10 @@ class RpsState extends State {
     let channelType = state.substr(0, 64);
     state = state.substr(64);
 
-    let channelNonce = state.substr(0, 64);
+    let channelNonce = extractBytes32(state);
     state = state.substr(64);
 
-    let numberOfParticipants = state.substr(0, 64);
+    let numberOfParticipants = extractBytes32(state);
     state = state.substr(64);
 
     let participants = [];
@@ -79,41 +79,41 @@ class RpsState extends State {
     }
     let channel = new Channel(channelType, channelNonce, participants);
 
-    let stateType = state.substr(0, 64);
+    let stateType = extractBytes32(state);
     state = state.substr(64);
 
-    let turnNum = state.substr(0, 64);
+    let turnNum = extractBytes32(state);
     state = state.substr(64);
 
-    let stateCount = state.substr(0, 64);
+    let stateCount = extractBytes32(state);
     state = state.substr(64);
 
     let resolution = []
     for (let i = 0; i < numberOfParticipants; i++ ) {
-      resolution.push(state.substr(0, 64));
+      resolution.push(extractBytes32(state));
       state = state.substr(64);
     }
 
     // Game state
-    let positionType = parseInt('0x' + state.substr(0, 64));
+    let positionType = extractBytes32(state);
     positionType = RpsGame.PositionTypes.get(parseInt(positionType))
     state = state.substr(64);
 
-    let stake = parseInt('0x' + state.substr(0, 64));
+    let stake = extractBytes32(state);
     state = state.substr(64);
 
-    let preCommit = '0x' + state.substr(0, 64);
+    let preCommit = extractBytes32(state);
     state = state.substr(64);
 
-    let bPlay = parseInt('0x' + state.substr(0, 64));
+    let bPlay = extractBytes32(state);
     bPlay = RpsGame.Plays.get(bPlay) || RpsGame.Plays.NONE;
     state = state.substr(64);
 
-    let aPlay = parseInt('0x' + state.substr(0, 64));
-    // let aPlay = extractBytes32(state);
+    let aPlay = extractBytes32(state);
     aPlay = RpsGame.Plays.get(aPlay) || RpsGame.Plays.NONE;
     state = state.substr(64);
 
+    // TODO: This should probably be extractBytes32
     let salt = state.substr(0, 64);
     state = state.substr(64);
 
@@ -132,6 +132,10 @@ class RpsState extends State {
 
     return state
   }
+}
+
+function extractBytes32(s) {
+  return parseInt('0x' + s.substr(0, 64));
 }
 
 export { RpsState };
