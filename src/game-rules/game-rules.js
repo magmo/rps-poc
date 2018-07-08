@@ -56,7 +56,85 @@ class RpsState extends State {
       padBytes32(this._isPreReveal() ? "0x0" : this.salt || "0x0").substr(2)
     );
   }
+
+  static fromHex(state) {
+    state = state.substr(2);
+
+    // Universal deserialization
+    // TODO: This should be in the fmg-core package
+    let channelType = state.substr(0, 64);
+    state = state.substr(64);
+
+    let channelNonce = state.substr(0, 64);
+    state = state.substr(64);
+
+    let numberOfParticipants = state.substr(0, 64);
+    state = state.substr(64);
+
+    let participants = [];
+
+    for (let i = 0; i < numberOfParticipants; i++ ) {
+      participants.push(state.substr(0, 64));
+      state = state.substr(64);
+    }
+    let channel = new Channel(channelType, channelNonce, participants);
+
+    let stateType = state.substr(0, 64);
+    state = state.substr(64);
+
+    let turnNum = state.substr(0, 64);
+    state = state.substr(64);
+
+    let stateCount = state.substr(0, 64);
+    state = state.substr(64);
+
+    let resolution = []
+    for (let i = 0; i < numberOfParticipants; i++ ) {
+      resolution.push(state.substr(0, 64));
+      state = state.substr(64);
+    }
+
+    // Game state
+    let positionType = parseInt('0x' + state.substr(0, 64));
+    positionType = RpsGame.PositionTypes.get(parseInt(positionType))
+    state = state.substr(64);
+
+    let stake = parseInt('0x' + state.substr(0, 64));
+    state = state.substr(64);
+
+    let preCommit = '0x' + state.substr(0, 64);
+    state = state.substr(64);
+
+    let bPlay = parseInt('0x' + state.substr(0, 64));
+    bPlay = RpsGame.Plays.get(bPlay) || RpsGame.Plays.NONE;
+    state = state.substr(64);
+
+    let aPlay = parseInt('0x' + state.substr(0, 64));
+    // let aPlay = extractBytes32(state);
+    aPlay = RpsGame.Plays.get(aPlay) || RpsGame.Plays.NONE;
+    state = state.substr(64);
+
+    let salt = state.substr(0, 64);
+    state = state.substr(64);
+
+    if (positionType.is('RESTING')) {
+      state = new RestState({channel, stateCount, resolution, turnNum, stake});
+    }
+    else if (positionType.is('ROUNDPROPOSED')) {
+      state = new ProposeState({channel, resolution, turnNum, stake, aPlay, salt});
+    }
+    else if (positionType.is('ROUNDACCEPTED')) {
+      state = new AcceptState({channel, resolution, turnNum, stake, preCommit, bPlay});
+    }
+    else if (positionType.is('REVEAL')) {
+      state = new RevealState({channel, resolution, turnNum, stake, aPlay, bPlay, salt})
+    }
+
+    return state
+  }
 }
+
+export { RpsState };
 
 // needs to store/copy game-specific attributes, but needs to behave like a framework state
 class InitializationState extends RpsState {
