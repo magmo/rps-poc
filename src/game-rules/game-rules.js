@@ -20,7 +20,7 @@ class RpsGame {
   }
 }
 
-RpsGame.Plays = new Enum(['NONE', 'ROCK', 'PAPER', 'SCISSORS', 'NONE']);
+RpsGame.Plays = new Enum(['NONE', 'ROCK', 'PAPER', 'SCISSORS']);
 
 RpsGame.PositionTypes = new Enum(['NONE', 'RESTING', 'ROUNDPROPOSED', 'ROUNDACCEPTED', 'REVEAL', 'NONE'])
 
