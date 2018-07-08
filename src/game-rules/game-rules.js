@@ -101,10 +101,11 @@ class RevealState extends RpsState {
 }
 
 class RestState extends RpsState {
-  constructor({ channnel, resolution, turnNum }) {
+  constructor({ channnel, resolution, turnNum, stake }) {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
     this.positionType = RpsGame.PositionTypes.RESTING;
+    this.stake = stake;
   }
   _isPreReveal() { return false; };
 }
