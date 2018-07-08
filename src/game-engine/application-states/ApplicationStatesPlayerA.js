@@ -35,69 +35,69 @@ class WaitForBlockchainDeploy {
 }
 
 class WaitForBToDeploy {
-    constructor({ channel, stake, balances, adjAddress }) {
+    constructor({ channel, stake, balances, adjudicator }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
     }
 }
 
 class ReadyToSendPostFundSetup0 {
-    constructor({ channel, stake, balances, adjAddress, signedPostFundSetup0Message }) {
+    constructor({ channel, stake, balances, adjudicator, signedPostFundSetup0Message }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
         this.message = signedPostFundSetup0Message;
     }
 }
 
 class WaitForPostFundSetup1 {
-    constructor({ channel, stake, balances, adjAddress, signedPostFundSetup0Message }) {
+    constructor({ channel, stake, balances, adjudicator, signedPostFundSetup0Message }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
         this.message = signedPostFundSetup0Message; // in case a resend is required
     }
 }
 
 class ReadyToChooseAPlay {
-    constructor({ channel, stake, balances, adjAddress }) {
+    constructor({ channel, stake, balances, adjudicator }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
     }
 }
 
 class ReadyToSendPropose {
-    constructor({ channel, stake, balances, adjAddress, aPlay, salt, signedProposeMessage }) {
+    constructor({ channel, stake, balances, adjudicator, aPlay, salt, signedProposeMessage }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
         this.aPlay = aPlay;
         this.salt = salt;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
         this.message = signedProposeMessage;
     }
 }
 
 class WaitForAccept {
-    constructor({ channel, stake, balances, adjAddress, aPlay, salt, signedProposeMessage }) {
+    constructor({ channel, stake, balances, adjudicator, aPlay, salt, signedProposeMessage }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
         this.aPlay = aPlay;
         this.salt = salt;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
         this.message = signedProposeMessage; // in case a resend is required
     }
 }
 
 class ReadyToSendReveal {
-    constructor({ channel, stake, balances, adjAddress, aPlay, bPlay, result, salt, signedRevealMessage }) {
+    constructor({ channel, stake, balances, adjudicator, aPlay, bPlay, result, salt, signedRevealMessage }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
@@ -105,13 +105,13 @@ class ReadyToSendReveal {
         this.bPlay = bPlay;
         this.result = result; // win/lose/draw
         this.salt = salt;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
         this.message = signedRevealMessage;
     }
 }
 
 class WaitForResting {
-    constructor({ channel, stake, balances, adjAddress, aPlay, bPlay, result, salt, signedRevealMessage }) {
+    constructor({ channel, stake, balances, adjudicator, aPlay, bPlay, result, salt, signedRevealMessage }) {
         this._channel = channel;
         this._balances = balances;
         this.stake = stake;
@@ -119,7 +119,7 @@ class WaitForResting {
         this.bPlay = bPlay;
         this.result = result; // win/lose/draw
         this.salt = salt;
-        this.adjAddress = adjAddress;
+        this.adjudicator = adjudicator;
         this.message = signedRevealMessage; // in case a resend is required
     }
 }
