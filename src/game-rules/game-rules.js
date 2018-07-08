@@ -8,7 +8,9 @@ class RpsGame {
     return new RestState(...arguments);
   }
   static proposeState({ channel, resolution, turnNum, stake, aPlay, salt }) {
-    return new ProposeState(...arguments);
+    let preCommit = ProposeState._hashCommitment(aPlay, salt)
+    var args = [].slice.call(arguments);
+    return new ProposeState(...args.slice(0,4).concat([preCommit]));
   }
   static acceptState({ channel, resolution, turnNum, stake, preCommit, bPlay }) {
     return new AcceptState(...arguments);
@@ -74,11 +76,10 @@ class FundConfirmationState extends RpsState {
 }
 
 class ProposeState extends RpsState {
-  constructor({ channel, resolution, turnNum, stake, aPlay, salt }) {
+  constructor({ channel, resolution, turnNum, stake, preCommit }) {
     super(...arguments);
     this.stateType = State.StateTypes.GAME;
     this.positionType = RpsGame.PositionTypes.ROUNDPROPOSED;
-    this.preCommit = this.constructor._hashCommitment(aPlay, salt);
   }
 }
 
