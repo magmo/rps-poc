@@ -8,7 +8,7 @@ class RpsGame {
     return new RestState(...arguments);
   }
   static proposeState({ channel, resolution, turnNum, stake, aPlay, salt }) {
-    let preCommit = ProposeState._hashCommitment(aPlay, salt)
+    let preCommit = ProposeState.hashCommitment(aPlay, salt)
     var args = [].slice.call(arguments);
     return new ProposeState(...args.slice(0,4).concat([preCommit]));
   }
@@ -38,7 +38,7 @@ class RpsState extends State {
 
   _isPreReveal() { return true; }
 
-  static _hashCommitment(play, salt) {
+  static hashCommitment(play, salt) {
     return soliditySha3(
       { type: 'uint256', value: play.value },
       { type: 'bytes32', value: padBytes32(salt) }
