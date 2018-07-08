@@ -94,6 +94,14 @@ class RpsState extends State {
       state = state.substr(64);
     }
 
+    if (stateType === 0) { // PreFundSetup
+      return new InitializationState({channel, stateCount, resolution, turnNum});
+    } else if (stateType === 1) { // PostFundSetup
+      return new FundConfirmationState({channel, stateCount, resolution, turnNum})
+    } else if (stateType === 3) { // Conclude
+      return new ConclusionState({channel, resolution, turnNum})
+    }
+
     // Game state
     let positionType = extractBytes32(state);
     positionType = RpsGame.PositionTypes.get(parseInt(positionType))

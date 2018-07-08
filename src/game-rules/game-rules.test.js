@@ -6,6 +6,7 @@ test('fromHex', () => {
     let resolution = [1,2];
     let turnNum = 511;
     let stake = 63;
+    // TODO: Test InitializationState, FundConfirmationState, and ConclusionState
 
     let s = RpsGame.restingState({channel, resolution, turnNum, stake});
     let h = s.toHex();
