@@ -10,25 +10,25 @@ test('fromHex', () => {
 
     let s = RpsGame.restingState({channel, resolution, turnNum, stake});
     let h = s.toHex();
-    let h2 = (RpsState.fromHex(h)).toHex()
-    expect(h).toBe(h2)
+    let s2 = RpsState.fromHex(h)
+    expect(s).toEqual(s2)
 
     let aPlay = RpsGame.Plays.ROCK;
-    let salt = 'xyz';
+    let salt = '0xabc';
     s = RpsGame.proposeState({channel, resolution, turnNum, stake, aPlay, salt});
     h = s.toHex();
-    h2 = (RpsState.fromHex(h)).toHex()
-    expect(h).toBe(h2)
+    s2 = RpsState.fromHex(h)
+    expect(s).toEqual(s2)
 
     let bPlay = RpsGame.Plays.SCISSORS;
-    let precommit = 'abbb5caa7dda850e60932de0934eb1f9d0f59695050f761dc64e443e5030a569';
-    s = RpsGame.acceptState({channel, resolution, turnNum, stake, precommit, bPlay});
+    let preCommit = '0xabbb5caa7dda850e60932de0934eb1f9d0f59695050f761dc64e443e5030a569';
+    s = RpsGame.acceptState({channel, resolution, turnNum, stake, preCommit, bPlay});
     h = s.toHex();
-    h2 = (RpsState.fromHex(h)).toHex()
-    expect(h).toBe(h2)
+    s2 = RpsState.fromHex(h)
+    expect(s).toEqual(s2)
 
     s = RpsGame.revealState({channel, resolution, turnNum, stake, aPlay, bPlay, salt});
     h = s.toHex();
-    h2 = (RpsState.fromHex(h)).toHex()
-    expect(h).toBe(h2)
+    s2 = RpsState.fromHex(h)
+    expect(s).toEqual(s2)
 });
