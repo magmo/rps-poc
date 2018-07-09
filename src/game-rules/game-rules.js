@@ -62,7 +62,7 @@ class RpsState extends State {
 
     // Universal deserialization
     // TODO: This should be in the fmg-core package
-    let channelType = state.substr(0, 64);
+    let channelType = extractBytes(state);
     state = state.substr(64);
 
     let channelNonce = extractBytes32(state);
@@ -74,7 +74,8 @@ class RpsState extends State {
     let participants = [];
 
     for (let i = 0; i < numberOfParticipants; i++ ) {
-      participants.push(state.substr(0, 64));
+      let participant = extractBytes(state);
+      participants.push(participant);
       state = state.substr(64);
     }
     let channel = new Channel(channelType, channelNonce, participants);
@@ -110,7 +111,7 @@ class RpsState extends State {
     let stake = extractBytes32(state);
     state = state.substr(64);
 
-    let preCommit = extractBytes32(state);
+    let preCommit = extractBytes(state);
     state = state.substr(64);
 
     let bPlay = extractBytes32(state);
@@ -122,7 +123,7 @@ class RpsState extends State {
     state = state.substr(64);
 
     // TODO: This should probably be extractBytes32
-    let salt = state.substr(0, 64);
+    let salt = extractBytes(state);
     state = state.substr(64);
 
     if (positionType.is('RESTING')) {
@@ -144,6 +145,10 @@ class RpsState extends State {
 
 function extractBytes32(s) {
   return parseInt('0x' + s.substr(0, 64));
+}
+
+function extractBytes(s) {
+  return '0x' + s.substr(0, 64).replace(/^0+/, '');
 }
 
 export { RpsState };

@@ -18,7 +18,7 @@ test('fromHex', () => {
     s = RpsGame.proposeState({channel, resolution, turnNum, stake, aPlay, salt});
     h = s.toHex();
     s2 = RpsState.fromHex(h)
-    expect(s).toEqual(s2)
+    expect(s.toHex()).toEqual(s2.toHex())
 
     let bPlay = RpsGame.Plays.SCISSORS;
     let preCommit = '0xabbb5caa7dda850e60932de0934eb1f9d0f59695050f761dc64e443e5030a569';
