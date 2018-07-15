@@ -1,10 +1,9 @@
 import { GE_STAGES, GE_COMMANDS } from '../constants';
 import * as ApplicationStatesA from './application-states/ApplicationStatesPlayerA';
 import * as ApplicationStatesB from './application-states/ApplicationStatesPlayerB';
-import { Message } from './message';
+import { Message } from './Message';
 import { RpsGame, RpsState } from '../game-rules/game-rules';
-import { Channel } from 'fmg-core';
-import { State } from '../../../minimal_viable_force_move_games/packages/fmg-core/src';
+import { Channel, State } from 'fmg-core';
 
 export default class GameEngine {
   constructor({ gameLibraryAddress, channelWallet, applicationController }) {
