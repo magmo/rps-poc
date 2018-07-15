@@ -6,10 +6,9 @@ import { RpsGame, RpsState } from '../game-rules/game-rules';
 import { Channel, State } from 'fmg-core';
 
 export default class GameEngine {
-  constructor({ gameLibraryAddress, channelWallet, applicationController }) {
+  constructor({ gameLibraryAddress, channelWallet }) {
     this.gameLibraryAddress = gameLibraryAddress;
     this.channelWallet = channelWallet;
-    this.applicationController = applicationController;
     this.state = {
       selectedPlayId: null,
       opponentMoveId: null,
@@ -110,7 +109,7 @@ export default class GameEngine {
     if (stateType === ApplicationStatesA.WaitForPreFundSetup1) {
       newState = new ApplicationStatesA.ReadyToDeploy({
         ...oldState.commonAttributes,
-        deploymentTransaction: this.applicationController.deployGame()
+        deploymentTransaction: "the gameEngine needs to construct this"
       })
     } else if (stateType === ApplicationStatesB.WaitForPostFundSetup0) {
       newState = new ApplicationStatesB.ReadyToSendPostFundSetup1({
@@ -169,7 +168,7 @@ export default class GameEngine {
       newState = new ApplicationStatesB.ReadyToDeposit({
         ...oldState.commonAttributes,
         adjudicator: event.adjudicator,
-        depositTransaction: this.applicationController.depositFunds()
+        depositTransaction: "the gameEngine needs to construct this"
       })
     }
 
