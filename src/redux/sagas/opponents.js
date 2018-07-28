@@ -8,22 +8,22 @@ import {
 
 const opponentsTransformer = ({ value }) => Object.keys(value).map(key => ({
   ...value[key],
-  id: key
+  id: key,
 }));
 
-function * syncOpponentsSaga () {
+function* syncOpponentsSaga() {
   yield fork(
     reduxSagaFirebase.database.sync,
     'players',
     {
       successActionCreator: syncOpponents,
       transform: opponentsTransformer,
-    }
+    },
   );
 }
 
-export default function * opponentSaga () {
-  while( yield take(types.OPPONENTS.SUBSCRIBE) ) {
+export default function* opponentSaga() {
+  while (yield take(types.OPPONENTS.SUBSCRIBE)) {
     const opponentSyncer = yield fork(syncOpponentsSaga);
 
     yield take(types.OPPONENTS.UNSUBSCRIBE);

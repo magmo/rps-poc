@@ -1,35 +1,18 @@
 import { call } from 'redux-saga/effects';
 
-import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
+import firebase, { reduxSagaFirebase } from '../../gateways/firebase';
 import ChannelWallet from '../../game-engine/ChannelWallet';
-
-export function* fetchOrCreateWallet(uid) {
-  if (!uid) { return null; }
-
-  let wallet = yield fetchWallet(uid);
-
-  if (!wallet) {
-    yield createWallet(uid);
-    // fetch again instead of using return val, just in case another wallet was created in the interim
-    wallet = yield fetchWallet(uid);
-  }
-
-  return wallet;
-}
 
 const walletTransformer = (data) => ({
   ...data.val(),
   id: data.key,
 });
 
-const walletRef = (uid) => {
-  return firebase.database()
-                 .ref('wallets')
-                 .orderByChild('uid')
-                 .equalTo(uid)
-                 .limitToFirst(1);
-}
-
+const walletRef = (uid) => firebase.database()
+                                   .ref('wallets')
+                                   .orderByChild('uid')
+                                   .equalTo(uid)
+                                   .limitToFirst(1);
 
 function* fetchWallet(uid) {
   const query = walletRef(uid);
@@ -50,10 +33,24 @@ function* createWallet(uid) {
   const newWallet = new ChannelWallet();
 
   const walletParams = {
-    uid: uid,
+    uid,
     privateKey: newWallet.privateKey,
     address: newWallet.address,
-  }
+  };
 
   return yield call(reduxSagaFirebase.database.create, 'wallets', walletParams);
+}
+
+export function* fetchOrCreateWallet(uid) {
+  if (!uid) { return null; }
+
+  let wallet = yield fetchWallet(uid);
+
+  if (!wallet) {
+    yield createWallet(uid);
+    // fetch again instead of using return val, just in case another wallet was created in the interim
+    wallet = yield fetchWallet(uid);
+  }
+
+  return wallet;
 }

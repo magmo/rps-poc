@@ -1,5 +1,7 @@
 import firebase from 'firebase';
-import { call, fork, put, take, takeEvery, cancel } from 'redux-saga/effects';
+import {
+  call, fork, put, take, takeEvery, cancel,
+} from 'redux-saga/effects';
 
 import {
   types,
@@ -14,7 +16,7 @@ import { fetchOrCreatePlayer, playerHeartbeatSaga } from './player';
 
 const authProvider = new firebase.auth.GoogleAuthProvider();
 
-function * loginSaga () {
+function* loginSaga() {
   try {
     yield call(reduxSagaFirebase.auth.signInWithPopup, authProvider);
     // successful login will trigger the loginStatusWatcher, which will update the state
@@ -23,7 +25,7 @@ function * loginSaga () {
   }
 }
 
-function * logoutSaga () {
+function* logoutSaga() {
   try {
     yield call(reduxSagaFirebase.auth.signOut);
     // successful logout will trigger the loginStatusWatcher, which will update the state
@@ -32,7 +34,7 @@ function * logoutSaga () {
   }
 }
 
-function * loginStatusWatcherSaga () {
+function* loginStatusWatcherSaga() {
   // Events on this channel are triggered on login and logout
   const channel = yield call(reduxSagaFirebase.auth.channel);
   let playerHeartbeatThread;
@@ -56,10 +58,10 @@ function * loginStatusWatcherSaga () {
   }
 }
 
-export default function * loginRootSaga () {
+export default function* loginRootSaga() {
   yield fork(loginStatusWatcherSaga);
   yield [
     takeEvery(types.LOGIN.REQUEST, loginSaga),
-    takeEvery(types.LOGOUT.REQUEST, logoutSaga)
+    takeEvery(types.LOGOUT.REQUEST, logoutSaga),
   ];
 }
