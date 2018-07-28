@@ -14,7 +14,7 @@ const opponentsTransformer = ({ value }) => Object.keys(value).map(key => ({
 function * syncOpponentsSaga () {
   yield fork(
     reduxSagaFirebase.database.sync,
-    'opponents',
+    'players',
     {
       successActionCreator: syncOpponents,
       transform: opponentsTransformer,

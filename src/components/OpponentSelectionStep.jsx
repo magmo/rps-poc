@@ -9,8 +9,8 @@ const propTypes = {
   opponents: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    wager: PropTypes.number.isRequired,
-    timestamp: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    lastSeen: PropTypes.number.isRequired,
   })),
 };
 
