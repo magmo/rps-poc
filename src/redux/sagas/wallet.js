@@ -1,30 +1,21 @@
-import { call, put, take } from 'redux-saga/effects';
+import { call } from 'redux-saga/effects';
 
-import { syncWallet } from '../actions/login';
-import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
+import firebase, { reduxSagaFirebase } from '../../gateways/firebase';
 import ChannelWallet from '../../game-engine/ChannelWallet';
-
-export function* fetchOrCreateWallet(uid) {
-  if (!uid) { return null; }
-
-  let wallet = yield fetchWallet(uid);
-
-  if (!wallet) {
-    yield createWallet(uid);
-    // fetch again instead of using return val, just in case another wallet was created in the interim
-    wallet = yield fetchWallet(uid);
-  }
-
-  return wallet;
-}
 
 const walletTransformer = (data) => ({
   ...data.val(),
   id: data.key,
 });
 
+const walletRef = (uid) => firebase.database()
+                                   .ref('wallets')
+                                   .orderByChild('uid')
+                                   .equalTo(uid)
+                                   .limitToFirst(1);
+
 function* fetchWallet(uid) {
-  const query = firebase.database().ref('wallets').orderByChild('uid').equalTo(uid).limitToFirst(1);
+  const query = walletRef(uid);
 
   // const wallet = yield call(reduxSagaFirebase.database.read, query);
   // ^ doesn't work as it returns an object like {-LIGGQQEI6OlWoveTPsq: {address: ... } }
@@ -42,24 +33,24 @@ function* createWallet(uid) {
   const newWallet = new ChannelWallet();
 
   const walletParams = {
-    uid: uid,
+    uid,
     privateKey: newWallet.privateKey,
     address: newWallet.address,
-  }
+  };
 
   return yield call(reduxSagaFirebase.database.create, 'wallets', walletParams);
 }
 
-export function * walletWatcherSaga(wallet) {
-  const channel = yield call(reduxSagaFirebase.database.channel, `wallets/${wallet.id}`);
+export function* fetchOrCreateWallet(uid) {
+  if (!uid) { return null; }
 
-  while (true) {
-    const { updatedWallet } = yield take(channel);
-    if (updatedWallet) {
-      yield put(syncWallet(updatedWallet));
-    } else { // someone has deleted the wallet remotely
-      const recreatedWallet = yield fetchOrCreateWallet(wallet.uid);
-      yield put(syncWallet(recreatedWallet));
-    }
+  let wallet = yield fetchWallet(uid);
+
+  if (!wallet) {
+    yield createWallet(uid);
+    // fetch again instead of using return val, just in case another wallet was created in the interim
+    wallet = yield fetchWallet(uid);
   }
+
+  return wallet;
 }

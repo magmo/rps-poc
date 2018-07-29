@@ -1,5 +1,6 @@
-import { types } from '../actions/game';
 import { Channel } from 'fmg-core';
+
+import { types } from '../actions/game';
 import * as playerA from '../../game-engine/application-states/ApplicationStatesPlayerA';
 
 // Fake data for development purposes
@@ -15,10 +16,10 @@ const bBal = 5;
 const balances = [aBal, bBal];
 const coreProps = { channel, stake, balances };
 const adjudicator = 0xc;
-const aPlay = "rock";
-const bPlay = "scissors";
+const aPlay = 'rock';
+const bPlay = 'scissors';
 
-const salt = "abc123";
+const salt = 'abc123';
 
 // todo: rewrite this to use the gameEngine and return actual data
 export default function gameReducer(state = {}, action = {}) {
@@ -80,6 +81,6 @@ export default function gameReducer(state = {}, action = {}) {
       break;
 
     default:
-      return state
+      return state;
   }
 }

@@ -3,12 +3,12 @@ export const types = {
     SYNC: 'OPPONENTS.SYNC',
     SUBSCRIBE: 'OPPONENTS.SUBSCRIBE',
     UNSUBSCRIBE: 'OPPONENTS.UNSUBSCRIBE',
-  }
+  },
 };
 
 export const syncOpponents = opponents => ({
   type: types.OPPONENTS.SYNC,
-  opponents
+  opponents,
 });
 
 export const subscribeOpponents = () => ({
