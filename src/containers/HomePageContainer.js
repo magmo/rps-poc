@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import HomePage from '../components/HomePage';
+import HomePage from '../components/AppPage';
 import { login, logout } from '../redux/actions/login';
 
 const mapStateToProps = (state) => ({

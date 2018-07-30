@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import OpponentSelectionStep from './OpponentSelectionStep';
 import WaitingStep from './WaitingStep';
+import LoginPage from './LoginPage';
 import SelectPlayStep from './SelectPlayStep';
 import { types as playerAStates } from '../game-engine/application-states/ApplicationStatesPlayerA';
 
@@ -15,7 +16,12 @@ export default class GameController extends PureComponent {
       messageSent,
       opponents,
       subscribeOpponents,
+      loggedIn,
     } = this.props;
+
+    if (!loggedIn) {
+      return <LoginPage />;
+    }
 
     switch (applicationState && applicationState.type) {
       case playerAStates.ReadyToSendPreFundSetup0:
