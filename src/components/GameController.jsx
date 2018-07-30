@@ -12,15 +12,26 @@ export default class GameController extends PureComponent {
     const {
       applicationState,
       chooseAPlay,
-      chooseOpponent,
-      messageSent,
+      proposeGame,
+      login,
+      logout,
       opponents,
       subscribeOpponents,
       loggedIn,
     } = this.props;
 
     if (!loggedIn) {
-      return <LoginPage />;
+      return <LoginPage login={login} logout={logout} loggedIn={loggedIn} />;
+    }
+
+    if (!applicationState.type) {
+      subscribeOpponents();
+      return (
+        <OpponentSelectionStep
+          proposeGame={proposeGame}
+          opponents={opponents}
+        />
+      );
     }
 
     switch (applicationState && applicationState.type) {
@@ -61,12 +72,8 @@ export default class GameController extends PureComponent {
         return <WaitingStep message="opponent to accept the outcome" />;
 
       default:
-        subscribeOpponents();
-        return <OpponentSelectionStep
-          handleMessageSent={messageSent}
-          handleCreateChallenge={chooseOpponent}
-          opponents={opponents}
-        />;
+        return null;
+        // oops something went wrong
     }
   }
 }
@@ -74,7 +81,10 @@ export default class GameController extends PureComponent {
 GameController.propTypes = {
   applicationState: PropTypes.object.isRequired,
   chooseAPlay: PropTypes.func.isRequired,
-  chooseOpponent: PropTypes.func.isRequired,
+  proposeGame: PropTypes.func.isRequired,
+  login: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired,
+  loggedIn: PropTypes.bool.isRequired,
   opponents: PropTypes.arrayOf(PropTypes.object).isRequired,
   subscribeOpponents: PropTypes.func.isRequired,
 };

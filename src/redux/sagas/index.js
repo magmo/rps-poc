@@ -8,7 +8,8 @@ import {
 } from '../actions/game';
 import opponentSaga from './opponents';
 import loginSaga from './login';
-import { getApplicationState } from '../store';
+import gameSaga from './game';
+import { getApplicationState } from '../reducers';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
 function* opponentResponseFaker() {
@@ -17,7 +18,7 @@ function* opponentResponseFaker() {
 }
 
 function* messageSender() {
-  let state = yield select(getApplicationState);
+  const state = yield select(getApplicationState);
   if (state.shouldSendMessage) {
     yield delay(2000);  // for dev purposes
     yield put(messageSent(state.message));
@@ -30,7 +31,7 @@ function* messageSender() {
 }
 
 function* blockchainResponseFaker() {
-  let state = yield select(getApplicationState);
+  const state = yield select(getApplicationState);
   if (state.type === playerAStates.WaitForBlockchainDeploy || state.type === playerAStates.WaitForBToDeposit) {
     yield delay(2000);
     yield put(eventReceived("blah"));
@@ -40,7 +41,7 @@ function* blockchainResponseFaker() {
 export default function* rootSaga() {
   yield fork(opponentSaga);
   yield fork(loginSaga);
+  yield fork(gameSaga);
   yield takeEvery('*', blockchainResponseFaker);
   yield takeEvery(types.MESSAGE_SENT, messageSender);
-  yield takeEvery(types.LOGIN_USER, loginSaga);
 }

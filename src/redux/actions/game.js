@@ -1,15 +1,20 @@
 export const types = Object.freeze({
-  CHOOSE_OPPONENT: "CHOOSE_OPPONENT",
-  CHOOSE_A_PLAY: "CHOOSE_A_PLAY",
-  MESSAGE_RECEIVED: "MESSAGE_RECEIVED",
-  EVENT_RECEIVED: "EVENT_RECEIVED",
-  MESSAGE_SENT: "MESSAGE_SENT",
+  PROPOSE_GAME: 'PROPOSE_GAME',
+  CHOOSE_A_PLAY: 'CHOOSE_A_PLAY',
+  MESSAGE_RECEIVED: 'MESSAGE_RECEIVED',
+  EVENT_RECEIVED: 'EVENT_RECEIVED',
+  MESSAGE_SENT: 'MESSAGE_SENT',
+  STATE_TRANSITIONED: 'STATE_TRANSITIONED',
 });
 
-export const chooseOpponent = (opponentAddress, stake) => ({
-  type: types.CHOOSE_OPPONENT,
+export const stateTransitioned = (state) => ({
+  type: types.STATE_TRANSITIONED,
+  state,
+});
+
+export const proposeGame = (opponentAddress) => ({
+  type: types.PROPOSE_GAME,
   opponentAddress,
-  stake,
 });
 
 export const chooseAPlay = (aPlay) => ({

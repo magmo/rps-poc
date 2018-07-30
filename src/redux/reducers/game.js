@@ -25,9 +25,8 @@ export default function gameReducer(state = {}, action = {}) {
   let signedProposeMessage;
 
   switch (action.type) {
-    case types.CHOOSE_OPPONENT:
-      signedPreFundSetup0Message = 'blah';
-      return new playerA.ReadyToSendPreFundSetup0({ ...coreProps, signedPreFundSetup0Message });
+    case types.STATE_TRANSITIONED:
+      return action.state;
 
     case types.CHOOSE_A_PLAY:
       signedProposeMessage = 'blah';

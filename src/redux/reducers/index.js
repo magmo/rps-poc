@@ -9,3 +9,8 @@ export default combineReducers({
   opponents,
   login,
 });
+
+export const getApplicationState = storeObj => storeObj.game;
+export const getWallet = storeObj => storeObj.login.wallet;
+export const getAddress = storeObj => storeObj.login.wallet.address;
+export const getUser = storeObj => storeObj.login.user;

@@ -5,9 +5,7 @@ import PropTypes from 'prop-types';
 import Button from './Button';
 
 const propTypes = {
-  handleMessageSent: PropTypes.func.isRequired,
-  handleCreateChallenge: PropTypes.func.isRequired,
-  handleSelectChallenge: PropTypes.func.isRequired,
+  proposeGame: PropTypes.func.isRequired,
   opponents: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -18,41 +16,9 @@ const propTypes = {
   ),
 };
 
-const defaultProps = {
-  opponents: [],
-};
-
 export default class OpponentSelectionStep extends React.PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.nameInput = React.createRef();
-    this.wagerInput = React.createRef();
-
-    _.bindAll(this, [
-      'onClickCreateChallenge',
-      'handleSelectChallenge',
-    ]);
-  }
-
-  onClickCreateChallenge() {
-    const { handleCreateChallenge } = this.props;
-    const name = this.nameInput.current.value;
-    const wager = Number(this.wagerInput.current.value);
-    if (!name || !wager) {
-      return;
-    }
-
-    handleCreateChallenge(name, wager);
-  }
-
-  handleSelectChallenge({ opponentId, stake }) {
-    // todo: implement logic to generate preFundMessage:
-    // this.props.handleMessageSent(preFundMessage)
-  }
-
   render() {
-    const { opponents } = this.props;
+    const { opponents, proposeGame } = this.props;
 
     return (
       <div style={{ maxWidth: '90%', margin: 'auto' }}>
@@ -81,12 +47,7 @@ export default class OpponentSelectionStep extends React.PureComponent {
                   <td>{opponent.timestamp}</td>
                   <td>
                     <Button
-                      onClick={() =>
-                        handleSelectChallenge({
-                          opponentId: opponent.id,
-                          stake: opponent.wager,
-                        })
-                      }
+                      onClick={() => proposeGame(opponent.address)}
                     >
                       Challenge
                     </Button>
@@ -95,20 +56,6 @@ export default class OpponentSelectionStep extends React.PureComponent {
               ))}
             </tbody>
           </table>
-          <form>
-            <h3>Or, create a challenge:</h3>
-            <div style={{ marginTop: 12 }}>
-              Name:
-              <input style={{ marginLeft: 12 }} type="text" name="name" ref={this.nameInput} />
-            </div>
-            <div style={{ marginTop: 12 }}>
-              Wager (in Finney):
-              <input style={{ marginLeft: 12 }} type="text" name="wager" ref={this.wagerInput} />
-            </div>
-            <div style={{ marginTop: 12 }}>
-              <Button onClick={this.onClickCreateChallenge}>Submit</Button>
-            </div>
-          </form>
         </div>
       </div>
     );
@@ -116,4 +63,3 @@ export default class OpponentSelectionStep extends React.PureComponent {
 }
 
 OpponentSelectionStep.propTypes = propTypes;
-OpponentSelectionStep.defaultProps = defaultProps;

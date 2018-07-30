@@ -16,7 +16,3 @@ const store = createStore(reducer, enhancers);
 sagaMiddleware.run(rootSaga);
 
 export default store;
-
-export const getApplicationState = storeObj => storeObj.game;
-export const getWallet = storeObj => storeObj.wallet;
-export const getUser = storeObj => storeObj.login.user;

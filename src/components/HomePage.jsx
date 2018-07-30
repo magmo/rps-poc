@@ -11,7 +11,7 @@ const propTypes = {
   loggedIn: PropTypes.bool.isRequired,
 };
 
-export default function LoginPage({ login, logout, loggedIn }) {
+export default function HomePage({ login, logout, loggedIn }) {
   let loginButton;
   if (loggedIn) {
     loginButton = <Button onClick={logout}>Logout</Button>;
@@ -52,4 +52,4 @@ export default function LoginPage({ login, logout, loggedIn }) {
   );
 }
 
-LoginPage.propTypes = propTypes;
+HomePage.propTypes = propTypes;
