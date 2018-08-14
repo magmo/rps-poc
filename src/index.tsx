@@ -1,16 +1,17 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { Provider } from 'react-redux';
+import { DrizzleProvider } from "drizzle-react";
 
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import store from './redux/store';
+import { drizzleOptions } from './drizzleOptions'
 
 render(
-  <Provider store={store}>
+  <DrizzleProvider options={drizzleOptions} store={store}>
     <App />
-  </Provider>,
+  </DrizzleProvider>,
   document.getElementById('root'),
 );
 registerServiceWorker();

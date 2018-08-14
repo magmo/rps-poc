@@ -1,7 +1,9 @@
 import { delay } from 'redux-saga';
 import {
-  put, takeEvery, select, fork,
+  put, takeEvery, select, fork, all
 } from 'redux-saga/effects';
+import { drizzleSagas } from 'drizzle'
+
 import * as playerAStates from '../../game-engine/application-states/PlayerA';
 import { GameAction, GameActionType } from '../actions/game';
 import opponentSaga from './opponents';
@@ -25,4 +27,7 @@ export default function* rootSaga() {
   yield fork(messageSaga);
   yield fork(autoOpponentSaga);
   yield takeEvery(GameActionType.STATE_CHANGED, blockchainResponseFaker);
+  yield all(
+    drizzleSagas.map(saga => fork(saga))
+  )
 }

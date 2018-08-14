@@ -1,4 +1,4 @@
-import { connect } from 'react-redux';
+import { drizzleConnect } from 'drizzle-react';
 
 import HomePage from '../components/HomePage';
 import { LoginAction } from '../redux/actions/login';
@@ -12,7 +12,8 @@ const mapDispatchToProps = {
   logout: LoginAction.logout,
 };
 
-export default connect(
+export default drizzleConnect(
+  HomePage,
   mapStateToProps,
   mapDispatchToProps,
-)(HomePage)
+)
