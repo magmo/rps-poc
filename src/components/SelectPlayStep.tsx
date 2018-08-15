@@ -3,13 +3,13 @@ import React from 'react';
 import { Play } from '../game-engine/positions';
 
 interface Props {
-  chooseAPlay: (aPlay: Play) => void;
+  choosePlay: (play: Play) => void;
   afterOpponent?: any;
 }
 
 export default class SelectPlayStep extends React.PureComponent<Props> {
   render() {
-    const { chooseAPlay, afterOpponent } = this.props;
+    const { choosePlay, afterOpponent } = this.props;
 
     return (
       <div style={{ maxWidth: '90%', margin: 'auto' }}>
@@ -24,7 +24,7 @@ export default class SelectPlayStep extends React.PureComponent<Props> {
           {Object.keys(Play).filter(key => !isNaN(Number(key))).map(option => (
             <button
               type="button"
-              onClick={() => chooseAPlay(parseInt(option,10))}
+              onClick={() => choosePlay(Play[option])}
               style={{ display: 'inline-block', width: '33%' }}
               key={option}
             >

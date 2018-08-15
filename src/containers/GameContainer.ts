@@ -11,7 +11,7 @@ const mapStateToProps = (state: ApplicationState) => ({
 });
 
 const mapDispatchToProps = {
-  chooseAPlay: GameAction.chooseAPlay,
+  choosePlay: GameAction.choosePlay,
   chooseOpponent: GameAction.chooseOpponent,
   subscribeOpponents: OpponentAction.subscribeOpponents,
   playComputer: GameAction.playComputer,

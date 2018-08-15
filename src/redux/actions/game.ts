@@ -5,7 +5,7 @@ import { State } from '../../game-engine/application-states';
 
 export enum GameActionType {
   CHOOSE_OPPONENT = 'GAME.CHOOSE_OPPONENT',
-  CHOOSE_A_PLAY = 'GAME.CHOOSE_A_PLAY',
+  CHOOSE_PLAY = 'GAME.CHOOSE_PLAY',
   EVENT_RECEIVED = 'GAME.EVENT_RECEIVED',
   MOVE_RECEIVED = 'GAME.MOVE_RECEIVED',
   MOVE_SENT = 'GAME.MOVE_SENT',
@@ -25,9 +25,9 @@ export const GameAction = {
     stake,
   }),
 
-  chooseAPlay: (aPlay: Play) => ({
-    type: GameActionType.CHOOSE_A_PLAY as typeof GameActionType.CHOOSE_A_PLAY,
-    aPlay,
+  choosePlay: (play: Play) => ({
+    type: GameActionType.CHOOSE_PLAY as typeof GameActionType.CHOOSE_PLAY,
+    play,
   }),
 
   moveReceived: (move: Move) => ({
