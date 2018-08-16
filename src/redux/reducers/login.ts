@@ -6,7 +6,7 @@ export interface LoginState {
   loggedIn: boolean,
   user: any,
   wallet: any,
-  player?: string,
+  player?: object,
 };
 
 const initialState: LoginState = {

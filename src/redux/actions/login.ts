@@ -28,7 +28,7 @@ export const LoginAction = {
     error,
   }),
 
-  loginSuccess: (user: object, wallet: ChannelWallet, player: string) => ({
+  loginSuccess: (user: object, wallet: ChannelWallet, player: object) => ({
     type: LoginActionType.LOGIN_SUCCESS as typeof LoginActionType.LOGIN_SUCCESS,
     user,
     wallet,
