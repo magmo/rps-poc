@@ -1,4 +1,3 @@
-import { ActionsUnion } from './type-helpers';
 import { Opponent } from '../reducers/opponents';
 
 export enum OpponentActionType {
@@ -22,4 +21,9 @@ export const OpponentAction = {
   }),
 }
 
-export type OpponentAction = ActionsUnion<typeof OpponentAction>;
+export type SyncOpponentsAction = ReturnType<typeof OpponentAction.syncOpponents>;
+export type SubscribeOpponentsAction = ReturnType<typeof OpponentAction.subscribeOpponents>;
+export type UnsubscribeOpponentsAction = ReturnType<typeof OpponentAction.unsubscribeOpponents>;
+
+export type OpponentAction = SyncOpponentsAction | SubscribeOpponentsAction | UnsubscribeOpponentsAction;
+

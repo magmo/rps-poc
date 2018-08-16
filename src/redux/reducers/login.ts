@@ -1,5 +1,5 @@
 import { Reducer } from 'redux';
-import { LoginActionType } from '../actions/login';
+import { LoginActionType, LoginAction } from '../actions/login';
 
 export interface LoginState {
   loading: boolean,
@@ -17,7 +17,7 @@ const initialState: LoginState = {
   player: undefined,
 };
 
-export const loginReducer: Reducer<LoginState> = (state = initialState, action) => {
+export const loginReducer: Reducer<LoginState> = (state = initialState, action:LoginAction) => {
   switch (action.type) {
     case LoginActionType.LOGIN_REQUEST:
     case LoginActionType.LOGOUT_REQUEST:

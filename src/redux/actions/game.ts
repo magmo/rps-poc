@@ -1,8 +1,7 @@
-import { ActionsUnion } from './type-helpers';
-
 import { Play } from '../../game-engine/positions';
 import Move from '../../game-engine/Move';
 import { State } from '../../game-engine/application-states';
+
 
 export enum GameActionType {
   CHOOSE_OPPONENT = 'GAME.CHOOSE_OPPONENT',
@@ -10,7 +9,7 @@ export enum GameActionType {
   EVENT_RECEIVED = 'GAME.EVENT_RECEIVED',
   MOVE_RECEIVED = 'GAME.MOVE_RECEIVED',
   MOVE_SENT = 'GAME.MOVE_SENT',
-  STATE_CHANGED = 'GAME.STATE_CHANGED',
+  STATE_CHANGED = 'GAME.STATE_CHANGED'
 }
 
 export const GameAction = {
@@ -46,4 +45,11 @@ export const GameAction = {
   }),
 };
 
-export type GameAction = ActionsUnion<typeof GameAction>;
+export type ChooseOpponentAction = ReturnType<typeof GameAction.chooseOpponent>;
+export type ChooseAPlayAction = ReturnType<typeof GameAction.chooseAPlay>;
+export type MoveReceivedAction = ReturnType<typeof GameAction.moveReceived>;
+export type MoveSentAction = ReturnType<typeof GameAction.moveSent>;
+export type EventReceivedAction = ReturnType<typeof GameAction.eventReceived>;
+export type StateChangedAction = ReturnType<typeof GameAction.stateChanged>;
+
+export type GameAction = ChooseOpponentAction | ChooseAPlayAction | MoveReceivedAction | MoveSentAction | EventReceivedAction | StateChangedAction;
