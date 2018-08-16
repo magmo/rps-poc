@@ -9,7 +9,7 @@ export enum OpponentActionType {
 export const OpponentAction = {
   syncOpponents: (opponents: Opponent[]) => ({
     type: OpponentActionType.SYNC as typeof OpponentActionType.SYNC,
-    opponents
+    opponents,
   }),
 
   subscribeOpponents: () => ({
