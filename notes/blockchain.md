@@ -23,7 +23,7 @@ This requires the following three actions to succeed:
     - There is a [breaking change](https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8) in metamask to be release on Nov. 2, which will force us to change the web3 injection process.
 2. TODO: addresses
 3. TODO: contracts
-    - In the case where we use truffle artifacts, we need to ensure that the `networks` attribute contains an entry for the network connected to web3 in step 1. The contract, of course, should be deployed at the address specified by this `networks` entry.
+    - In the case where we use truffle artifacts, we need to ensure that the `networks` attribute contains an entry for the network connected to web3 in step 1. The contract, of course, should be deployed at the address specified by this `networks` entry, like below:
     ```
       "networks": {
         "network_id": {
@@ -46,7 +46,9 @@ Here is [an example](https://github.com/truffle-box/drizzle-box/blob/e31a10027bd
 
 
 # TODO
+- [ ] Figure out how `react-scripts-ts build` works, ie. have a transpiled app available in `build/dist` or `lib` or wherever.
 - [ ] Add contract compilation to build process.
   - [ ] Contract artifacts should be copied into `src/contracts`
 - [ ] Add contract migration to build process.
 - [ ] Sort out events, and add to the above doc
+- [ ] Get truffle configuration working.
