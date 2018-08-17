@@ -67,15 +67,19 @@ export default class GameController extends PureComponent<Props> {
         return <SelectPlayStep choosePlay={choosePlay} />;
 
       case playerA.ReadyToSendPropose:
+        // choice made
         return <WaitingStep message="ready to send round proposal" />;
 
       case playerA.WaitForAccept:
+        // choice made
         return <WaitingStep message="opponent to choose their move" />;
 
       case playerA.ReadyToSendReveal:
+        // result
         return <WaitingStep message="ready to send reveal" />;
 
       case playerA.WaitForResting:
+        // result 
         return <WaitingStep message="Wait for resting" />;
       
       case playerB.ReadyToSendPreFundSetupB:
@@ -100,12 +104,15 @@ export default class GameController extends PureComponent<Props> {
         return <SelectPlayStep choosePlay={choosePlay} />;
 
       case playerB.ReadyToSendAccept:
+        // your choice
         return <WaitingStep message="opponent to accept the outcome" />;
 
       case playerB.WaitForReveal:
+        // choice made
         return <WaitingStep message="opponent to accept the outcome" />;
 
       case playerB.ReadyToSendResting:
+        // result
         return <WaitingStep message="opponent to accept the outcome" />;
 
       default:
