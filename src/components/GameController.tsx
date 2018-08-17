@@ -83,33 +83,33 @@ export default class GameController extends PureComponent<Props> {
         return <WaitingStep message="Wait for resting" />;
       
       case playerB.ReadyToSendPreFundSetupB:
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="ready to send prefund setup" />;
 
       case playerB.WaitForAToDeploy:
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="waiting for adjudicator to be deployed" />;
 
       case playerB.ReadyToDeposit:
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="ready to deposit funds" />;
 
       case playerB.WaitForBlockchainDeposit:
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="waiting for deposit confirmation" />;
 
       case playerB.WaitForPostFundSetupA:
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="waiting for post fund setup" />;
 
       case playerB.ReadyToSendPostFundSetupB:
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="ready to send post fund setup" />;
 
       case playerB.ReadyToChooseBPlay:
         return <SelectPlayStep choosePlay={choosePlay} />;
 
       case playerB.ReadyToSendAccept:
         // your choice
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="ready to send accept" />;
 
       case playerB.WaitForReveal:
         // choice made
-        return <WaitingStep message="opponent to accept the outcome" />;
+        return <WaitingStep message="opponent to reveal their move" />;
 
       case playerB.ReadyToSendResting:
         // result
