@@ -21,3 +21,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(GameController);
+
