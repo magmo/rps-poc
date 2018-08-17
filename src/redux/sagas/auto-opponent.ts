@@ -51,7 +51,7 @@ function* startAutoOpponent() {
         case MessageActionType.SEND_MESSAGE:
           yield handleMessage(gameEngine);
           break;
-
+        // We're filtering our actions so the state will always be WaitForBToDeposit 
         case GameActionType.STATE_CHANGED:
           // Fake sending to the blockchain for now
           gameEngine.receiveEvent({});
