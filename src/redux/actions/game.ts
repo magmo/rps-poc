@@ -52,10 +52,10 @@ export const GameAction = {
 };
 
 export type ChooseOpponentAction = ReturnType<typeof GameAction.chooseOpponent>;
-export type ChooseAPlayAction = ReturnType<typeof GameAction.chooseAPlay>;
+export type ChoosePlayAction = ReturnType<typeof GameAction.choosePlay>;
 export type MoveReceivedAction = ReturnType<typeof GameAction.moveReceived>;
 export type MoveSentAction = ReturnType<typeof GameAction.moveSent>;
 export type EventReceivedAction = ReturnType<typeof GameAction.eventReceived>;
 export type StateChangedAction = ReturnType<typeof GameAction.stateChanged>;
 export type PlayComputerAction = ReturnType<typeof GameAction.playComputer>;
-export type GameAction = ChooseOpponentAction | ChooseAPlayAction | MoveReceivedAction | MoveSentAction | EventReceivedAction | StateChangedAction | PlayComputerAction;
+export type GameAction = ChooseOpponentAction | ChoosePlayAction | MoveReceivedAction | MoveSentAction | EventReceivedAction | StateChangedAction | PlayComputerAction;
