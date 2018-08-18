@@ -16,5 +16,5 @@ export default combineReducers<ApplicationState>({
   game: gameReducer,
   opponents: opponentReducer,
   login: loginReducer,
-  ...drizzleReducers
+  ...drizzleReducers,
 });
