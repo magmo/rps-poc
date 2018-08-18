@@ -5,6 +5,7 @@ import {
   actionChannel,
   select,
 } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
 import { GameActionType, GameAction, MoveSentAction } from '../actions/game';
 import { fetchOrCreateWallet } from './wallet';
 import { MessageActionType, MessageAction } from '../actions/messages';
@@ -41,7 +42,7 @@ function* startAutoOpponent() {
 
   while (true) {
     const action = yield take(channel);
-
+    yield delay(2000);
     if (gameEngine === null) {
       // Start up the game engine for our autoplayer B
       gameEngine = fromProposal({ move: Move.fromHex(action.data), wallet });
@@ -51,7 +52,7 @@ function* startAutoOpponent() {
         case MessageActionType.SEND_MESSAGE:
           yield handleMessage(gameEngine);
           break;
-        // We're filtering our actions so the state will always be WaitForBToDeposit 
+        // We're filtering our actions so the state will always be WaitForBToDeposit
         case GameActionType.STATE_CHANGED:
           // Fake sending to the blockchain for now
           gameEngine.receiveEvent({});
