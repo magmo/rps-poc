@@ -65,8 +65,6 @@ function* startAutoOpponent() {
 function* continueWithFollowingActions(gameEngine: GameEngine) {
   while (true) { // keep going until we don't have an action to take
     const state = gameEngine.state;
-    // tslint:disable-next-line:no-console
-    console.log(state);
 
     if (state instanceof ReadyToChooseBPlay) {
       // Good ol rock, nothings beats that!
