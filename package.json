@@ -17,6 +17,8 @@
     "aphrodite": "^2.2.2",
     "babel-core": "6",
     "babel-runtime": "^6.23.0",
+    "drizzle": "^1.2.2",
+    "drizzle-react": "^1.1.1",
     "enum": "^2.5.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-plugin-import": "^2.13.0",

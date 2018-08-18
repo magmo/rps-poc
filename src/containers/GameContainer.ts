@@ -1,4 +1,4 @@
-import { connect } from 'react-redux';
+import { drizzleConnect } from 'drizzle-react';
 
 import { GameAction } from '../redux/actions/game';
 import { OpponentAction } from '../redux/actions/opponents';
@@ -17,8 +17,8 @@ const mapDispatchToProps = {
   playComputer: GameAction.playComputer,
 };
 
-export default connect(
+export default drizzleConnect(
+  GameController,
   mapStateToProps,
   mapDispatchToProps,
-)(GameController);
-
+)

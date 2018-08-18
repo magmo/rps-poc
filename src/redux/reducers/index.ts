@@ -1,4 +1,6 @@
 import { combineReducers } from 'redux';
+import { drizzleReducers } from 'drizzle'
+
 
 import { gameReducer, GameState } from './game';
 import { opponentReducer, OpponentState } from './opponents';
@@ -14,4 +16,5 @@ export default combineReducers<ApplicationState>({
   game: gameReducer,
   opponents: opponentReducer,
   login: loginReducer,
+  ...drizzleReducers,
 });
