@@ -139,7 +139,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "C:\\Users\\alexg\\code\\rps-poc\\tsconfig.test.json"
+        "tsConfigFile": "./tsconfig.test.json"
       }
     }
   },
