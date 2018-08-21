@@ -142,9 +142,15 @@ export default class GameEngineB {
       return this.state;
     }
 
-    this.validateBalances();
-
     const { channel, stake, balances, preCommit, adjudicator, turnNum } = this.state;
+
+    if (this.state.stake > this.state.balances[1]) {
+      return this.transitionTo(
+        new State.InsufficientFundsB({
+          channel, balances, adjudicator,
+        })
+      )
+    }
 
     const newBalances = [...balances];
     newBalances[0] -= stake;
@@ -292,9 +298,4 @@ export default class GameEngineB {
     );
   }
 
-  validateBalances() {
-    if (this.state.stake > this.state.balances[1]) {
-      throw Error('Insufficient balance for player B.');
-    }
-  }
 }

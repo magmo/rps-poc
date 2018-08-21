@@ -11,6 +11,7 @@ import WaitForResting from './WaitForResting';
 import ReadyToSendConcludeA from './ReadyToSendConcludeA';
 import WaitForConcludeA from './WaitForConcludeA';
 import ReadyToFund from './ReadyToFund'
+import InsufficientFundsA from './InsufficientFundsA';
 
 export type PlayerAState = (
   ReadyToSendPreFundSetupA |
@@ -25,7 +26,8 @@ export type PlayerAState = (
   WaitForResting |
   ReadyToSendConcludeA |
   WaitForConcludeA | 
-  ReadyToFund
+  ReadyToFund |
+  InsufficientFundsA
 );
 
 export { ReadyToSendPreFundSetupA };
@@ -41,3 +43,4 @@ export { WaitForResting };
 export { ReadyToSendConcludeA };
 export { WaitForConcludeA };
 export {ReadyToFund};
+export { InsufficientFundsA };

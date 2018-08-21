@@ -3,7 +3,7 @@ import * as ApplicationStatesA from '../application-states/PlayerA';
 import * as GameEngine from '../GameEngine';
 import { Play } from '../positions';
 
-it('requires sufficient funds', () => {
+it('requires sufficient funds to choose a play', () => {
   const stake = 5;
   const initialBals = [2, 5];
   const wallet = new ChannelWallet();
@@ -25,8 +25,7 @@ it('requires sufficient funds', () => {
     wallet,
   })
 
-  gameEngineA.transitionTo(readyToChooseAPlay);
-  expect(
-    () => { gameEngineA.choosePlay(Play.Rock) }
-  ).toThrow('Insufficient balance for player A.')
+  gameEngineA.choosePlay(Play.Rock);
+
+  expect(gameEngineA.state instanceof ApplicationStatesA.InsufficientFundsA).toBe(true)
 })
