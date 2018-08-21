@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "ganache-cli": "^6.1.8",
+    "truffle": "^4.1.14"
+  }
+}
