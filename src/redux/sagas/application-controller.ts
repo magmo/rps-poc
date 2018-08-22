@@ -5,8 +5,7 @@ import { GameActionType, GameAction } from '../actions/game';
 import { setupGame, fromProposal, GameEngine } from '../../game-engine/GameEngine';
 import { State } from '../../game-engine/application-states';
 import Move from '../../game-engine/Move';
-import { ReadyToDeploy } from '../../game-engine/application-states/PlayerA';
-import { Wallet } from '../../wallet';
+import { Wallet, WalletFundingAction, WalletFundingActionType } from '../../wallet';
 
 export default function* applicationControllerSaga(wallet: Wallet) {
   let gameEngine: GameEngine | null = null;
@@ -43,25 +42,26 @@ export default function* applicationControllerSaga(wallet: Wallet) {
         case GameActionType.CHOOSE_PLAY:
           newState = gameEngine.choosePlay(action.play);
           break;
-        case GameActionType.EVENT_RECEIVED:
-          newState = gameEngine.receiveEvent(action.event);
-          break;
         default:
           // do nothing
       }
     }
 
-    if (newState) {
+    if (newState && gameEngine!=null) {
       if (newState.isReadyToSend) {
 
         yield put(MessageAction.sendMessage(newState.opponentAddress, newState.move.toHex()))
         yield put(GameAction.moveSent(newState.move));
       }
-      // Fake sending a transaction for now
-      if (newState instanceof ReadyToDeploy && gameEngine){
-          gameEngine.transactionSent();
-          newState = gameEngine.state;
+      if (newState.isReadyForFunding){
+        yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
+        const fundingAction: WalletFundingAction = yield take(WalletFundingActionType.WALLETFUNDING_FUNDED);
+        const adjucator = {fundingAction};
+        // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
+        newState = gameEngine.receiveFunding({adjucator});
+
       }
+      
       // TODO: Once we stop faking the transaction we won't need this null check
       if (newState){
         yield put(GameAction.stateChanged(newState));

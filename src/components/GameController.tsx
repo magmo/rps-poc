@@ -53,14 +53,14 @@ export default class GameController extends PureComponent<Props> {
       case playerA.WaitForPreFundSetupB:
         return <ProposalSentPage message="Waiting for opponent to accept game" />;
 
-      case playerA.ReadyToDeploy:
-        return <WaitingStep message="ready to deploy adjudicator" />;
+      case playerA.WaitForFunding:
+        return <WaitingStep message="waiting for wallet" />;
+      // TODO: Wallet states will be seperated out into a wallet component
+      // case playerA.WaitForBlockchainDeploy:
+      //   return <WaitingStep message="confirmation of adjudicator deployment" />;
 
-      case playerA.WaitForBlockchainDeploy:
-        return <WaitingStep message="confirmation of adjudicator deployment" />;
-
-      case playerA.WaitForBToDeposit:
-        return <WaitingStep message="confirmation of opponent's deposit" />;
+      // case playerA.WaitForBToDeposit:
+      //   return <WaitingStep message="confirmation of opponent's deposit" />;
 
       case playerA.ReadyToSendPostFundSetupA:
         return <FundingConfirmedPage message="sending acknowledgement to opponent" />;
@@ -98,14 +98,14 @@ export default class GameController extends PureComponent<Props> {
       case playerB.ReadyToSendPreFundSetupB:
         return <WaitingStep message="ready to send prefund setup" />;
 
-      case playerB.WaitForAToDeploy:
-        return <WaitingStep message="waiting for adjudicator to be deployed" />;
+      // case playerB.WaitForAToDeploy:
+      //   return <WaitingStep message="waiting for adjudicator to be deployed" />;
 
-      case playerB.ReadyToDeposit:
-        return <WaitingStep message="ready to deposit funds" />;
+      // case playerB.ReadyToDeposit:
+      //   return <WaitingStep message="ready to deposit funds" />;
 
-      case playerB.WaitForBlockchainDeposit:
-        return <WaitingStep message="waiting for deposit confirmation" />;
+      // case playerB.WaitForBlockchainDeposit:
+      //   return <WaitingStep message="waiting for deposit confirmation" />;
 
       case playerB.WaitForPostFundSetupA:
         return <WaitingStep message="waiting for post fund setup" />;
