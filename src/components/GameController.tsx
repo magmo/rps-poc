@@ -3,6 +3,9 @@ import React, { PureComponent } from 'react';
 import OpponentSelectionStep from './OpponentSelectionStep';
 import WaitingStep from './WaitingStep';
 import SelectPlayPage from './SelectPlayPage';
+import ProposeGamePage from './ProposeGamePage';
+import ProposalSentPage from './ProposalSentPage';
+import FundingConfirmedPage from './FundingConfirmedPage';
 import PlaySelectedPage from './PlaySelectedPage';
 import ResultPage from './ResultPage';
 import * as playerA from '../game-engine/application-states/PlayerA';
@@ -45,10 +48,10 @@ export default class GameController extends PureComponent<Props> {
 
     switch (applicationState && applicationState.constructor) {
       case playerA.ReadyToSendPreFundSetupA:
-        return <WaitingStep message="ready to propose game" />;
+        return <ProposeGamePage message="ready to propose game" />;
 
       case playerA.WaitForPreFundSetupB:
-        return <WaitingStep message="opponent to accept game" />;
+        return <ProposalSentPage message="Waiting for opponent to accept game" />;
 
       case playerA.ReadyToDeploy:
         return <WaitingStep message="ready to deploy adjudicator" />;
@@ -60,10 +63,10 @@ export default class GameController extends PureComponent<Props> {
         return <WaitingStep message="confirmation of opponent's deposit" />;
 
       case playerA.ReadyToSendPostFundSetupA:
-        return <WaitingStep message="ready to send deposit confirmation" />;
+        return <FundingConfirmedPage message="sending acknowledgement to opponent" />;
 
       case playerA.WaitForPostFundSetupB:
-        return <WaitingStep message="opponent to confirm deposits" />;
+        return <FundingConfirmedPage message="waiting for opponent to acknowledge" />;
 
       case playerA.ReadyToChooseAPlay:
         return <SelectPlayPage choosePlay={choosePlay} />;
@@ -79,7 +82,7 @@ export default class GameController extends PureComponent<Props> {
                                  yourPlay={state3.aPlay} />;
 
       case playerA.ReadyToSendReveal:
-        const state0 = applicationState as playerA.WaitForResting;
+        const state0 = applicationState as playerA.ReadyToSendReveal;
         return <ResultPage message="resting"
                            yourPlay={state0.aPlay}
                            theirPlay={state0.bPlay}
