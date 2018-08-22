@@ -84,7 +84,7 @@
     "build": "node scripts/build.js && run-s truffle:compile",
     "truffle:compile": "(cd truffle && truffle compile) && run-s copy_contracts",
     "test": "node scripts/test.js --env=jsdom",
-    "test:truffle": "(cd truffle && ../scripts/run-with-ganash.sh)",
+    "test:truffle": "(cd truffle && ../scripts/run-with-ganache.sh)",
     "postinstall": "rm -f node_modules/web3/index.d.ts"
   },
   "devDependencies": {
