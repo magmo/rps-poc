@@ -21,11 +21,15 @@
 
 #### To update dependencies:
 
-`yarn install`
+`yarn install && (cd truffle && yarn install)`
 
 #### To add a dependency:
 
 `yarn add [package-name]` - installs the latest version of the package
+
+#### To add a development dependency:
+
+`yarn add -D [package-name]` - installs the latest version of the package as a dev dep
 
 #### To update the version of a dependency:
 
