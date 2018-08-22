@@ -247,7 +247,7 @@ export default class GameEngineB {
 
     const nextPosition = new Resting(channel, turnNum, balances, stake);
     const move = new Move(nextPosition.toHex(),this.wallet.sign(nextPosition.toHex()));
-    
+    const result = calculateResult(bPlay, aPlay);
     return this.transitionTo(
       new State.ReadyToSendResting({
         channel,
