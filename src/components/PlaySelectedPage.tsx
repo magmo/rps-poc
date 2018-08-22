@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { StyleSheet, css } from 'aphrodite';
 
 import { Play } from '../game-engine/positions';
@@ -10,11 +9,6 @@ interface Props {
 }
 
 export default class PlaySelectedPage extends React.PureComponent<Props> {
-  static propTypes = {
-    message: PropTypes.string.isRequired,
-    selectedPlayId: PropTypes.number,
-  };
-
   static defaultProps = {
     selectedPlayId: null,
   };
