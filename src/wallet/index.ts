@@ -10,6 +10,7 @@ import {
   WalletRetrievedAction,
   WalletRequestedAction,
 } from './redux/actions/wallet';
+import WalletController from './containers/WalletContainer';
 
 export interface Wallet {
   privateKey: string;
@@ -29,3 +30,5 @@ export { WalletRequestedAction };
 
 export { WalletFundingRequestAction };
 export { WalletFundedAction };
+
+export { WalletController};
