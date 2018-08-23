@@ -1,6 +1,6 @@
-import BasePlayerB from './Base';
+import BasePlayerA from './Base';
 
-export default class InsufficientFundsB extends BasePlayerB {
+export default class InsufficientFundsB extends BasePlayerA {
   adjudicator: any;
   readonly isReadyToSend = false;
 

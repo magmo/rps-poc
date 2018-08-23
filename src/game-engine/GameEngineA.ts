@@ -137,14 +137,6 @@ export default class GameEngineA {
 
     const { balances, turnNum, stake, channel, adjudicator } = this.state;
 
-    if (this.state.stake > this.state.balances[0]) {
-      return this.transitionTo(
-        new State.InsufficientFundsA({
-          channel, balances, adjudicator,
-        })
-      )
-    }
-
     const salt = 'salt'; // todo: make random
 
     const newPosition = Propose.createWithPlayAndSalt(
@@ -217,6 +209,15 @@ export default class GameEngineA {
     if (!(this.state instanceof State.WaitForPostFundSetupB)) { return this.state };
 
     const { channel, stake, balances, adjudicator } = this.state;
+
+    if (this.state.stake > this.state.balances[0] || this.state.stake > this.state.balances[0]) {
+      return this.transitionTo(
+        new State.InsufficientFundsA({
+          channel, balances, adjudicator,
+        })
+      )
+    };
+
     const turnNum = position.turnNum + 1;
 
     return this.transitionTo(
@@ -266,6 +267,11 @@ export default class GameEngineA {
     const { adjudicator } = this.state;
     const turnNum = oldTurnNum + 1;
 
+    const insufficientFundState = this.insufficientFundState()
+    if (insufficientFundState) {
+      return this.transitionTo(insufficientFundState)
+    }
+
     return this.transitionTo(
       new State.ReadyToChooseAPlay({channel, stake, balances, adjudicator, turnNum })
     );
@@ -279,5 +285,21 @@ export default class GameEngineA {
     return this.transitionTo(
       new State.ReadyToSendConcludeA({ channel, balances, adjudicator })
     )
+  }
+
+  insufficientFundState() : State.InsufficientFunds | null {
+    if (this.state.stake > this.state.balances[0]) {
+      const { channel, balances, adjudicator } = this.state
+      return new State.InsufficientFundsA({
+        channel, balances, adjudicator,
+      })
+    } else if (this.state.stake > this.state.balances[1]) {
+      const { channel, balances, adjudicator } = this.state
+      return new State.InsufficientFundsB({
+        channel, balances, adjudicator,
+      })
+    }
+
+    return null;
   }
 }

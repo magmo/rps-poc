@@ -11,7 +11,7 @@ import ReadyToSendConcludeB from './ReadyToSendConcludeB';
 import WaitForConcludeB from './WaitForConcludeB';
 import WaitForFunding from './WaitForFunding';
 import ReadyToFund from './ReadyToFund';
-import InsufficientFundsB from './InsufficientFundsB';
+import InsufficientFundsB from '../PlayerA/InsufficientFundsB';
 
 export type PlayerBState =
   | ReadyToSendPreFundSetupB

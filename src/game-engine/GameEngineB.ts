@@ -144,14 +144,6 @@ export default class GameEngineB {
 
     const { channel, stake, balances, preCommit, adjudicator, turnNum } = this.state;
 
-    if (this.state.stake > this.state.balances[1]) {
-      return this.transitionTo(
-        new State.InsufficientFundsB({
-          channel, balances, adjudicator,
-        })
-      )
-    }
-
     const newBalances = [...balances];
     newBalances[0] -= stake;
     newBalances[1] += stake;
