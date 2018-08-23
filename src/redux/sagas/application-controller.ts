@@ -14,7 +14,7 @@ export default function* applicationControllerSaga(wallet: Wallet) {
 
   while (true) {
     let newState: State | null = null;
-    const action: GameAction | MessageAction = yield take(channel);
+    const action: GameAction | MessageAction | WalletFundingAction = yield take(channel);
 
     if (gameEngine == null) {
       switch (action.type) {
@@ -42,33 +42,25 @@ export default function* applicationControllerSaga(wallet: Wallet) {
         case GameActionType.CHOOSE_PLAY:
           newState = gameEngine.choosePlay(action.play);
           break;
+        case WalletFundingActionType.WALLETFUNDING_FUNDED:
+          const adjudicator = { action };
+          // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
+          newState = gameEngine.fundingConfirmed({ adjudicator });
+          // We've received funding so we need to update the game state again
+          break;
         default:
         // do nothing
       }
     }
-    if (newState) {
-      // Update that tehs tate has changed
-      yield put(GameAction.stateChanged(newState));
-
-      if (gameEngine != null) {
-        if (newState.isReadyToSend) {
-          yield put(MessageAction.sendMessage(newState.opponentAddress, newState.move.toHex()));
-          yield put(GameAction.moveSent(newState.move));
-        }
-        if (newState.isReadyForFunding) {
-          yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
-          const fundingAction: WalletFundingAction = yield take(
-            WalletFundingActionType.WALLETFUNDING_FUNDED,
-          );
-          const adjudicator = { fundingAction };
-          // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
-          newState = gameEngine.receiveFunding({ adjudicator });
-          // We've received funding so we need to update the game state again
-          if (newState != null) {
-            yield put(GameAction.stateChanged(newState));
-          }
-        }
+    if (newState && gameEngine != null) {
+      if (newState.isReadyToSend) {
+        yield put(MessageAction.sendMessage(newState.opponentAddress, newState.move.toHex()));
+        yield put(GameAction.moveSent(newState.move));
       }
+      if (newState.isReadyForFunding) {
+        yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
+      }
+      yield put(GameAction.stateChanged(newState));
     }
   }
 }

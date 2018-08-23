@@ -104,7 +104,7 @@ export default class GameEngineA {
     }
   }
 
-  receiveFunding(event) {
+  fundingConfirmed(event) {
     const { channel, stake, balances } = this.state;
     const stateCount = 0;
     const turnNum = 2;

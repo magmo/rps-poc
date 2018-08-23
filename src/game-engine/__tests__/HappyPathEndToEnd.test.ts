@@ -63,7 +63,7 @@ it('runthrough', () => {
   const fundingEvent = { adjudicator: '0xBla', aBalance: 1, bBalance: 2 }; // TODO
 
   // In A's application
-  const readyToSendPostFundSetupA = gameEngineA.receiveFunding(fundingEvent);
+  const readyToSendPostFundSetupA = gameEngineA.fundingConfirmed(fundingEvent);
   expect(readyToSendPostFundSetupA).toBeInstanceOf(ApplicationStatesA.ReadyToSendPostFundSetupA);
 
   const move2 = readyToSendPostFundSetupA.move;
@@ -79,7 +79,7 @@ it('runthrough', () => {
   expect(waitForPostFundSetupB.adjudicator).toEqual(fundingEvent.adjudicator);
 
   // In B's application
-  const WaitForPostFundSetupA = gameEngineB.receiveFunding(fundingEvent);
+  const WaitForPostFundSetupA = gameEngineB.fundingConfirmed(fundingEvent);
   expect(WaitForPostFundSetupA).not.toBeUndefined();
   expect(WaitForPostFundSetupA).toBeInstanceOf(ApplicationStatesB.WaitForPostFundSetupA);
   const readyToSendPostFundSetupB = gameEngineB.receiveMove(move2);

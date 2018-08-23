@@ -113,7 +113,7 @@ export default class GameEngineB {
     }
   }
 
-  receiveFunding(event) {
+  fundingConfirmed(event) {
     if (!(this.state instanceof State.WaitForFunding)) {
       return this.state;
     }
