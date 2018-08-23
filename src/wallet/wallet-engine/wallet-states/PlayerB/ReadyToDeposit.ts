@@ -2,10 +2,12 @@ import BasePlayerB from './Base';
 
 export default class ReadyToDeposit extends BasePlayerB {
   transaction;
+  adjudicator;
   readonly isReadyToSend = true;
-  readonly funded = false;
-  constructor({ transaction }) {
+  readonly isFunded = false;
+  constructor({adjudicator, transaction }) {
     super();
     this.transaction = transaction;
+    this.adjudicator = adjudicator;
   }
 }

@@ -2,8 +2,7 @@ import { Wallet } from '..';
 import * as State from './wallet-states/PlayerB';
 export default class WalletEngineB {
   static setupWalletEngine(wallet: Wallet): WalletEngineB {
-    const transaction = 'bla';
-    const walletState = new State.WaitForAToDeploy({ transaction });
+    const walletState = new State.WaitForAToDeploy();
     return new WalletEngineB(wallet, walletState);
   }
   wallet: Wallet;
@@ -17,10 +16,12 @@ export default class WalletEngineB {
   receiveEvent(event): State.PlayerBState {
     switch (this.state.constructor) {
       case State.WaitForAToDeploy:
-        return this.transitionTo(new State.ReadyToDeposit({ transaction: 'test' }));
+      const { adjudicator } = event;
+      const transaction = 'Some Value';
+        return this.transitionTo(new State.ReadyToDeposit({adjudicator,transaction}));
       case State.WaitForBlockchainDeposit:
-        const { adjudicator } = event;
-        return this.transitionTo(new State.Funded({ adjudicator }));
+        const stateAdjudicator = this.state.adjudicator;
+        return this.transitionTo(new State.Funded({ adjudicator:stateAdjudicator }));
       default:
         return this.state;
     }
@@ -28,12 +29,12 @@ export default class WalletEngineB {
 
   transactionSent() {
     if (this.state.constructor === State.ReadyToDeposit) {
-      return this.transitionTo(new State.WaitForBlockchainDeposit());
-    }else{
-        return this.state;
+      return this.transitionTo(new State.WaitForBlockchainDeposit(this.state.adjudicator));
+    } else {
+      return this.state;
     }
   }
-  
+
   transitionTo(state): State.PlayerBState {
     this.state = state;
     return state;

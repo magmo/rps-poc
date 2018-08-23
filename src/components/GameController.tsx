@@ -54,7 +54,7 @@ export default class GameController extends PureComponent<Props> {
         return <ProposalSentPage message="Waiting for opponent to accept game" />;
 
       case playerA.WaitForFunding:
-        return <WaitingStep message="waiting for wallet" />;
+        return <WaitingStep message="wallet" />;
       // TODO: Wallet states will be seperated out into a wallet component
       // case playerA.WaitForBlockchainDeploy:
       //   return <WaitingStep message="confirmation of adjudicator deployment" />;
@@ -97,6 +97,8 @@ export default class GameController extends PureComponent<Props> {
       
       case playerB.ReadyToSendPreFundSetupB:
         return <WaitingStep message="ready to send prefund setup" />;
+      case playerB.WaitForFunding:
+        return <WaitingStep message="wallet" />;
 
       // case playerB.WaitForAToDeploy:
       //   return <WaitingStep message="waiting for adjudicator to be deployed" />;
@@ -129,7 +131,9 @@ export default class GameController extends PureComponent<Props> {
         return <WaitingStep message="opponent to accept the outcome" />;
 
       default:
-      return <WaitingStep message={`[view not implemented: ${applicationState.constructor.name}`} />;
+        return (
+          <WaitingStep message={`[view not implemented: ${applicationState.constructor.name}`} />
+        );
     }
   }
 }

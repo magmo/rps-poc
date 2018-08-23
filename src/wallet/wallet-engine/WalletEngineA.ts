@@ -32,10 +32,11 @@ export default class WalletEngineA {
   receiveEvent(event): State.PlayerAState {
     switch (this.state.constructor) {
       case State.WaitForBlockchainDeploy:
-        return this.transitionTo(new State.WaitForBToDeposit());
-      case State.WaitForBToDeposit:
         const { adjudicator } = event;
-        return this.transitionTo(new State.Funded({ adjudicator }));
+        return this.transitionTo(new State.WaitForBToDeposit({ adjudicator }));
+      case State.WaitForBToDeposit:
+        const stateAdjudicator = this.state.adjudicator;
+        return this.transitionTo(new State.Funded({ adjudicator:stateAdjudicator }));
       default:
         return this.state;
     }

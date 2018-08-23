@@ -12,27 +12,27 @@ export default function* applicationControllerSaga(wallet: Wallet) {
 
   const channel = yield actionChannel('*');
 
-  while(true) {
+  while (true) {
     let newState: State | null = null;
     const action: GameAction | MessageAction = yield take(channel);
 
     if (gameEngine == null) {
-      switch(action.type) {
+      switch (action.type) {
         case GameActionType.CHOOSE_OPPONENT:
           const { opponent, stake } = action;
-          const balances = [ 3 * stake, 3 * stake ];
-          gameEngine = setupGame({opponent, stake, balances, wallet})
+          const balances = [3 * stake, 3 * stake];
+          gameEngine = setupGame({ opponent, stake, balances, wallet });
           newState = gameEngine.state;
           break;
         case MessageActionType.MESSAGE_RECEIVED:
-          gameEngine = fromProposal({move: Move.fromHex(action.message), wallet});
+          gameEngine = fromProposal({ move: Move.fromHex(action.message), wallet });
           newState = gameEngine.state;
           break;
         default:
-          // do nothing
+        // do nothing
       }
     } else {
-      switch(action.type) {
+      switch (action.type) {
         case MessageActionType.MESSAGE_RECEIVED:
           newState = gameEngine.receiveMove(Move.fromHex(action.message));
           break;
@@ -43,28 +43,31 @@ export default function* applicationControllerSaga(wallet: Wallet) {
           newState = gameEngine.choosePlay(action.play);
           break;
         default:
-          // do nothing
+        // do nothing
       }
     }
+    if (newState) {
+      // Update that tehs tate has changed
+      yield put(GameAction.stateChanged(newState));
 
-    if (newState && gameEngine!=null) {
-      if (newState.isReadyToSend) {
-
-        yield put(MessageAction.sendMessage(newState.opponentAddress, newState.move.toHex()))
-        yield put(GameAction.moveSent(newState.move));
-      }
-      if (newState.isReadyForFunding){
-        yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
-        const fundingAction: WalletFundingAction = yield take(WalletFundingActionType.WALLETFUNDING_FUNDED);
-        const adjudicator = {fundingAction};
-        // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
-        newState = gameEngine.receiveFunding({adjudicator});
-
-      }
-      
-      // TODO: Once we stop faking the transaction we won't need this null check
-      if (newState){
-        yield put(GameAction.stateChanged(newState));
+      if (gameEngine != null) {
+        if (newState.isReadyToSend) {
+          yield put(MessageAction.sendMessage(newState.opponentAddress, newState.move.toHex()));
+          yield put(GameAction.moveSent(newState.move));
+        }
+        if (newState.isReadyForFunding) {
+          yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
+          const fundingAction: WalletFundingAction = yield take(
+            WalletFundingActionType.WALLETFUNDING_FUNDED,
+          );
+          const adjudicator = { fundingAction };
+          // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
+          newState = gameEngine.receiveFunding({ adjudicator });
+          // We've received funding so we need to update the game state again
+          if (newState != null) {
+            yield put(GameAction.stateChanged(newState));
+          }
+        }
       }
     }
   }

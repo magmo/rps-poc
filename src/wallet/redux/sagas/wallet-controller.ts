@@ -35,7 +35,7 @@ export default function* walletControllerSaga() {
     }
 
     const channel = yield actionChannel(BlockchainActionType.BLOCKCHAIN_RECEIVEEVENT);
-    while (walletState != null && !walletState.funded) {
+    while (walletState != null && !walletState.isFunded) {
       // We'll wait for any events from the blockchain
       const receiveAction: BlockchainReceiveEventAction = yield take(channel);
       walletState = walletEngine.receiveEvent(receiveAction.event);
@@ -46,7 +46,7 @@ export default function* walletControllerSaga() {
       }
     }
 
-    if (walletState != null && walletState.funded) {
+    if (walletState != null && walletState.isFunded) {
       yield put(WalletFundingAction.walletFunded(walletState.adjudicator));
     }
   }
