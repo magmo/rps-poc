@@ -1,4 +1,4 @@
-import { Wallet } from '..';
+import { Wallet } from '../..';
 
 export type BlockchainSendTransactionAction = ReturnType<typeof BlockchainAction.sendTransaction>;
 export type BlockchainReceiveEventAction = ReturnType<typeof BlockchainAction.receiveEvent>;

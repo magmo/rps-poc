@@ -23,10 +23,10 @@ export default class WalletEngineA {
 
   transactionSent() {
     if (this.state.constructor === State.ReadyToDeploy) {
-        return this.transitionTo(new State.WaitForBlockchainDeploy());
-      }else{
-          return this.state;
-      }
+      return this.transitionTo(new State.WaitForBlockchainDeploy());
+    } else {
+      return this.state;
+    }
   }
 
   receiveEvent(event): State.PlayerAState {
@@ -34,8 +34,8 @@ export default class WalletEngineA {
       case State.WaitForBlockchainDeploy:
         return this.transitionTo(new State.WaitForBToDeposit());
       case State.WaitForBToDeposit:
-      const {adjudicator} = event;
-        return this.transitionTo(new State.Funded({adjudicator}));
+        const { adjudicator } = event;
+        return this.transitionTo(new State.Funded({ adjudicator }));
       default:
         return this.state;
     }

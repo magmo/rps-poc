@@ -9,9 +9,9 @@ import loginSaga from './login';
 import messageSaga from './messages';
 import { getApplicationState } from '../store';
 import autoOpponentSaga from './auto-opponent';
-import { walletSaga } from '../../wallet/sagas/wallet';
-import { BlockchainAction } from '../../wallet/actions/blockchain';
-import walletControllerSaga from '../../wallet/sagas/wallet-controller';
+import { walletSaga } from '../../wallet/redux/sagas/wallet';
+import { BlockchainAction } from '../../wallet/redux/actions/blockchain';
+import walletControllerSaga from '../../wallet/redux/sagas/wallet-controller';
 
 function* blockchainResponseFaker() {
   const state = yield select(getApplicationState);

@@ -1,17 +1,17 @@
-import  { WalletEngine, setupWalletEngine } from '../wallet-engine/WalletEngine';
+import  { WalletEngine, setupWalletEngine } from '../../wallet-engine/WalletEngine';
 import {
   Wallet,
   WalletFundingActionType,
   WalletFundingAction,
   WalletFundingRequestAction,
-} from '..';
+} from '../..';
 import { take, put, actionChannel } from 'redux-saga/effects';
 import {
   BlockchainAction,
   BlockchainActionType,
   BlockchainReceiveEventAction,
 } from '../actions/blockchain';
-import { State } from '../wallet-engine/wallet-states';
+import { State } from '../../wallet-engine/wallet-states';
 
 export default function* walletControllerSaga() {
   let walletEngine: WalletEngine | null = null;

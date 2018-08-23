@@ -7,7 +7,7 @@ import Move from '../../game-engine/Move';
 import { ReadyToChooseBPlay, WaitForFunding } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
-import { WalletActionType, WalletRetrievedAction, WalletFundingAction } from '../../wallet';
+import { WalletActionType, WalletFundingAction, WalletRetrievedAction } from '../../wallet';
 
 export default function* autoOpponentSaga() {
   yield takeEvery(GameActionType.PLAY_COMPUTER, startAutoOpponent);
