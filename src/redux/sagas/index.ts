@@ -18,7 +18,7 @@ function* blockchainResponseFaker() {
   if (state == null) { return false; }
   if (state instanceof playerAStates.WaitForFunding) {
     yield delay(2000);
-    yield put(BlockchainAction.receiveEvent({adjucator:"FakeAddress"}));
+    yield put(BlockchainAction.receiveEvent({adjudicator:"FakeAddress"}));
   }
 }
 

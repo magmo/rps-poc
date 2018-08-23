@@ -18,8 +18,8 @@ export const WalletFundingAction = {
     wallet,
     playerIndex,
   }),
-  walletFunded: (adjucator: string) => ({
+  walletFunded: (adjudicator: string) => ({
     type: WalletFundingActionType.WALLETFUNDING_FUNDED as typeof WalletFundingActionType.WALLETFUNDING_FUNDED,
-    adjucator,
+    adjudicator,
   }),
 };

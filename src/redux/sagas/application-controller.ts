@@ -56,9 +56,9 @@ export default function* applicationControllerSaga(wallet: Wallet) {
       if (newState.isReadyForFunding){
         yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
         const fundingAction: WalletFundingAction = yield take(WalletFundingActionType.WALLETFUNDING_FUNDED);
-        const adjucator = {fundingAction};
+        const adjudicator = {fundingAction};
         // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
-        newState = gameEngine.receiveFunding({adjucator});
+        newState = gameEngine.receiveFunding({adjudicator});
 
       }
       
