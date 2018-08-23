@@ -1,4 +1,4 @@
-import  { WalletEngine, setupWalletEngine } from '../../wallet-engine/WalletEngine';
+import { WalletEngine, setupWalletEngine } from '../../wallet-engine/WalletEngine';
 import {
   Wallet,
   WalletFundingActionType,
@@ -12,6 +12,7 @@ import {
   BlockchainReceiveEventAction,
 } from '../actions/blockchain';
 import { State } from '../../wallet-engine/wallet-states';
+import { WalletStateActions } from '../actions/wallet-state';
 
 export default function* walletControllerSaga() {
   let walletEngine: WalletEngine | null = null;
@@ -29,9 +30,10 @@ export default function* walletControllerSaga() {
     walletEngine = setupWalletEngine(action.wallet, action.playerIndex);
 
     // Before waiting for any events check if we need to send something
-    if (walletEngine!=null && walletEngine.state != null && walletEngine.state.isReadyToSend) {
+    if (walletEngine != null && walletEngine.state != null && walletEngine.state.isReadyToSend) {
       put(BlockchainAction.sendTransaction(walletEngine.state.transaction, wallet));
       walletState = walletEngine.transactionSent();
+      yield put(WalletStateActions.stateChanged(walletState));
     }
 
     const channel = yield actionChannel(BlockchainActionType.BLOCKCHAIN_RECEIVEEVENT);
@@ -39,10 +41,12 @@ export default function* walletControllerSaga() {
       // We'll wait for any events from the blockchain
       const receiveAction: BlockchainReceiveEventAction = yield take(channel);
       walletState = walletEngine.receiveEvent(receiveAction.event);
+      yield put(WalletStateActions.stateChanged(walletState));
       // If our new state has something to send to the blockchain, send it
       if (walletState != null && walletState.isReadyToSend) {
         put(BlockchainAction.sendTransaction(walletState.transaction, wallet));
         walletState = walletEngine.transactionSent();
+        yield put(WalletStateActions.stateChanged(walletState));
       }
     }
 
