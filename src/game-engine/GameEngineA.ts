@@ -23,7 +23,7 @@ export default class GameEngineA {
     const channel = new Channel(fakeGameLibraryAddress, 456, participants);
 
     const nextPledge = new PreFundSetup(channel, 0, balances, 0, stake);
-    const move =new Move(nextPledge.toHex(), wallet.sign(nextPledge.toHex()));
+    const move = new Move(nextPledge.toHex(), wallet.sign(nextPledge.toHex()));
 
     const appState = new State.ReadyToSendPreFundSetupA({
       channel,
