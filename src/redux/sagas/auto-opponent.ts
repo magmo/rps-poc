@@ -7,7 +7,7 @@ import Move from '../../game-engine/Move';
 import { ReadyToChooseBPlay, ReadyForFunding } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
-import { WalletActionType, WalletFundingAction, WalletRetrievedAction } from '../../wallet';
+import { WalletActionType, WalletRetrievedAction, WalletFundingActionType } from '../../wallet';
 
 export default function* autoOpponentSaga() {
   yield takeEvery(GameActionType.PLAY_COMPUTER, startAutoOpponent);
@@ -59,10 +59,12 @@ function* continueWithFollowingActions(gameEngine: GameEngine) {
       gameEngine.moveSent();
     } else if (state instanceof ReadyForFunding) {
       
-      // TODO: This will be a bit strange with the blockchain faker competing against it
-      yield put (WalletFundingAction.walletFunded('0xComputerPlayerFakeAddress'));
+      // TODO: We're relying on the blockchain faker for now. Once that's no longer the case
+      // we'll have to handle some funding logic here
+      // yield put (WalletFundingAction.walletFunded('0xComputerPlayerFakeAddress'));
       gameEngine.fundingRequested();
-      gameEngine.fundingConfirmed({ adjudicator: '0xComputerPlayerFakeAddress' });
+      const action = yield take (WalletFundingActionType.WALLETFUNDING_FUNDED);
+      gameEngine.fundingConfirmed({adjudicator:action.adjudicator});
     } else {
       return false;
     }
