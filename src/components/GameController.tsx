@@ -102,7 +102,7 @@ export default class GameController extends PureComponent<Props> {
       case playerB.ReadyToSendPreFundSetupB:
         return <WaitingStep message="ready to send prefund setup" />;
       
-      case playerB.ReadyForFunding:
+      case playerB.ReadyToFund:
         return <WaitingStep message="ready for funding"/>
 
       case playerB.WaitForFunding:

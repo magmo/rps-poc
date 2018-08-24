@@ -51,9 +51,9 @@ it('runthrough', () => {
   expect(gameState1.resolution).toEqual(initialBals);
   expect(gameState1.stake).toEqual(1);
 
-  const readyForFundingB = gameEngineB.moveSent();
-  expect(readyForFundingB).toBeInstanceOf(ApplicationStatesB.ReadyForFunding);
-  expect(readyForFundingB.balances).toEqual(initialBals);
+  const readyToFundB = gameEngineB.moveSent();
+  expect(readyToFundB).toBeInstanceOf(ApplicationStatesB.ReadyToFund);
+  expect(readyToFundB.balances).toEqual(initialBals);
 
   // In A's application 
   const readyToFund = gameEngineA.receiveMove(move1);

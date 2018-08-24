@@ -3,7 +3,7 @@ import { delay } from 'redux-saga';
 import { GameActionType, GameAction, MoveSentAction } from '../actions/game';
 import { MessageAction } from '../actions/messages';
 import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
-import { ReadyToChooseBPlay, ReadyForFunding } from '../../game-engine/application-states/PlayerB';
+import { ReadyToChooseBPlay, ReadyToFund } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
 import { WalletActionType, WalletRetrievedAction, WalletFundingActionType } from '../../wallet';
@@ -55,7 +55,7 @@ function* continueWithFollowingActions(gameEngine: GameEngine) {
     } else if (state.isReadyToSend) {
       yield put(MessageAction.messageReceived(gameEngine.state.move.toHex()));
       gameEngine.moveSent();
-    } else if (state instanceof ReadyForFunding) {
+    } else if (state instanceof ReadyToFund) {
       // TODO: We're relying on the blockchain faker for now. Once that's no longer the case
       // we'll have to handle some funding logic here
       // yield put (WalletFundingAction.walletFunded('0xComputerPlayerFakeAddress'));

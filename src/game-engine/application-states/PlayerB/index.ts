@@ -10,7 +10,7 @@ import ReadyToSendResting from './ReadyToSendResting';
 import ReadyToSendConcludeB from './ReadyToSendConcludeB';
 import WaitForConcludeB from './WaitForConcludeB';
 import WaitForFunding from './WaitForFunding';
-import ReadyForFunding from './ReadyForFunding';
+import ReadyToFund from './ReadyToFund';
 
 export type PlayerBState =
   | ReadyToSendPreFundSetupB
@@ -24,7 +24,7 @@ export type PlayerBState =
   | ReadyToSendConcludeB
   | WaitForConcludeB
   | WaitForFunding
-  | ReadyForFunding;
+  | ReadyToFund;
 
 export { ReadyToSendPreFundSetupB };
 export { WaitForPostFundSetupA };
@@ -37,4 +37,4 @@ export { ReadyToSendResting };
 export { ReadyToSendConcludeB };
 export { WaitForConcludeB };
 export { WaitForFunding };
-export { ReadyForFunding };
+export { ReadyToFund };

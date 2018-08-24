@@ -1,6 +1,6 @@
 import BasePlayerB from './Base';
 
-export default class ReadyForFunding extends BasePlayerB {
+export default class ReadyToFund extends BasePlayerB {
   readonly isReadyToSend = false;
 readonly isReadyForFunding = true;
   constructor({ channel, stake, balances }) {
