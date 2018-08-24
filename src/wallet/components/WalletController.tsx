@@ -2,7 +2,7 @@ import * as playerA from '../wallet-engine/wallet-states/PlayerA';
 import * as playerB from '../wallet-engine/wallet-states/PlayerB';
 import { WalletState } from '../redux/reducers/wallet-state';
 import { PureComponent } from 'react';
-import WaitingStep from '../../components/WaitingStep';
+import WaitingStep from './WaitingStep';
 import React from 'react';
 
 interface Props {
