@@ -7,14 +7,12 @@ interface Props {
 
 export default class ProposeGamePage extends React.PureComponent<Props> {
   render() {
-    const { message } = this.props;
-
     return (
       <div className={css(styles.container)}>
         <div>
-          <h1>Game proposal sent</h1>
+          <h1>Game Proposed</h1>
 
-          <div>{message}</div>
+          <div>Waiting for your opponent to accept the game!</div>
         </div>
       </div>
     );

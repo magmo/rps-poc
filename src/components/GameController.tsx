@@ -3,8 +3,7 @@ import React, { PureComponent } from 'react';
 import OpponentSelectionStep from './OpponentSelectionStep';
 import WaitingStep from './WaitingStep';
 import SelectPlayPage from './SelectPlayPage';
-import ProposeGamePage from './ProposeGamePage';
-import ProposalSentPage from './ProposalSentPage';
+import GameProposedPage from './GameProposedPage';
 import FundingConfirmedPage from './FundingConfirmedPage';
 import PlaySelectedPage from './PlaySelectedPage';
 import ResultPage from './ResultPage';
@@ -55,10 +54,10 @@ export default class GameController extends PureComponent<Props> {
 
     switch (applicationState && applicationState.constructor) {
       case playerA.ReadyToSendPreFundSetupA:
-        return <ProposeGamePage message="ready to propose game" />;
+        return <GameProposedPage message="Waiting for opponent to accept game" />;
 
       case playerA.WaitForPreFundSetupB:
-        return <ProposalSentPage message="Waiting for opponent to accept game" />;
+        return <GameProposedPage message="Waiting for opponent to accept game" />;
 
       case playerA.ReadyToFund:
         return <WaitingStep message="ready to send funds"/>
@@ -80,7 +79,7 @@ export default class GameController extends PureComponent<Props> {
         return <PlaySelectedPage message="ready to send round proposal" yourPlay={state2.aPlay} />;
 
       case playerA.WaitForAccept:
-        const state3 = applicationState as playerA.ReadyToSendPropose;
+        const state3 = applicationState as playerA.WaitForAccept;
         return <PlaySelectedPage message="wait for opponent to accept" yourPlay={state3.aPlay} />;
 
       case playerA.ReadyToSendReveal:
