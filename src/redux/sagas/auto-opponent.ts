@@ -1,16 +1,18 @@
-import { takeEvery, put, take, actionChannel, select } from 'redux-saga/effects';
+import { put, take, actionChannel, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { GameActionType, GameAction } from '../actions/game';
-import { MessageActionType, MessageAction, SendMessageAction } from '../actions/messages';
+import { GameActionType, GameAction, MoveSentAction } from '../actions/game';
+import { MessageAction } from '../actions/messages';
 import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
-import Move from '../../game-engine/Move';
 import { ReadyToChooseBPlay, ReadyForFunding } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
 import { WalletActionType, WalletRetrievedAction, WalletFundingActionType } from '../../wallet';
 
 export default function* autoOpponentSaga() {
-  yield takeEvery(GameActionType.PLAY_COMPUTER, startAutoOpponent);
+  while (yield take(GameActionType.PLAY_COMPUTER)) {
+     yield fork(startAutoOpponent);
+    // TODO: Cancel auto opponent if needed
+  }
 }
 
 function* startAutoOpponent() {
@@ -23,23 +25,19 @@ function* startAutoOpponent() {
 
   let gameEngine: GameEngine | null = null;
 
-  const actionFilter = (action): boolean => {
-    return action.type === MessageActionType.SEND_MESSAGE && action.to === wallet.address;
-  };
-
   // Get a channel of actions we're interested in
-  const channel = yield actionChannel(actionFilter);
+  const channel = yield actionChannel(GameActionType.MOVE_SENT);
 
   while (true) {
-    const action: SendMessageAction = yield take(channel);
+    const action: MoveSentAction = yield take(channel);
 
     yield delay(2000);
     if (gameEngine === null) {
       // Start up the game engine for our autoplayer B
-      gameEngine = fromProposal({ move: Move.fromHex(action.data), wallet });
+      gameEngine = fromProposal({ move: action.move, wallet });
       yield continueWithFollowingActions(gameEngine);
     } else {
-      gameEngine.receiveMove(Move.fromHex(action.data));
+      gameEngine.receiveMove(action.move);
 
       yield continueWithFollowingActions(gameEngine);
     }
@@ -58,13 +56,12 @@ function* continueWithFollowingActions(gameEngine: GameEngine) {
       yield put(MessageAction.messageReceived(gameEngine.state.move.toHex()));
       gameEngine.moveSent();
     } else if (state instanceof ReadyForFunding) {
-      
       // TODO: We're relying on the blockchain faker for now. Once that's no longer the case
       // we'll have to handle some funding logic here
       // yield put (WalletFundingAction.walletFunded('0xComputerPlayerFakeAddress'));
       gameEngine.fundingRequested();
-      const action = yield take (WalletFundingActionType.WALLETFUNDING_FUNDED);
-      gameEngine.fundingConfirmed({adjudicator:action.adjudicator});
+      const action = yield take(WalletFundingActionType.WALLETFUNDING_FUNDED);
+      gameEngine.fundingConfirmed({ adjudicator: action.adjudicator });
     } else {
       return false;
     }
