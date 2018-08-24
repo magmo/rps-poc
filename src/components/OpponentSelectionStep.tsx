@@ -18,7 +18,7 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
 
   constructor(props) {
     super(props);
-    this.createChallengeHandler = this.createChallengeHandler.bind(this)
+    this.createChallengeHandler = this.createChallengeHandler.bind(this);
     this.wagerInput = React.createRef();
   }
 
@@ -67,13 +67,13 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
       return;
     }
 
-    const currentPlayer = this.props.currentPlayer
+    const currentPlayer = this.props.currentPlayer;
     this.props.createChallenge({
       address: currentPlayer.address,
       lastSeen: Date.now(),
       name: currentPlayer.name,
       wager,
-    })
+    });
   }
 }
 

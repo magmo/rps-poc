@@ -7,9 +7,9 @@ import { OpponentAction, OpponentActionType, CreateChallenge } from '../actions/
 const opponentsTransformer = (dict) => Object.keys(dict.value).map((key) => dict.value[key]);
 
 function * createChallenge(action: CreateChallenge) {
-  const { challenge } = action
+  const { challenge } = action;
 
-  yield call(reduxSagaFirebase.database.create, `/players`, challenge)
+  yield call(reduxSagaFirebase.database.create, `/players`, challenge);
 }
 
 function * syncOpponentsSaga () {
