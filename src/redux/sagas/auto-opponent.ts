@@ -4,7 +4,7 @@ import { GameActionType, GameAction } from '../actions/game';
 import { MessageActionType, MessageAction, SendMessageAction } from '../actions/messages';
 import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
 import Move from '../../game-engine/Move';
-import { ReadyToChooseBPlay, WaitForFunding } from '../../game-engine/application-states/PlayerB';
+import { ReadyToChooseBPlay, ReadyForFunding } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
 import { WalletActionType, WalletFundingAction, WalletRetrievedAction } from '../../wallet';
@@ -57,8 +57,8 @@ function* continueWithFollowingActions(gameEngine: GameEngine) {
     } else if (state.isReadyToSend) {
       yield put(MessageAction.messageReceived(gameEngine.state.move.toHex()));
       gameEngine.moveSent();
-    } else if (state instanceof WaitForFunding) {
-      // If we're waiting for funding we broadcast to everyone that funding is done
+    } else if (state instanceof ReadyForFunding) {
+      
       // TODO: This will be a bit strange with the blockchain faker competing against it
       yield put (WalletFundingAction.walletFunded('0xComputerPlayerFakeAddress'));
       gameEngine.fundingRequested();
