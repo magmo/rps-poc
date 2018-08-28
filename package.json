@@ -57,6 +57,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
+    "test:all": "run-s truffle:test 'test --all'",
     "postinstall": "rm -f node_modules/web3/index.d.ts",
     "copy_truffle_files": "copyfiles './contracts/**/*' './migrations/**/*' ./build/dist",
     "copy_dotenv": "copyfiles '.env' ./build/dist",
