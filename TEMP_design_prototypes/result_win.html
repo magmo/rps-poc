@@ -55,6 +55,13 @@
       justify-content: center;
     }
 
+    .action {
+      flex: 1 1 auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+
     #top-bar {
       border-bottom: 1px solid white;
     }
@@ -66,11 +73,6 @@
     .play-choice i {
       padding: 20px;
       border: 1px solid #435764;
-      border-radius: 10px;
-    }
-
-    .play-choice i:hover {
-      border: 1px solid white;
       border-radius: 10px;
     }
 
@@ -93,26 +95,33 @@
       </span>
     </nav>
     <div class="main">
-        <div class="title">
-          <div class="row text-center">
-            <div class="col-sm">
-              <h1>Pick your move!</h1>
-            </div>
+      <div class="title">
+        <div class="row text-center">
+          <div class="col-sm">
+            <h1>You win!</h1>
+            <p>Rock beats paper</p>
           </div>
         </div>
-        <div class="display">
-          <div class="row text-center">
-            <div class="play-choice col-sm">
-              <i class="fas fa-hand-rock fa-9x fa-rotate-90"></i>
-            </div>
-            <div class="play-choice col-sm">
-              <i class="fas fa-hand-paper fa-9x fa-rotate-90"></i>
-            </div>
-            <div class="play-choice col-sm">
-              <i class="fas fa-hand-scissors fa-9x fa-flip-horizontal"></i>
-            </div>
+      </div>
+      <div class="display">
+        <div class="row text-center">
+          <div class="play-choice col-sm">
+            <i class="fas fa-hand-rock fa-9x fa-rotate-90"></i>
+          </div>
+          <div class="play-choice col-sm">
+            <i class="fas fa-hand-scissors fa-9x"></i>
           </div>
         </div>
+      </div>
+      <div class="action">
+        <div class="row text-center">
+          <div class="col-sm">
+            <h4>Play again?</h4>
+            <button class="btn btn-default btn-lg">Yes</button>
+            <button class="btn btn-default btn-lg">No</button>
+          </div>
+        </div>
+      </div>
     </div>
     <nav class="navbar fixed-bottom" id="bottom-bar">
       <span class="navbar-brand">
