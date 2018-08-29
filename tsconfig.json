@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "build/dist",
-    "module": "esnext",
+    "module": "commonjs",
     "target": "es2015",
     "lib": ["es6", "dom"],
     "sourceMap": true,
@@ -15,9 +15,8 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,
-    "paths": {
-      "@contracts/*": ["build/dist/build/contracts/*"]
-  }
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
   },
   "exclude": [
     "node_modules",
