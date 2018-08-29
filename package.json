@@ -57,6 +57,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "run-s test:truffle 'test:app --all'",
+    "test:ci": "run-s test:truffle 'test:app --all --ci'",
     "test:app": "node scripts/test.js --env=jsdom",
     "test:truffle": "run-s truffle:compile && (cd build/dist && pwd && ../../scripts/run-with-ganache.sh)",
     "postinstall": "rm -f node_modules/web3/index.d.ts",
