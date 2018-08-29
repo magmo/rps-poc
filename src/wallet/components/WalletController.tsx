@@ -2,7 +2,8 @@ import * as playerA from '../wallet-engine/wallet-states/PlayerA';
 import * as playerB from '../wallet-engine/wallet-states/PlayerB';
 import { WalletState } from '../redux/reducers/wallet-state';
 import { PureComponent } from 'react';
-import GenericStopGap from './GenericStopGapPage';
+import WalletLayout from './WalletLayout';
+import FundingInProgress from './FundingInProgress';
 import React from 'react';
 
 interface Props {
@@ -17,22 +18,46 @@ export default class WalletController extends PureComponent<Props> {
     }
     switch (walletState && walletState.constructor) {
       case playerA.WaitForBlockchainDeploy:
-        return <GenericStopGap message="confirmation of adjudicator deployment" />;
+        return (
+          <WalletLayout>
+            <FundingInProgress message="confirmation of adjudicator deployment" />;
+          </WalletLayout>
+        )
 
       case playerA.WaitForBToDeposit:
-        return <GenericStopGap message="confirmation of opponent's deposit" />;
+        return (
+          <WalletLayout>
+            <FundingInProgress message="confirmation of adjudicator deployment" />;
+          </WalletLayout>
+        )
+
       case playerB.WaitForAToDeploy:
-        return <GenericStopGap message="waiting for adjudicator to be deployed" />;
+        return (
+          <WalletLayout>
+            <FundingInProgress message="waiting for adjudicator to be deployed" />;
+          </WalletLayout>
+        )
 
       case playerB.ReadyToDeposit:
-        return <GenericStopGap message="ready to deposit funds" />;
+        return (
+          <WalletLayout>
+            <FundingInProgress message="ready to deposit funds" />;
+          </WalletLayout>
+        )
 
       case playerB.WaitForBlockchainDeposit:
-        return <GenericStopGap message="waiting for deposit confirmation" />;
+        return (
+          <WalletLayout>
+            <FundingInProgress message="waiting for deposit confirmation" />;
+          </WalletLayout>
+        )
+
       default:
         return (
-          <GenericStopGap message={`[view not implemented: ${walletState.constructor.name}`} />
-        );
+          <WalletLayout>
+            <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />;
+          </WalletLayout>
+        )
     }
   }
 }
