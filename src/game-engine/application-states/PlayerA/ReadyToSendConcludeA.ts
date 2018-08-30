@@ -1,9 +1,9 @@
 import PlayerABase from './Base';
-import Move from '../../Move';
+import { Position } from '../../positions';
 
 export default class ReadyToSendConcludeA extends PlayerABase {
   adjudicator: any;
-  move: Move;
+  position: Position;
   readonly isReadyToSend = true;
 
   constructor({ channel, balances, adjudicator }) {

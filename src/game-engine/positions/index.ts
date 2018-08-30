@@ -19,6 +19,15 @@ export {
   Reveal
 } 
 
+export type Position =
+  | Accept
+  | Conclude
+  | PostFundSetup
+  | PreFundSetup
+  | Propose
+  | Resting
+  | Reveal
+
 export enum GamePositionType {
   Resting,
   Propose,

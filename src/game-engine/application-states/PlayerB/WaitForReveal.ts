@@ -1,16 +1,16 @@
 import BasePlayerB from './Base';
-import Move from '../../Move';
+import { Position } from '../../positions';
 import { Play } from '../../positions';
 
 export default class WaitForReveal extends BasePlayerB {
-  move: Move;
+  position: Position;
   bPlay: Play;
   adjudicator: string;
   readonly isReadyToSend = false;
 
-  constructor({ channel, stake, balances, adjudicator, bPlay, move }) {
+  constructor({ channel, stake, balances, adjudicator, bPlay, position }) {
     super({ channel, stake, balances });
-    this.move = move;
+    this.position = position;
     this.adjudicator = adjudicator;
     this.bPlay = bPlay;
   }

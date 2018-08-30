@@ -1,7 +1,6 @@
 import { Channel } from 'fmg-core';
 import * as AppStates from '..';
-import Move from '../../../Move';
-import { Play, Result } from '../../../positions';
+import { Play, Result, PreFundSetup } from '../../../positions';
 
 const gameLibrary = '0xc1912fee45d61c87cc5ea59dae31190fffff232d';
 const channelNonce = 15;
@@ -18,7 +17,7 @@ const adjudicator = 0xc;
 const aPlay = Play.Rock;
 const bPlay = Play.Scissors;
 const salt = "abc123";
-const move = new Move('state', 'signature'); // fake move
+const position = new PreFundSetup(channel, 0, balances, 0, stake);
 const result = Result.YouWin;
 
 const itHasSharedFunctionality = (appState) => {
@@ -44,12 +43,12 @@ const itHasSharedFunctionality = (appState) => {
 };
 
 describe("ReadyToSendPreFundSetupB", () => {
-  const appState = new AppStates.ReadyToSendPreFundSetupB({ ...coreProps, move });
+  const appState = new AppStates.ReadyToSendPreFundSetupB({ ...coreProps, position });
 
   itHasSharedFunctionality(appState);
 
-  it("has a move", () => {
-    expect(appState.move).toEqual(move);
+  it("has a position", () => {
+    expect(appState.position).toEqual(position);
   });
 });
 
@@ -68,7 +67,7 @@ describe("ReadyToSendPostFundSetupB", () => {
   const appState = new AppStates.ReadyToSendPostFundSetupB({
     ...coreProps,
     adjudicator,
-    move,
+    position,
   });
 
   itHasSharedFunctionality(appState);
@@ -77,8 +76,8 @@ describe("ReadyToSendPostFundSetupB", () => {
     expect(appState.adjudicator).toEqual(adjudicator);
   });
 
-  it("has a move", () => {
-    expect(appState.move).toEqual(move);
+  it("has a position", () => {
+    expect(appState.position).toEqual(position);
   });
 });
 
@@ -86,7 +85,7 @@ describe("WaitForPropose", () => {
   const appState = new AppStates.WaitForPropose({
     ...coreProps,
     adjudicator,
-    move,
+    position,
   });
 
   itHasSharedFunctionality(appState);
@@ -95,8 +94,8 @@ describe("WaitForPropose", () => {
     expect(appState.adjudicator).toEqual(adjudicator);
   });
 
-  it("has a move", () => {
-    expect(appState.move).toEqual(move);
+  it("has a position", () => {
+    expect(appState.position).toEqual(position);
   });
 });
 
@@ -120,7 +119,7 @@ describe("ReadyToSendAccept", () => {
     ...coreProps,
     adjudicator,
     bPlay,
-    move,
+    position,
   });
 
   itHasSharedFunctionality(appState);
@@ -133,8 +132,8 @@ describe("ReadyToSendAccept", () => {
     expect(appState.bPlay).toEqual(bPlay);
   });
 
-  it("has a move", () => {
-    expect(appState.move).toEqual(move);
+  it("has a position", () => {
+    expect(appState.position).toEqual(position);
   });
 });
 
@@ -143,7 +142,7 @@ describe("WaitForReveal", () => {
     ...coreProps,
     adjudicator,
     bPlay,
-    move,
+    position,
   });
 
   itHasSharedFunctionality(appState);
@@ -156,8 +155,8 @@ describe("WaitForReveal", () => {
     expect(appState.bPlay).toEqual(bPlay);
   });
 
-  it("has a move", () => {
-    expect(appState.move).toEqual(move);
+  it("has a position", () => {
+    expect(appState.position).toEqual(position);
   });
 });
 
@@ -169,7 +168,7 @@ describe("ReadyToSendResting", () => {
     aPlay,
     salt,
     result,
-    move,
+    position,
   });
 
   itHasSharedFunctionality(appState);
@@ -194,7 +193,7 @@ describe("ReadyToSendResting", () => {
     expect(appState.result).toEqual(result);
   });
 
-  it("has a move", () => {
-    expect(appState.move).toEqual(move);
+  it("has a position", () => {
+    expect(appState.position).toEqual(position);
   });
 });
