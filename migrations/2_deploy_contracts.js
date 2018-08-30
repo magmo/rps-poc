@@ -19,5 +19,4 @@ module.exports = function (deployer) {
   // so we probably don't have to bother doing it.
   deployer.link(State, SimpleAdjudicator);
   deployer.link(Rules, SimpleAdjudicator);
-  deployer.link(Rules, SimpleAdjudicator);
 };
