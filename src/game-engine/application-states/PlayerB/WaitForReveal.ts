@@ -5,13 +5,11 @@ import { Play } from '../../positions';
 export default class WaitForReveal extends BasePlayerB {
   position: Position;
   bPlay: Play;
-  adjudicator: string;
   readonly isReadyToSend = false;
 
-  constructor({ channel, stake, balances, adjudicator, bPlay, position }) {
+  constructor({ channel, stake, balances, bPlay, position }) {
     super({ channel, stake, balances });
     this.position = position;
-    this.adjudicator = adjudicator;
     this.bPlay = bPlay;
   }
 }

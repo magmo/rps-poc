@@ -68,7 +68,6 @@ it('runthrough', () => {
 
   const waitForPostFundSetupB = gameEngineA.positionSent();
   expect(waitForPostFundSetupB).toBeInstanceOf(ApplicationStatesA.WaitForPostFundSetupB);
-  expect(waitForPostFundSetupB.adjudicator).toEqual(fundingEvent.adjudicator);
 
   // In B's application
   const waitForFundingB= gameEngineB.fundingRequested();

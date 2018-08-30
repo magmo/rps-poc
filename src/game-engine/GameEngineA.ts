@@ -55,7 +55,6 @@ export default class GameEngineA {
         return this.transitionTo(
           new State.WaitForPostFundSetupB({
             ...this.state.commonAttributes,
-            adjudicator: this.state.adjudicator,
             position: this.state.position,
           })
         );
@@ -63,7 +62,6 @@ export default class GameEngineA {
         return this.transitionTo(
           new State.WaitForAccept({
             ...this.state.commonAttributes,
-            adjudicator: this.state.adjudicator,
             aPlay: this.state.aPlay,
             salt: this.state.salt,
             position: this.state.position,
@@ -102,14 +100,12 @@ export default class GameEngineA {
     const stateCount = 0;
     const turnNum = 2;
     const newPosition = new PostFundSetup(channel, turnNum, balances, stateCount, stake);
-    const {adjudicator} = event;
     return this.transitionTo(
       new State.ReadyToSendPostFundSetupA({
         channel,
         stake,
         balances,
         position: newPosition,
-        adjudicator,
       })
     );
   }
@@ -127,7 +123,7 @@ export default class GameEngineA {
   choosePlay(aPlay: Play) {
     if (!(this.state instanceof State.ReadyToChooseAPlay)) { return this.state };
 
-    const { balances, turnNum, stake, channel, adjudicator } = this.state;
+    const { balances, turnNum, stake, channel } = this.state;
 
     const salt = 'salt'; // todo: make random
 
@@ -145,7 +141,6 @@ export default class GameEngineA {
         channel,
         stake,
         balances, 
-        adjudicator,
         aPlay,
         salt,
         position: newPosition,
@@ -168,13 +163,11 @@ export default class GameEngineA {
     // if (oldPledge.turnNum % 2 === 0) {
     //   newState = new State.ReadyToSendConcludeA({
     //     ...oldState.commonAttributes,
-    //     adjudicator: oldState.adjudicator,
     //     move: concludeMove,
     //   });
     // } else if (oldPledge.turnNum % 2 === 1) {
     //   newState = new ApplicationStatesB.ReadyToSendConcludeB({
     //     ...oldState.commonAttributes,
-    //     adjudicator: oldState.adjudicator,
     //     move: concludeMove,
     //   });
     // }
@@ -198,12 +191,12 @@ export default class GameEngineA {
   receivedPostFundSetup(position: PostFundSetup) {
     if (!(this.state instanceof State.WaitForPostFundSetupB)) { return this.state };
 
-    const { channel, stake, balances, adjudicator } = this.state;
+    const { channel, stake, balances } = this.state;
 
     if (this.state.stake > this.state.balances[0] || this.state.stake > this.state.balances[0]) {
       return this.transitionTo(
         new State.InsufficientFundsA({
-          channel, balances, adjudicator,
+          channel, balances,
         })
       )
     };
@@ -211,7 +204,7 @@ export default class GameEngineA {
     const turnNum = position.turnNum + 1;
 
     return this.transitionTo(
-      new State.ReadyToChooseAPlay({ channel, stake, balances, adjudicator, turnNum })
+      new State.ReadyToChooseAPlay({ channel, stake, balances, turnNum })
     );
   }
 
@@ -219,7 +212,7 @@ export default class GameEngineA {
     if (!(this.state instanceof State.WaitForAccept)) { return this.state };
 
     const { channel, stake, resolution: oldBalances, bPlay, turnNum } = position;
-    const { adjudicator, aPlay, salt } = this.state;
+    const { aPlay, salt } = this.state;
     const result = calculateResult(aPlay, bPlay);
 
     const balances = [...oldBalances];
@@ -238,7 +231,6 @@ export default class GameEngineA {
         channel,
         stake,
         balances,
-        adjudicator,
         aPlay,
         bPlay,
         result,
@@ -253,7 +245,6 @@ export default class GameEngineA {
     if (!(this.state instanceof State.WaitForResting)) { return this.state };
 
     const { channel, turnNum: oldTurnNum, resolution: balances, stake } = position;
-    const { adjudicator } = this.state;
     const turnNum = oldTurnNum + 1;
 
     const insufficientFundState = this.insufficientFundState()
@@ -262,30 +253,29 @@ export default class GameEngineA {
     }
 
     return this.transitionTo(
-      new State.ReadyToChooseAPlay({channel, stake, balances, adjudicator, turnNum })
+      new State.ReadyToChooseAPlay({channel, stake, balances, turnNum })
     );
   }
 
   receivedConclude(position: Conclude) {
     const { channel, resolution: balances } = position;
-    const { adjudicator } = this.state;
 
     // todo: need a move. Might also need an intermediate state here
     return this.transitionTo(
-      new State.ReadyToSendConcludeA({ channel, balances, adjudicator })
+      new State.ReadyToSendConcludeA({ channel, balances })
     )
   }
 
   insufficientFundState() : State.InsufficientFunds | null {
     if (this.state.stake > this.state.balances[0]) {
-      const { channel, balances, adjudicator } = this.state
+      const { channel, balances } = this.state
       return new State.InsufficientFundsA({
-        channel, balances, adjudicator,
+        channel, balances,
       })
     } else if (this.state.stake > this.state.balances[1]) {
-      const { channel, balances, adjudicator } = this.state
+      const { channel, balances } = this.state
       return new State.InsufficientFundsB({
-        channel, balances, adjudicator,
+        channel, balances,
       })
     }
 

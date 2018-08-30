@@ -53,19 +53,17 @@ export default class GameEngineB {
             channel,
             stake,
             balances,
-            adjudicator: this.state.adjudicator,
             position: nextPosition,
           }),
         );
       case State.ReadyToSendAccept:
-        const { bPlay, position: nextPosition2, adjudicator } = this.state;
+        const { bPlay, position: nextPosition2 } = this.state;
         return this.transitionTo(
           new State.WaitForReveal({
             channel,
             stake,
             balances,
             bPlay,
-            adjudicator,
             position: nextPosition2,
           }),
         );
@@ -75,7 +73,6 @@ export default class GameEngineB {
             channel,
             stake,
             balances,
-            adjudicator: this.state.adjudicator,
             position: this.state.position,
           }),
         );
@@ -118,10 +115,9 @@ export default class GameEngineB {
     }
 
     const { channel, stake, balances } = this.state;
-    const { adjudicator } = event;
 
     return this.transitionTo(
-      new State.WaitForPostFundSetupA({ channel, stake, balances, adjudicator }),
+      new State.WaitForPostFundSetupA({ channel, stake, balances }),
     );
   }
 
@@ -130,7 +126,7 @@ export default class GameEngineB {
       return this.state;
     }
 
-    const { channel, stake, balances, preCommit, adjudicator, turnNum } = this.state;
+    const { channel, stake, balances, preCommit, turnNum } = this.state;
 
     const newBalances = [...balances];
     newBalances[0] -= stake;
@@ -143,7 +139,6 @@ export default class GameEngineB {
         channel,
         stake,
         balances: newBalances,
-        adjudicator,
         bPlay,
         position: nextPosition,
       }),
@@ -168,13 +163,11 @@ export default class GameEngineB {
     // if (oldPledge.turnNum % 2 === 0) {
     //   newState = new ApplicationStatesA.ReadyToSendConcludeA({
     //     ...oldState.commonAttributes,
-    //     adjudicator: oldState.adjudicator,
     //     move: concludeMove,
     //   });
     // } else if (oldPledge.turnNum % 2 === 1) {
     //   newState = new State.ReadyToSendConcludeB({
     //     ...oldState.commonAttributes,
-    //     adjudicator: oldState.adjudicator,
     //     move: concludeMove,
     //   });
     // }
@@ -201,7 +194,6 @@ export default class GameEngineB {
         stake,
         balances,
         position: nextPosition,
-        adjudicator: this.state.adjudicator,
       }),
     );
   }
@@ -213,14 +205,12 @@ export default class GameEngineB {
 
     const { channel, stake, resolution: balances, preCommit } = position;
     const turnNum = position.turnNum + 1;
-    const { adjudicator } = this.state;
 
     return this.transitionTo(
       new State.ReadyToChooseBPlay({
         channel,
         stake,
         balances,
-        adjudicator,
         turnNum,
         preCommit,
       }),
@@ -241,7 +231,6 @@ export default class GameEngineB {
       bPlay,
       salt,
     } = position;
-    const { adjudicator } = this.state;
     const turnNum = oldTurnNum + 1;
 
     const nextPosition = new Resting(channel, turnNum, balances, stake);
@@ -251,7 +240,6 @@ export default class GameEngineB {
         channel,
         stake,
         balances,
-        adjudicator,
         aPlay,
         bPlay,
         result,
@@ -263,13 +251,12 @@ export default class GameEngineB {
 
   receivedConclude(position: Conclude) {
     const { channel, resolution: balances } = position;
-    const { adjudicator } = this.state;
 
     const newPosition = new Conclude(channel, position.turnNum + 1, balances);
 
     // todo: need a move. Might also need an intermediate state here
     return this.transitionTo(
-      new State.ReadyToSendConcludeB({ channel, balances, adjudicator, position: newPosition }),
+      new State.ReadyToSendConcludeB({ channel, balances, position: newPosition }),
     );
   }
 }

@@ -11,7 +11,6 @@ it('requires sufficient funds to transition from WaitForPostFundSetupB to ReadyT
   const balances = [2, 5];
   const wallet = new ChannelWallet();
   const channel = new Channel(wallet.address, 456, [wallet.address, '0x123']);
-  const adjudicator = '0x2718';
 
   const position = new PostFundSetup(channel, 0, balances, 0, stake);
 
@@ -19,7 +18,6 @@ it('requires sufficient funds to transition from WaitForPostFundSetupB to ReadyT
     channel,
     stake,
     balances,
-    adjudicator,
     position,
   })
 
@@ -35,7 +33,6 @@ it('requires sufficient funds to transition from WaitForResting to ReadyToChoose
   const balances = [5, 2];
   const wallet = new ChannelWallet();
   const channel = new Channel(wallet.address, 456, [wallet.address, '0x123']);
-  const adjudicator = '0x2718';
 
   const position = new Resting(channel, 3, balances, stake);
 
@@ -43,7 +40,6 @@ it('requires sufficient funds to transition from WaitForResting to ReadyToChoose
     channel,
     stake,
     balances,
-    adjudicator,
     aPlay: Play.Rock,
     bPlay: Play.Scissors,
     result: Result.YouWin,

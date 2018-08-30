@@ -13,7 +13,6 @@ const aBal = 4;
 const bBal = 5;
 const balances = [aBal, bBal];
 const coreProps = { channel, stake, balances };
-const adjudicator = 0xc;
 const aPlay = Play.Rock;
 const bPlay = Play.Scissors;
 const salt = "abc123";
@@ -64,13 +63,9 @@ describe("WaitForPreFundSetupB", () => {
 
 
 describe("ReadyToSendPostFundSetupA", () => {
-  const appState = new AppStates.ReadyToSendPostFundSetupA({ ...coreProps, adjudicator, position });
+  const appState = new AppStates.ReadyToSendPostFundSetupA({ ...coreProps, position });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 
   it("has a position", () => {
     expect(appState.position).toEqual(position);
@@ -78,13 +73,9 @@ describe("ReadyToSendPostFundSetupA", () => {
 });
 
 describe("WaitForPostFundSetupB", () => {
-  const appState = new AppStates.WaitForPostFundSetupB({ ...coreProps, adjudicator, position });
+  const appState = new AppStates.WaitForPostFundSetupB({ ...coreProps, position });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 
   it("has a position", () => {
     expect(appState.position).toEqual(position);
@@ -92,29 +83,20 @@ describe("WaitForPostFundSetupB", () => {
 });
 
 describe("ReadyToChooseAPlay", () => {
-  const appState = new AppStates.ReadyToChooseAPlay({ ...coreProps, turnNum: 3, adjudicator });
+  const appState = new AppStates.ReadyToChooseAPlay({ ...coreProps, turnNum: 3 });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 });
 
 describe("ReadyToSendPropose", () => {
   const appState = new AppStates.ReadyToSendPropose({
     ...coreProps,
-    adjudicator,
     aPlay,
     salt,
     position,
   });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 
   it("returns aPlay", () => {
     expect(appState.aPlay).toEqual(aPlay);
@@ -132,17 +114,12 @@ describe("ReadyToSendPropose", () => {
 describe("WaitForAccept", () => {
   const appState = new AppStates.WaitForAccept({
     ...coreProps,
-    adjudicator,
     aPlay,
     salt,
     position,
   });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 
   it("returns aPlay", () => {
     expect(appState.aPlay).toEqual(aPlay);
@@ -160,7 +137,6 @@ describe("WaitForAccept", () => {
 describe("ReadyToSendReveal", () => {
   const appState = new AppStates.ReadyToSendReveal({
     ...coreProps,
-    adjudicator,
     aPlay,
     bPlay,
     result,
@@ -169,10 +145,6 @@ describe("ReadyToSendReveal", () => {
   });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 
   it("returns aPlay", () => {
     expect(appState.aPlay).toEqual(aPlay);
@@ -194,7 +166,6 @@ describe("ReadyToSendReveal", () => {
 describe("WaitForResting", () => {
   const appState = new AppStates.WaitForResting({
     ...coreProps,
-    adjudicator,
     aPlay,
     bPlay,
     result,
@@ -203,10 +174,6 @@ describe("WaitForResting", () => {
   });
 
   itHasSharedFunctionality(appState);
-
-  it("returns the adjudicator address", () => {
-    expect(appState.adjudicator).toEqual(adjudicator);
-  });
 
   it("returns aPlay", () => {
     expect(appState.aPlay).toEqual(aPlay);
