@@ -3,12 +3,10 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { generateContractsInitialState } from 'drizzle';
 
-import RockPaperScissorsGame from '../contracts/RockPaperScissorsGame.json'
-import State from '../contracts/State.json';
-import Rules from '../contracts/Rules.json';
+
 import reducer from './reducers';
 import rootSaga from './sagas';
-
+import { Contracts } from '../blockchain/contracts';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -18,14 +16,14 @@ const enhancers = compose(
 );
 
 const drizzleOptions = {
-  contracts: [RockPaperScissorsGame,State,Rules],
+  contracts: Contracts,
 };
 const initialState = {
   contracts: generateContractsInitialState(drizzleOptions),
 };
 
-const store = createStore(reducer, initialState, enhancers); 
-initDrizzle(store,drizzleOptions);
+const store = createStore(reducer, initialState, enhancers);
+initDrizzle(store, drizzleOptions);
 sagaMiddleware.run(rootSaga);
 
 export default store;

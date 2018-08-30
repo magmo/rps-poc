@@ -27,6 +27,7 @@ const env = getClientEnvironment(publicUrl);
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
 module.exports = {
+
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
   devtool: 'cheap-module-source-map',
@@ -94,6 +95,7 @@ module.exports = {
       '.json',
       '.web.jsx',
       '.jsx',
+      '.sol',
     ],
     alias: {
       
@@ -102,11 +104,6 @@ module.exports = {
       'react-native': 'react-native-web',
     },
     plugins: [
-       // This often causes confusion because we only process files within src/ with babel.
-      // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
-      // please link the files into your node_modules/ and let module-resolution kick in.
-      // Make sure your source files are compiled, as they will not be processed in any way.
-      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
       new TsconfigPathsPlugin({ configFile: paths.appTsConfig }),
     ],
   },
@@ -116,7 +113,19 @@ module.exports = {
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
       // { parser: { requireEnsure: false } },
-
+      {
+        test: /\.sol/,
+        use: [
+          {
+            loader: 'json-loader'
+          },
+          {
+            loader: 'truffle-solidity-loader',
+            options: {
+              network: 'development',
+            }
+          }]
+        },
       {
         test: /\.(js|jsx|mjs)$/,
         loader: require.resolve('source-map-loader'),
