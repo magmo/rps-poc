@@ -41,18 +41,8 @@ const itHasSharedFunctionality = (appState) => {
   });
 };
 
-describe("ReadyToSendPreFundSetupA", () => {
-  const appState = new AppStates.ReadyToSendPreFundSetupA({ ...coreProps, position });
-
-  itHasSharedFunctionality(appState);
-
-  it("has a position", () => {
-    expect(appState.position).toEqual(position);
-  });
-});
-
-describe("WaitForPreFundSetupB", () => {
-  const appState = new AppStates.WaitForPreFundSetupB({ ...coreProps, position });
+describe("WaitForPreFundSetup", () => {
+  const appState = new AppStates.WaitForPreFundSetup({ ...coreProps, position });
 
   itHasSharedFunctionality(appState);
 

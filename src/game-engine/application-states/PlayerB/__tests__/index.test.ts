@@ -95,24 +95,6 @@ describe("ReadyToChooseBPlay", () => {
 
 });
 
-describe("ReadyToSendAccept", () => {
-  const appState = new AppStates.ReadyToSendAccept({
-    ...coreProps,
-    bPlay,
-    position,
-  });
-
-  itHasSharedFunctionality(appState);
-
-  it("returns b's play", () => {
-    expect(appState.bPlay).toEqual(bPlay);
-  });
-
-  it("has a position", () => {
-    expect(appState.position).toEqual(position);
-  });
-});
-
 describe("WaitForReveal", () => {
   const appState = new AppStates.WaitForReveal({
     ...coreProps,
