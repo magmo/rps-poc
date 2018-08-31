@@ -7,6 +7,7 @@ import { ReadyToChooseBPlay, ReadyToFund } from '../../game-engine/application-s
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
 import { WalletActionType, WalletRetrievedAction, WalletFundingActionType } from '../../wallet';
+import { default as positionFromHex } from '../../game-engine/positions/decode';
 
 export default function* autoOpponentSaga() {
   while (yield take(GameActionType.PLAY_COMPUTER)) {
@@ -34,10 +35,10 @@ function* startAutoOpponent() {
     yield delay(2000);
     if (gameEngine === null) {
       // Start up the game engine for our autoplayer B
-      gameEngine = fromProposal({ move: action.move, wallet });
+      gameEngine = fromProposal(positionFromHex(action.move.state));
       yield continueWithFollowingActions(gameEngine);
     } else {
-      gameEngine.receiveMove(action.move);
+      gameEngine.receivePosition(positionFromHex(action.move.state));
 
       yield continueWithFollowingActions(gameEngine);
     }
@@ -54,7 +55,7 @@ function* continueWithFollowingActions(gameEngine: GameEngine) {
       gameEngine.choosePlay(Play.Rock);
     } else if (state.isReadyToSend) {
       yield put(MessageAction.messageReceived(gameEngine.state.move.toHex()));
-      gameEngine.moveSent();
+      gameEngine.positionSent();
     } else if (state instanceof ReadyToFund) {
       // TODO: We're relying on the blockchain faker for now. Once that's no longer the case
       // we'll have to handle some funding logic here

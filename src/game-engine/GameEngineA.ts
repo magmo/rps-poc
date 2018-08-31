@@ -1,7 +1,6 @@
 import { Channel } from 'fmg-core';
 
 import * as State from './application-states/PlayerA';
-import Move from './Move';
 import { calculateResult, Result, Play, Position }  from './positions';
 import PreFundSetup from './positions/PreFundSetup';
 import PostFundSetup from './positions/PostFundSetup';
