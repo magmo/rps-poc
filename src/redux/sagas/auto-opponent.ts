@@ -54,7 +54,7 @@ function* continueWithFollowingActions(gameEngine: GameEngine) {
       // Good ol rock, nothings beats that!
       gameEngine.choosePlay(Play.Rock);
     } else if (state.isReadyToSend) {
-      yield put(MessageAction.messageReceived(gameEngine.state.move.toHex()));
+      yield put(MessageAction.messageReceived(gameEngine.state.position.toHex()));
       gameEngine.positionSent();
     } else if (state instanceof ReadyToFund) {
       // TODO: We're relying on the blockchain faker for now. Once that's no longer the case
