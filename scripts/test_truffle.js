@@ -8,7 +8,7 @@ process.env.BABEL_ENV = 'test';
 process.env.NODE_ENV = 'test';
 process.env.PUBLIC_URL = '';
 
-
+try {
 var ganache = require("ganache-cli");
 var server = ganache.server({port:5732});
 server.listen(process.env.DEV_GANACHE_PORT, function(err, blockchain) {
@@ -24,3 +24,9 @@ exec('truffle.cmd test --network ganache',(err, stdout, stderr) => {
   });
 
 server.close();
+} catch (err){
+    if (err && err.message) {
+        console.log(err.message);
+    }
+    process.exit(1);
+}
