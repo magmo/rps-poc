@@ -130,7 +130,7 @@ export default function decode(hexString) {
     case State.StateType.PreFundSetup:
       const stateCountPre = extractStateCount(hexString);
       const stakePre = extractStake(hexString);
-      if (stateCountPre == 0) {
+      if (stateCountPre === 0) {
         return new PreFundSetupA(channel, turnNum, balances, stateCountPre, stakePre);
       } else {
         return new PreFundSetupB(channel, turnNum, balances, stateCountPre, stakePre);
@@ -138,7 +138,7 @@ export default function decode(hexString) {
     case State.StateType.PostFundSetup:
       const stateCountPost = extractStateCount(hexString);
       const stakePost = extractStake(hexString);
-      if (stateCountPost == 0) {
+      if (stateCountPost === 0) {
         return new PostFundSetupA(channel, turnNum, balances, stateCountPost, stakePost);
       } else {
         return new PostFundSetupB(channel, turnNum, balances, stateCountPost, stakePost);

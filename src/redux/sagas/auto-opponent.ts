@@ -1,7 +1,7 @@
 import { put, take, actionChannel, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { GameActionType, GameAction, MoveSentAction } from '../actions/game';
-import { MessageAction } from '../actions/messages';
+import { GameActionType, GameAction } from '../actions/game';
+import { MessageAction, SendMessageAction } from '../actions/messages';
 import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
 import { PlayerBStateType as StateType } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
@@ -30,15 +30,15 @@ function* startAutoOpponent() {
   const channel = yield actionChannel(GameActionType.MOVE_SENT);
 
   while (true) {
-    const action: MoveSentAction = yield take(channel);
+    const action: SendMessageAction = yield take(channel);
 
     yield delay(2000);
 
     if (gameEngine === null) {
       // Start up the game engine for our autoplayer B
-      gameEngine = fromProposal(positionFromHex(action.move.state));
+      gameEngine = fromProposal(positionFromHex(action.data));
     } else {
-      gameEngine.receivePosition(positionFromHex(action.move.state));
+      gameEngine.receivePosition(positionFromHex(action.data));
     }
 
     let state = gameEngine.state;

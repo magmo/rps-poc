@@ -6,7 +6,6 @@ import { setupGame, fromProposal, GameEngine } from '../../game-engine/GameEngin
 import { State } from '../../game-engine/application-states';
 import { default as positionFromHex } from '../../game-engine/positions/decode';
 import { Wallet, WalletFundingAction, WalletFundingActionType } from '../../wallet';
-import Move from '../../game-engine/Move';
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 

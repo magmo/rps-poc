@@ -6,7 +6,6 @@ import {
   PostFundSetupB,
   Propose,
   Accept,
-  Reveal,
   Resting,
   Conclude,
   calculateResult,
