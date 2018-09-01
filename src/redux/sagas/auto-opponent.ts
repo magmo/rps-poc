@@ -1,7 +1,7 @@
 import { put, take, actionChannel, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import { GameActionType, GameAction } from '../actions/game';
-import { MessageAction, SendMessageAction } from '../actions/messages';
+import { MessageAction, SendMessageAction, MessageActionType } from '../actions/messages';
 import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
 import { PlayerBStateType as StateType } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
@@ -27,7 +27,7 @@ function* startAutoOpponent() {
   let gameEngine: GameEngine | null = null;
 
   // Get a channel of actions we're interested in
-  const channel = yield actionChannel(GameActionType.MOVE_SENT);
+  const channel = yield actionChannel(MessageActionType.SEND_MESSAGE);
 
   while (true) {
     const action: SendMessageAction = yield take(channel);
@@ -42,15 +42,19 @@ function* startAutoOpponent() {
     }
 
     let state = gameEngine.state;
+    // tslint:disable-next-line:no-console
+    console.log('PlayerB state: ', state.type);
 
     switch(state.type) {
         case StateType.CHOOSE_PLAY:
           // Good ol rock, nothings beats that!
           state = gameEngine.choosePlay(Play.Rock);
           yield put(MessageAction.messageReceived(state.position.toHex()));
+          break;
         case StateType.WAIT_FOR_FUNDING:
           gameEngine.fundingConfirmed();
           // in this case we're waiting for A to sent PostFundSetupA, so don't send anything
+          break;
         default:
           yield put(MessageAction.messageReceived(state.position.toHex()));
     }

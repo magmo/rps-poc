@@ -15,7 +15,6 @@ export default function* applicationControllerSaga(wallet: Wallet) {
   const actionTypesFilter = [
     GameActionType.CHOOSE_OPPONENT,
     MessageActionType.MESSAGE_RECEIVED,
-    GameActionType.MOVE_SENT,
     GameActionType.CHOOSE_PLAY,
     WalletFundingActionType.WALLETFUNDING_FUNDED,
     WalletFundingActionType.WALLETFUNDING_REQUEST,
@@ -23,8 +22,11 @@ export default function* applicationControllerSaga(wallet: Wallet) {
   const channel = yield actionChannel(actionTypesFilter);
 
   while (true) {
-    let newState: State | null = null;
+    const oldState: State | null = gameEngine && gameEngine.state;
+    let newState: State | null = oldState;
     const action: GameAction | MessageAction | WalletFundingAction = yield take(channel);
+    // tslint:disable-next-line:no-console
+    console.log('application-controller: ', action.type);
 
     if (gameEngine == null) {
       switch (action.type) {
@@ -35,9 +37,11 @@ export default function* applicationControllerSaga(wallet: Wallet) {
           newState = gameEngine.state;
           break;
         case MessageActionType.MESSAGE_RECEIVED:
-          gameEngine = fromProposal(positionFromHex(action.message));
-          if (gameEngine !== null) {
+          try {
+            gameEngine = fromProposal(positionFromHex(action.message));
             newState = gameEngine.state;
+          } catch {
+            // ignore "not a prefundsetup" error
           }
           break;
         default:
@@ -61,7 +65,7 @@ export default function* applicationControllerSaga(wallet: Wallet) {
       }
     }
 
-    if (newState && gameEngine != null) {
+    if (newState && newState !== oldState) {
       switch(newState.type) {
         case PlayerAStateType.WAIT_FOR_FUNDING:
           yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
