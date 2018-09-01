@@ -6,7 +6,7 @@ import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
 import { PlayerBStateType as StateType } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
 import { getUser } from '../store';
-import { WalletActionType, WalletRetrievedAction } from '../../wallet';
+import { WalletActionType, WalletFundingAction, WalletRetrievedAction } from '../../wallet';
 import { default as positionFromHex } from '../../game-engine/positions/decode';
 
 export default function* autoOpponentSaga() {
@@ -52,8 +52,10 @@ function* startAutoOpponent() {
           yield put(MessageAction.messageReceived(state.position.toHex()));
           break;
         case StateType.WAIT_FOR_FUNDING:
+          yield put(MessageAction.messageReceived(state.position.toHex()));
           gameEngine.fundingConfirmed();
-          // in this case we're waiting for A to sent PostFundSetupA, so don't send anything
+          // stub out wallet too
+          yield put(WalletFundingAction.walletFunded('fake-adjudicator todo remove'));
           break;
         default:
           yield put(MessageAction.messageReceived(state.position.toHex()));
