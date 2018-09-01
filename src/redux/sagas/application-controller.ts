@@ -25,8 +25,6 @@ export default function* applicationControllerSaga(wallet: Wallet) {
     const oldState: State | null = gameEngine && gameEngine.state;
     let newState: State | null = oldState;
     const action: GameAction | MessageAction | WalletFundingAction = yield take(channel);
-    // tslint:disable-next-line:no-console
-    console.log('application-controller: ', action.type);
 
     if (gameEngine == null) {
       switch (action.type) {

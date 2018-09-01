@@ -42,8 +42,6 @@ function* startAutoOpponent() {
     }
 
     let state = gameEngine.state;
-    // tslint:disable-next-line:no-console
-    console.log('PlayerB state: ', state.type);
 
     switch(state.type) {
         case StateType.CHOOSE_PLAY:
