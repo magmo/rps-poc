@@ -7,6 +7,8 @@ import { State } from '../../game-engine/application-states';
 import { default as positionFromHex } from '../../game-engine/positions/decode';
 import { Wallet, WalletFundingAction, WalletFundingActionType } from '../../wallet';
 import Move from '../../game-engine/Move';
+import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
+import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 
 export default function* applicationControllerSaga(wallet: Wallet) {
   let gameEngine: GameEngine | null = null;
@@ -47,32 +49,33 @@ export default function* applicationControllerSaga(wallet: Wallet) {
         case MessageActionType.MESSAGE_RECEIVED:
           newState = gameEngine.receivePosition(positionFromHex(action.message));
           break;
-        case GameActionType.MOVE_SENT:
-          newState = gameEngine.positionSent();
-          break;
         case GameActionType.CHOOSE_PLAY:
           newState = gameEngine.choosePlay(action.play);
           break;
         case WalletFundingActionType.WALLETFUNDING_FUNDED:
-          const adjudicator = { action };
           // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
-          newState = gameEngine.fundingConfirmed({ adjudicator });
+          newState = gameEngine.fundingConfirmed();
           // We've received funding so we need to update the game state again
-          break;
-        case WalletFundingActionType.WALLETFUNDING_REQUEST:
-          newState = gameEngine.fundingRequested();
           break;
         default:
         // do nothing
       }
     }
+
     if (newState && gameEngine != null) {
-      if (newState.isReadyToSend) {
-        yield put(MessageAction.sendMessage(newState.opponentAddress, newState.position.toHex()));
-        yield put(GameAction.moveSent(new Move(newState.position.toHex(), 'fakesig'))); // TODO: fix
-      }
-      if (newState.isReadyForFunding) {
-        yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
+      switch(newState.type) {
+        case PlayerAStateType.WAIT_FOR_FUNDING:
+          yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
+          break;
+        case PlayerBStateType.WAIT_FOR_FUNDING:
+          yield put(WalletFundingAction.walletFundingRequest(wallet, newState.player));
+          break;
+        case PlayerAStateType.CHOOSE_PLAY:
+          break; // don't send anything if the next step is to ChoosePlay
+        case PlayerBStateType.CHOOSE_PLAY:
+          break;
+        default:
+          yield put(MessageAction.sendMessage(newState.opponentAddress, newState.position.toHex()));
       }
       yield put(GameAction.stateChanged(newState));
     }
