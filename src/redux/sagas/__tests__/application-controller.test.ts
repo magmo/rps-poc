@@ -5,7 +5,7 @@ import { Channel } from 'fmg-core';
 import applicationControllerSaga from '../application-controller';
 import { GameAction } from '../../actions/game';
 import { MessageAction } from '../../actions/messages';
-import { Wallet, WalletFundingAction } from '../../../wallet';
+import { Wallet, actions as walletActions } from '../../../wallet';
 import { PreFundSetupA, PreFundSetupB  } from '../../../game-engine/positions';
 
 describe('Application Controller', () => {
@@ -67,7 +67,7 @@ describe('Application Controller', () => {
 
     return expectSaga(applicationControllerSaga, wallet)
       .dispatch(GameAction.chooseOpponent(opponent, stake))
-      .put(WalletFundingAction.walletFundingRequest(wallet, testState.player))
+      .put(walletActions.fundingRequest(testState.channelId))
       .put(GameAction.stateChanged(testState))
       .silentRun();
   });
