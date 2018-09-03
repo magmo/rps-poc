@@ -78,7 +78,3 @@ export default function* applicationControllerSaga(address: string) {
     }
   }
 }
-
-
-
-
