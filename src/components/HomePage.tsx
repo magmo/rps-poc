@@ -27,7 +27,7 @@ const HomePage: React.SFC<IProps> = ({ login, logout, loggedIn }) => {
       <div className={css(styles.centerAligned)}>
         <h1 className={css(styles.title)}>Rock, Paper, Scissors</h1>
         <p>
-          <em>A State-Channel BLAHBLAH</em>
+          <em>A State-Channel Proof-of-Concept Game</em>
         </p>
       </div>
       <div className={css(styles.centeredGroup, styles.icons)}>

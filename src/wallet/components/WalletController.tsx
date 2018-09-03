@@ -57,7 +57,6 @@ export default class WalletController extends PureComponent<Props> {
         return (
           <WalletLayout>
             <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />
-            ;
           </WalletLayout>
         );
     }
