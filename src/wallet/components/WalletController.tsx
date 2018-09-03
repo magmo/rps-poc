@@ -13,51 +13,53 @@ interface Props {
 export default class WalletController extends PureComponent<Props> {
   render() {
     const { walletState } = this.props;
-    if (walletState==null){
-        return null;
+    if (walletState === null) {
+      return null;
     }
+
     switch (walletState && walletState.constructor) {
       case playerA.WaitForBlockchainDeploy:
         return (
           <WalletLayout>
             <FundingInProgress message="confirmation of adjudicator deployment" />;
           </WalletLayout>
-        )
+        );
 
       case playerA.WaitForBToDeposit:
         return (
           <WalletLayout>
             <FundingInProgress message="confirmation of adjudicator deployment" />;
           </WalletLayout>
-        )
+        );
 
       case playerB.WaitForAToDeploy:
         return (
           <WalletLayout>
             <FundingInProgress message="waiting for adjudicator to be deployed" />;
           </WalletLayout>
-        )
+        );
 
       case playerB.ReadyToDeposit:
         return (
           <WalletLayout>
             <FundingInProgress message="ready to deposit funds" />;
           </WalletLayout>
-        )
+        );
 
       case playerB.WaitForBlockchainDeposit:
         return (
           <WalletLayout>
             <FundingInProgress message="waiting for deposit confirmation" />;
           </WalletLayout>
-        )
+        );
 
       default:
         return (
           <WalletLayout>
-            <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />;
+            <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />
+            ;
           </WalletLayout>
-        )
+        );
     }
   }
 }
