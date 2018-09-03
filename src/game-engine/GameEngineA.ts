@@ -146,7 +146,7 @@ export default class GameEngineA {
 
     const { stake, balances } = this.state;
 
-    if (stake > balances[0] || stake > balances[0]) {
+    if (stake > balances[0] || stake > balances[1]) {
       return this.transitionTo(new State.InsufficientFunds({ position }));
     };
 
