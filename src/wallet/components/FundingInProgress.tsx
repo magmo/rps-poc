@@ -5,18 +5,14 @@ interface Props {
 }
 
 export default class FundingUnderway extends React.PureComponent<Props> {
-  static defaultProps = {};
-
   render() {
     return (
       <div>
-        <h1>
-          Funding underway!
-          </h1>
+        <h1>Funding underway!</h1>
         <p>
-          Funding underway for channel 0x234234 for the application at https://rps-poc.com
-            using the <strong>SimpleAdjudicator</strong> strategy.
-          </p>
+          Funding underway for channel 0x234234 for the application at https://rps-poc.com using the{' '}
+          <strong>SimpleAdjudicator</strong> strategy.
+        </p>
         <ul>
           <li>Agree strategy</li>
           <li>You deploy the adjudicator and deposit 0.123 ETH</li>

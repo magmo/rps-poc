@@ -6,14 +6,10 @@ interface Props {
 }
 
 export default class FundingSuccessful extends React.PureComponent<Props> {
-  static defaultProps = {};
-
   render() {
     return (
       <div>
-        <h1>
-          Funding successful!
-          </h1>
+        <h1>Funding successful!</h1>
         <p>
           <span className={css(styles.large)}>🎉</span>
         </p>
