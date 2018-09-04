@@ -10,15 +10,13 @@ export default class ProposeGamePage extends React.PureComponent<Props> {
     const { message } = this.props;
 
     return (
-      <div className={css(styles.container)}>
-        <div>
-          <h1>Game Proposed</h1>
+      <div>
+        <h1>Game Proposed</h1>
 
-          <div>Waiting for your opponent to accept the game!</div>
+        <div>Waiting for your opponent to accept the game!</div>
 
-          <div className={css(styles.footerBar)}>
-            <div className={css(styles.container, styles.message)}>{message}</div>
-          </div>
+        <div className={css(styles.footerBar)}>
+          <div className={css(styles.container, styles.message)}>{message}</div>
         </div>
       </div>
     );

@@ -15,28 +15,20 @@ export default class ResultPage extends React.PureComponent<Props> {
     const { yourPlay, theirPlay, message } = this.props;
 
     return (
-      <div className={css(styles.container)}>
+      <React.Fragment>
         <div>{message}</div>
         <div>
           <h1>The result:</h1>
         </div>
         <div className={css(styles.fullWidth)}>You chose {Play[yourPlay]}</div>
-        <div className={css(styles.fullWidth)}>
-          Your opponent chose {Play[theirPlay]}
-        </div>
-      </div>
+        <div className={css(styles.fullWidth)}>Your opponent chose {Play[theirPlay]}</div>
+      </React.Fragment>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    maxWidth: '90%',
-    margin: 'auto',
-  },
-
   fullWidth: {
     width: '100%',
   },
 });
-

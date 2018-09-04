@@ -5,7 +5,6 @@ import { BRAND_COLOR } from '../constants';
 
 interface ButtonStyles {
   button: Record<string, any>;
-  ':hover': Record<string, any>;
 }
 
 export const buttonStyles: ButtonStyles = {
@@ -17,13 +16,12 @@ export const buttonStyles: ButtonStyles = {
     borderStyle: 'solid',
     borderWidth: 1,
     color: '#fff',
-    transition: 'background-color 0.5s ease',
+    transition: 'background-color 0.25s ease',
     boxShadow: '0px 0px 1px',
-  },
 
-  ':hover': {
-    textDecorationLine: 'none',
-    backgroundColor: '#aaa',
+    ':hover': {
+      backgroundColor: '#aaa',
+    },
   },
 };
 

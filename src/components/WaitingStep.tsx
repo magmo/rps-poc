@@ -18,17 +18,15 @@ export default class WaitingStep extends React.PureComponent<Props> {
 
     return (
       <React.Fragment>
-        <div className={css(styles.container)}>
-          <div>
-            <h1>
-              {message}
-              ...
-            </h1>
-          </div>
-          {selectedPlayId && (
-            <div className={css(styles.fullWidth)}>You&apos;ve chosen {Play[selectedPlayId]}</div>
-          )}
+        <div>
+          <h1>
+            {message}
+            ...
+          </h1>
         </div>
+        {selectedPlayId && (
+          <div className={css(styles.fullWidth)}>You&apos;ve chosen {Play[selectedPlayId]}</div>
+        )}
         <div className={css(styles.footerBar)}>{message}</div>
       </React.Fragment>
     );
@@ -36,11 +34,6 @@ export default class WaitingStep extends React.PureComponent<Props> {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    maxWidth: '90%',
-    margin: 'auto',
-  },
-
   fullWidth: {
     width: '100%',
   },

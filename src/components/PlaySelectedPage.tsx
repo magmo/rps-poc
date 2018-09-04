@@ -17,22 +17,20 @@ export default class PlaySelectedPage extends React.PureComponent<Props> {
     const { message, yourPlay } = this.props;
 
     return (
-      <div className={css(styles.container)}>
+      <React.Fragment>
         <div>
-          <h1>Waiting for {message}...</h1>
+          <h1>
+            Waiting for {message}
+            ...
+          </h1>
         </div>
         <div className={css(styles.fullWidth)}>You&apos;ve chosen {Play[yourPlay]}</div>
-      </div>
+      </React.Fragment>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    maxWidth: '90%',
-    margin: 'auto',
-  },
-
   fullWidth: {
     width: '100%',
   },

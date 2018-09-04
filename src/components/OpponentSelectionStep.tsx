@@ -44,10 +44,8 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
     const { opponents, chooseOpponent, playComputer } = this.props;
 
     return (
-      <div className={css(styles.container)}>
-        <div>
-          <h1>Select an opponent:</h1>
-        </div>
+      <React.Fragment>
+        <h1>Select an opponent:</h1>
         <div className={css(styles.centeredTable)}>
           <table className={css(styles.leftAlign)}>
             <tbody>
@@ -79,17 +77,12 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
             </div>
           </div>
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    maxWidth: '90%',
-    margin: 'auto',
-  },
-
   centeredTable: {
     left: '50%',
     position: 'absolute',

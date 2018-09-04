@@ -16,7 +16,7 @@ class RevealStep extends React.PureComponent<IProps> {
     const theirPlay = PLAY_OPTIONS.find(option => option.id === opponentMoveId);
 
     return (
-      <div className={css(styles.container)}>
+      <React.Fragment>
         <div>
           <h1>The result:</h1>
         </div>
@@ -24,17 +24,12 @@ class RevealStep extends React.PureComponent<IProps> {
         <div className={css(styles.fullWidth)}>
           Your opponent chose {theirPlay && theirPlay.name}
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    maxWidth: '90%',
-    margin: 'auto',
-  },
-
   fullWidth: {
     width: '100%',
   },
