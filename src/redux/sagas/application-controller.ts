@@ -17,14 +17,25 @@ export default function* applicationControllerSaga(address: string) {
     MessageActionType.MESSAGE_RECEIVED,
     GameActionType.CHOOSE_PLAY,
     walletActions.FUNDING_SUCCESS,
+    walletActions.SEND_MESSAGE,
   ];
   const channel = yield actionChannel(actionTypesFilter);
 
   while (true) {
     const oldState: State | null = gameEngine && gameEngine.state;
     let newState: State | null = oldState;
-    const action: GameAction | MessageAction | walletActions.FundingSuccess = yield take(channel);
+    const action: GameAction | MessageAction | walletActions.FundingSuccess | walletActions.SendMessageAction = yield take(channel);
 
+    if (action.type=== walletActions.SEND_MESSAGE && newState){
+      yield put(MessageAction.sendMessage(newState.opponentAddress, `WALLETMESSAGE-${action.data}` ));
+      continue;
+    }
+    if (action.type === MessageActionType.MESSAGE_RECEIVED && action.message.indexOf('WALLETMESSAGE')){
+      const walletMessage = action.message.replace('WALLETMESSAGE-','');
+      yield put(walletActions.receiveMessage(walletMessage));
+      continue;
+    }
+    
     if (gameEngine == null) {
       switch (action.type) {
         case GameActionType.CHOOSE_OPPONENT:
@@ -66,7 +77,7 @@ export default function* applicationControllerSaga(address: string) {
       switch(newState.type) {
         case PlayerAStateType.WAIT_FOR_FUNDING:
         case PlayerBStateType.WAIT_FOR_FUNDING:
-          yield put(walletActions.fundingRequest(newState.channelId));
+          yield put(walletActions.fundingRequest(newState.channelId, newState));
           break;
         case PlayerAStateType.CHOOSE_PLAY:
         case PlayerBStateType.CHOOSE_PLAY:

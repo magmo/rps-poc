@@ -1,17 +1,14 @@
 import * as WalletStates from '..';
 
 describe('WaitForAToDeploy', () => {
-  const transaction = 'bla';
-  const walletState = new WalletStates.WaitForAToDeploy({ transaction });
+  const walletState = new WalletStates.WaitForAToDeploy();
   it('is not ready to send', () => {
     expect(walletState.isReadyToSend).toBe(false);
   });
   it('is not funded', () => {
     expect(walletState.isFunded).toBe(false);
   });
-  it('stores the transaction in state', () => {
-    expect(walletState.transaction).toEqual(transaction);
-  });
+
 });
 describe('ReadyToDeposit', () => {
   const transaction = { some: 'transaction properties' };

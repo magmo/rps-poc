@@ -15,7 +15,8 @@ export function* blockchainSaga() {
     const action = yield take(channel);
     const network = yield call(detectNetwork, web3.currentProvider);
     const simpleAdjudicatorContract = contract(simpleAdjudicatorArtifact);
-    yield call (simpleAdjudicatorContract.defaults,{from:web3.eth.defaultAccount})
+    yield call (simpleAdjudicatorContract.defaults,{from:web3.eth.defaultAccount});
+
     if (!Object.keys(simpleAdjudicatorContract.networks).find(id => id === network.id)) {
       yield put(blockchainActions.wrongNetwork(network.id));
       continue;
@@ -27,7 +28,7 @@ export function* blockchainSaga() {
     switch (action.type) {
       case blockchainActions.DEPLOY_REQUEST:
         try {
-          const deployedContract = yield call(simpleAdjudicatorContract.new, [action.channelId]);
+          const deployedContract = yield call(simpleAdjudicatorContract.new, [action.channelId],{value:action.amount});
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
         } catch (err) {
           yield put(blockchainActions.deploymentFailure(err));
@@ -36,8 +37,7 @@ export function* blockchainSaga() {
       case blockchainActions.DEPOSIT_REQUEST:
         try {
           const existingContract = yield call(simpleAdjudicatorContract.at, action.address);
-          // TODO: Use correct amount
-          const transaction = yield call(existingContract.send, web3.toWei(action.amount, "ether"));
+          const transaction = yield call(existingContract.send, action.amount);
           yield put(blockchainActions.depositSuccess(transaction));
           break;
         } catch (err) {

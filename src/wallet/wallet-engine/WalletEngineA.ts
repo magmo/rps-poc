@@ -1,17 +1,14 @@
-import { Wallet } from '..';
 import * as State from './wallet-states/PlayerA';
 
 export default class WalletEngineA {
-  static setupWalletEngine(wallet: Wallet, transaction: any): WalletEngineA {
-    const walletState = new State.ReadyToDeploy({ transaction });
-    return new WalletEngineA(wallet, walletState);
+  static setupWalletEngine(): WalletEngineA {
+    const walletState = new State.WaitForApproval();
+    return new WalletEngineA(walletState);
   }
 
-  wallet: Wallet;
   state: any;
 
-  constructor(wallet, state) {
-    this.wallet = wallet;
+  constructor(state) {
     this.state = state;
   }
 
@@ -20,6 +17,20 @@ export default class WalletEngineA {
     return state;
   }
 
+  approve(): State.PlayerAState {
+    if (this.state.constructor === State.WaitForApproval) {
+      return this.transitionTo(new State.ReadyToDeploy());
+    } else {
+      return this.state;
+    }
+  }
+  deployed(adjudicator): State.PlayerAState {
+    if (this.state.constructor === State.WaitForBlockchainDeploy){
+      return this.transitionTo(new State.WaitForBToDeposit(adjudicator));
+    }else{
+      return this.state;
+    }
+  }
   transactionSent() {
     if (this.state.constructor === State.ReadyToDeploy) {
       return this.transitionTo(new State.WaitForBlockchainDeploy());

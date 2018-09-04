@@ -1,12 +1,9 @@
 import * as WalletStates from '..';
 
 describe('ReadyToDeploy', () => {
-  const transaction = { some: 'properties to craft a transaction' };
-  const walletState = new WalletStates.ReadyToDeploy({ transaction });
+  // const transaction = { some: 'properties to craft a transaction' };
+  const walletState = new WalletStates.ReadyToDeploy();
 
-  it('has a transaction', () => {
-    expect(walletState.transaction).toEqual(transaction);
-  });
   it('is ready to send', () => {
     expect(walletState.isReadyToSend).toBe(true);
   });
