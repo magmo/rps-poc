@@ -13,31 +13,11 @@ interface Props {
     address: string;
     name: string;
   };
-  createChallenge: (challenge: any) => void;
 }
 
 export default class OpponentSelectionStep extends React.PureComponent<Props> {
-  wagerInput: any;
-
   constructor(props) {
     super(props);
-    this.createChallengeHandler = this.createChallengeHandler.bind(this);
-    this.wagerInput = React.createRef();
-  }
-
-  createChallengeHandler() {
-    const wager = this.wagerInput.current.value;
-    if (!wager) {
-      return;
-    }
-
-    const currentPlayer = this.props.currentPlayer;
-    this.props.createChallenge({
-      address: currentPlayer && currentPlayer.address,
-      lastSeen: Date.now(),
-      name: currentPlayer && currentPlayer.name,
-      wager,
-    });
   }
 
   render() {

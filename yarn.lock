@@ -7910,6 +7910,10 @@ parse-asn1@^5.0.0:
     evp_bytestokey "^1.0.0"
     pbkdf2 "^3.0.3"
 
+parse-domain@^1.1.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/parse-domain/-/parse-domain-1.2.0.tgz#f3a28f3e103fa9cff8a4761eb7208f9596f29bc9"
+
 parse-glob@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/parse-glob/-/parse-glob-3.0.4.tgz#b2c376cfb11f35513badd173ef0bb6e3a388391c"
@@ -11464,6 +11468,13 @@ web3-core@1.0.0-beta.34:
     web3-core-method "1.0.0-beta.34"
     web3-core-requestmanager "1.0.0-beta.34"
     web3-utils "1.0.0-beta.34"
+
+web3-detect-network@^0.0.17:
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/web3-detect-network/-/web3-detect-network-0.0.17.tgz#b531bd8c8e40d0c588f28a53b057e1be43db8a31"
+  dependencies:
+    bluebird "^3.5.1"
+    parse-domain "^1.1.0"
 
 web3-eth-abi@1.0.0-beta.33:
   version "1.0.0-beta.33"

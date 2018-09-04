@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { StyleSheet, css } from 'aphrodite';
 
-import OpponentSelectionStep from './OpponentSelectionStep';
+import ChallengePage from './ChallengePage';
 import WaitingStep from './WaitingStep';
 import SelectPlayPage from './SelectPlayPage';
 import GameProposedPage from './GameProposedPage';
@@ -53,7 +53,7 @@ export default class GameController extends PureComponent<Props> {
       subscribeOpponents();
 
       return (
-        <OpponentSelectionStep
+        <ChallengePage
           chooseOpponent={chooseOpponent}
           playComputer={playComputer}
           opponents={opponents}
