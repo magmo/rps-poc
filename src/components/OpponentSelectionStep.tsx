@@ -71,8 +71,12 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
             <Button onClick={() => playComputer(50)}>Play against computer</Button>
           </div>
           <div className={css(styles.buttonPosition)}>
-            <Button onClick={this.createChallengeHandler}>Create challenge</Button>
-            <input className={css(styles.input)} ref={this.wagerInput} />
+            <div className={css(styles.topAlign)}>
+              <Button onClick={this.createChallengeHandler}>Create challenge</Button>
+            </div>
+            <div className={css(styles.input, styles.topAlign)}>
+              <input ref={this.wagerInput} />
+            </div>
           </div>
         </div>
       </div>
@@ -102,9 +106,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    verticalAlign: 'top',
-    fontSize: 20,
-    paddingTop: 3,
+    fontSize: 18,
+    marginLeft: 8,
+  },
+
+  topAlign: {
+    verticalAlign: 'middle',
+    display: 'inline-block',
   },
 
   titleRow: {
