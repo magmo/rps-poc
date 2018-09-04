@@ -1,4 +1,5 @@
 import * as State from './wallet-states/PlayerB';
+
 export default class WalletEngineB {
   static setupWalletEngine(): WalletEngineB {
     const walletState = new State.WaitForAToDeploy();
@@ -14,23 +15,14 @@ export default class WalletEngineB {
     return this.state;
   }
 
-  receiveEvent(event): State.PlayerBState {
-    switch (this.state.constructor) {
-      case State.WaitForAToDeploy:
-        const { adjudicator } = event;
-        const { transaction } = this.state;
-        return this.transitionTo(new State.ReadyToDeposit({ adjudicator, transaction }));
+
+  transactionConfirmed(adjudicator:string): State.PlayerBState{
+    switch (this.state.constructor){
       case State.WaitForBlockchainDeposit:
-        const stateAdjudicator = this.state.adjudicator;
-        return this.transitionTo(new State.Funded({ adjudicator: stateAdjudicator }));
+      return this.transitionTo(new State.Funded({adjudicator}));
+      case State.WaitForAToDeploy:
+      return this.transitionTo(new State.ReadyToDeposit({adjudicator}))
       default:
-        return this.state;
-    }
-  }
-  deployed(adjudicator): State.PlayerBState {
-    if (this.state.constructor === State.WaitForAToDeploy){
-      return this.transitionTo(new State.ReadyToDeposit(adjudicator));
-    }else{
       return this.state;
     }
   }

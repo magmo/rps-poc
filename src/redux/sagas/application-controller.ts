@@ -30,7 +30,7 @@ export default function* applicationControllerSaga(address: string) {
       yield put(MessageAction.sendMessage(newState.opponentAddress, `WALLETMESSAGE-${action.data}` ));
       continue;
     }
-    if (action.type === MessageActionType.MESSAGE_RECEIVED && action.message.indexOf('WALLETMESSAGE')){
+    if (action.type === MessageActionType.MESSAGE_RECEIVED && action.message.indexOf('WALLETMESSAGE')>-1){
       const walletMessage = action.message.replace('WALLETMESSAGE-','');
       yield put(walletActions.receiveMessage(walletMessage));
       continue;
@@ -77,6 +77,7 @@ export default function* applicationControllerSaga(address: string) {
       switch(newState.type) {
         case PlayerAStateType.WAIT_FOR_FUNDING:
         case PlayerBStateType.WAIT_FOR_FUNDING:
+        yield put(MessageAction.sendMessage(newState.opponentAddress, newState.position.toHex()));
           yield put(walletActions.fundingRequest(newState.channelId, newState));
           break;
         case PlayerAStateType.CHOOSE_PLAY:

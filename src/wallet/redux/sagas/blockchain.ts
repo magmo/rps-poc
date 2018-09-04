@@ -28,7 +28,7 @@ export function* blockchainSaga() {
     switch (action.type) {
       case blockchainActions.DEPLOY_REQUEST:
         try {
-          const deployedContract = yield call(simpleAdjudicatorContract.new, [action.channelId],{value:action.amount});
+          const deployedContract = yield call(simpleAdjudicatorContract.new, [action.channelId],{value:web3.toWei(action.amount,'ether')});
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
         } catch (err) {
           yield put(blockchainActions.deploymentFailure(err));

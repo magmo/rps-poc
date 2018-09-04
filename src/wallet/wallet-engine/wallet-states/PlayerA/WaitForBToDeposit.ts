@@ -4,7 +4,7 @@ export default class WaitForBToDeposit extends BasePlayerA {
   adjudicator: string;
   readonly isReadyToSend = false;
   readonly isFunded = false;
-  constructor({ adjudicator }) {
+  constructor(adjudicator: string) {
     super();
     this.adjudicator = adjudicator;
   }
