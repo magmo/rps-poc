@@ -14,7 +14,7 @@ describe('ReadyToDeploy', () => {
 
 describe('WaitForBToDeposit', () => {
   const adjudicator = 'address';
-  const walletState = new WalletStates.WaitForBToDeposit({ adjudicator });
+  const walletState = new WalletStates.WaitForBToDeposit( adjudicator );
 
   it('returns the adjudicator address', () => {
     expect(walletState.adjudicator).toEqual(adjudicator);

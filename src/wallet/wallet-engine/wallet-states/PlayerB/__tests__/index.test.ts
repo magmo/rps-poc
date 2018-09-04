@@ -11,12 +11,9 @@ describe('WaitForAToDeploy', () => {
 
 });
 describe('ReadyToDeposit', () => {
-  const transaction = { some: 'transaction properties' };
   const adjudicator = 'address';
-  const walletState = new WalletStates.ReadyToDeposit({ adjudicator, transaction });
-  it('has a transaction', () => {
-    expect(walletState.transaction).toEqual(transaction);
-  });
+  const walletState = new WalletStates.ReadyToDeposit({ adjudicator });
+ 
   it('returns the address of the adjudicator', () => {
     expect(walletState.adjudicator).toEqual(adjudicator);
   });
