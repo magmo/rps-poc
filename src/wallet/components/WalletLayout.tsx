@@ -1,4 +1,6 @@
 import React, { ReactNode } from 'react';
+import Modal from 'react-modal';
+import { css, StyleSheet } from 'aphrodite';
 
 interface Props {
   children: ReactNode;
@@ -7,13 +9,18 @@ interface Props {
 export default class WalletLayout extends React.PureComponent<Props> {
   render() {
     return (
-      <div className="container">
-        {/* TODO: make this a modal */}
-        <div>
-          <h3>Channel Wallet</h3>
-          <p>{this.props.children}</p>
+      <Modal isOpen={true}>
+        <div className={css(styles.topBar)}>
+          <h2>Channel Wallet</h2>
         </div>
-      </div>
+        <p>{this.props.children}</p>
+      </Modal>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  topBar: {
+    borderBottom: 'solid 1px #000',
+  },
+});

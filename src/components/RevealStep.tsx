@@ -17,9 +17,7 @@ class RevealStep extends React.PureComponent<IProps> {
 
     return (
       <React.Fragment>
-        <div>
-          <h1>The result:</h1>
-        </div>
+        <h1>The result:</h1>
         <div className={css(styles.fullWidth)}>You chose {yourPlay && yourPlay.name}</div>
         <div className={css(styles.fullWidth)}>
           Your opponent chose {theirPlay && theirPlay.name}

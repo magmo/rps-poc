@@ -4,7 +4,7 @@ interface Props {
   message: string;
 }
 
-export default class FundingUnderway extends React.PureComponent<Props> {
+export default class FundingInProgress extends React.PureComponent<Props> {
   render() {
     return (
       <div>

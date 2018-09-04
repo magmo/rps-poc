@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, css } from 'aphrodite';
+
+import FooterBar from './FooterBar';
 
 interface Props {
   message: string;
@@ -15,36 +16,8 @@ export default class ProposeGamePage extends React.PureComponent<Props> {
 
         <div>Waiting for your opponent to accept the game!</div>
 
-        <div className={css(styles.footerBar)}>
-          <div className={css(styles.container, styles.message)}>{message}</div>
-        </div>
+        <FooterBar>{message}</FooterBar>
       </div>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    maxWidth: '90%',
-    margin: 'auto',
-  },
-
-  fullWidth: {
-    width: '100%',
-  },
-
-  message: {
-    paddingTop: 12,
-  },
-
-  footerBar: {
-    position: 'fixed',
-    bottom: 0,
-    height: 50,
-    left: 0,
-    right: 0,
-    borderTopColor: 'black',
-    borderTopStyle: 'solid',
-    borderTopWidth: 1,
-  },
-});

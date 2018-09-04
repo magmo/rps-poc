@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default class WalletController extends PureComponent<Props> {
-  render() {
+  renderWallet() {
     const { walletState } = this.props;
     if (walletState === null) {
       return null;
@@ -19,46 +19,28 @@ export default class WalletController extends PureComponent<Props> {
 
     switch (walletState && walletState.constructor) {
       case playerA.WaitForBlockchainDeploy:
-        return (
-          <WalletLayout>
-            <FundingInProgress message="confirmation of adjudicator deployment" />;
-          </WalletLayout>
-        );
+        return <FundingInProgress message="confirmation of adjudicator deployment" />;
 
       case playerA.WaitForBToDeposit:
-        return (
-          <WalletLayout>
-            <FundingInProgress message="confirmation of adjudicator deployment" />;
-          </WalletLayout>
-        );
+        return <FundingInProgress message="confirmation of adjudicator deployment" />;
 
       case playerB.WaitForAToDeploy:
-        return (
-          <WalletLayout>
-            <FundingInProgress message="waiting for adjudicator to be deployed" />;
-          </WalletLayout>
-        );
+        return <FundingInProgress message="waiting for adjudicator to be deployed" />;
 
       case playerB.ReadyToDeposit:
-        return (
-          <WalletLayout>
-            <FundingInProgress message="ready to deposit funds" />;
-          </WalletLayout>
-        );
+        return <FundingInProgress message="ready to deposit funds" />;
 
       case playerB.WaitForBlockchainDeposit:
-        return (
-          <WalletLayout>
-            <FundingInProgress message="waiting for deposit confirmation" />;
-          </WalletLayout>
-        );
+        return <FundingInProgress message="waiting for deposit confirmation" />;
 
       default:
         return (
-          <WalletLayout>
-            <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />
-          </WalletLayout>
+          <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />
         );
     }
+  }
+
+  render() {
+    return <WalletLayout>{this.renderWallet()}</WalletLayout>;
   }
 }

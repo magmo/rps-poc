@@ -18,12 +18,7 @@ export default class PlaySelectedPage extends React.PureComponent<Props> {
 
     return (
       <React.Fragment>
-        <div>
-          <h1>
-            Waiting for {message}
-            ...
-          </h1>
-        </div>
+        <h1>{message}</h1>
         <div className={css(styles.fullWidth)}>You&apos;ve chosen {Play[yourPlay]}</div>
       </React.Fragment>
     );
