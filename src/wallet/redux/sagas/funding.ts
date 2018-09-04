@@ -10,7 +10,7 @@ export function* fundingSaga(channelId: string) {
   // - wait for user's response
   // - if player a
   //   - send transaction to blockchain
-  yield put(blockchainActions.deployAdjudicator(channelId));
+  yield put(blockchainActions.deploymentRequest(channelId));
   //   - update state to display "waiting for deploy"
   //   - wait for confirmation
   //   - send adjudicator address to opponent
