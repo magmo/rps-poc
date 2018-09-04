@@ -18,15 +18,15 @@ export const DEPOSIT_REQUEST = 'BLOCKCHAIN.DEPOSIT.REQUEST';
 export const DEPOSIT_SUCCESS = 'BLOCKCHAIN.DEPOSIT.SUCCESS';
 export const DEPOSIT_FAILURE = 'BLOCKCHAIN.DEPOSIT.FAILURE';
 
-export const WRONG_NETWORK = 'BLOCKCHAIN.WRONGNETWORK'
+export const WRONG_NETWORK = 'BLOCKCHAIN.WRONGNETWORK';
 
 // TODO: Remove this
 export const BLOCKCHAIN_RECEIVEEVENT = 'BLOCKCHAIN.RECEIVEEVENT';
 
-
-export const deploymentRequest = (channelId: any) => ({
+export const deploymentRequest = (channelId: any, amount: number) => ({
   type: DEPLOY_REQUEST,
   channelId,
+  amount,
 });
 export const deploymentSuccess = (address: string) => ({
   type: DEPLOY_SUCCESS,
@@ -37,7 +37,6 @@ export const deploymentFailure = (error: any) => ({
   type: DEPLOY_FAILURE,
   error,
 });
-
 
 export const depositRequest = (address: string, amount: number) => ({
   type: DEPOSIT_REQUEST,
@@ -52,8 +51,6 @@ export const depositFailure = (error: any) => ({
   type: DEPOSIT_FAILURE,
   error,
 });
-
-
 
 export const wrongNetwork = (networkId: number) => ({
   type: WRONG_NETWORK,
