@@ -14,10 +14,10 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-process.env.DEV_GANACHE_HOST = (process.env.DEV_GANACHE_HOST === undefined) ? 'localhost' : process.env.DEV_GANACHE_HOST;
-process.env.DEV_GANACHE_PORT = (process.env.DEV_GANACHE_PORT === undefined) ? 7546 : process.env.DEV_GANACHE_PORT;
-process.env.DEFAULT_GAS = (process.env.DEFAULT_GAS === undefined) ? 6721975 : process.env.DEFAULT_GAS;
-process.env.DEFAULT_GAS_PRICE = (process.env.DEFAULT_GAS_PRICE === undefined) ? 20000000000 : process.env.DEFAULT_GAS_PRICE;
+process.env.DEV_GANACHE_HOST = process.env.DEV_GANACHE_HOST || 'localhost';
+process.env.DEV_GANACHE_PORT = process.env.DEV_GANACHE_PORT || 7546;
+process.env.DEFAULT_GAS = process.env.DEFAULT_GAS || 6721975;
+process.env.DEFAULT_GAS_PRICE = process.env.DEFAULT_GAS_PRICE || 20000000000;
 
 const fs = require('fs');
 const chalk = require('chalk');
@@ -104,21 +104,22 @@ choosePort(HOST, DEFAULT_PORT)
     var ganache = require("ganache-cli");
     console.log(`Starting ganache on port ${process.env.DEV_GANACHE_PORT}`);
     var ganacheServer = ganache.server({ port: process.env.DEV_GANACHE_PORT, network_id: 0, accounts });
+    var ganachePortInUse = false;
     ganacheServer.on('error', function (err) {
-      if (err.code && err.code==='EADDRINUSE') {
+      if (err.code && err.code === 'EADDRINUSE') {
         console.log(`Port ${process.env.DEV_GANACHE_PORT} in use. Assuming a ganache instance on that port.`);
+        ganachePortInUse = true;
       } else {
         throw err;
       }
     });
-    ganacheServer.listen(process.env.DEV_GANACHE_PORT, process.env.DEV_GANACHE_HOST, function (err, blockchain) {
-
-      if (err) {
-        return console.log(err);
-      }
-
-    });
-
+    if (!ganachePortInUse) {
+      ganacheServer.listen(process.env.DEV_GANACHE_PORT, process.env.DEV_GANACHE_HOST, function (err, blockchain) {
+        if (err) {
+          return console.log(err);
+        }
+      });
+    }
     const devServer = new WebpackDevServer(compiler, serverConfig);
     // Launch WebpackDevServer.
     devServer.listen(port, HOST, err => {
