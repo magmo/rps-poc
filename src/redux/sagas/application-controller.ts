@@ -74,10 +74,12 @@ export default function* applicationControllerSaga(address: string) {
     }
 
     if (newState && newState !== oldState) {
-      switch(newState.type) {
+      switch (newState.type) {
         case PlayerAStateType.WAIT_FOR_FUNDING:
+          yield put(walletActions.fundingRequest(newState.channelId, newState));
+          break;
         case PlayerBStateType.WAIT_FOR_FUNDING:
-        yield put(MessageAction.sendMessage(newState.opponentAddress, newState.position.toHex()));
+          yield put(MessageAction.sendMessage(newState.opponentAddress, newState.position.toHex()));
           yield put(walletActions.fundingRequest(newState.channelId, newState));
           break;
         case PlayerAStateType.CHOOSE_PLAY:
