@@ -11,10 +11,6 @@
     ```
     yarn install
     ```
-1. Set up your `.env`
-    ```
-    cp .env.example .env
-    ```
 
 ### Developement Info
 
