@@ -32,11 +32,6 @@ describe('Happy path runthrough', () => {
     expect(waitForBlockchainToDeploy).toBeInstanceOf(WalletStatesA.WaitForBlockchainDeploy);
   });
 
-  it('should have the wait for B to deposit state', () => {
-    const waitForBToDeposit = walletEngineA.receiveEvent({ adjudicator });
-    expect(waitForBToDeposit).toBeInstanceOf(WalletStatesA.WaitForBToDeposit);
-    expect((waitForBToDeposit as WalletStatesA.WaitForBToDeposit).adjudicator).toEqual(adjudicator);
-  });
 
   // In B's application
 
@@ -46,11 +41,7 @@ describe('Happy path runthrough', () => {
     expect(waitForBlockchainDeposit.adjudicator).toEqual(adjudicator);
   });
 
-  // In A's application
-  it('should have the funded state', () => {
-    const funded = walletEngineA.receiveEvent({});
-    expect(funded).toBeInstanceOf(WalletStatesA.Funded);
-  });
+
 
 
 });

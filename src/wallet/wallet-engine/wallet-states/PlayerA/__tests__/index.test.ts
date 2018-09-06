@@ -29,12 +29,8 @@ describe('WaitForBToDeposit', () => {
 });
 
 describe('Funded', () => {
-  const adjudicator = 'address';
-  const walletState = new WalletStates.Funded({ adjudicator });
+  const walletState = new WalletStates.Funded();
 
-  it('returns the adjudicator address', () => {
-    expect(walletState.adjudicator).toEqual(adjudicator);
-  });
   it('is not ready to send', () => {
     expect(walletState.isReadyToSend).toBe(false);
   });

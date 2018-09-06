@@ -5,55 +5,48 @@ import { WaitForFunding as WaitForFundingB } from '../../../game-engine/applicat
 
 import { WalletStateActions } from '../actions/state';
 import * as walletExternalActions from '../actions/external';
-import * as WalletEngine from '../../wallet-engine/WalletEngine';
+import WalletEngineA from '../../wallet-engine/WalletEngineA';
+import WalletEngineB from '../../wallet-engine/WalletEngineB';
 
 export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitForFundingB) {
-  
   // if state.sendToBlockchain
 
   // if state send to player
-  
-  const walletEngine = WalletEngine.setupWalletEngine(state.playerIndex);
+
   if (state.playerIndex === 0) {
-    
+    const walletEngine = WalletEngineA.setupWalletEngine();
     let newState = walletEngine.approve();
-   
-    yield put(blockchainActions.deploymentRequest(channelId, state.stake));
+
+    yield put(blockchainActions.deploymentRequest(channelId, state.balances[0]));
     newState = walletEngine.transactionSent();
 
     yield put(WalletStateActions.stateChanged(newState));
-    
+
     const deploySuceededAction = yield take(blockchainActions.DEPLOY_SUCCESS);
     yield put(walletExternalActions.sendMessage(deploySuceededAction.address));
     walletEngine.transactionConfirmed(deploySuceededAction.address);
-    const action = yield take (blockchainActions.FUNDSRECEIVED_EVENT);
-    if (action.amountDeposited===state.balances[1]){
-      return true;
+    let action = yield take(blockchainActions.FUNDSRECEIVED_EVENT);
+    // TODO: Should the wallet engine handle this check?
+    while (true) {
+      if (action.adjudicatorBalance.toNumber() === state.balances[0] + state.balances[1]) {
+        newState = walletEngine.receiveFundingEvent();
+        yield put(blockchainActions.unsubscribeForEvents());
+        yield put(WalletStateActions.stateChanged(newState));
+        return true;
+      }
+      action = yield take(blockchainActions.FUNDSRECEIVED_EVENT);
     }
-
   } else if (state.player === 1) {
-    
+    const walletEngine = WalletEngineB.setupWalletEngine();
     let newState = walletEngine.approve();
     yield put(WalletStateActions.stateChanged(newState));
     const action = yield take(walletExternalActions.RECEIVE_MESSAGE);
     newState = walletEngine.transactionConfirmed(action.data);
     yield put(WalletStateActions.stateChanged(newState));
-    yield put(blockchainActions.depositRequest(newState.adjudicator, state.stake));
+    yield put(blockchainActions.depositRequest(newState.adjudicator, state.balances[1]));
     yield take(blockchainActions.DEPOSIT_SUCCESS);
-    walletEngine.transactionConfirmed("");
+    walletEngine.transactionConfirmed('');
     yield put(WalletStateActions.stateChanged(newState));
   }
-  // - update state to display confirmation screen to user
-  // - wait for user's response
-  // - if player a
-  //   - send transaction to blockchain
-  //   - update state to display "waiting for deploy"
-  //   - wait for confirmation
-  //   - send adjudicator address to opponent
-  //   - update state to display "waiting for deposit"
-  //   - wait for opponent to deposit / blockchain confirmation
-  //   - update state to display the success screen
-  //   - wait for user to click "return-to-app"
-
   return true;
 }

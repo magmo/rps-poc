@@ -52,7 +52,7 @@ export function* blockchainSaga() {
       case blockchainActions.DEPLOY_REQUEST:
         try {
           const deployedContract = yield call(simpleAdjudicatorContract.new, [action.channelId], {
-            value: web3.toWei(action.amount, 'ether'),
+            value: action.amount,
           });
 
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
