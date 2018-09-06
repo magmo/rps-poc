@@ -8,6 +8,8 @@ import { default as positionFromHex } from '../../game-engine/positions/decode';
 import { actions as walletActions } from '../../wallet';
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
+import { encodeMessage, Queue, decodeMessage } from '../../utils/messages';
+import messageSaga from './messages';
 
 export default function* applicationControllerSaga(address: string) {
   let gameEngine: GameEngine | null = null;
@@ -23,8 +25,24 @@ export default function* applicationControllerSaga(address: string) {
   while (true) {
     const oldState: State | null = gameEngine && gameEngine.state;
     let newState: State | null = oldState;
-    const action: GameAction | MessageAction | walletActions.FundingSuccess = yield take(channel);
+    const action: GameAction | MessageAction | walletActions.FundingSuccess | walletActions.SendMessageAction = yield take(channel);
+    let message;
+    if (action.type === MessageActionType.MESSAGE_RECEIVED) {
+      message = decodeMessage(action.message);
+    }
 
+    if (action.type=== walletActions.SEND_MESSAGE && newState){
+      yield put(MessageAction.sendMessage(
+        newState.opponentAddress,
+        encodeMessage(Queue.WALLET, action.data)
+      ));
+      continue;
+    }
+    if (action.type === MessageActionType.MESSAGE_RECEIVED && message.isWallet) {
+      yield put(walletActions.receiveMessage(message.body));
+      continue;
+    }
+    
     if (gameEngine == null) {
       switch (action.type) {
         case GameActionType.CHOOSE_OPPONENT:
@@ -35,7 +53,7 @@ export default function* applicationControllerSaga(address: string) {
           break;
         case MessageActionType.MESSAGE_RECEIVED:
           try {
-            gameEngine = fromProposal(positionFromHex(action.message));
+            gameEngine = fromProposal(positionFromHex(message.body));
             newState = gameEngine.state;
           } catch {
             // ignore "not a prefundsetup" error
@@ -47,7 +65,7 @@ export default function* applicationControllerSaga(address: string) {
     } else {
       switch (action.type) {
         case MessageActionType.MESSAGE_RECEIVED:
-          newState = gameEngine.receivePosition(positionFromHex(action.message));
+          newState = gameEngine.receivePosition(positionFromHex(message.body));
           break;
         case GameActionType.CHOOSE_PLAY:
           newState = gameEngine.choosePlay(action.play);
@@ -63,7 +81,7 @@ export default function* applicationControllerSaga(address: string) {
     }
 
     if (newState && newState !== oldState) {
-      switch(newState.type) {
+      switch (newState.type) {
         case PlayerAStateType.WAIT_FOR_FUNDING:
         case PlayerBStateType.WAIT_FOR_FUNDING:
           yield put(walletActions.fundingRequest(newState.channelId));
