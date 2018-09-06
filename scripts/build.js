@@ -15,7 +15,6 @@ process.on('unhandledRejection', err => {
 require('../config/env');
 
 // Default to ropsten test network
-// the ETH_ACCOUNT_MNENOMIC and INFURA_API_KEY must be defined in your .env
 process.env.TARGET_NETWORK = process.env.TARGET_NETWORK || 'ropsten';
 process.env.DEFAULT_GAS = process.env.DEFAULT_GAS || 6721975;
 process.env.DEFAULT_GAS_PRICE = process.env.DEFAULT_GAS_PRICE || 20000000000;
