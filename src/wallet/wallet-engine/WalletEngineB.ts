@@ -15,14 +15,18 @@ export default class WalletEngineB {
     return this.state;
   }
 
+  deployConfirmed({ adjudicator }): State.PlayerBState {
+    if (this.state.constructor === State.WaitForAToDeploy) {
+      return this.transitionTo(new State.ReadyToDeposit({ adjudicator }));
+    } else {
+      return this.state;
+    }
+  }
 
-  transactionConfirmed(adjudicator:string): State.PlayerBState{
-    switch (this.state.constructor){
-      case State.WaitForBlockchainDeposit:
-      return this.transitionTo(new State.Funded({adjudicator}));
-      case State.WaitForAToDeploy:
-      return this.transitionTo(new State.ReadyToDeposit({adjudicator}))
-      default:
+  transactionConfirmed(): State.PlayerBState {
+    if (this.state.constructor === State.WaitForBlockchainDeposit) {
+      return this.transitionTo(new State.Funded());
+    } else {
       return this.state;
     }
   }
