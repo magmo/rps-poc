@@ -25,8 +25,11 @@ export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitFor
     
     const deploySuceededAction = yield take(blockchainActions.DEPLOY_SUCCESS);
     yield put(walletExternalActions.sendMessage(deploySuceededAction.address));
-
     walletEngine.transactionConfirmed(deploySuceededAction.address);
+    const action = yield take (blockchainActions.FUNDSRECEIVED_EVENT);
+    if (action.amountDeposited===state.balances[1]){
+      return true;
+    }
 
   } else if (state.player === 1) {
     
