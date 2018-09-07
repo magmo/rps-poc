@@ -22,7 +22,7 @@ export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitFor
     yield put(stateActions.stateChanged(newState));
 
     const deploySuceededAction = yield take(blockchainActions.DEPLOY_SUCCESS);
-    yield put(externalActions.sendMessage(opponentAddress, "SUCCESS"));
+    yield put(externalActions.sendMessage(opponentAddress, deploySuceededAction.address));
 
     walletEngine.transactionConfirmed(deploySuceededAction.address);
 
@@ -44,7 +44,7 @@ export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitFor
 
     yield put(stateActions.stateChanged(newState));
 
-    const action = yield take(externalActions.RECEIVE_MESSAGE);
+    const action: externalActions.ReceiveMessage = yield take(externalActions.RECEIVE_MESSAGE);
     newState = walletEngine.deployConfirmed(action.data);
     yield put(stateActions.stateChanged(newState));
     yield put(blockchainActions.depositRequest(newState.adjudicator, state.balances[1]));
