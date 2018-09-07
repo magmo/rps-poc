@@ -11,7 +11,7 @@ interface Props {
   autoOpponentAddress: string,
 }
 
-export default class OpponentSelectionStep extends React.PureComponent<Props> {
+export default class SelectChallenge extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
   }

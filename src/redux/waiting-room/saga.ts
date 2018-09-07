@@ -11,7 +11,7 @@ type ActionType = (
   | messageActions.MessageReceived
 );
 
-export default function * waitingRoomSaga(address, stake, name, isPublic) {
+export default function * waitingRoomSaga(address: string, name: string, stake: number, isPublic: boolean) {
 
   const channel = yield actionChannel([
     waitingRoomActions.CANCEL_CHALLENGE,
@@ -27,7 +27,8 @@ export default function * waitingRoomSaga(address, stake, name, isPublic) {
   }
 
   yield put(applicationActions.waitingRoomSuccess(challenge));
-  yield call(reduxSagaFirebase.database.create, `/challenges/${address}`, challenge);
+  // use update to allow us to pick our own key
+  yield call(reduxSagaFirebase.database.update, `/challenges/${address}`, challenge);
 
   while (true) {
     const action: ActionType = yield take(channel);
