@@ -15,6 +15,8 @@ interface Props {
   };
 }
 
+const DEFAULT_WAGER = 50;
+
 export default class OpponentSelectionStep extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
@@ -39,14 +41,14 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
                   <td>{opponent.name}</td>
                   <td>{opponent.wager}</td>
                   <td>
-                    <Button onClick={() => chooseOpponent(opponent.address, 50)}>Challenge</Button>
+                    <Button onClick={() => chooseOpponent(opponent.address, DEFAULT_WAGER)}>Challenge</Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className={css(styles.buttonPosition)}>
-            <Button onClick={() => playComputer(50)}>Play against computer</Button>
+            <Button onClick={() => playComputer(DEFAULT_WAGER)}>Play against computer</Button>
           </div>
         </div>
       </React.Fragment>
