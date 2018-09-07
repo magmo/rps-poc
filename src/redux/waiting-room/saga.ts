@@ -13,6 +13,7 @@ type ActionType = (
   | messageActions.MessageReceived
 );
 
+const REFRESH_INTERVAL = 4000; // milliseconds
 const EXPIRATION_INTERVAL = 5000; // milliseconds
 
 export default function * waitingRoomSaga(address: string, name: string, stake: number, isPublic: boolean) {
@@ -59,7 +60,7 @@ export default function * waitingRoomSaga(address: string, name: string, stake: 
 
 function * challengeHeartbeatSaga(challenge) {
   while(true) {
-    yield call(delay, 5000);
+    yield call(delay, REFRESH_INTERVAL);
     yield refreshChallenge(challenge);
   }
 }
