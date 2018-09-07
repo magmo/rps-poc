@@ -9,6 +9,7 @@ import WalletEngineA from '../../wallet-engine/WalletEngineA';
 import WalletEngineB from '../../wallet-engine/WalletEngineB';
 
 export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitForFundingB) {
+  const opponentAddress = state.opponentAddress;
 
   if (state.playerIndex === 0) {
     const walletEngine = WalletEngineA.setupWalletEngine();
@@ -21,7 +22,7 @@ export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitFor
     yield put(stateActions.stateChanged(newState));
 
     const deploySuceededAction = yield take(blockchainActions.DEPLOY_SUCCESS);
-    yield put(externalActions.sendMessage(deploySuceededAction.address, "SUCCESS"));
+    yield put(externalActions.sendMessage(opponentAddress, "SUCCESS"));
 
     walletEngine.transactionConfirmed(deploySuceededAction.address);
 
