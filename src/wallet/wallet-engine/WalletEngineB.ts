@@ -15,9 +15,9 @@ export default class WalletEngineB {
     return this.state;
   }
 
-  deployConfirmed({ adjudicator }): State.PlayerBState {
+  deployConfirmed( adjudicator ): State.PlayerBState {
     if (this.state.constructor === State.WaitForAToDeploy) {
-      return this.transitionTo(new State.ReadyToDeposit({ adjudicator }));
+      return this.transitionTo(new State.ReadyToDeposit( adjudicator ));
     } else {
       return this.state;
     }
