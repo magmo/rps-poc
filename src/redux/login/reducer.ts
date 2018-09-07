@@ -1,21 +1,16 @@
 import { Reducer } from 'redux';
-import * as loginActions from '../actions/login';
+import * as loginActions from './actions';
 
 export interface LoginState {
   loading: boolean;
   loggedIn: boolean;
   user: any;
-  player?: {
-    address: string;
-    name: string;
-  };
 }
 
 const initialState: LoginState = {
   loading: false,
   loggedIn: false,
   user: null,
-  player: undefined,
 };
 
 export const loginReducer: Reducer<LoginState> = (state = initialState, action: loginActions.AnyAction) => {
@@ -32,7 +27,6 @@ export const loginReducer: Reducer<LoginState> = (state = initialState, action: 
         loading: false,
         loggedIn: true,
         user: action.user,
-        player: action.player,
       };
     case loginActions.LOGIN_FAILURE:
       return {

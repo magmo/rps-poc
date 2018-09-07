@@ -9,10 +9,9 @@ export const loginRequest = () => ({
   type: LOGIN_REQUEST as typeof LOGIN_REQUEST,
 });
 
-export const loginSuccess = (user: object, player: { address: string; name: string; }) => ({
+export const loginSuccess = (user: object) => ({
   type: LOGIN_SUCCESS as typeof LOGIN_SUCCESS,
   user,
-  player,
 });
 
 export const loginFailure = (error: Error) => ({

@@ -1,13 +1,9 @@
 import firebase from 'firebase';
-import { call, fork, put, take, takeEvery, cancel, race } from 'redux-saga/effects';
-import { delay } from 'redux-saga'
+import { call, fork, put, take, takeEvery, cancel } from 'redux-saga/effects';
 
-import * as loginActions from '../actions/login';
+import * as loginActions from './actions';
 import { reduxSagaFirebase } from '../../gateways/firebase';
-import { fetchOrCreatePlayer } from './player';
-import applicationControllerSaga from './application-controller';
-import { MessageAction } from '../actions/messages';
-import { walletSaga, actions as walletActions } from '../../wallet';
+import applicationSaga from '../application/saga';
 
 const authProvider = new firebase.auth.GoogleAuthProvider();
 
@@ -40,31 +36,14 @@ function* loginStatusWatcherSaga() {
     const { user } = yield take(channel);
 
     if (user) {
-      // login procedure
-      yield fork(walletSaga, user.uid);
+      applicationThread = yield fork(applicationSaga, user.uid);
 
-      const { success, failure } = yield race({
-        success: take(walletActions.INITIALIZATION_SUCCESS),
-        failure: call(delay, 2000),
-      });
-
-      if (failure) { throw new Error('Wallet initialization timed out'); }
-
-      const address = (success as walletActions.InitializationSuccess).address;
-
-      const player = yield fetchOrCreatePlayer(address, user.displayName);
-
-      yield put(MessageAction.subscribeMessages(address));
-
-      applicationThread = yield fork(applicationControllerSaga, address);
-
-      yield put(loginActions.loginSuccess(user, player));
+      yield put(loginActions.loginSuccess(user));
 
     } else {
       if (applicationThread) {
         yield cancel(applicationThread);
       }
-      yield put(MessageAction.unsubscribeMessages());
       yield put(loginActions.logoutSuccess());
     }
   }

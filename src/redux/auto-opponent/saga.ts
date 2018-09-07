@@ -1,7 +1,8 @@
-import { put, take, actionChannel, fork } from 'redux-saga/effects';
+import { put, take, actionChannel } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { GameActionType, GameAction } from '../actions/game';
-import { MessageAction, SendMessageAction, MessageActionType } from '../actions/messages';
+
+import * as autoOpponentActions from './actions';
+
 import { fromProposal, GameEngine } from '../../game-engine/GameEngine';
 import { PlayerBStateType as StateType } from '../../game-engine/application-states/PlayerB';
 import { Play } from '../../game-engine/positions';
@@ -9,23 +10,15 @@ import { default as positionFromHex } from '../../game-engine/positions/decode';
 import ChannelWallet from '../../wallet/domain/ChannelWallet';
 
 export default function* autoOpponentSaga() {
-  while (yield take(GameActionType.PLAY_COMPUTER)) {
-    yield fork(startAutoOpponent);
-    // TODO: Cancel auto opponent if needed
-  }
-}
-
-function* startAutoOpponent() {
   const wallet = new ChannelWallet(); // generate new wallet just for this process
-  yield put(GameAction.chooseOpponent(wallet.address, 50));
+  yield put(autoOpponentActions.initializationSuccess(wallet.address));
 
   let gameEngine: GameEngine | null = null;
 
-  // Get a channel of actions we're interested in
-  const channel = yield actionChannel(MessageActionType.SEND_MESSAGE);
+  const channel = yield actionChannel(autoOpponentActions.MESSAGE_FROM_APP);
 
   while (true) {
-    const action: SendMessageAction = yield take(channel);
+    const action: autoOpponentActions.MessageFromApp = yield take(channel);
 
     yield delay(2000);
 
@@ -42,14 +35,14 @@ function* startAutoOpponent() {
         case StateType.CHOOSE_PLAY:
           // Good ol rock, nothings beats that!
           state = gameEngine.choosePlay(Play.Rock);
-          yield put(MessageAction.messageReceived(state.position.toHex()));
+          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
           break;
         case StateType.WAIT_FOR_FUNDING:
-          yield put(MessageAction.messageReceived(state.position.toHex()));
+          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
           gameEngine.fundingConfirmed();
           break;
         default:
-          yield put(MessageAction.messageReceived(state.position.toHex()));
+          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
     }
   }
 }
