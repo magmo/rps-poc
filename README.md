@@ -29,6 +29,7 @@
     2. Click on the account icon (circle in the top right)
     3. Select "Import"
     4. Paste in the secret key from [`scripts/setup.js`](./scripts/setup.js)
+5. If you restart ganache, you will need to switch to another network and back in metamask to prevent transactions from failing with "incorrect nonce" errors
 
 #### To build:
 
