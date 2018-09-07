@@ -39,8 +39,7 @@ describe('WaitForBlockchainDeposit', () => {
 });
 
 describe('Funded', () => {
-  const adjudicator = 'address';
-  const walletState = new WalletStates.Funded({ adjudicator });
+  const walletState = new WalletStates.Funded();
   it('is not ready to send', () => {
     expect(walletState.isReadyToSend).toBe(false);
   });
