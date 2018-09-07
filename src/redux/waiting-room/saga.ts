@@ -1,16 +1,19 @@
-import { take, actionChannel, put, call } from 'redux-saga/effects'; 
-import { reduxSagaFirebase } from '../../gateways/firebase';
+import { take, actionChannel, put, call, fork } from 'redux-saga/effects'; 
+import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
  
 import * as waitingRoomActions from '../waiting-room/actions';
 import * as messageActions from '../message-service/actions';
 import * as applicationActions from '../application/actions';
 import GameEngineB from '../../game-engine/GameEngineB';
 import decode from '../../game-engine/positions/decode';
+import { delay } from 'redux-saga';
 
 type ActionType = (
   | waitingRoomActions.CancelChallenge
   | messageActions.MessageReceived
 );
+
+const EXPIRATION_INTERVAL = 5000; // milliseconds
 
 export default function * waitingRoomSaga(address: string, name: string, stake: number, isPublic: boolean) {
 
@@ -25,11 +28,14 @@ export default function * waitingRoomSaga(address: string, name: string, stake: 
     stake,
     isPublic,
     lastSeen: new Date().getTime(),
+    expiresAt: new Date().getTime() + EXPIRATION_INTERVAL,
   }
 
   yield put(applicationActions.waitingRoomSuccess(challenge));
   // use update to allow us to pick our own key
   yield call(reduxSagaFirebase.database.update, `/challenges/${address}`, challenge);
+
+  yield fork(challengeHeartbeatSaga, challenge);
 
   while (true) {
     const action: ActionType = yield take(channel);
@@ -51,4 +57,21 @@ export default function * waitingRoomSaga(address: string, name: string, stake: 
   }
 }
 
+function * challengeHeartbeatSaga(challenge) {
+  while(true) {
+    yield call(delay, 5000);
+    yield refreshChallenge(challenge);
+  }
+}
 
+const challengeRef = (challenge) => {
+  return firebase.database().ref(`challenges/${challenge.address}`);
+}
+
+function * refreshChallenge(challenge) {
+  const challengeParams = {
+    expiresAt: new Date().getTime() + EXPIRATION_INTERVAL,
+  }
+
+  return yield call(reduxSagaFirebase.database.patch, challengeRef(challenge), challengeParams);
+}
