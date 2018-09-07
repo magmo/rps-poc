@@ -9,7 +9,6 @@ import { actions as walletActions } from '../../wallet';
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 import { encodeMessage, Queue, decodeMessage } from '../../utils/messages';
-import messageSaga from './messages';
 
 export default function* applicationControllerSaga(address: string) {
   let gameEngine: GameEngine | null = null;
