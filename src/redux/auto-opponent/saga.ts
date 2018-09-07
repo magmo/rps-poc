@@ -31,22 +31,22 @@ export default function* autoOpponentSaga() {
 
     let state = gameEngine.state;
 
-    switch(state.type) {
-        case StateType.CHOOSE_PLAY:
-          // Good ol rock, nothings beats that!
-          state = gameEngine.choosePlay(Play.Rock);
-          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
-          break;
-        case StateType.WAIT_FOR_FUNDING:
-          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
-          gameEngine.fundingConfirmed();
-          break;
-        case StateType.VIEW_RESULT:
-          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
-          gameEngine.playAgain();
-          break;
-        default:
-          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
+    switch (state.type) {
+      case StateType.CHOOSE_PLAY:
+        // Good ol rock, nothings beats that!
+        state = gameEngine.choosePlay(Play.Rock);
+        yield put(autoOpponentActions.messageToApp(state.position.toHex()));
+        break;
+      case StateType.WAIT_FOR_FUNDING:
+        yield put(autoOpponentActions.messageToApp(state.position.toHex()));
+        gameEngine.fundingConfirmed();
+        break;
+      case StateType.VIEW_RESULT:
+        yield put(autoOpponentActions.messageToApp(state.position.toHex()));
+        gameEngine.playAgain();
+        break;
+      default:
+        yield put(autoOpponentActions.messageToApp(state.position.toHex()));
     }
   }
 }

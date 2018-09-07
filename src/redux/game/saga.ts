@@ -46,9 +46,9 @@ export default function* gameSaga(gameEngine: GameEngine) {
 
     if (newState && newState !== oldState) {
       switch (newState.type) {
-       case PlayerAStateType.WAIT_FOR_FUNDING:
+        case PlayerAStateType.WAIT_FOR_FUNDING:
         case PlayerBStateType.WAIT_FOR_FUNDING:
-          yield put(walletActions.fundingRequest(newState.channelId));
+          yield put(walletActions.fundingRequest(newState.channelId, newState));
           break;
         case PlayerAStateType.CHOOSE_PLAY:
         case PlayerBStateType.CHOOSE_PLAY:
@@ -61,6 +61,6 @@ export default function* gameSaga(gameEngine: GameEngine) {
   }
 }
 
-function * sendState(state) {
+function* sendState(state) {
   yield put(messageActions.sendMessage(state.opponentAddress, state.position.toHex()));
 }
