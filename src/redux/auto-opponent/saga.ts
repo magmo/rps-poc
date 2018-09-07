@@ -41,6 +41,10 @@ export default function* autoOpponentSaga() {
           yield put(autoOpponentActions.messageToApp(state.position.toHex()));
           gameEngine.fundingConfirmed();
           break;
+        case StateType.VIEW_RESULT:
+          yield put(autoOpponentActions.messageToApp(state.position.toHex()));
+          gameEngine.playAgain();
+          break;
         default:
           yield put(autoOpponentActions.messageToApp(state.position.toHex()));
     }
