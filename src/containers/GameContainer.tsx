@@ -22,11 +22,13 @@ import { Play } from '../game-engine/positions';
 
 interface GameProps {
   state: GameState,
-  choosePlay: (play: Play) => void; // TODO: what should this be?
+  choosePlay: (play: Play) => void;
+  abandonGame: () => void;
+  playAgain: () => void;
 }
 
 function GameContainer(props: GameProps) {
-  const { state, choosePlay } = props;
+  const { state, choosePlay, playAgain, abandonGame } = props;
 
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
@@ -56,6 +58,8 @@ function GameContainer(props: GameProps) {
           yourPlay={state.aPlay}
           theirPlay={state.bPlay}
           result={state.result}
+          playAgain={playAgain}
+          abandonGame={abandonGame}
         />
       );
 
@@ -89,6 +93,8 @@ function GameContainer(props: GameProps) {
             yourPlay={state.bPlay}
             theirPlay={state.aPlay}
             result={state.result}
+            playAgain={playAgain}
+            abandonGame={abandonGame}
           />
         );
 
@@ -103,6 +109,8 @@ const mapStateToProps = (state: SiteState) => ({
 
 const mapDispatchToProps = {
   choosePlay: gameActions.choosePlay,
+  playAgain: gameActions.playAgain,
+  abandonGame: gameActions.abandonGame,
 };
 
 export default connect(
