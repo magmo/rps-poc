@@ -32,10 +32,10 @@ function creatEventChannel(deployedContract) {
 
 // The blockchain saga will be responsible for dealing with the blockchain using truffle
 export function* blockchainSaga() {
-  const channel = yield actionChannel(
-    a =>
-      a.type === blockchainActions.DEPLOY_REQUEST || a.type === blockchainActions.DEPOSIT_REQUEST,
-  );
+  const channel = yield actionChannel([
+    blockchainActions.DEPLOY_REQUEST,
+    blockchainActions.DEPOSIT_REQUEST,
+  ]);
 
   while (true) {
     const action = yield take(channel);
