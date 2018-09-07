@@ -44,7 +44,7 @@ function GameContainer(props: GameProps) {
     case playerA.WAIT_FOR_ACCEPT:
       return (
         <PlaySelectedPage
-          message="Waiting for opponent to accept"
+          message="Waiting for opponent to choose their move"
           yourPlay={state.aPlay}
         />
       );
@@ -72,12 +72,25 @@ function GameContainer(props: GameProps) {
     case playerB.WAIT_FOR_POST_FUND_SETUP:
       return <WaitingStep message="Waiting for post-fund setup" />;
 
+    case playerB.WAIT_FOR_PROPOSE:
+      return <WaitingStep message="Waiting for your opponent to choose their move" />;
+
     case playerB.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} />;
 
     case playerB.WAIT_FOR_REVEAL:
       // choice made
       return <WaitingStep message="Waiting for opponent to reveal their move" />;
+
+    case playerB.VIEW_RESULT:
+        return (
+          <ResultPage
+            message="Waiting for opponent to suggest a new game"
+            yourPlay={state.bPlay}
+            theirPlay={state.aPlay}
+            result={state.result}
+          />
+        );
 
     default:
       return <WaitingStep message={`[view not implemented: ${state.type}`} />;
