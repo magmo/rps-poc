@@ -5,6 +5,7 @@ import * as waitingRoomActions from '../waiting-room/actions';
 import * as messageActions from '../message-service/actions';
 import * as applicationActions from '../application/actions';
 import GameEngineB from '../../game-engine/GameEngineB';
+import decode from '../../game-engine/positions/decode';
 
 type ActionType = (
   | waitingRoomActions.CancelChallenge
@@ -40,7 +41,8 @@ export default function * waitingRoomSaga(address: string, name: string, stake: 
         break;
 
       case messageActions.MESSAGE_RECEIVED:
-        const gameEngine = GameEngineB.fromProposal(action.message);
+        const position = decode(action.message);
+        const gameEngine = GameEngineB.fromProposal(position);
         // todo: handle error if it isn't a propose state with the right properties
         yield call(reduxSagaFirebase.database.delete, `/challenges/${address}`);
         yield put(applicationActions.gameRequest(gameEngine));

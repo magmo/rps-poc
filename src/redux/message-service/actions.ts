@@ -10,12 +10,12 @@ export const sendMessage = (to: string, data: string) => ({
   data,
 });
 
-export const messageReceived = (message: any) => ({
+export const messageReceived = (message: string) => ({
   type: MESSAGE_RECEIVED as typeof MESSAGE_RECEIVED,
   message,
 });
 
-export const subscribeMessages = (address) => ({
+export const subscribeMessages = (address: string) => ({
   type: SUBSCRIBE_MESSAGES as typeof SUBSCRIBE_MESSAGES,
   address,
 });
