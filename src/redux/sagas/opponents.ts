@@ -9,7 +9,7 @@ const opponentsTransformer = (dict) => Object.keys(dict.value).map((key) => dict
 function * createChallenge(action: CreateChallenge) {
   const { challenge } = action;
 
-  yield call(reduxSagaFirebase.database.create, `/players`, challenge);
+  yield call(reduxSagaFirebase.database.create, `/challenges`, challenge);
 }
 
 function * syncOpponentsSaga () {

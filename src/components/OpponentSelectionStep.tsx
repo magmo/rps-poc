@@ -15,6 +15,8 @@ interface Props {
   };
 }
 
+const DEFAULT_WAGER = 50;
+
 export default class OpponentSelectionStep extends React.PureComponent<Props> {
   constructor(props) {
     super(props);
@@ -31,22 +33,24 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
             <tbody>
               <tr className={css(styles.titleRow)}>
                 <th>Name</th>
-                <th>Wager (Finney)</th>
-                <th>Time initiated</th>
+                <th>Last Seen</th>
+                <th>Wager</th>
+                <th>Action</th>
               </tr>
               {opponents.map(opponent => (
                 <tr key={opponent.address}>
                   <td>{opponent.name}</td>
-                  <td>{opponent.wager}</td>
+                  <td>{(new Date(opponent.lastSeen)).toUTCString()}</td>
+                  <td>{DEFAULT_WAGER}</td>
                   <td>
-                    <Button onClick={() => chooseOpponent(opponent.address, 50)}>Challenge</Button>
+                    <Button onClick={() => chooseOpponent(opponent.address, DEFAULT_WAGER)}>Challenge</Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className={css(styles.buttonPosition)}>
-            <Button onClick={() => playComputer(50)}>Play against computer</Button>
+            <Button onClick={() => playComputer(DEFAULT_WAGER)}>Play against computer</Button>
           </div>
         </div>
       </React.Fragment>
