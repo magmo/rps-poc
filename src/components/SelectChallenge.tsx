@@ -1,18 +1,14 @@
 import React from 'react';
 import { StyleSheet, css } from 'aphrodite';
 
-import { Opponent } from '../redux/reducers/opponents';
+import { Challenge } from '../redux/application/reducer';
 
 import Button from './Button';
 
 interface Props {
-  chooseOpponent: (opponentAddress: string, stake: number) => void;
-  playComputer: (stake: number) => void;
-  opponents: Opponent[];
-  currentPlayer?: {
-    address: string;
-    name: string;
-  };
+  challenges: Challenge[],
+  acceptChallenge: (address: string, stake: number) => void,
+  autoOpponentAddress: string,
 }
 
 export default class OpponentSelectionStep extends React.PureComponent<Props> {
@@ -21,7 +17,7 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
   }
 
   render() {
-    const { opponents, chooseOpponent, playComputer } = this.props;
+    const { challenges, acceptChallenge, autoOpponentAddress } = this.props;
 
     return (
       <React.Fragment>
@@ -34,20 +30,24 @@ export default class OpponentSelectionStep extends React.PureComponent<Props> {
                 <th>Wager (Finney)</th>
                 <th>Time initiated</th>
               </tr>
-              {opponents.map(opponent => (
-                <tr key={opponent.address}>
-                  <td>{opponent.name}</td>
-                  <td>{opponent.wager}</td>
+              <tr key={autoOpponentAddress}>
+                <td>RockBot 🤖 </td>
+                <td>30</td>
+                <td>
+                  <Button onClick={() => acceptChallenge(autoOpponentAddress, 30)}>Challenge</Button>
+                </td>
+              </tr>
+              {challenges.map(challenge => (
+                <tr key={challenge.address}>
+                  <td>{challenge.name}</td>
+                  <td>{challenge.stake}</td>
                   <td>
-                    <Button onClick={() => chooseOpponent(opponent.address, 50)}>Challenge</Button>
+                    <Button onClick={() => acceptChallenge(challenge.address, challenge.stake)}>Challenge</Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className={css(styles.buttonPosition)}>
-            <Button onClick={() => playComputer(50)}>Play against computer</Button>
-          </div>
         </div>
       </React.Fragment>
     );

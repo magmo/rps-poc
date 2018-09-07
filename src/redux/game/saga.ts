@@ -14,6 +14,7 @@ import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 
 export default function* gameSaga(gameEngine: GameEngine) {
   yield put(applicationActions.gameSuccess(gameEngine.state));
+  yield sendState(gameEngine.state);
 
   const channel = yield actionChannel([
     messageActions.MESSAGE_RECEIVED,
@@ -53,9 +54,13 @@ export default function* gameSaga(gameEngine: GameEngine) {
         case PlayerBStateType.CHOOSE_PLAY:
           break; // don't send anything if the next step is to ChoosePlay
         default:
-          yield put(messageActions.sendMessage(newState.opponentAddress, newState.position.toHex()));
+          yield sendState(newState);
       }
       yield put(gameActions.stateChanged(newState));
     }
   }
+}
+
+function * sendState(state) {
+  yield put(messageActions.sendMessage(state.opponentAddress, state.position.toHex()));
 }

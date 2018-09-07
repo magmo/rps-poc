@@ -32,7 +32,7 @@ export default function* lobbySaga(address: string) {
         break;
 
       case lobbyActions.CREATE_CHALLENGE:
-        yield put(applicationActions.waitingRoomRequest());
+        yield put(applicationActions.waitingRoomRequest(action.name, action.stake));
         break;
 
       case lobbyActions.SYNC_CHALLENGES:
@@ -51,7 +51,7 @@ const challengeTransformer = (dict) => Object.keys(dict.value).map((key) => dict
 function * challengeSyncer() {
   yield fork(
     reduxSagaFirebase.database.sync,
-    'players',
+    'challenges',
     {
       successActionCreator: lobbyActions.syncChallenges,
       transform: challengeTransformer,

@@ -20,7 +20,11 @@ export default function* applicationControllerSaga(userId: string) {
 
   yield fork(messageServiceSaga, address, autoOpponentAddress);
 
-  let channel = yield actionChannel('CHANGE_ROOM');
+  const channel = yield actionChannel([
+    applicationActions.LOBBY_REQUEST,
+    applicationActions.WAITING_ROOM_REQUEST,
+    applicationActions.GAME_REQUEST,
+  ]);
   let currentRoom = yield fork(lobbySaga, address);
 
   while (true) {

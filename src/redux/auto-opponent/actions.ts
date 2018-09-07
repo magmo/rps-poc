@@ -20,3 +20,5 @@ export const initializationSuccess = (address) => ({
 export type MessageFromApp = ReturnType<typeof messageFromApp>;
 export type MessageToApp = ReturnType<typeof messageToApp>;
 export type InitializationSuccess = ReturnType<typeof initializationSuccess>;
+
+export type AnyAction = MessageFromApp | MessageToApp | InitializationSuccess;

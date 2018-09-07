@@ -12,7 +12,6 @@ type ActionType = (
 );
 
 export default function * waitingRoomSaga(address, stake, name, isPublic) {
-  yield put(applicationActions.waitingRoomSuccess());
 
   const channel = yield actionChannel([
     waitingRoomActions.CANCEL_CHALLENGE,
@@ -21,12 +20,13 @@ export default function * waitingRoomSaga(address, stake, name, isPublic) {
 
   const challenge = {
     address,
-    name: name,
-    stake: stake,
-    isPublic: isPublic,
+    name,
+    stake,
+    isPublic,
     lastSeen: new Date().getTime(),
   }
 
+  yield put(applicationActions.waitingRoomSuccess(challenge));
   yield call(reduxSagaFirebase.database.create, `/challenges/${address}`, challenge);
 
   while (true) {
@@ -40,7 +40,7 @@ export default function * waitingRoomSaga(address, stake, name, isPublic) {
 
       case messageActions.MESSAGE_RECEIVED:
         const gameEngine = GameEngineB.fromProposal(action.message);
-        //todo: handle error if it isn't a propose state with the right properties
+        // todo: handle error if it isn't a propose state with the right properties
         yield call(reduxSagaFirebase.database.delete, `/challenges/${address}`);
         yield put(applicationActions.gameRequest(gameEngine));
         break;
