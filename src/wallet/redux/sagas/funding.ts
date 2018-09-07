@@ -17,6 +17,7 @@ export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitFor
 
     yield put(blockchainActions.deploymentRequest(channelId, state.balances[0]));
     newState = walletEngine.transactionSent();
+
     yield put(WalletStateActions.stateChanged(newState));
 
     const deploySuceededAction = yield take(blockchainActions.DEPLOY_SUCCESS);
@@ -38,6 +39,7 @@ export function* fundingSaga(channelId: string, state: WaitForFundingA | WaitFor
     const walletEngine = WalletEngineB.setupWalletEngine();
       // TODO: We should get the approval from the user from the UI
     let newState = walletEngine.approve();
+
     yield put(WalletStateActions.stateChanged(newState));
 
     const action = yield take(walletExternalActions.RECEIVE_MESSAGE);
