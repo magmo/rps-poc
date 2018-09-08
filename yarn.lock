@@ -4219,7 +4219,15 @@ fmg-core@^0.0.6:
     sha3 "^1.2.2"
     web3-utils "^1.0.0-beta.30"
 
-fmg-simple-adjudicator@0.0.8:
+fmg-core@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/fmg-core/-/fmg-core-0.0.9.tgz#9a1b15defc0ef8637cd658156c0d57bd297f3af0"
+  dependencies:
+    bn.js "^4.11.8"
+    sha3 "^1.2.2"
+    web3-utils "^1.0.0-beta.30"
+
+fmg-simple-adjudicator@^0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/fmg-simple-adjudicator/-/fmg-simple-adjudicator-0.0.8.tgz#059d0e6c010a02ca5da7c87a8e17b00ac73d9cd6"
   dependencies:
