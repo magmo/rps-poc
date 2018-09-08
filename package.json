@@ -25,7 +25,7 @@
     "dotenv-expand": "4.2.0",
     "enum": "^2.5.0",
     "firebase": "^5.0.4",
-    "fmg-core": "^0.0.9",
+    "fmg-core": "0.0",
     "fmg-simple-adjudicator": "^0.0.8",
     "fs-extra": "3.0.1",
     "key-mirror": "^1.0.1",
