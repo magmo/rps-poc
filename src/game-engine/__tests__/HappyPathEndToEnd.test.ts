@@ -82,12 +82,13 @@ describe('game engine runthrough', () => {
 
   // balances
   describe('balances', () => {
-    const bWinsBals = [4, 5];
-    const aWinsBals = [6, 3];
+    const bWinsBals = [new BN(4),new BN(5)];
+    const aWinsBals = [new BN(6), new BN(3)];
 
     const testBalances = (state, balances) => {
       it(`creates the expected balances for state with type ${state.type}`, () => {
-        expect(state.balances).toEqual(balances);
+        expect(state.balances[0].eq(balances[0]));
+        expect(state.balances[1].eq(balances[1]));
       });
     };
 
