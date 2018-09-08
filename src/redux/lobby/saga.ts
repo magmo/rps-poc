@@ -54,7 +54,7 @@ const challengeTransformer = (dict) => {
     return dict.value[key];
   }).filter((challenge) => {
     return challenge.expiresAt > Date.now().toFixed()
-}
+})};
 
 function* challengeSyncer() {
   // Since everyone who is currently posting a challenge is refreshing it

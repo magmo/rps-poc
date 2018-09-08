@@ -4212,7 +4212,7 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.1"
     readable-stream "^2.0.4"
 
-fmg-core@0.0:
+fmg-core@^0.0.10:
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/fmg-core/-/fmg-core-0.0.10.tgz#abf4c9fde2b407349c4eb5266a3814fcbe404203"
   dependencies:
