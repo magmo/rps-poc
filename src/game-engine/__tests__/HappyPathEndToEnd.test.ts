@@ -2,9 +2,10 @@ import * as GameEngine from '../GameEngine';
 import { PlayerAStateType } from '../application-states/PlayerA';
 import { PlayerBStateType } from '../application-states/PlayerB';
 import { Play, Result } from '../positions';
+import BN from 'bn.js';
 
-const stake = 1;
-const initialBals = [5, 4];
+const stake = new BN(1);
+const initialBals = [new BN(5), new BN(4)];
 const me = '0xa';
 const opponent = '0xb';
 

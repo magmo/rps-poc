@@ -7,7 +7,7 @@ import * as applicationActions from '../application/actions';
 import GameEngineB from '../../game-engine/GameEngineB';
 import decode from '../../game-engine/positions/decode';
 import { delay } from 'redux-saga';
-
+import BN from 'bn.js';
 type ActionType = (
   | waitingRoomActions.CancelChallenge
   | messageActions.MessageReceived
@@ -16,27 +16,30 @@ type ActionType = (
 const REFRESH_INTERVAL = 4000; // milliseconds
 const EXPIRATION_INTERVAL = 5000; // milliseconds
 
-export default function * waitingRoomSaga(address: string, name: string, stake: number, isPublic: boolean) {
+export default function * waitingRoomSaga(address: string, name: string, stake: BN, isPublic: boolean) {
 
   const channel = yield actionChannel([
     waitingRoomActions.CANCEL_CHALLENGE,
     messageActions.MESSAGE_RECEIVED,
   ]);
 
-  const challenge = {
+  const commonChallengeProps = {
     address,
     name,
-    stake,
     isPublic,
     lastSeen: new Date().getTime(),
     expiresAt: new Date().getTime() + EXPIRATION_INTERVAL,
   }
 
-  yield put(applicationActions.waitingRoomSuccess(challenge));
+  yield put(applicationActions.waitingRoomSuccess({...commonChallengeProps,stake}));
+  const serializedChallenge = {
+    ...commonChallengeProps,
+    stake: stake.toString(),
+  }
   // use update to allow us to pick our own key
-  yield call(reduxSagaFirebase.database.update, `/challenges/${address}`, challenge);
+  yield call(reduxSagaFirebase.database.update, `/challenges/${address}`, serializedChallenge);
 
-  yield fork(challengeHeartbeatSaga, challenge);
+  yield fork(challengeHeartbeatSaga, {...commonChallengeProps,stake});
 
   while (true) {
     const action: ActionType = yield take(channel);

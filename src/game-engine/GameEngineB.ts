@@ -73,8 +73,8 @@ export default class GameEngineB {
     const { channel, stake, balances, preCommit, turnNum } = this.state;
 
     const newBalances = [...balances];
-    newBalances[0] -= stake;
-    newBalances[1] += stake;
+    newBalances[0] = newBalances[0].add(stake);
+    newBalances[1] = newBalances[1].sub(stake);
 
     const nextPosition = new Accept(channel, turnNum + 1, newBalances, stake, preCommit, bPlay);
 
