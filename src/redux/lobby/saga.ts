@@ -1,4 +1,4 @@
-import { fork, put, take, actionChannel } from 'redux-saga/effects';
+import { fork, put, take, actionChannel, call, takeLatest, cancel } from 'redux-saga/effects'; 
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -7,6 +7,8 @@ import * as applicationActions from '../application/actions';
 
 import GameEngineA from '../../game-engine/GameEngineA';
 import BN from 'bn.js';
+import { delay } from 'redux-saga';
+import { CHALLENGE_EXPIRATION_INTERVAL } from '../../constants';
 
 export default function* lobbySaga(address: string) {
   yield put(applicationActions.lobbySuccess());
@@ -66,6 +68,8 @@ function* challengeSyncer() {
   // TODO: The challengeSyncer should force a resync at time
   //   max(activeChallenges.map((c) => c.expiresAt)
 
+  yield fork(watchForExpiringChallenges);
+
   yield fork(
     reduxSagaFirebase.database.sync,
     'challenges',
@@ -75,4 +79,29 @@ function* challengeSyncer() {
     },
     'value',
   );
+}
+
+function * watchForExpiringChallenges() {
+  while (true) {
+    const expiring = yield fork(expireChallenges);
+    yield take(lobbyActions.EXPIRE_CHALLENGES);
+    yield cancel(expiring)
+  }
+}
+
+function * expireChallenges() {
+  while(true) {
+    yield takeLatest(lobbyActions.SYNC_CHALLENGES, debounce);
+  }
+}
+
+function * debounce() {
+  yield call(delay, CHALLENGE_EXPIRATION_INTERVAL)
+  const challenges = yield call(reduxSagaFirebase.database.read, '/challenges')
+  const activeChallenges = Object.keys(challenges).map(
+    (addr) => challenges[addr]
+  ).filter (
+    c => c.expiresAt > Date.now().toFixed()
+  )
+  yield put(lobbyActions.expireChallenges(activeChallenges));
 }
