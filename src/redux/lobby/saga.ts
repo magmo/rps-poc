@@ -55,13 +55,15 @@ const challengeTransformer = (dict) => {
     dict.value[key].stake = new BN(dict.value[key].stake);
     return dict.value[key];
   }).filter((challenge) => {
+    // TODO: filter self challenges
     return Date.now() < challenge.updatedAt + CHALLENGE_EXPIRATION_INTERVAL
 })};
 
 function* challengeSyncer() {
+  // TODO: figure out how to use a Firebase reference here to limit the data
   yield fork(
     reduxSagaFirebase.database.sync,
-    'challenges',
+    'challenges', 
     {
       successActionCreator: lobbyActions.syncChallenges,
       transform: challengeTransformer,
