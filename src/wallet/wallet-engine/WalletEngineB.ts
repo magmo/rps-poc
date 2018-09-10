@@ -15,9 +15,20 @@ export default class WalletEngineB {
     return this.state;
   }
 
-  deployConfirmed( adjudicator ): State.PlayerBState {
+  errorOccurred(): State.PlayerBState {
+    switch (this.state.constructor) {
+      case State.WaitForBlockchainDeposit:
+      case State.WaitForAToDeploy:
+        return this.transitionTo(new State.FundingFailed());
+
+      default:
+        return this.state;
+    }
+  }
+
+  deployConfirmed(adjudicator): State.PlayerBState {
     if (this.state.constructor === State.WaitForAToDeploy) {
-      return this.transitionTo(new State.ReadyToDeposit( adjudicator ));
+      return this.transitionTo(new State.ReadyToDeposit(adjudicator));
     } else {
       return this.state;
     }
@@ -34,7 +45,7 @@ export default class WalletEngineB {
   transactionSent() {
     if (this.state.constructor === State.ReadyToDeposit) {
       const { adjudicator } = this.state;
-      return this.transitionTo(new State.WaitForBlockchainDeposit( adjudicator ));
+      return this.transitionTo(new State.WaitForBlockchainDeposit(adjudicator));
     } else {
       return this.state;
     }

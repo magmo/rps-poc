@@ -16,6 +16,15 @@ export default class WalletEngineA {
     this.state = state;
     return state;
   }
+  errorOccurred():State.PlayerAState {
+    switch (this.state.constructor){
+      case State.WaitForApproval:
+      case State.WaitForBlockchainDeploy:
+      return this.transitionTo(new State.FundingFailed());
+      default:
+      return this.state;
+    }
+  }
 
   approve(): State.PlayerAState {
     if (this.state.constructor === State.WaitForApproval) {
