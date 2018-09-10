@@ -32,13 +32,13 @@ function GameContainer(props: GameProps) {
 
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
-      return <GameProposedPage message="Waiting for opponent to accept game" />;
+      return <GameProposedPage message="Waiting for your opponent to accept game" />;
 
     case playerA.WAIT_FOR_FUNDING:
       return <WalletController />;
 
     case playerA.WAIT_FOR_POST_FUND_SETUP:
-      return <FundingConfirmedPage message="Waiting for opponent to acknowledge" />;
+      return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
     case playerA.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} />;
@@ -46,7 +46,7 @@ function GameContainer(props: GameProps) {
     case playerA.WAIT_FOR_ACCEPT:
       return (
         <PlaySelectedPage
-          message="Waiting for opponent to choose their move"
+          message="Waiting for your opponent to choose their move"
           yourPlay={state.aPlay}
         />
       );
