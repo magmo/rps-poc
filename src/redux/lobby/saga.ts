@@ -81,7 +81,7 @@ function* challengeSyncer() {
   );
 }
 
-function * watchForExpiringChallenges() {
+function* watchForExpiringChallenges() {
   while (true) {
     const expiring = yield fork(expireChallenges);
     yield take(lobbyActions.EXPIRE_CHALLENGES);
@@ -89,13 +89,13 @@ function * watchForExpiringChallenges() {
   }
 }
 
-function * expireChallenges() {
+function* expireChallenges() {
   while(true) {
     yield takeLatest(lobbyActions.SYNC_CHALLENGES, debounce);
   }
 }
 
-function * debounce() {
+function* debounce() {
   yield call(delay, CHALLENGE_EXPIRATION_INTERVAL)
   const challenges = yield call(reduxSagaFirebase.database.read, '/challenges')
   const activeChallenges = Object.keys(challenges).map(
