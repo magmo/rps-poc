@@ -17,8 +17,8 @@ export interface Challenge {
   name: string,
   stake: BN,
   isPublic: boolean,
-  lastSeen: number,
-  expiresAt: number,
+  createdAt: number,
+  updatedAt: number,
 };
 
 export interface ApplicationState {

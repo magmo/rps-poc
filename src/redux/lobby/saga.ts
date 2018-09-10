@@ -81,7 +81,7 @@ function* expireChallenges() {
   const activeChallenges = Object.keys(challenges).map(
     (addr) => challenges[addr]
   ).filter (
-    c => c.expiresAt > Date.now().toFixed()
+    c => Date.now() < c.updatedAt + CHALLENGE_EXPIRATION_INTERVAL 
   )
   yield put(lobbyActions.expireChallenges(activeChallenges));
 }
