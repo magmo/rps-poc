@@ -16,13 +16,13 @@ export default class WalletEngineA {
     this.state = state;
     return state;
   }
-  errorOccurred():State.PlayerAState {
-    switch (this.state.constructor){
+  errorOccurred(message: string): State.PlayerAState {
+    switch (this.state.constructor) {
       case State.WaitForApproval:
       case State.WaitForBlockchainDeploy:
-      return this.transitionTo(new State.FundingFailed());
+        return this.transitionTo(new State.FundingFailed(message));
       default:
-      return this.state;
+        return this.state;
     }
   }
 
@@ -34,7 +34,10 @@ export default class WalletEngineA {
     }
   }
   transactionConfirmed(adjudicator: string): State.PlayerAState {
-    if (this.state.constructor === State.WaitForBlockchainDeploy) {
+    if (
+      this.state.constructor === State.WaitForBlockchainDeploy ||
+      this.state.constructor === State.FundingFailed
+    ) {
       return this.transitionTo(new State.WaitForBToDeposit(adjudicator));
     } else {
       return this.state;
