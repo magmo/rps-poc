@@ -14,18 +14,18 @@ export default function MetamaskErrorPage(props: MetamaskErrorProps) {
     42: 'kovan',
     4: 'rinkeby',
   };
-  let message = "Metamask doesn't appear to be installed.";
+  let message = <span>This site needs to be connected to an ethereum wallet to function. If you have metamask, enable it now. If not, you can download a copy <a className={css(styles.link)} href="https://metamask.io/">here</a>.</span>;
   if (props.error.errorType === 'WrongNetwork' && props.error.networkId) {
     const type = networksTypes[props.error.networkId] || 'development';
-    message = `The wrong network is selected in metamask. Please select the ${type} network in metamask.`;
+    message = <span>{`The wrong network is selected in your ethereum wallet. Please select the ${type} network in your ethereum wallet.`}</span>;
   }
 
   return (
     <div className={css(styles.container)}>
       <div className={css(styles.headerText)}>
-        <h1 className={css(styles.title)}>Metamask Error</h1>
+        <h1 className={css(styles.title)}>Ethereum Wallet Error</h1>
         <p>
-          <em>{message}</em>
+          {message}
         </p>
       </div>
     </div>
@@ -41,7 +41,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 32,
   },
-
+  link: {
+    color: "unset",
+  },
   title: {
     marginBottom: 0,
   },
