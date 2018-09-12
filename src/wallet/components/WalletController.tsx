@@ -6,10 +6,14 @@ import WalletLayout from './WalletLayout';
 import FundingInProgress from './FundingInProgress';
 import FundingError from './FundingError';
 import React from 'react';
+import ConfirmFunding from './ConfirmFunding';
+import { PreFunding } from '../wallet-engine/positions';
 
 interface Props {
   walletState: WalletState;
-  tryAgain: () => void;
+  tryFundingAgain: () => void;
+  approveFunding: () => void;
+  declineFunding: () => void;
 }
 
 export default class WalletController extends PureComponent<Props> {
@@ -23,7 +27,12 @@ export default class WalletController extends PureComponent<Props> {
       case playerA.FundingFailed:
       case playerB.FundingFailed:
         const fundingErrorState = walletState as playerA.FundingFailed | playerB.FundingFailed;
-        return <FundingError message={fundingErrorState.message} tryAgain={this.props.tryAgain} />;
+        return (
+          <FundingError
+            message={fundingErrorState.position.message}
+            tryAgain={this.props.tryFundingAgain}
+          />
+        );
       case playerA.WaitForBlockchainDeploy:
         return <FundingInProgress message="confirmation of adjudicator deployment" />;
 
@@ -38,7 +47,26 @@ export default class WalletController extends PureComponent<Props> {
 
       case playerB.WaitForBlockchainDeposit:
         return <FundingInProgress message="waiting for deposit confirmation" />;
-
+      case playerA.WaitForApproval:
+      case playerB.WaitForApproval:
+      case playerB.WaitForApprovalWithAdjudicator:
+        const {
+          myAddress,
+          opponentAddress,
+          myBalance,
+          opponentBalance,
+        } = walletState.position as PreFunding;
+        const confirmFundingProps = {
+          myAddress,
+          opponentAddress,
+          myBalance,
+          opponentBalance,
+          rulesAddress: '0x0123',
+          appName: 'Rock Paper Scissors',
+          approve: this.props.approveFunding,
+          decline: this.props.declineFunding,
+        };
+        return <ConfirmFunding {...confirmFundingProps} />;
       default:
         return (
           <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />
