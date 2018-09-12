@@ -35,11 +35,17 @@ export default class WalletEngineB {
   }
 
   deployConfirmed(adjudicator): State.PlayerBState {
-    if (this.state.constructor === State.WaitForAToDeploy) {
-      const newPosition = new AdjudicatorReceived(adjudicator);
-      return this.transitionTo(new State.ReadyToDeposit(newPosition));
-    } else {
-      return this.state;
+    switch (this.state.constructor) {
+      case State.WaitForAToDeploy:
+        const newPosition = new AdjudicatorReceived(adjudicator);
+        return this.transitionTo(new State.ReadyToDeposit(newPosition));
+      case State.WaitForApproval:
+        const previousPosition = this.state.position;
+        return this.transitionTo(
+          new State.WaitForApprovalWithAdjudicator(previousPosition, adjudicator),
+        );
+      default:
+        return this.state;
     }
   }
 

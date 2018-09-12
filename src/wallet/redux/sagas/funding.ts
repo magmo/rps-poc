@@ -45,9 +45,9 @@ export function* deployContract(channelId: string, walletEngine: WalletEngineA, 
 
 export function* fundContract(walletEngine: WalletEngineB, amount: BN) {
   let newState = walletEngine.state;
-  const { adjudicator } = newState.position;
+  const { adjudicatorAddress } = newState.position;
   yield put(stateActions.stateChanged(newState));
-  yield put(blockchainActions.depositRequest(adjudicator, amount));
+  yield put(blockchainActions.depositRequest(adjudicatorAddress, amount));
   while (true) {
     const fundAction = yield take([
       blockchainActions.DEPOSIT_FAILURE,
@@ -57,7 +57,7 @@ export function* fundContract(walletEngine: WalletEngineB, amount: BN) {
       newState = walletEngine.errorOccurred(fundAction.error);
       yield put(stateActions.stateChanged(newState));
       yield take(playerActions.TRY_FUNDING_AGAIN);
-      yield put(blockchainActions.depositRequest(adjudicator, amount));
+      yield put(blockchainActions.depositRequest(adjudicatorAddress, amount));
     } else {
       newState = walletEngine.transactionConfirmed();
       yield put(stateActions.stateChanged(newState));
@@ -99,14 +99,13 @@ function* playerBFundingSaga(channelId: string, engineArguments: EngineArguments
   const walletEngine = WalletEngineB.setupWalletEngine(engineArguments);
   let newState: PlayerBState = walletEngine.state;
   yield put(stateActions.stateChanged(walletEngine.state));
-  const actionTypes = [
-    playerActions.APPROVE_FUNDING,
-    playerActions.DECLINE_FUNDING,
-    externalActions.RECEIVE_MESSAGE,
-  ];
-  const action = yield take(actionTypes);
 
   while (newState.constructor !== ReadyToDeposit) {
+    const action = yield take([
+      playerActions.APPROVE_FUNDING,
+      playerActions.DECLINE_FUNDING,
+      externalActions.RECEIVE_MESSAGE,
+    ]);
     if (action.type === playerActions.DECLINE_FUNDING) {
       return false;
     }
