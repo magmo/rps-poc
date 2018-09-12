@@ -59,7 +59,7 @@ export default function* gameSaga(gameEngine: GameEngine, playingAutoOpponent=fa
     }
 
     if (newState && newState !== oldState) {
-      yield processState(newState);
+      yield processState(newState, playingAutoOpponent);
     }
   }
 }
@@ -68,11 +68,13 @@ function* sendState(state) {
   yield put(messageActions.sendMessage(state.opponentAddress, state.position.toHex()));
 }
 
-function* processState(state) {
+function* processState(state, playingAutoOpponent=false) {
   switch (state.type) {
     case PlayerAStateType.WAIT_FOR_FUNDING:
     case PlayerBStateType.WAIT_FOR_FUNDING:
-      yield put(walletActions.fundingRequest(state.channelId, state));
+      if (!playingAutoOpponent) {
+        yield put(walletActions.fundingRequest(state.channelId, state));
+      }
       yield sendState(state);
       break;
     case PlayerAStateType.CHOOSE_PLAY:
