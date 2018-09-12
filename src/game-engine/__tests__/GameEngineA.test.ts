@@ -6,7 +6,6 @@ import * as GameEngine from '../GameEngine';
 import { Play, Resting, Accept, Propose } from '../positions';
 import { PostFundSetupB, Reveal } from '../positions'
 import BN from 'bn.js';
-import { truncateSync } from 'fs';
 
 it('normally can transition to states', () => {
   const stake =new BN(3);
