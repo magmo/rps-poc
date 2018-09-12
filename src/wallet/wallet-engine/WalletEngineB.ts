@@ -19,7 +19,8 @@ export default class WalletEngineB {
       case State.WaitForApproval:
         return this.transitionTo(new State.WaitForAToDeploy());
       case State.WaitForApprovalWithAdjudicator:
-        return this.transitionTo(new State.ReadyToDeposit(this.state.adjudicatorPosition));
+      const newPosition = new AdjudicatorReceived(this.state.adjudicatorAddress);
+        return this.transitionTo(new State.ReadyToDeposit(newPosition));
       default:
         return this.state;
     }
@@ -40,9 +41,10 @@ export default class WalletEngineB {
         const newPosition = new AdjudicatorReceived(adjudicator);
         return this.transitionTo(new State.ReadyToDeposit(newPosition));
       case State.WaitForApproval:
-        const previousPosition = this.state.position;
+        // We store the adjudicator in the state and keep the current position
+        const position = this.state.position;
         return this.transitionTo(
-          new State.WaitForApprovalWithAdjudicator(previousPosition, adjudicator),
+          new State.WaitForApprovalWithAdjudicator(position, adjudicator),
         );
       default:
         return this.state;
