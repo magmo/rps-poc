@@ -33,9 +33,6 @@ export default function* gameSaga(gameEngine: GameEngine, playingAutoOpponent=fa
     switch (action.type) {
       case messageActions.MESSAGE_RECEIVED:
         if (playingAutoOpponent) {
-          // TODO: This creates a security vulnerability until we start checking
-          // signatures, since a real-life opponent, who has access to the auto-opponent
-          // address, can then pretend to send messages from the auto-opponent.
           gameEngine.fundingConfirmed()
         }
         newState = gameEngine.receivePosition(positionFromHex(action.message));
