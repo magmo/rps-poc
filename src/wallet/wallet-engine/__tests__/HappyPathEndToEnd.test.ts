@@ -36,9 +36,13 @@ describe('Happy path runthrough', () => {
 
   // In B's application
   const walletEngineB = WalletEngineB.setupWalletEngine(engineArgs);
+  it('should have the wait for approval state', () => {
+    const waitForApprovalB = walletEngineB.state;
+    expect(waitForApprovalB).toBeInstanceOf(WalletStatesB.WaitForApproval);
+  });
 
   it('should have the wait for A to deploy state', () => {
-    const waitForAToDeploy = walletEngineB.state;
+    const waitForAToDeploy =  walletEngineB.approve();
     expect(waitForAToDeploy).toBeInstanceOf(WalletStatesB.WaitForAToDeploy);
   });
 
