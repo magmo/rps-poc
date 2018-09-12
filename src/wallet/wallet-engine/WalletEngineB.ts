@@ -1,8 +1,11 @@
 import * as State from './wallet-states/PlayerB';
+import { PreFunding, AdjudicatorReceived } from './positions';
 
 export default class WalletEngineB {
-  static setupWalletEngine(): WalletEngineB {
-    const walletState = new State.WaitForAToDeploy();
+  static setupWalletEngine({ myAddress, opponentAddress, myBalance, opponentBalance }) {
+    const newPosition = new PreFunding({ myAddress, opponentAddress, myBalance, opponentBalance });
+
+    const walletState = new State.WaitForApproval(newPosition);
     return new WalletEngineB(walletState);
   }
   state: any;
@@ -11,13 +14,21 @@ export default class WalletEngineB {
     this.state = state;
   }
 
-  approve() {
-    return this.state;
+  approve(): State.PlayerBState {
+    switch (this.state.constructor) {
+      case State.WaitForApproval:
+        return this.transitionTo(new State.WaitForAToDeploy());
+      case State.WaitForApprovalWithAdjudicator:
+        return this.transitionTo(new State.ReadyToDeposit(this.state.adjudicatorPosition));
+      default:
+        return this.state;
+    }
   }
 
   errorOccurred(message: string): State.PlayerBState {
     if (this.state.constructor === State.ReadyToDeposit) {
-      return this.transitionTo(new State.FundingFailed(message));
+      const newPosition = new Error(message);
+      return this.transitionTo(new State.FundingFailed(newPosition));
     } else {
       return this.state;
     }
@@ -25,7 +36,8 @@ export default class WalletEngineB {
 
   deployConfirmed(adjudicator): State.PlayerBState {
     if (this.state.constructor === State.WaitForAToDeploy) {
-      return this.transitionTo(new State.ReadyToDeposit(adjudicator));
+      const newPosition = new AdjudicatorReceived(adjudicator);
+      return this.transitionTo(new State.ReadyToDeposit(newPosition));
     } else {
       return this.state;
     }
@@ -45,7 +57,10 @@ export default class WalletEngineB {
   transactionSent() {
     if (this.state.constructor === State.ReadyToDeposit) {
       const { adjudicator } = this.state;
-      return this.transitionTo(new State.WaitForBlockchainDeposit(adjudicator));
+      const newPosition: AdjudicatorReceived = {
+        adjudicatorAddress: adjudicator,
+      };
+      return this.transitionTo(new State.WaitForBlockchainDeposit(newPosition));
     } else {
       return this.state;
     }
