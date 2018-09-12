@@ -15,9 +15,9 @@ export default function* applicationControllerSaga(userId: string) {
   // need to yield* so that the fork(walletSaga) runs in the context of this saga -
   // otherwise it'll be killed when the setupWallet saga returns
   const address = yield* setupWallet(userId);
-  const autoOpponentAddress = yield* setupAutoOpponent();
+  yield* setupAutoOpponent();
 
-  yield fork(messageServiceSaga, address, autoOpponentAddress);
+  yield fork(messageServiceSaga, address);
 
   const channel = yield actionChannel([
     applicationActions.LOBBY_REQUEST,
@@ -39,8 +39,7 @@ export default function* applicationControllerSaga(userId: string) {
         currentRoom = yield fork(waitingRoomSaga, address, action.name, action.stake, isPublic);
         break;
       case applicationActions.GAME_REQUEST:
-        const playingAutoOpponent = action.gameEngine.state.opponentAddress === autoOpponentAddress;
-        currentRoom = yield fork(gameSaga, action.gameEngine, playingAutoOpponent);
+        currentRoom = yield fork(gameSaga, action.gameEngine);
         break;
       default:
         // todo: check for unreachability
