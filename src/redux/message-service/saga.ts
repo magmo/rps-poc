@@ -5,7 +5,7 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 import * as messageActions from './actions';
 import * as autoOpponentActions from '../auto-opponent/actions';
 import { actions as walletActions } from '../../wallet';
-import { AUTOOPPONENT_ADDRESS } from '../../constants';
+import { AUTO_OPPONENT_ADDRESS } from '../../constants';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -30,7 +30,7 @@ function* sendMessagesSaga() {
       queue = Queue.WALLET;
     }
 
-    if (to === AUTOOPPONENT_ADDRESS) {
+    if (to === AUTO_OPPONENT_ADDRESS) {
       yield put(autoOpponentActions.messageFromApp(data))
     } else {
       yield call(reduxSagaFirebase.database.create, `/messages/${to}`, { data, queue });

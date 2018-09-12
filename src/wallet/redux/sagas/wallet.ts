@@ -5,7 +5,7 @@ import * as actions from '../actions/external';
 import ChannelWallet from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
-import { AUTOOPPONENT_ADDRESS } from '../../../constants';
+import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = yield initializeWallet(uid);
@@ -68,7 +68,7 @@ function* handleValidationRequest(requestId, data) {
 
 function* handleFundingRequest(_wallet: ChannelWallet, channelId, state) {
   let success;
-  if (state.opponentAddress === AUTOOPPONENT_ADDRESS) {
+  if (state.opponentAddress === AUTO_OPPONENT_ADDRESS) {
     success = true
   } else {
     yield fork(blockchainSaga);
