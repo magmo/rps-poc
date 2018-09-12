@@ -12,7 +12,7 @@ import { default as positionFromHex } from '../../game-engine/positions/decode';
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 
-export default function* gameSaga(gameEngine: GameEngine) {
+export default function* gameSaga(gameEngine: GameEngine, playingAutoOpponent=false) {
   yield put(applicationActions.gameSuccess(gameEngine.state));
   yield processState(gameEngine.state);
 
@@ -32,6 +32,12 @@ export default function* gameSaga(gameEngine: GameEngine) {
 
     switch (action.type) {
       case messageActions.MESSAGE_RECEIVED:
+        if (playingAutoOpponent) {
+          // TODO: This creates a security vulnerability until we start checking
+          // signatures, since a real-life opponent, who has access to the auto-opponent
+          // address, can then pretend to send messages from the auto-opponent.
+          gameEngine.fundingConfirmed()
+        }
         newState = gameEngine.receivePosition(positionFromHex(action.message));
         break;
       case gameActions.CHOOSE_PLAY:
@@ -49,7 +55,7 @@ export default function* gameSaga(gameEngine: GameEngine) {
         // We've received funding so we need to update the game state again
         break;
       default:
-      // do nothing
+        // do nothing
     }
 
     if (newState && newState !== oldState) {
