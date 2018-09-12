@@ -12,7 +12,7 @@ import { default as positionFromHex } from '../../game-engine/positions/decode';
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 
-export default function* gameSaga(gameEngine: GameEngine, playingAutoOpponent=false) {
+export default function* gameSaga(gameEngine: GameEngine) {
   yield put(applicationActions.gameSuccess(gameEngine.state));
   yield processState(gameEngine.state);
 
@@ -32,9 +32,7 @@ export default function* gameSaga(gameEngine: GameEngine, playingAutoOpponent=fa
 
     switch (action.type) {
       case messageActions.MESSAGE_RECEIVED:
-        if (playingAutoOpponent) {
-          gameEngine.fundingConfirmed()
-        }
+        gameEngine.fundingConfirmed()
         newState = gameEngine.receivePosition(positionFromHex(action.message));
         break;
       case gameActions.CHOOSE_PLAY:
@@ -56,7 +54,7 @@ export default function* gameSaga(gameEngine: GameEngine, playingAutoOpponent=fa
     }
 
     if (newState && newState !== oldState) {
-      yield processState(newState, playingAutoOpponent);
+      yield processState(newState);
     }
   }
 }
@@ -65,13 +63,11 @@ function* sendState(state) {
   yield put(messageActions.sendMessage(state.opponentAddress, state.position.toHex()));
 }
 
-function* processState(state, playingAutoOpponent=false) {
+function* processState(state) {
   switch (state.type) {
     case PlayerAStateType.WAIT_FOR_FUNDING:
     case PlayerBStateType.WAIT_FOR_FUNDING:
-      if (!playingAutoOpponent) {
-        yield put(walletActions.fundingRequest(state.channelId, state));
-      }
+      yield put(walletActions.fundingRequest(state.channelId, state));
       yield sendState(state);
       break;
     case PlayerAStateType.CHOOSE_PLAY:
