@@ -74,6 +74,11 @@ function* processState(state) {
     case PlayerAStateType.CHOOSE_PLAY:
     case PlayerBStateType.CHOOSE_PLAY:
       break; // don't send anything if the next step is to ChoosePlay
+    case PlayerAStateType.CONCLUDED:
+    case PlayerBStateType.CONCLUDED:
+      yield put(walletActions.withdrawalRequest(state));
+      // Once the game is concluded, the players do not need to interact with each other
+      break;
     default:
       yield sendState(state);
   }
