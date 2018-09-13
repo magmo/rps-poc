@@ -44,7 +44,7 @@ export default class WalletEngineA {
       this.state.constructor === State.WaitForBlockchainDeploy ||
       this.state.constructor === State.FundingFailed
     ) {
-      return this.transitionTo(new State.AdjudicatorReceived(adjudicator));
+      return this.transitionTo(new State.WaitForBToDeposit(adjudicator));
     } else {
       return this.state;
     }
