@@ -30,9 +30,6 @@ export default class CreateChallenge extends React.PureComponent<Props> {
     const wager = Number(this.wagerInput.current.value);
     const name = String(this.nameInput.current.value);
 
-    // tslint:disable-next-line:no-console
-    console.log('in create challenge', wager, name);
-
     if (!wager || Number.isNaN(wager)) {
       return;
     }
