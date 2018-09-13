@@ -157,7 +157,6 @@ module.exports = {
               loader: 'sass-loader' // compiles Sass to CSS
             }]
           },
-          ...
           // "url" loader works just like "file" loader but it also embeds
           // assets smaller than specified size as data URLs to avoid requests.
           {
