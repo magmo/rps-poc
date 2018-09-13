@@ -1,10 +1,13 @@
 import * as State from './wallet-states/PlayerA';
-import { PreFunding, AdjudicatorReceived, Error } from './positions';
+
 export default class WalletEngineA {
   static setupWalletEngine({ myAddress, opponentAddress, myBalance, opponentBalance }) {
-    const newPosition = new PreFunding({ myAddress, opponentAddress, myBalance, opponentBalance });
-
-    const walletState = new State.WaitForApproval(newPosition);
+    const walletState = new State.WaitForApproval({
+      myAddress,
+      opponentAddress,
+      myBalance,
+      opponentBalance,
+    });
     return new WalletEngineA(walletState);
   }
 
@@ -22,8 +25,7 @@ export default class WalletEngineA {
     switch (this.state.constructor) {
       case State.WaitForApproval:
       case State.WaitForBlockchainDeploy:
-        const newPosition: Error = { message };
-        return this.transitionTo(new State.FundingFailed(newPosition));
+        return this.transitionTo(new State.FundingFailed(message));
       default:
         return this.state;
     }
@@ -42,8 +44,7 @@ export default class WalletEngineA {
       this.state.constructor === State.WaitForBlockchainDeploy ||
       this.state.constructor === State.FundingFailed
     ) {
-      const newPosition = new AdjudicatorReceived(adjudicator);
-      return this.transitionTo(new State.WaitForBToDeposit(newPosition));
+      return this.transitionTo(new State.AdjudicatorReceived(adjudicator));
     } else {
       return this.state;
     }

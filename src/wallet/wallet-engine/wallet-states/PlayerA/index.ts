@@ -1,34 +1,17 @@
-import BaseState from '../Base';
-import { Error, AdjudicatorReceived, PreFunding, Position } from '../../positions';
-import Default from '../../positions/Default';
+import * as CommonState from '../';
 
-class BasePlayerA<T extends Position> extends BaseState<T> {
-  readonly playerIndex = 0;
-}
-
-export class Funded extends BasePlayerA<Default> {
-  constructor() {
-    super(new Default());
-  }
-}
-export class FundingFailed extends BasePlayerA<Error> {}
-export class ReadyToDeploy extends BasePlayerA<Default> {
-  constructor() {
-    super(new Default());
-  }
-}
-export class WaitForApproval extends BasePlayerA<PreFunding> {}
-export class WaitForBlockchainDeploy extends BasePlayerA<Default> {
-  constructor() {
-    super(new Default());
-  }
-}
-export class WaitForBToDeposit extends BasePlayerA<AdjudicatorReceived> {}
-
+export class ReadyToDeploy {}
+export class WaitForBlockchainDeploy {}
+export class WaitForBToDeposit {}
+export const AdjudicatorReceived = CommonState.AdjudicatorReceived;
+export const FundingFailed = CommonState.FundingFailed;
+export const WaitForApproval = CommonState.WaitForApproval;
+export const Funded = CommonState.Funded;
 export type PlayerAState =
-  | Funded
-  | FundingFailed
   | ReadyToDeploy
-  | WaitForApproval
   | WaitForBlockchainDeploy
-  | WaitForBToDeposit;
+  | WaitForBToDeposit
+  | CommonState.WaitForApproval
+  | CommonState.FundingFailed
+  | CommonState.AdjudicatorReceived
+  |CommonState.Funded;

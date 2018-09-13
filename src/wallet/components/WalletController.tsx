@@ -7,7 +7,7 @@ import FundingInProgress from './FundingInProgress';
 import FundingError from './FundingError';
 import React from 'react';
 import ConfirmFunding from './ConfirmFunding';
-import { PreFunding } from '../wallet-engine/positions';
+import { FundingFailed, WaitForApproval } from '../wallet-engine/wallet-states';
 
 interface Props {
   walletState: WalletState;
@@ -24,12 +24,10 @@ export default class WalletController extends PureComponent<Props> {
     }
 
     switch (walletState && walletState.constructor) {
-      case playerA.FundingFailed:
-      case playerB.FundingFailed:
-        const fundingErrorState = walletState as playerA.FundingFailed | playerB.FundingFailed;
+      case FundingFailed:
         return (
           <FundingError
-            message={fundingErrorState.position.message}
+            message={(walletState as FundingFailed).message}
             tryAgain={this.props.tryFundingAgain}
           />
         );
@@ -47,15 +45,9 @@ export default class WalletController extends PureComponent<Props> {
 
       case playerB.WaitForBlockchainDeposit:
         return <FundingInProgress message="waiting for deposit confirmation" />;
-      case playerA.WaitForApproval:
-      case playerB.WaitForApproval:
+      case WaitForApproval:
       case playerB.WaitForApprovalWithAdjudicator:
-        const {
-          myAddress,
-          opponentAddress,
-          myBalance,
-          opponentBalance,
-        } = walletState.position as PreFunding;
+        const { myAddress, opponentAddress, myBalance, opponentBalance } = walletState as WaitForApproval;
         const confirmFundingProps = {
           myAddress,
           opponentAddress,
