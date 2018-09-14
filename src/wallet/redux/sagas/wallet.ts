@@ -53,7 +53,7 @@ function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData)
   // - validate the transition
   // - sign the position
   // - store the position
-  const signedPosition = wallet.sign(positionData)
+  const signedPosition = wallet.sign(positionData);
 
   yield put(actions.signatureSuccess(requestId, signedPosition));
 }
