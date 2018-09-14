@@ -74,10 +74,10 @@ export const signatureRequest = (requestId: string, positionData: string) => ({
   requestId,
   positionData,
 });
-export const signatureSuccess = (requestId: string, moveData: string) => ({
+export const signatureSuccess = (requestId: string, signature: string) => ({
   type: SIGNATURE_SUCCESS as typeof SIGNATURE_SUCCESS,
   requestId,
-  moveData,
+  signature,
 });
 export const signatureFailure = (requestId: string, reason: string) => ({
   type: SIGNATURE_FAILURE as typeof SIGNATURE_FAILURE,
