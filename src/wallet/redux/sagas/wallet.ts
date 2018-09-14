@@ -1,4 +1,4 @@
-import { actionChannel, take, put, fork, } from 'redux-saga/effects';
+import { actionChannel, take, put, fork } from 'redux-saga/effects';
 
 import { initializeWallet } from './initialization';
 import * as actions from '../actions/external';
@@ -19,8 +19,8 @@ export function* walletSaga(uid: string): IterableIterator<any> {
 
   yield put(actions.initializationSuccess(wallet.address));
 
-  while(true) {
-    const action: actions.RequestAction = yield take(channel)
+  while (true) {
+    const action: actions.RequestAction = yield take(channel);
 
     // The handlers below will block, so the wallet will only ever
     // process one action at a time from the queue.
@@ -30,7 +30,13 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       case actions.VALIDATION_REQUEST:
-        yield handleValidationRequest(action.requestId, action.positionData, action.signature);
+        yield handleValidationRequest(
+          wallet,
+          action.requestId,
+          action.positionData,
+          action.signature,
+          action.expectedAddress,
+        );
         break;
 
       case actions.FUNDING_REQUEST:
@@ -38,12 +44,12 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       default:
-        // const _exhaustiveCheck: never = action;
-        // todo: get this to work
-        // currently causes a 'noUnusedLocals' error on compilation
-        // underscored variables should be an exception but there seems to 
-        // be a bug in my current version of typescript
-        // https://github.com/Microsoft/TypeScript/issues/15053
+      // const _exhaustiveCheck: never = action;
+      // todo: get this to work
+      // currently causes a 'noUnusedLocals' error on compilation
+      // underscored variables should be an exception but there seems to
+      // be a bug in my current version of typescript
+      // https://github.com/Microsoft/TypeScript/issues/15053
     }
   }
 }
@@ -58,13 +64,18 @@ function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData)
   yield put(actions.signatureSuccess(requestId, signedPosition));
 }
 
-function* handleValidationRequest(requestId, data, signature) {
+function* handleValidationRequest(
+  wallet: ChannelWallet,
+  requestId,
+  data,
+  signature,
+  expectedAddress,
+) {
   // todo:
-  // tslint:disable-next-line:no-console
-  console.log(web3.eth.accounts.recover(data, signature));
-  
-  
-  
+  const address = wallet.recover(data, signature);
+  if (address !== expectedAddress) {
+    yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
+  }
   // - validate the transition
   // - store the position
 
@@ -74,7 +85,7 @@ function* handleValidationRequest(requestId, data, signature) {
 function* handleFundingRequest(_wallet: ChannelWallet, channelId, state) {
   let success;
   if (state.opponentAddress === AUTO_OPPONENT_ADDRESS) {
-    success = true
+    success = true;
   } else {
     success = yield fundingSaga(channelId, state);
   }
