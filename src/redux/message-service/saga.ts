@@ -61,6 +61,9 @@ function* receiveFromFirebaseSaga(address: string) {
     const { data, queue } = message.value;
 
     if (queue === Queue.GAME_ENGINE) {
+      const { signaure } = message.value;
+      const requestId = hash(message + Date.now());
+      yield put(walletActions.validationRequest(requestId, data,signaure));
       yield put(messageActions.messageReceived(data));
     } else {
       yield put(walletActions.receiveMessage(data));
