@@ -25,4 +25,9 @@ import Web3 from 'web3';
     return this.account.sign(stateString).signature;
     
   }
+  
+  recover(data:string, signature:string){
+    const web3 = new Web3('');
+    return web3.eth.accounts.recover(data,signature);
+  }
 }

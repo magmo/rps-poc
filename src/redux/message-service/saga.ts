@@ -6,7 +6,7 @@ import * as messageActions from './actions';
 import * as autoOpponentActions from '../auto-opponent/actions';
 import { actions as walletActions } from '../../wallet';
 import { AUTO_OPPONENT_ADDRESS } from '../../constants';
-import { SignatureSuccess } from '../../wallet/redux/actions/external';
+import { SignatureResponse } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
 export enum Queue {
   WALLET = 'WALLET',
@@ -23,16 +23,9 @@ function* sendMessagesSaga() {
     let message = {};
     let queue;
     if (action.type === messageActions.SEND_MESSAGE) {
-      const requestId = hash(`${data}${Date.now()}`);
-
-      yield put(walletActions.signatureRequest(requestId, data));
-      // TODO: Handle signature failure
-      let signatureCompleteAction: SignatureSuccess = yield take(walletActions.SIGNATURE_SUCCESS);
-      while (signatureCompleteAction.requestId !== requestId) {
-        signatureCompleteAction = yield take(walletActions.SIGNATURE_SUCCESS);
-      }
       queue = Queue.GAME_ENGINE;
-      message = { data, queue, signature: signatureCompleteAction.signature };
+      const signature = yield signMessage(data);
+      message = { data, queue, signature };
     } else {
       queue = Queue.WALLET;
       message = { data, queue };
@@ -61,14 +54,48 @@ function* receiveFromFirebaseSaga(address: string) {
     const { data, queue } = message.value;
 
     if (queue === Queue.GAME_ENGINE) {
-      const { signaure } = message.value;
-      const requestId = hash(message + Date.now());
-      yield put(walletActions.validationRequest(requestId, data,signaure));
+      const { signature } = message.value;
+      const validMessage = yield validateMessage(data, signature, address);
+      if (!validMessage) {
+        // TODO: Handle this
+      }
       yield put(messageActions.messageReceived(data));
     } else {
       yield put(walletActions.receiveMessage(data));
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
+  }
+}
+
+function* validateMessage(data, signature, address) {
+  const requestId = hash(data + Date.now());
+  yield put(walletActions.validationRequest(requestId, data, signature, address));
+  const actionFilter = [walletActions.VALIDATION_SUCCESS, walletActions.VALIDATION_FAILURE];
+  let action: walletActions.ValidationResponse = yield take(actionFilter);
+  while (action.requestId !== requestId) {
+    action = yield take(actionFilter);
+  }
+  if (action.type === walletActions.VALIDATION_SUCCESS) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function* signMessage(data) {
+  const requestId = hash(`${data}${Date.now()}`);
+
+  yield put(walletActions.signatureRequest(requestId, data));
+  // TODO: Handle signature failure
+  const actionFilter = [walletActions.SIGNATURE_SUCCESS, walletActions.SIGNATURE_FAILURE];
+  let signatureResponse: SignatureResponse = yield take(actionFilter);
+  while (signatureResponse.requestId !== requestId) {
+    signatureResponse = yield take(actionFilter);
+  }
+  if (signatureResponse.type === walletActions.SIGNATURE_SUCCESS) {
+    return signatureResponse.signature;
+  } else {
+    // TODO: Handle this
   }
 }
 
