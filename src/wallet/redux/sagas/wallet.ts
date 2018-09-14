@@ -30,7 +30,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       case actions.VALIDATION_REQUEST:
-        yield handleValidationRequest(action.requestId, action.signedPositionData);
+        yield handleValidationRequest(action.requestId, action.positionData, action.signature);
         break;
 
       case actions.FUNDING_REQUEST:
@@ -58,13 +58,17 @@ function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData)
   yield put(actions.signatureSuccess(requestId, signedPosition));
 }
 
-function* handleValidationRequest(requestId, data) {
+function* handleValidationRequest(requestId, data, signature) {
   // todo:
-  // - check the signature
+  // tslint:disable-next-line:no-console
+  console.log(web3.eth.accounts.recover(data, signature));
+  
+  
+  
   // - validate the transition
   // - store the position
 
-  yield put(actions.validationSuccess(requestId, data));
+  yield put(actions.validationSuccess(requestId));
 }
 
 function* handleFundingRequest(_wallet: ChannelWallet, channelId, state) {
