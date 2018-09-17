@@ -41,15 +41,16 @@ export const VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 
-export const validationRequest = (requestId: string, signedPositionData: string) => ({
+export const validationRequest = (requestId: string, positionData: string, signature:string, expectedAddress:string) => ({
   type: VALIDATION_REQUEST as typeof VALIDATION_REQUEST,
   requestId,
-  signedPositionData,
+  positionData,
+  signature,
+  expectedAddress,
 });
-export const validationSuccess = (requestId: string, positionData: string) => ({
+export const validationSuccess = (requestId: string) => ({
   type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
   requestId,
-  positionData,
 });
 export const validationFailure = (requestId: string, reason: string) => ({
   type: VALIDATION_FAILURE as typeof VALIDATION_FAILURE,
@@ -74,10 +75,10 @@ export const signatureRequest = (requestId: string, positionData: string) => ({
   requestId,
   positionData,
 });
-export const signatureSuccess = (requestId: string, moveData: string) => ({
+export const signatureSuccess = (requestId: string, signature: string) => ({
   type: SIGNATURE_SUCCESS as typeof SIGNATURE_SUCCESS,
   requestId,
-  moveData,
+  signature,
 });
 export const signatureFailure = (requestId: string, reason: string) => ({
   type: SIGNATURE_FAILURE as typeof SIGNATURE_FAILURE,
