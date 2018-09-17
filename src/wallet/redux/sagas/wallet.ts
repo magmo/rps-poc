@@ -1,4 +1,4 @@
-import { actionChannel, take, put, fork, } from 'redux-saga/effects';
+import { actionChannel, take, put, fork, call, } from 'redux-saga/effects';
 
 import { initializeWallet } from './initialization';
 import * as actions from '../actions/external';
@@ -6,15 +6,17 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
+import { withdrawalSaga } from './withdrawal';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
-  const wallet = yield initializeWallet(uid);
+  const wallet = (yield initializeWallet(uid)) as ChannelWallet;
   yield fork(blockchainSaga);
 
   const channel = yield actionChannel([
     actions.FUNDING_REQUEST,
     actions.SIGNATURE_REQUEST,
     actions.VALIDATION_REQUEST,
+    actions.WITHDRAWAL_REQUEST
   ]);
 
   yield put(actions.initializationSuccess(wallet.address));
@@ -35,6 +37,10 @@ export function* walletSaga(uid: string): IterableIterator<any> {
 
       case actions.FUNDING_REQUEST:
         yield handleFundingRequest(wallet, action.channelId, action.state);
+        break;
+
+      case actions.WITHDRAWAL_REQUEST:
+        yield handleWithdrawalRequest(wallet);
         break;
 
       default:
@@ -80,5 +86,21 @@ function* handleFundingRequest(_wallet: ChannelWallet, channelId, state) {
   } else {
     yield put(actions.fundingFailure(channelId, 'Something went wrong'));
   }
+  return true;
+}
+
+export function* handleWithdrawalRequest(
+  wallet: ChannelWallet,
+) {
+  const { address: playerAddress } = wallet
+
+  const { transaction, failureReason } = yield call(withdrawalSaga, playerAddress);
+  if (transaction) {
+    // TODO: broadcast the channelId
+    yield put(actions.withdrawalSuccess(transaction));
+  } else {
+    yield put(actions.withdrawalFailure(failureReason));
+  }
+
   return true;
 }
