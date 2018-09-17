@@ -6,6 +6,7 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
+import decode, { GAME_ATTRIBUTE_OFFSET } from '../../domain/decode';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = yield initializeWallet(uid);
@@ -15,6 +16,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
     actions.FUNDING_REQUEST,
     actions.SIGNATURE_REQUEST,
     actions.VALIDATION_REQUEST,
+    actions.DECODE_STATE_REQUEST,
   ]);
 
   yield put(actions.initializationSuccess(wallet.address));
@@ -35,14 +37,16 @@ export function* walletSaga(uid: string): IterableIterator<any> {
           action.requestId,
           action.positionData,
           action.signature,
-          action.expectedAddress,
+          action.opponentIndex,
         );
         break;
 
       case actions.FUNDING_REQUEST:
         yield handleFundingRequest(wallet, action.channelId, action.state);
         break;
-
+      case actions.DECODE_STATE_REQUEST:
+        yield handleDecodeRequest(action.data);
+        break;
       default:
       // const _exhaustiveCheck: never = action;
       // todo: get this to work
@@ -52,6 +56,13 @@ export function* walletSaga(uid: string): IterableIterator<any> {
       // https://github.com/Microsoft/TypeScript/issues/15053
     }
   }
+}
+
+function* handleDecodeRequest(data: string) {
+  const state = decode(data);
+  const additionalData = data.substr(GAME_ATTRIBUTE_OFFSET);
+  yield put(actions.decodeStateSuccess(state, additionalData));
+
 }
 
 function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData) {
@@ -69,13 +80,15 @@ function* handleValidationRequest(
   requestId,
   data,
   signature,
-  expectedAddress,
+  opponentIndex,
 ) {
-  // todo:
+
   const address = wallet.recover(data, signature);
-  if (address !== expectedAddress) {
+  const state = decode(data);
+  if (state.channel.participants[opponentIndex] !== address) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
+  // todo:
   // - validate the transition
   // - store the position
 

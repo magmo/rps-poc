@@ -1,4 +1,4 @@
-import { fork, take, call, put, actionChannel } from 'redux-saga/effects';
+import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects';
 import { buffers } from 'redux-saga';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -6,8 +6,10 @@ import * as messageActions from './actions';
 import * as autoOpponentActions from '../auto-opponent/actions';
 import { actions as walletActions } from '../../wallet';
 import { AUTO_OPPONENT_ADDRESS } from '../../constants';
-import { SignatureResponse } from '../../wallet/redux/actions/external';
+import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
+import { getApplicationState } from 'src/redux/store';
+import { ApplicationState } from '../application/reducer';
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
@@ -55,7 +57,7 @@ function* receiveFromFirebaseSaga(address: string) {
 
     if (queue === Queue.GAME_ENGINE) {
       const { signature } = message.value;
-      const validMessage = yield validateMessage(data, signature, address);
+      const validMessage = yield validateMessage(data, signature);
       if (!validMessage) {
         // TODO: Handle this
       }
@@ -67,9 +69,14 @@ function* receiveFromFirebaseSaga(address: string) {
   }
 }
 
-function* validateMessage(data, signature, address) {
+function* validateMessage(data, signature) {
+  const appState: ApplicationState = yield select(getApplicationState);
+  let opponentIndex = 0;
+  if (appState.gameState) {
+    opponentIndex = 1 - appState.gameState.playerIndex;
+  }
   const requestId = hash(data + Date.now());
-  yield put(walletActions.validationRequest(requestId, data, signature, address));
+  yield put(walletActions.validationRequest(requestId, data, signature, opponentIndex));
   const actionFilter = [walletActions.VALIDATION_SUCCESS, walletActions.VALIDATION_FAILURE];
   let action: walletActions.ValidationResponse = yield take(actionFilter);
   while (action.requestId !== requestId) {
@@ -78,7 +85,8 @@ function* validateMessage(data, signature, address) {
   if (action.type === walletActions.VALIDATION_SUCCESS) {
     return true;
   } else {
-    return false;
+    // TODO: Properly handle this.
+    throw new Error("Signature Validation error");
   }
 }
 
@@ -87,16 +95,12 @@ function* signMessage(data) {
 
   yield put(walletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
-  const actionFilter = [walletActions.SIGNATURE_SUCCESS, walletActions.SIGNATURE_FAILURE];
-  let signatureResponse: SignatureResponse = yield take(actionFilter);
+  const actionFilter = walletActions.SIGNATURE_SUCCESS;
+  let signatureResponse: SignatureSuccess = yield take(actionFilter);
   while (signatureResponse.requestId !== requestId) {
     signatureResponse = yield take(actionFilter);
   }
-  if (signatureResponse.type === walletActions.SIGNATURE_SUCCESS) {
-    return signatureResponse.signature;
-  } else {
-    // TODO: Handle this
-  }
+  return signatureResponse.signature;
 }
 
 function* receiveFromAutoOpponentSaga() {

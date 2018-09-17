@@ -1,11 +1,12 @@
 import {
-  WaitForFunding as WaitForFundingA, 
-  Concluded as ConcludedA, 
+  WaitForFunding as WaitForFundingA,
+  Concluded as ConcludedA,
 } from '../../../game-engine/application-states/PlayerA';
 import {
-  WaitForFunding as WaitForFundingB, 
-  Concluded as ConcludedB, 
+  WaitForFunding as WaitForFundingB,
+  Concluded as ConcludedB,
 } from '../../../game-engine/application-states/PlayerB';
+import { State } from 'fmg-core';
 
 // FUNDING
 // =======
@@ -41,12 +42,12 @@ export const VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 
-export const validationRequest = (requestId: string, positionData: string, signature:string, expectedAddress:string) => ({
+export const validationRequest = (requestId: string, positionData: string, signature: string, opponentIndex: number) => ({
   type: VALIDATION_REQUEST as typeof VALIDATION_REQUEST,
   requestId,
   positionData,
   signature,
-  expectedAddress,
+  opponentIndex,
 });
 export const validationSuccess = (requestId: string) => ({
   type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
@@ -136,11 +137,6 @@ export const initializationFailure = (message: string) => ({
 
 export type InitializationSuccess = ReturnType<typeof initializationSuccess>;
 
-// Requests
-// ========
-
-export type RequestAction = FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest;
-
 // MESSAGING
 // =========
 export const SEND_MESSAGE = 'WALLET.MESSAGING.SEND';
@@ -159,3 +155,34 @@ export const receiveMessage = (data: string) => ({
 
 export type SendMessage = ReturnType<typeof sendMessage>;
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
+
+// DECODING
+// ========
+export const DECODE_STATE_REQUEST = 'WAllET.DECODE.REQUEST';
+export const DECODE_STATE_SUCCESS = 'WAllET.DECODE.SUCCESS';
+export const DECODE_STATE_FAILURE = 'WAllET.DECODE.FAILURE';
+
+export const decodeStateRequest = (data: string) => ({
+  type: DECODE_STATE_REQUEST as typeof DECODE_STATE_REQUEST,
+  data,
+});
+
+export const decodeStateSuccess = (state: State, additionalData?: string) => ({
+  type: DECODE_STATE_SUCCESS as typeof DECODE_STATE_SUCCESS,
+  state,
+  additionalData,
+});
+
+export const decodeStateFailure = (message: string) => ({
+  type: DECODE_STATE_FAILURE as typeof DECODE_STATE_FAILURE,
+  message,
+});
+
+export type DecodeStateRequest = ReturnType<typeof decodeStateRequest>;
+export type DecodeStateSuccess = ReturnType<typeof decodeStateSuccess>;
+export type DecodeStateFailure = ReturnType<typeof decodeStateFailure>;
+export type DecodeStateResponse = DecodeStateFailure | DecodeStateSuccess;
+
+// Requests
+// ========
+export type RequestAction = FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest | DecodeStateRequest;
