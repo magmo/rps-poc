@@ -11,6 +11,7 @@ import Reveal from './Reveal';
 import Resting from './Resting';
 import Conclude from './Conclude';
 import BN from 'bn.js';
+import decodeState from '../../wallet/domain/decode';
 
 const PREFIX_CHARS = 2; // the 0x takes up 2 characters
 const CHARS_PER_BYTE = 2;
@@ -67,7 +68,9 @@ function extractSalt(hexString: string) {
   return extractBytes(hexString, GAME_ATTRIBUTE_OFFSET + 5 * 32);
 }
 
-export default function decode(state: State, hexString: string) {
+export default function decode(hexString: string) {
+
+  const state = decodeState(hexString);
   const channel = state.channel;
   const turnNum = state.turnNum;
   const stateType = state.stateType;

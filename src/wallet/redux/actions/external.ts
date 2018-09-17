@@ -6,7 +6,6 @@ import {
   WaitForFunding as WaitForFundingB,
   Concluded as ConcludedB,
 } from '../../../game-engine/application-states/PlayerB';
-import { State } from 'fmg-core';
 
 // FUNDING
 // =======
@@ -158,30 +157,7 @@ export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 
 // DECODING
 // ========
-export const DECODE_STATE_REQUEST = 'WAllET.DECODE.REQUEST';
-export const DECODE_STATE_SUCCESS = 'WAllET.DECODE.SUCCESS';
-export const DECODE_STATE_FAILURE = 'WAllET.DECODE.FAILURE';
-
-export const decodeStateRequest = (data: string) => ({
-  type: DECODE_STATE_REQUEST as typeof DECODE_STATE_REQUEST,
-  data,
-});
-
-export const decodeStateSuccess = (state: State) => ({
-  type: DECODE_STATE_SUCCESS as typeof DECODE_STATE_SUCCESS,
-  state,
-});
-
-export const decodeStateFailure = (message: string) => ({
-  type: DECODE_STATE_FAILURE as typeof DECODE_STATE_FAILURE,
-  message,
-});
-
-export type DecodeStateRequest = ReturnType<typeof decodeStateRequest>;
-export type DecodeStateSuccess = ReturnType<typeof decodeStateSuccess>;
-export type DecodeStateFailure = ReturnType<typeof decodeStateFailure>;
-export type DecodeStateResponse = DecodeStateFailure | DecodeStateSuccess;
 
 // Requests
 // ========
-export type RequestAction = FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest | DecodeStateRequest;
+export type RequestAction = FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest;

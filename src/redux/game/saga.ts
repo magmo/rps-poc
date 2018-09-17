@@ -32,9 +32,7 @@ export default function* gameSaga(gameEngine: GameEngine) {
 
     switch (action.type) {
       case messageActions.MESSAGE_RECEIVED:
-        yield put(walletActions.decodeStateRequest(action.message));
-        const decodeAction: walletActions.DecodeStateSuccess = yield take(walletActions.DECODE_STATE_SUCCESS);
-        newState = gameEngine.receivePosition(positionFromHex(decodeAction.state,action.message));
+        newState = gameEngine.receivePosition(positionFromHex(action.message));
         break;
       case gameActions.CHOOSE_PLAY:
         newState = gameEngine.choosePlay(action.play);

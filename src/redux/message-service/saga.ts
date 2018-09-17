@@ -91,7 +91,7 @@ function* validateMessage(data, signature) {
 }
 
 function* signMessage(data) {
-  const requestId = hash(`${data}${Date.now()}`);
+  const requestId = hash(data+Date.now());
 
   yield put(walletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure

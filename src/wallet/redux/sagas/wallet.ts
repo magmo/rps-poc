@@ -16,7 +16,6 @@ export function* walletSaga(uid: string): IterableIterator<any> {
     actions.FUNDING_REQUEST,
     actions.SIGNATURE_REQUEST,
     actions.VALIDATION_REQUEST,
-    actions.DECODE_STATE_REQUEST,
   ]);
 
   yield put(actions.initializationSuccess(wallet.address));
@@ -42,10 +41,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       case actions.FUNDING_REQUEST:
-        yield fork(handleFundingRequest,wallet, action.channelId, action.state);
-        break;
-      case actions.DECODE_STATE_REQUEST:
-        yield handleDecodeRequest(action.data);
+        yield fork(handleFundingRequest, wallet, action.channelId, action.state);
         break;
       default:
       // const _exhaustiveCheck: never = action;
@@ -58,11 +54,6 @@ export function* walletSaga(uid: string): IterableIterator<any> {
   }
 }
 
-function* handleDecodeRequest(data: string) {
-  const state = decode(data);
-  yield put(actions.decodeStateSuccess(state));
-
-}
 
 function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData) {
   // todo:
