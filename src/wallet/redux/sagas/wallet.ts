@@ -42,7 +42,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       case actions.FUNDING_REQUEST:
-        yield handleFundingRequest(wallet, action.channelId, action.state);
+        yield fork(handleFundingRequest,wallet, action.channelId, action.state);
         break;
       case actions.DECODE_STATE_REQUEST:
         yield handleDecodeRequest(action.data);
