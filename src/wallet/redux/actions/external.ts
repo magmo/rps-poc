@@ -167,10 +167,9 @@ export const decodeStateRequest = (data: string) => ({
   data,
 });
 
-export const decodeStateSuccess = (state: State, additionalData?: string) => ({
+export const decodeStateSuccess = (state: State) => ({
   type: DECODE_STATE_SUCCESS as typeof DECODE_STATE_SUCCESS,
   state,
-  additionalData,
 });
 
 export const decodeStateFailure = (message: string) => ({

@@ -6,6 +6,7 @@ import * as messageActions from '../message-service/actions';
 import * as applicationActions from '../application/actions';
 import GameEngineB from '../../game-engine/GameEngineB';
 import decode from '../../game-engine/positions/decode';
+import * as walletActions from '../../wallet/redux/actions/external';
 import { delay } from 'redux-saga';
 import BN from 'bn.js';
 import { CHALLENGE_REFRESH_INTERVAL } from '../../constants';
@@ -54,7 +55,9 @@ export default function* waitingRoomSaga(
         break;
 
       case messageActions.MESSAGE_RECEIVED:
-        const position = decode(action.message);
+        yield put(walletActions.decodeStateRequest(action.message));
+        const decodeAction = yield take(walletActions.DECODE_STATE_SUCCESS);
+        const position = decode(decodeAction.state, action.message);
         const gameEngine = GameEngineB.fromProposal(position);
         // todo: handle error if it isn't a propose state with the right properties
         yield call(reduxSagaFirebase.database.delete, `/challenges/${address}`);
@@ -65,7 +68,7 @@ export default function* waitingRoomSaga(
 }
 
 function* challengeHeartbeatSaga(challenge) {
-  while(true) {
+  while (true) {
     yield call(delay, CHALLENGE_REFRESH_INTERVAL);
     yield updateChallenge(challenge);
   }

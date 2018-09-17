@@ -9,6 +9,7 @@ import { Play } from '../../game-engine/positions';
 import { default as positionFromHex } from '../../game-engine/positions/decode';
 import ChannelWallet from '../../wallet/domain/ChannelWallet';
 import { AUTO_OPPONENT_PRIVATE_KEY } from '../../constants';
+import * as walletActions from '../../wallet/redux/actions/external';
 
 export default function* autoOpponentSaga() {
   const wallet = new ChannelWallet(AUTO_OPPONENT_PRIVATE_KEY); // generate new wallet just for this process
@@ -22,12 +23,13 @@ export default function* autoOpponentSaga() {
     const action: autoOpponentActions.MessageFromApp = yield take(channel);
 
     yield delay(2000);
-
+    yield put(walletActions.decodeStateRequest(action.data));
+    const decodeAction: walletActions.DecodeStateSuccess = yield take(walletActions.DECODE_STATE_SUCCESS);
     if (gameEngine === null) {
       // Start up the game engine for our autoplayer B
-      gameEngine = fromProposal(positionFromHex(action.data));
+      gameEngine = fromProposal(positionFromHex(decodeAction.state, action.data));
     } else {
-      gameEngine.receivePosition(positionFromHex(action.data));
+      gameEngine.receivePosition(positionFromHex(decodeAction.state, action.data));
     }
 
     let state = gameEngine.state;

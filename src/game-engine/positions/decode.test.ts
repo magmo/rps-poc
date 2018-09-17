@@ -1,4 +1,4 @@
-import { Channel } from 'fmg-core';
+import { Channel, State } from 'fmg-core';
 
 import { hashCommitment, Play } from '.';
 import decode from './decode';
@@ -33,7 +33,8 @@ const preCommit = hashCommitment(aPlay, salt);
 const testEncodeDecode = (pledge) => {
   it(`${pledge.constructor.name} is the same after encoding and decoding`, () => {
     const encoded = pledge.toHex();
-    const decoded = decode(encoded);
+    const state = pledge as State;
+    const decoded = decode(state,encoded);
     // We need to use JSON stringify due to the BN.js having possible different 
     // internal representations of the same number
     expect(JSON.stringify(decoded)).toEqual(JSON.stringify(pledge));

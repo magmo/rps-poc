@@ -6,7 +6,7 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
-import decode, { GAME_ATTRIBUTE_OFFSET } from '../../domain/decode';
+import decode from '../../domain/decode';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = yield initializeWallet(uid);
@@ -60,8 +60,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
 
 function* handleDecodeRequest(data: string) {
   const state = decode(data);
-  const additionalData = data.substr(GAME_ATTRIBUTE_OFFSET);
-  yield put(actions.decodeStateSuccess(state, additionalData));
+  yield put(actions.decodeStateSuccess(state));
 
 }
 
