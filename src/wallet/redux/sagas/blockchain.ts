@@ -64,7 +64,7 @@ function* contractSetup() {
         });
 
         yield put(blockchainActions.deploymentSuccess(deployedContract.address));
-        // TODO: This should nprobably move out of this scope
+        // TODO: This should probably move out of this scope
         const listener = yield fork(listenForFundsReceivedEvents, deployedContract);
         yield take(blockchainActions.UNSUBSCRIBE_EVENTS);
         yield cancel(listener);
