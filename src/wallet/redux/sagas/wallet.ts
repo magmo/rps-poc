@@ -111,7 +111,7 @@ function* handleFundingRequest(_wallet: ChannelWallet, channelId, state) {
 export function* handleWithdrawalRequest(
   wallet: ChannelWallet,
 ) {
-  const { address: playerAddress } = wallet
+  const { address: playerAddress } = wallet;
 
   const { transaction, failureReason } = yield call(withdrawalSaga, playerAddress);
   if (transaction) {
