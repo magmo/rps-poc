@@ -293,7 +293,8 @@ module.exports = {
     }),
     new webpack.EnvironmentPlugin({
     FIREBASE_PROJECT: 'rock-paper-scissors-dev',
-    FIREBASE_API_KEY: 'AIzaSyAlGe17xjJjfoJ_KDYjCREg7ZL4ns61Chc'
+    FIREBASE_API_KEY: 'AIzaSyAlGe17xjJjfoJ_KDYjCREg7ZL4ns61Chc',
+    DEPLOY_GAME_LIBRARY: true,
     })],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

@@ -5,6 +5,7 @@ import * as loginActions from './actions';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 import applicationSaga from '../application/saga';
 import metamaskSaga from '../metamask/saga';
+import gameLibrarySaga from '../game-library/saga';
 
 const authProvider = new firebase.auth.GoogleAuthProvider();
 
@@ -38,7 +39,7 @@ function* loginStatusWatcherSaga() {
 
     if (user) {
       applicationThread = yield fork(applicationSaga, user.uid);
-
+      yield fork(gameLibrarySaga);
       yield put(loginActions.loginSuccess(user));
 
     } else {

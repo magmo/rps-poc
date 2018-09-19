@@ -9,8 +9,10 @@ import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
 import { withdrawalSaga } from './withdrawal';
 import decode from '../../domain/decode';
 import { State } from 'fmg-core';
-import { reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
-
+import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
+import { fetchGameLibraryRequest, GAMELIBRARY_FETCH_SUCCESS } from '../../../redux/game-library/actions';
+import validateTransitionSaga from './validate';
+import * as validateTransistionActions from '../actions/validate';
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
   yield fork(blockchainSaga);
@@ -21,7 +23,9 @@ export function* walletSaga(uid: string): IterableIterator<any> {
     actions.VALIDATION_REQUEST,
     actions.WITHDRAWAL_REQUEST
   ]);
-
+  yield put(fetchGameLibraryRequest());
+  const libraryAction = yield take(GAMELIBRARY_FETCH_SUCCESS);
+  yield fork(validateTransitionSaga, libraryAction.address);
   yield put(actions.initializationSuccess(wallet.address));
 
   while (true) {
@@ -68,6 +72,11 @@ function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData)
   // TODO: Validate transition
   const signedPosition = wallet.sign(positionData);
   const state = decode(positionData);
+  const fromState = yield getLasReceivedState(wallet, state.channel.id);
+  if (!!fromState) {
+    yield put(validateTransistionActions.validateRequest(decode(fromState.state), state));
+    yield take(validateTransistionActions.VALIDATE_SUCCESS);
+  }
   yield storeLastSentState(wallet, state, signedPosition);
   yield put(actions.signatureSuccess(requestId, signedPosition));
 }
@@ -75,15 +84,22 @@ function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData)
 function* storeLastSentState(wallet: ChannelWallet, state: State, signature: string) {
   yield call(reduxSagaFirebase.database.update,
     `wallets/${wallet.id}/channels/${state.channel.id}/sent`,
-    { state, signature,updatedAt:serverTimestamp });
+    { state:state.toHex(), signature, updatedAt: serverTimestamp });
 
+}
+function* getLasReceivedState(wallet: ChannelWallet, channelId: string) {
+  const query = firebase.database().ref(
+    `wallets/${wallet.id}/channels/${channelId}/received`
+  );
+  const result = yield call([query, query.once], 'value');
+  return result.val();
 }
 
 function* storeLastReceivedState(wallet: ChannelWallet, state: State, signature: string) {
 
   yield call(reduxSagaFirebase.database.update,
     `wallets/${wallet.id}/channels/${state.channel.id}/received`,
-    { state, signature, updatedAt: serverTimestamp });
+    { state:state.toHex(), signature, updatedAt: serverTimestamp });
 }
 
 function* handleValidationRequest(
@@ -100,9 +116,6 @@ function* handleValidationRequest(
   if (state.channel.participants[opponentIndex] !== address) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
-  // todo:
-  // - validate the transition
-  // - store the position
 
   yield put(actions.validationSuccess(requestId));
 }
