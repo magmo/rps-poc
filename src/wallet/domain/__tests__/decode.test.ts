@@ -15,7 +15,6 @@ const aBal = new BN(4);
 const bBal = new BN(5);
 const balances = [aBal, bBal];
 
-
 const testEncodeDecode = (pledge) => {
   it(`${pledge.constructor.name} is the same after encoding and decoding`, () => {
     const encoded = pledge.toHex();
