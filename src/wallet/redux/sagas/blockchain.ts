@@ -5,30 +5,7 @@ import simpleAdjudicatorArtifact from 'fmg-simple-adjudicator/contracts/SimpleAd
 import contract from 'truffle-contract';
 import detectNetwork from 'web3-detect-network';
 import { eventChannel } from 'redux-saga';
-
-function* listenForFundsReceivedEvents(deployedContract) {
-  const watchChannel = createEventChannel(deployedContract);
-  while (true) {
-    const result = yield take(watchChannel);
-    yield put(blockchainActions.fundsReceivedEvent({ ...result.args }));
-  }
-}
-
-function createEventChannel(deployedContract) {
-  const filter = deployedContract.FundsReceived();
-  const channel = eventChannel(emitter => {
-    filter.watch((error, results) => {
-      if (error) {
-        throw error;
-      }
-      emitter(results);
-    });
-    return () => {
-      filter.stopWatching();
-    };
-  });
-  return channel;
-}
+import { ConclusionProof } from '../../domain/ConclusionProof';
 
 export function* blockchainSaga() {
   const simpleAdjudicator = yield call(contractSetup);
@@ -101,8 +78,22 @@ function* blockchainWithdrawal(simpleAdjudicator) {
   while (true) {
     const action = yield take(blockchainActions.WITHDRAW_REQUEST);
     try {
-      // TODO: ensure that someone has first called simpleAdudicator.conclude
-      // This requires us to pass signed states.
+      const { proof } : { proof: ConclusionProof } = action;
+
+      try {
+        yield call(
+          simpleAdjudicator.conclude,
+          proof.fromState.toHex(),
+          proof.toState.toHex(),
+          proof.v,
+          proof.r,
+          proof.s
+        );
+      } catch (err) {
+        // for now, assume that the game's been concluded, and continue
+        // TODO: check if the game's been concluded in the watchAdjudicator saga.
+      }
+
       const transaction = yield simpleAdjudicator.withdraw(action.playerAddress);
       yield put(blockchainActions.withdrawSuccess(transaction));
       return true;
@@ -115,4 +106,28 @@ function* blockchainWithdrawal(simpleAdjudicator) {
 function handleError(action, err) {
   const message = err.message ? err.message : "Something went wrong";
   return put(action(message));
+}
+
+function* listenForFundsReceivedEvents(deployedContract) {
+  const watchChannel = createEventChannel(deployedContract);
+  while (true) {
+    const result = yield take(watchChannel);
+    yield put(blockchainActions.fundsReceivedEvent({ ...result.args }));
+  }
+}
+
+function createEventChannel(deployedContract) {
+  const filter = deployedContract.FundsReceived();
+  const channel = eventChannel(emitter => {
+    filter.watch((error, results) => {
+      if (error) {
+        throw error;
+      }
+      emitter(results);
+    });
+    return () => {
+      filter.stopWatching();
+    };
+  });
+  return channel;
 }
