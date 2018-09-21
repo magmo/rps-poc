@@ -18,8 +18,7 @@ const balances = [aBal, bBal];
 const testEncodeDecode = (pledge) => {
   it(`${pledge.constructor.name} is the same after encoding and decoding`, () => {
     const encoded = pledge.toHex();
-    const decoded = decode(encoded);
-    // We need to use JSON stringify due to the BN.js having possible different 
+    const decoded = decode(encoded); // We need to use JSON stringify due to the BN.js having possible different 
     // internal representations of the same number
     expect(JSON.stringify(decoded)).toEqual(JSON.stringify(pledge));
   });
@@ -30,5 +29,4 @@ describe('decode', () => {
   testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.Game}));
   testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.PostFundSetup}));
   testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.PreFundSetup}));
-
 });
