@@ -59,7 +59,7 @@ function* contractSetup() {
     switch (action.type) {
     case blockchainActions.DEPLOY_REQUEST: // Player A
       try {
-        const deployedContract = yield call(simpleAdjudicatorContract.new, [action.channelId], {
+        const deployedContract = yield call(simpleAdjudicatorContract.new, action.channelId, {
           value: action.amount.toString(),
         });
 
