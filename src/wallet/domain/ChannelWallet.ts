@@ -36,6 +36,7 @@ export default class ChannelWallet {
 
   recover(data: string, signature: string) {
     const web3 = new Web3('');
-    return web3.eth.accounts.recover(data, signature);
+    const hash = sha3(data);
+    return web3.eth.accounts.recover(hash, signature);
   }
 }
