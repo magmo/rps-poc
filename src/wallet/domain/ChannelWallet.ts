@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import {sha3} from 'web3-utils';
 
 export default class ChannelWallet {
 
@@ -25,9 +26,12 @@ export default class ChannelWallet {
     }
   }
 
-  sign(stateString: string): string {
-    return this.account.sign(stateString).signature;
 
+  sign(state: string): string {
+    const localWeb3 = new Web3('');
+    const account:any = localWeb3.eth.accounts.privateKeyToAccount(this.account.privateKey);
+    const hash = sha3(state);
+    return account.sign(hash).signature;
   }
 
   recover(data: string, signature: string) {
