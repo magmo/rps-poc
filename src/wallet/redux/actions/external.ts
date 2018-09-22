@@ -6,6 +6,8 @@ import {
   WaitForFunding as WaitForFundingB,
   Concluded as ConcludedB,
 } from '../../../game-engine/application-states/PlayerB';
+import ChannelWallet from '../../domain/ChannelWallet';
+import { Channel } from 'fmg-core';
 
 // FUNDING
 // =======
@@ -33,6 +35,36 @@ export type FundingRequest = ReturnType<typeof fundingRequest>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type FundingFailure = ReturnType<typeof fundingFailure>;
 export type FundingResponse = FundingSuccess | FundingFailure;
+
+// CHANNELS
+// ========
+
+export const OPEN_CHANNEL = 'WALLET.CHANNEL.REQUEST.OPEN';
+export const CLOSE_CHANNEL = 'WALLET.CHANNEL.REQUEST.CLOSE';
+export const CHANNEL_OPENED = 'WALLET.CHANNEL.OPENED';
+export const CHANNEL_CLOSED = 'WALLET.CHANNEL.CLOSED';
+
+export const openChannel = (channel: Channel) => ({
+  type: OPEN_CHANNEL as typeof OPEN_CHANNEL,
+  channel,
+});
+export const channelOpened = (channelId: string) => ({
+  type: CHANNEL_OPENED as typeof CHANNEL_OPENED,
+  channelId,
+});
+export const closeChannel = (wallet: ChannelWallet) => ({
+  type: CLOSE_CHANNEL as typeof CLOSE_CHANNEL,
+  wallet,
+});
+export const channelClosed = (walletId: string) => ({
+  type: CHANNEL_CLOSED as typeof CHANNEL_CLOSED,
+  walletId,
+});
+
+export type OpenChannel = ReturnType<typeof openChannel>;
+export type ChannelOpened = ReturnType<typeof channelOpened>;
+export type CloseChannel = ReturnType<typeof closeChannel>;
+export type ChannelClosed = ReturnType<typeof channelClosed>;
 
 // VALIDATION
 // ==========
@@ -159,4 +191,4 @@ export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 
 // Requests
 // ========
-export type RequestAction = FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest;
+export type RequestAction = OpenChannel | CloseChannel | FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest;

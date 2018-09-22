@@ -7,8 +7,7 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
-import decode from '../../domain/decode';
-import { State } from 'fmg-core';
+import { State, Channel } from 'fmg-core';
 import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 
@@ -16,21 +15,32 @@ export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
   yield fork(blockchainSaga);
 
+  yield put(actions.initializationSuccess(wallet.address));
+
   const channel = yield actionChannel([
     actions.FUNDING_REQUEST,
     actions.SIGNATURE_REQUEST,
     actions.VALIDATION_REQUEST,
-    actions.WITHDRAWAL_REQUEST
+    actions.WITHDRAWAL_REQUEST,
+    actions.OPEN_CHANNEL,
+    actions.CLOSE_CHANNEL,
   ]);
-
-  yield put(actions.initializationSuccess(wallet.address));
-
   while (true) {
     const action: actions.RequestAction = yield take(channel);
 
     // The handlers below will block, so the wallet will only ever
     // process one action at a time from the queue.
     switch (action.type) {
+      case actions.OPEN_CHANNEL:
+        yield wallet.openChannel(action.channel);
+        yield put(actions.channelOpened(wallet.channelId));
+        break;
+
+      case actions.CLOSE_CHANNEL:
+        yield wallet.closeChannel();
+        yield put(actions.channelClosed(wallet.id));
+        break;
+
       case actions.SIGNATURE_REQUEST:
         yield handleSignatureRequest(wallet, action.requestId, action.positionData);
         break;
@@ -46,7 +56,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       case actions.FUNDING_REQUEST:
-        yield fork(handleFundingRequest, wallet, action.channelId, action.state);
+        yield fork(handleFundingRequest, wallet, action.state);
         break;
 
       case actions.WITHDRAWAL_REQUEST:
@@ -65,30 +75,29 @@ export function* walletSaga(uid: string): IterableIterator<any> {
   }
 }
 
-function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData) {
+function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData: string) {
   // TODO: Validate transition
-  const position = decode(positionData);
-  const signature = wallet.sign(position);
-  yield storeLastSentState(wallet, position, signature);
+  const signature = wallet.sign(positionData);
+  yield storeLastSentState(wallet, positionData, signature);
   yield put(actions.signatureSuccess(requestId, signature));
 }
 
 function* storeLastSentState(
-  wallet: ChannelWallet, state: State, signature: string
+  wallet: ChannelWallet, positionData: string, signature: string
 ) {
   yield call(
     reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${state.channel.id}/sent`,
-    { state: state.toHex(), signature, updatedAt: serverTimestamp }
+    `wallets/${wallet.id}/channels/${wallet.channelId}/sent`,
+    { state: positionData, signature, updatedAt: serverTimestamp }
   );
 
 }
 
-function* storeLastReceivedState(wallet: ChannelWallet, state: State, signature: string) {
+function* storeLastReceivedState(wallet: ChannelWallet, state: string, signature: string) {
 
   yield call(reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${state.channel.id}/received`,
-    { state: state.toHex(), signature, updatedAt: serverTimestamp });
+    `wallets/${wallet.id}/channels/${wallet.channelId}/received`,
+    { state, signature, updatedAt: serverTimestamp });
 }
 
 function* handleValidationRequest(
@@ -100,9 +109,8 @@ function* handleValidationRequest(
 ) {
 
   const address = wallet.recover(data, signature);
-  const state = decode(data);
-  yield storeLastReceivedState(wallet, state, signature);
-  if (state.channel.participants[opponentIndex] !== address) {
+  yield storeLastReceivedState(wallet, data, signature);
+  if ((wallet.channel as Channel).participants[opponentIndex] !== address) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
   // todo:
@@ -112,18 +120,18 @@ function* handleValidationRequest(
   yield put(actions.validationSuccess(requestId));
 }
 
-function* handleFundingRequest(_wallet: ChannelWallet, channelId, state) {
+function* handleFundingRequest(wallet: ChannelWallet, state) {
   let success;
   if (state.opponentAddress === AUTO_OPPONENT_ADDRESS) {
     success = true;
   } else {
-    success = yield fundingSaga(channelId, state);
+    success = yield fundingSaga(wallet.channelId, state);
   }
 
   if (success) {
-    yield put(actions.fundingSuccess(channelId));
+    yield put(actions.fundingSuccess(wallet.channelId));
   } else {
-    yield put(actions.fundingFailure(channelId, 'Something went wrong'));
+    yield put(actions.fundingFailure(wallet.channelId, 'Something went wrong'));
   }
   return true;
 }
@@ -167,6 +175,7 @@ function* loadConclusionProof(
   );
   const myMove = yield call([myQuery, myQuery.once], 'value');
   const { state: myState, signature: mySignature } = myMove.val();
+
   return new ConclusionProof(
     myState,
     yourState,
