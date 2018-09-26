@@ -7,9 +7,10 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
-import { State, Channel } from 'fmg-core';
+import { State, } from 'fmg-core';
 import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
 import { ConclusionProof } from '../../domain/ConclusionProof';
+import decode from '../../domain/decode';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
@@ -85,18 +86,19 @@ function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData:
 function* storeLastSentState(
   wallet: ChannelWallet, positionData: string, signature: string
 ) {
+  const channelId = decode(positionData).channel.id;
   yield call(
     reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${wallet.channelId}/sent`,
+    `wallets/${wallet.id}/channels/${channelId}/sent`,
     { state: positionData, signature, updatedAt: serverTimestamp }
   );
 
 }
 
 function* storeLastReceivedState(wallet: ChannelWallet, state: string, signature: string) {
-
+  const channelId = decode(state).channel.id;
   yield call(reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${wallet.channelId}/received`,
+    `wallets/${wallet.id}/channels/${channelId}/received`,
     { state, signature, updatedAt: serverTimestamp });
 }
 
@@ -107,16 +109,16 @@ function* handleValidationRequest(
   signature: string,
   opponentIndex,
 ) {
-
   const address = wallet.recover(data, signature);
-  yield storeLastReceivedState(wallet, data, signature);
-  if ((wallet.channel as Channel).participants[opponentIndex] !== address) {
+  // The wallet should also have the channel, except when the data is the first message
+  // that the player has received.
+  // So, we need to read the channel off of the decoded data, rather than the wallet.
+  const state = decode(data);
+  if (state.channel.participants[opponentIndex] !== address) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
-  // todo:
-  // - validate the transition
-  // - store the position
 
+  yield storeLastReceivedState(wallet, data, signature);
   yield put(actions.validationSuccess(requestId));
 }
 
