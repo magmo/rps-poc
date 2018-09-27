@@ -72,8 +72,9 @@
     "deploymentNetwork": "ropsten"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
+    "clear_contracts": "rm -rf ./build/contracts",
+    "start": "run-s clear_contracts && node scripts/start.js",
+    "build": "run-s clear_contracts && node scripts/build.js",
     "test": "run-s test:truffle 'test:app --all'",
     "test:ci": "run-s build test:truffle 'test:app --all --ci'",
     "test:app": "node scripts/test.js --env=jsdom",
