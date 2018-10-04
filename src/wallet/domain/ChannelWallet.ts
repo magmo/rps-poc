@@ -1,7 +1,7 @@
 import Web3 from 'web3';
-import {sha3} from 'web3-utils';
-import { Channel, } from 'fmg-core';
+import { Channel, sign as coreSign, recover as coreRecover, SolidityParameter } from 'fmg-core';
 
+export type SignableData = string | SolidityParameter | SolidityParameter[];
 export default class ChannelWallet {
 
   get address() {
@@ -48,16 +48,21 @@ export default class ChannelWallet {
     this.channel = null;
   }
 
-  sign(state: string): string {
-    const localWeb3 = new Web3('');
-    const account:any = localWeb3.eth.accounts.privateKeyToAccount(this.account.privateKey);
-    const hash = sha3(state);
-    return account.sign(hash).signature;
+  sign(data: SignableData): string {
+    const { v, r, s } =  coreSign(data, this.account.privateKey);
+    return r + s.substr(2) + v.substr(2);
   }
 
-  recover(data: string, signature: string) {
-    const web3 = new Web3('');
-    const hash = sha3(data);
-    return web3.eth.accounts.recover(hash, signature);
+  recover(data: SignableData, signature: string) {
+    const { v, r, s } = decodeSignature(signature);
+    return coreRecover(data, v, r, s);
   }
+}
+
+function decodeSignature(signature: string) : { v, r, s } {
+  const r = '0x' + signature.slice(2, 66);
+  const s = '0x' + signature.slice(66, 130);
+  const v = '0x' + signature.slice(130, 132);
+
+  return { v, r, s };
 }

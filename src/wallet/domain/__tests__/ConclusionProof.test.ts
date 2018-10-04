@@ -2,6 +2,7 @@ import { ConclusionProof } from '../ConclusionProof';
 import { State, Channel } from 'fmg-core';
 import Web3 from 'web3';
 import BN from 'bn.js';
+import ChannelWallet from '../ChannelWallet';
 
 it.skip("can be constructed", () => { // There's a problem with bn.js equality.
   const web3 = new Web3('');
@@ -30,8 +31,11 @@ it.skip("can be constructed", () => { // There's a problem with bn.js equality.
     resolution: balances,
   });
 
-  const fromSignature = fromState.sign(participantA.privateKey);
-  const toSignature = toState.sign(participantB.privateKey);
+  const fromWallet = new ChannelWallet(participantA.privateKey);
+  const toWallet = new ChannelWallet(participantA.privateKey);
+
+  const fromSignature = fromWallet.sign(fromState.toHex());
+  const toSignature = toWallet.sign(toState.toHex());
 
   const proof = new ConclusionProof(fromState.toHex(), toState.toHex(), fromSignature, toSignature);
 
