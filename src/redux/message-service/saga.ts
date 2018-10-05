@@ -88,7 +88,7 @@ function* validateMessage(data, signature) {
     action = yield take(actionFilter);
   }
   if (action.type === walletActions.VALIDATION_SUCCESS) {
-    yield put(walletActions.storeMessageRequest(requestId, data, Direction.Received));
+    yield put(walletActions.storeMessageRequest(data, signature, Direction.Received));
     return true;
   } else {
     // TODO: Properly handle this.
@@ -107,7 +107,7 @@ function* signMessage(data) {
     signatureResponse = yield take(actionFilter);
   }
 
-  yield put(walletActions.storeMessageRequest(requestId, data, Direction.Sent));
+  yield put(walletActions.storeMessageRequest(data, signatureResponse.signature, Direction.Sent));
   return signatureResponse.signature;
 }
 

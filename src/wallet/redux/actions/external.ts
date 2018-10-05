@@ -6,7 +6,7 @@ import {
   WaitForFunding as WaitForFundingB,
   Concluded as ConcludedB,
 } from '../../../game-engine/application-states/PlayerB';
-import ChannelWallet from '../../domain/ChannelWallet';
+import ChannelWallet, { SignableData } from '../../domain/ChannelWallet';
 import { Channel } from 'fmg-core';
 
 // FUNDING
@@ -76,10 +76,10 @@ export const VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 
-export const validationRequest = (requestId: string, positionData: string, signature: string, opponentIndex: number) => ({
+export const validationRequest = (requestId: string, data: SignableData, signature: string, opponentIndex: number) => ({
   type: VALIDATION_REQUEST as typeof VALIDATION_REQUEST,
   requestId,
-  positionData,
+  data,
   signature,
   opponentIndex,
 });
@@ -105,10 +105,10 @@ export const SIGNATURE_REQUEST = 'WALLET.SIGNATURE.REQUEST';
 export const SIGNATURE_SUCCESS = 'WALLET.SIGNATURE.SUCCESS';
 export const SIGNATURE_FAILURE = 'WALLET.SIGNATURE.FAILURE';
 
-export const signatureRequest = (requestId: string, positionData: string) => ({
+export const signatureRequest = (requestId: string, data: SignableData) => ({
   type: SIGNATURE_REQUEST as typeof SIGNATURE_REQUEST,
   requestId,
-  positionData,
+  data,
 });
 export const signatureSuccess = (requestId: string, signature: string) => ({
   type: SIGNATURE_SUCCESS as typeof SIGNATURE_SUCCESS,
@@ -188,10 +188,10 @@ export const receiveMessage = (data: string) => ({
   data,
 });
 
-export const storeMessageRequest = (requestId: string, positionData: string, direction: "sent" | "received") => ({
+export const storeMessageRequest = (positionData: string, signature: string, direction: "sent" | "received") => ({
   type: STORE_MESSAGE_REQUEST as typeof STORE_MESSAGE_REQUEST,
-  requestId,
   positionData,
+  signature,
   direction,
 });
 
