@@ -16,7 +16,10 @@ export const FUNDING_REQUEST = 'WALLET.FUNDING.REQUEST';
 export const FUNDING_SUCCESS = 'WALLET.FUNDING.SUCCESS';
 export const FUNDING_FAILURE = 'WALLET.FUNDING.FAILURE';
 
-export const fundingRequest = (channelId, state: WaitForFundingA | WaitForFundingB) => ({
+export const fundingRequest = (
+  channelId: string,
+  state: WaitForFundingA | WaitForFundingB
+) => ({
   type: FUNDING_REQUEST as typeof FUNDING_REQUEST,
   channelId,
   state,
@@ -39,21 +42,21 @@ export type FundingResponse = FundingSuccess | FundingFailure;
 // CHANNELS
 // ========
 
-export const OPEN_CHANNEL = 'WALLET.CHANNEL.REQUEST.OPEN';
-export const CLOSE_CHANNEL = 'WALLET.CHANNEL.REQUEST.CLOSE';
+export const OPEN_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.OPEN';
+export const CLOSE_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.CLOSE';
 export const CHANNEL_OPENED = 'WALLET.CHANNEL.OPENED';
 export const CHANNEL_CLOSED = 'WALLET.CHANNEL.CLOSED';
 
-export const openChannel = (channel: Channel) => ({
-  type: OPEN_CHANNEL as typeof OPEN_CHANNEL,
+export const openChannelRequest = (channel: Channel) => ({
+  type: OPEN_CHANNEL_REQUEST as typeof OPEN_CHANNEL_REQUEST,
   channel,
 });
 export const channelOpened = (channelId: string) => ({
   type: CHANNEL_OPENED as typeof CHANNEL_OPENED,
   channelId,
 });
-export const closeChannel = (wallet: ChannelWallet) => ({
-  type: CLOSE_CHANNEL as typeof CLOSE_CHANNEL,
+export const closeChannelRequest = (wallet: ChannelWallet) => ({
+  type: CLOSE_CHANNEL_REQUEST as typeof CLOSE_CHANNEL_REQUEST,
   wallet,
 });
 export const channelClosed = (walletId: string) => ({
@@ -61,9 +64,9 @@ export const channelClosed = (walletId: string) => ({
   walletId,
 });
 
-export type OpenChannel = ReturnType<typeof openChannel>;
+export type OpenChannelRequest = ReturnType<typeof openChannelRequest>;
 export type ChannelOpened = ReturnType<typeof channelOpened>;
-export type CloseChannel = ReturnType<typeof closeChannel>;
+export type CloseChannelRequest = ReturnType<typeof closeChannelRequest>;
 export type ChannelClosed = ReturnType<typeof channelClosed>;
 
 // VALIDATION
@@ -171,6 +174,8 @@ export type InitializationSuccess = ReturnType<typeof initializationSuccess>;
 // =========
 export const SEND_MESSAGE = 'WALLET.MESSAGING.SEND';
 export const RECEIVE_MESSAGE = 'WALLET.MESSAGING.RECEIVE';
+export const STORE_MESSAGE_REQUEST = 'WALLET.MESSAGING.REQUEST.STORE';
+
 
 export const sendMessage = (to: string, data: string) => ({
   type: SEND_MESSAGE as typeof SEND_MESSAGE,
@@ -183,12 +188,20 @@ export const receiveMessage = (data: string) => ({
   data,
 });
 
+export const storeMessageRequest = (requestId: string, positionData: string, direction: "sent" | "received") => ({
+  type: STORE_MESSAGE_REQUEST as typeof STORE_MESSAGE_REQUEST,
+  requestId,
+  positionData,
+  direction,
+});
+
 export type SendMessage = ReturnType<typeof sendMessage>;
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
+export type StoreMessageRequest = ReturnType<typeof storeMessageRequest>;
 
 // DECODING
 // ========
 
 // Requests
 // ========
-export type RequestAction = OpenChannel | CloseChannel | FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest;
+export type RequestAction = OpenChannelRequest | CloseChannelRequest | FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest | StoreMessageRequest;

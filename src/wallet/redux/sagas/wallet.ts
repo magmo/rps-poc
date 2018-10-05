@@ -3,11 +3,11 @@ import { actionChannel, take, put, fork, call, } from 'redux-saga/effects';
 import { initializeWallet } from './initialization';
 import * as actions from '../actions/external';
 import * as blockchainActions from '../actions/blockchain';
-import ChannelWallet from '../../domain/ChannelWallet';
+import ChannelWallet, { SignableData } from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
-import { State, } from 'fmg-core';
+import { State, SolidityParameter } from 'fmg-core';
 import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import decode from '../../domain/decode';
@@ -23,8 +23,9 @@ export function* walletSaga(uid: string): IterableIterator<any> {
     actions.SIGNATURE_REQUEST,
     actions.VALIDATION_REQUEST,
     actions.WITHDRAWAL_REQUEST,
-    actions.OPEN_CHANNEL,
-    actions.CLOSE_CHANNEL,
+    actions.OPEN_CHANNEL_REQUEST,
+    actions.CLOSE_CHANNEL_REQUEST,
+    actions.STORE_MESSAGE_REQUEST
   ]);
   while (true) {
     const action: actions.RequestAction = yield take(channel);
@@ -32,18 +33,22 @@ export function* walletSaga(uid: string): IterableIterator<any> {
     // The handlers below will block, so the wallet will only ever
     // process one action at a time from the queue.
     switch (action.type) {
-      case actions.OPEN_CHANNEL:
+      case actions.OPEN_CHANNEL_REQUEST:
         yield wallet.openChannel(action.channel);
         yield put(actions.channelOpened(wallet.channelId));
         break;
 
-      case actions.CLOSE_CHANNEL:
+      case actions.CLOSE_CHANNEL_REQUEST:
         yield wallet.closeChannel();
         yield put(actions.channelClosed(wallet.id));
         break;
 
       case actions.SIGNATURE_REQUEST:
         yield handleSignatureRequest(wallet, action.requestId, action.positionData);
+        break;
+
+      case actions.STORE_MESSAGE_REQUEST:
+        yield handleStoreMessageRequest(wallet, action.requestId, action.positionData, action.direction);
         break;
 
       case actions.VALIDATION_REQUEST:
@@ -76,30 +81,21 @@ export function* walletSaga(uid: string): IterableIterator<any> {
   }
 }
 
-function* handleSignatureRequest(wallet: ChannelWallet, requestId, positionData: string) {
+function* handleSignatureRequest(wallet: ChannelWallet, requestId, data: SignableData) {
   // TODO: Validate transition
-  const signature = wallet.sign(positionData);
-  yield storeLastSentState(wallet, positionData, signature);
+  const signature: string = wallet.sign(data);
   yield put(actions.signatureSuccess(requestId, signature));
 }
 
-function* storeLastSentState(
-  wallet: ChannelWallet, positionData: string, signature: string
+function* handleStoreMessageRequest(
+  wallet: ChannelWallet, positionData: string, signature: string, direction: "Sent" | "Received"
 ) {
   const channelId = decode(positionData).channel.id;
   yield call(
     reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${channelId}/sent`,
+    `wallets/${wallet.id}/channels/${channelId}/${direction}`,
     { state: positionData, signature, updatedAt: serverTimestamp }
   );
-
-}
-
-function* storeLastReceivedState(wallet: ChannelWallet, state: string, signature: string) {
-  const channelId = decode(state).channel.id;
-  yield call(reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${channelId}/received`,
-    { state, signature, updatedAt: serverTimestamp });
 }
 
 function* handleValidationRequest(
@@ -118,7 +114,6 @@ function* handleValidationRequest(
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
 
-  yield storeLastReceivedState(wallet, data, signature);
   yield put(actions.validationSuccess(requestId));
 }
 
