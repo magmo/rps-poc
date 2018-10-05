@@ -165,6 +165,13 @@ export default class GameEngineB {
     if (this.state instanceof State.Concluded) {
       return this.state;
     }
+    if (this.state instanceof State.WaitForConclude) {
+      // We assume that the player wishes to conclude the game,
+      // and conclude it on their behalf.
+      return this.transitionTo(
+        new State.Concluded({ position })
+      );
+    }
     const { channel, resolution: balances } = position;
 
     const newPosition = new Conclude(channel, position.turnNum + 1, balances);

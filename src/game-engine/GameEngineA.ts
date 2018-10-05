@@ -198,6 +198,8 @@ export default class GameEngineA {
       return this.state;
     }
     if (this.state instanceof State.WaitForConclude) {
+      // We assume that the player wishes to conclude the game,
+      // and conclude it on their behalf.
       return this.transitionTo(
         new State.Concluded({ position })
       );
