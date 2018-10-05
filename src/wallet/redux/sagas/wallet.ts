@@ -7,7 +7,7 @@ import ChannelWallet, { SignableData } from '../../domain/ChannelWallet';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
-import { State, SolidityParameter } from 'fmg-core';
+import { State, SolidityType, decodeSignature } from 'fmg-core';
 import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import decode from '../../domain/decode';
@@ -44,18 +44,23 @@ export function* walletSaga(uid: string): IterableIterator<any> {
         break;
 
       case actions.SIGNATURE_REQUEST:
-        yield handleSignatureRequest(wallet, action.requestId, action.positionData);
+        yield handleSignatureRequest(wallet, action.requestId, action.data);
         break;
 
       case actions.STORE_MESSAGE_REQUEST:
-        yield handleStoreMessageRequest(wallet, action.requestId, action.positionData, action.direction);
+        yield handleStoreMessageRequest(
+          wallet,
+          action.positionData,
+          action.signature,
+          action.direction,
+        );
         break;
 
       case actions.VALIDATION_REQUEST:
         yield handleValidationRequest(
           wallet,
           action.requestId,
-          action.positionData,
+          action.data,
           action.signature,
           action.opponentIndex,
         );
@@ -81,14 +86,21 @@ export function* walletSaga(uid: string): IterableIterator<any> {
   }
 }
 
-function* handleSignatureRequest(wallet: ChannelWallet, requestId, data: SignableData) {
+function* handleSignatureRequest(
+  wallet: ChannelWallet,
+  requestId: string,
+  data: SignableData
+) {
   // TODO: Validate transition
   const signature: string = wallet.sign(data);
   yield put(actions.signatureSuccess(requestId, signature));
 }
 
 function* handleStoreMessageRequest(
-  wallet: ChannelWallet, positionData: string, signature: string, direction: "Sent" | "Received"
+  wallet: ChannelWallet,
+  positionData: string,
+  signature: string,
+  direction: "sent" | "received"
 ) {
   const channelId = decode(positionData).channel.id;
   yield call(
@@ -101,7 +113,7 @@ function* handleStoreMessageRequest(
 function* handleValidationRequest(
   wallet: ChannelWallet,
   requestId,
-  data: string,
+  data: SignableData,
   signature: string,
   opponentIndex,
 ) {
@@ -137,11 +149,21 @@ export function* handleWithdrawalRequest(
   wallet: ChannelWallet,
   state: State,
 ) {
-  const { address: playerAddress } = wallet;
+  const { address: playerAddress, channelId } = wallet;
+
+  const destination = '0xD912E03a7407Eb03961823aA39b4277DB3aAa9dB'; // just to get it working
+
+  const data = [
+    { type: SolidityType.address, value: playerAddress },
+    { type: SolidityType.address, value: destination },
+    { type: SolidityType.bytes32, value: wallet.channelId },
+  ];
+
+  const { v, r, s } = decodeSignature(wallet.sign(data));
 
   const proof = yield call(loadConclusionProof, wallet, state);
 
-  yield put(blockchainActions.withdrawRequest(playerAddress, proof));
+  yield put(blockchainActions.withdrawRequest(proof, { playerAddress, channelId, destination, v, r, s }));
   const { transaction, reason: failureReason } = yield take([
     blockchainActions.WITHDRAW_SUCCESS,
     blockchainActions.WITHDRAW_FAILURE

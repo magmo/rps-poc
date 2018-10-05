@@ -1,5 +1,5 @@
 import * as blockchainActions from '../actions/blockchain';
-import { take, put, actionChannel, call, fork, cancel } from 'redux-saga/effects';
+import { take, put, actionChannel, call, fork, cancel, spawn } from 'redux-saga/effects';
 // @ts-ignore
 import simpleAdjudicatorArtifact from 'fmg-simple-adjudicator/contracts/SimpleAdjudicator.sol';
 import contract from 'truffle-contract';
@@ -8,12 +8,12 @@ import { eventChannel } from 'redux-saga';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 
 export function* blockchainSaga() {
-  const simpleAdjudicator = yield call(contractSetup);
-  const watchAdjudicatorTask = yield fork(watchAdjudicator);
+  const { simpleAdjudicator, eventListener } = yield call(contractSetup);
+
   yield fork(blockchainWithdrawal, simpleAdjudicator);
 
   yield take(blockchainActions.WITHDRAW_SUCCESS);
-  yield cancel(watchAdjudicatorTask);
+  yield cancel(eventListener);
 
   return true;
 }
@@ -42,11 +42,10 @@ function* contractSetup() {
 
         yield put(blockchainActions.deploymentSuccess(deployedContract.address));
         // TODO: This should probably move out of this scope
-        const listener = yield fork(listenForFundsReceivedEvents, deployedContract);
-        yield take(blockchainActions.UNSUBSCRIBE_EVENTS);
-        yield cancel(listener);
+        const eventListener = yield spawn(watchAdjudicator, deployedContract);
+        yield take(blockchainActions.FUNDSRECEIVED_EVENT);
 
-        return deployedContract;
+        return { simpleAdjudicator: deployedContract, eventListener };
       } catch (err) {
         yield handleError(blockchainActions.deploymentFailure, err);
       }
@@ -57,8 +56,9 @@ function* contractSetup() {
         const existingContract = yield call(simpleAdjudicatorContract.at, action.address);
         const transaction = yield call(existingContract.send, action.amount.toString());
         yield put(blockchainActions.depositSuccess(transaction));
+        const eventListener = yield fork(watchAdjudicator, existingContract);
 
-        return existingContract;
+        return { simpleAdjudicator: existingContract, eventListener };
       } catch (err) {
         yield handleError(blockchainActions.depositFailure, err);
       }
@@ -67,18 +67,11 @@ function* contractSetup() {
   }
 }
 
-function* watchAdjudicator() {
-  while (true) {
-    yield take("Relevant blockchain events");
-    // TODO: Respond accordingly
-  }
-}
-
 function* blockchainWithdrawal(simpleAdjudicator) {
   while (true) {
-    const action = yield take(blockchainActions.WITHDRAW_REQUEST);
+    const action: blockchainActions.WithdrawRequest = yield take(blockchainActions.WITHDRAW_REQUEST);
     try {
-      const { proof } : { proof: ConclusionProof } = action;
+      const proof : ConclusionProof = action.proof;
 
       try {
         yield call(
@@ -89,12 +82,21 @@ function* blockchainWithdrawal(simpleAdjudicator) {
           proof.r,
           proof.s
         );
+
       } catch (err) {
         // for now, assume that the game's been concluded, and continue
-        // TODO: check if the game's been concluded in the watchAdjudicator saga.
+        // TODO: call concludeAndWithdraw instead
       }
 
-      const transaction = yield simpleAdjudicator.withdraw(action.playerAddress);
+      const { playerAddress, destination, channelId, v, r, s } = action.withdrawData;
+
+      const transaction = yield simpleAdjudicator.withdraw(
+        playerAddress,
+        destination,
+        channelId,
+        v, r, s
+      );
+
       yield put(blockchainActions.withdrawSuccess(transaction));
       return true;
     } catch (err) {
@@ -108,11 +110,16 @@ function handleError(action, err) {
   return put(action(message));
 }
 
-function* listenForFundsReceivedEvents(deployedContract) {
+function* watchAdjudicator(deployedContract) {
   const watchChannel = createEventChannel(deployedContract);
   while (true) {
     const result = yield take(watchChannel);
-    yield put(blockchainActions.fundsReceivedEvent({ ...result.args }));
+
+    if (result.event === "FundsReceived") {
+      yield put(blockchainActions.fundsReceivedEvent({ ...result.args }));
+    } else if (result.event === "GameConcluded") {
+      yield put(blockchainActions.gameConcluded({ ...result.args }));
+    }
   }
 }
 
