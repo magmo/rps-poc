@@ -1,9 +1,8 @@
 import Web3 from 'web3';
-import { Channel, sign as coreSign, recover as coreRecover, SolidityParameter } from 'fmg-core';
+import { Channel, sign as coreSign, recover as coreRecover, decodeSignature, SolidityParameter } from 'fmg-core';
 
 export type SignableData = string | SolidityParameter | SolidityParameter[];
 export default class ChannelWallet {
-
   get address() {
     return this.account.address;
   }
@@ -57,12 +56,4 @@ export default class ChannelWallet {
     const { v, r, s } = decodeSignature(signature);
     return coreRecover(data, v, r, s);
   }
-}
-
-function decodeSignature(signature: string) : { v, r, s } {
-  const r = '0x' + signature.slice(2, 66);
-  const s = '0x' + signature.slice(66, 130);
-  const v = '0x' + signature.slice(130, 132);
-
-  return { v, r, s };
 }
