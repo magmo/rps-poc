@@ -81,10 +81,13 @@ export const concludeGame = (channelId: string, state: State) => {
   });
 };
 
-export const withdrawRequest = (playerAddress: string, proof: ConclusionProof) => ({
+export const withdrawRequest = (
+  proof: ConclusionProof,
+  withdrawData: { playerAddress: string, destination: string, channelId: string, v: string, r: string, s: string },
+) => ({
   type: WITHDRAW_REQUEST,
-  playerAddress,
   proof,
+  withdrawData,
 });
 export const withdrawSuccess = (transaction: any) => ({
   type: WITHDRAW_SUCCESS,
