@@ -13,7 +13,7 @@ import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 
 export default function* gameSaga(gameEngine: GameEngine) {
-  yield put(walletActions.openChannel(gameEngine.state.channel));
+  yield put(walletActions.openChannelRequest(gameEngine.state.channel));
   yield take(walletActions.CHANNEL_OPENED);
   yield put(applicationActions.gameSuccess(gameEngine.state));
   yield processState(gameEngine.state);
