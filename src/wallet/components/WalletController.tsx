@@ -34,7 +34,7 @@ export default class WalletController extends PureComponent<Props> {
           />
         );
       case WaitForWithdrawl:
-      return <div>Waiting for withdrawl</div>;
+      return <div>Waiting for withdrawl process to complete.</div>;
       break;
       case SelectWithdrawlAddress:
         return <WithdrawFunds selectAddress={this.props.selectWithdrawlAddress} />;
