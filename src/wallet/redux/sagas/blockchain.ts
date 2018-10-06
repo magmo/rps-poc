@@ -56,7 +56,7 @@ function* contractSetup() {
         const existingContract = yield call(simpleAdjudicatorContract.at, action.address);
         const transaction = yield call(existingContract.send, action.amount.toString());
         yield put(blockchainActions.depositSuccess(transaction));
-        const eventListener = yield fork(watchAdjudicator, existingContract);
+        const eventListener = yield spawn(watchAdjudicator, existingContract);
 
         return { simpleAdjudicator: existingContract, eventListener };
       } catch (err) {
@@ -124,7 +124,7 @@ function* watchAdjudicator(deployedContract) {
 }
 
 function createEventChannel(deployedContract) {
-  const filter = deployedContract.FundsReceived();
+  const filter = deployedContract.allEvents();
   const channel = eventChannel(emitter => {
     filter.watch((error, results) => {
       if (error) {

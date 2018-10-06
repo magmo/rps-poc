@@ -9,7 +9,6 @@ import GameProposedPage from '../components/GameProposedPage';
 import FundingConfirmedPage from '../components/FundingConfirmedPage';
 import PlaySelectedPage from '../components/PlaySelectedPage';
 import ResultPage from '../components/ResultPage';
-import web3Utils from 'web3-utils';
 import { WalletController } from '../wallet';
 
 import { SiteState } from '../redux/reducer';
@@ -73,15 +72,9 @@ function GameContainer(props: GameProps) {
 
     case playerA.WAIT_FOR_CONCLUDE:
     case playerB.WAIT_FOR_CONCLUDE:
-      return <WaitingStep message="Waiting for opponent to conclude the game" />;
-
     case playerA.CONCLUDED:
     case playerB.CONCLUDED:
-      // TODO: add withdraw button!
-      const message = `The game has concluded -- you may now withdraw your winnings of ${
-        web3Utils.fromWei(state.balances[state.playerIndex])
-      } Finney!`;
-      return <WaitingStep message={message} />;
+      return <WalletController />;
 
     case playerB.WAIT_FOR_FUNDING:
       return <WalletController />;

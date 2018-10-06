@@ -25,4 +25,14 @@ export class AdjudicatorReceived {
   }
 }
 
-export class Funded {}
+export class Funded { }
+
+export class SelectWithdrawlAddress { }
+
+export class WaitForWithdrawl {
+  depositAddress: string;
+  constructor(depositAddress: string) {
+    this.depositAddress = depositAddress;
+  }
+
+}

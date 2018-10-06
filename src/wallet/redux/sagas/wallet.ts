@@ -11,7 +11,11 @@ import { State, SolidityType, decodeSignature } from 'fmg-core';
 import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import decode from '../../domain/decode';
-
+import WalletEngineA from '../../wallet-engine/WalletEngineA';
+import { SelectWithdrawlAddress } from '../../wallet-engine/wallet-states/PlayerB';
+import WalletEngineB from '../../wallet-engine/WalletEngineB';
+import * as stateActions from '../actions/state';
+import * as playerActions from '../actions/player';
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
   yield fork(blockchainSaga);
@@ -147,11 +151,18 @@ function* handleFundingRequest(wallet: ChannelWallet, state) {
 
 export function* handleWithdrawalRequest(
   wallet: ChannelWallet,
-  state: State,
+  state,
 ) {
+  // TODO: There's probably enough logic here to pull it out into it's own saga
   const { address: playerAddress, channelId } = wallet;
 
-  const destination = '0xD912E03a7407Eb03961823aA39b4277DB3aAa9dB'; // just to get it working
+  const walletEngine = state.playerIndex === 0 ? new WalletEngineA(new SelectWithdrawlAddress()) : new WalletEngineB(new SelectWithdrawlAddress());
+  yield put(stateActions.stateChanged(walletEngine.state));
+  
+  const action = yield take(playerActions.SELECT_WITHDRAWL_ADDRESS);
+  const destination = action.address;
+  walletEngine.selectWithdrawlAddress(action.address);
+  yield put(stateActions.stateChanged(walletEngine.state));
 
   const data = [
     { type: SolidityType.address, value: playerAddress },

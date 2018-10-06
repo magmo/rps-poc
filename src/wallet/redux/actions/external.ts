@@ -6,7 +6,7 @@ import {
   WaitForFunding as WaitForFundingB,
   Concluded as ConcludedB,
 } from '../../../game-engine/application-states/PlayerB';
-import ChannelWallet, { SignableData } from '../../domain/ChannelWallet';
+import  { SignableData } from '../../domain/ChannelWallet';
 import { Channel } from 'fmg-core';
 
 // FUNDING
@@ -55,9 +55,8 @@ export const channelOpened = (channelId: string) => ({
   type: CHANNEL_OPENED as typeof CHANNEL_OPENED,
   channelId,
 });
-export const closeChannelRequest = (wallet: ChannelWallet) => ({
+export const closeChannelRequest = () => ({
   type: CLOSE_CHANNEL_REQUEST as typeof CLOSE_CHANNEL_REQUEST,
-  wallet,
 });
 export const channelClosed = (walletId: string) => ({
   type: CHANNEL_CLOSED as typeof CHANNEL_CLOSED,

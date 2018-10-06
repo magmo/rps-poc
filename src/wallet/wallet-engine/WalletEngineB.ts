@@ -11,6 +11,14 @@ export default class WalletEngineB {
     this.state = state;
   }
 
+
+  selectWithdrawlAddress(depositAddress:string):State.PlayerBState{
+    if (this.state.constructor!== State.SelectWithdrawlAddress){
+      return this.state;
+    }
+    return this.transitionTo(new State.WithdrawAndConclude(depositAddress));
+  }
+
   approve(): State.PlayerBState {
     switch (this.state.constructor) {
       case State.WaitForApproval:
