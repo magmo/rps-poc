@@ -57,9 +57,6 @@ export default function* gameSaga(gameEngine: GameEngine) {
     if (newState && newState !== oldState) {
       yield processState(newState);
     }
-    if (newState.type === PlayerAStateType.CONCLUDED || newState.type === PlayerBStateType.CONCLUDED) {
-      yield put(applicationActions.lobbyRequest());
-    }
   }
 }
 
@@ -86,6 +83,7 @@ function* processState(state) {
       yield put(walletActions.withdrawalRequest(state));
       yield take(walletActions.WITHDRAWAL_SUCCESS);
       yield put(walletActions.closeChannelRequest());
+      yield put(applicationActions.lobbyRequest());
       // Once the game is concluded, the players do not need to interact with each other
       break;
     default:

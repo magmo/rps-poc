@@ -1,4 +1,4 @@
-import { actionChannel, take, put, fork, call, } from 'redux-saga/effects';
+import { actionChannel, take, put, fork, call, cancel, } from 'redux-saga/effects';
 
 import { initializeWallet } from './initialization';
 import * as actions from '../actions/external';
@@ -18,10 +18,9 @@ import * as stateActions from '../actions/state';
 import * as playerActions from '../actions/player';
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
-  yield fork(blockchainSaga);
 
   yield put(actions.initializationSuccess(wallet.address));
-
+  let runningBlockchainSaga = null;
   const channel = yield actionChannel([
     actions.FUNDING_REQUEST,
     actions.SIGNATURE_REQUEST,
@@ -38,11 +37,15 @@ export function* walletSaga(uid: string): IterableIterator<any> {
     // process one action at a time from the queue.
     switch (action.type) {
       case actions.OPEN_CHANNEL_REQUEST:
+        runningBlockchainSaga = yield fork(blockchainSaga);
         yield wallet.openChannel(action.channel);
         yield put(actions.channelOpened(wallet.channelId));
         break;
 
       case actions.CLOSE_CHANNEL_REQUEST:
+        if (runningBlockchainSaga!=null){
+          yield cancel(runningBlockchainSaga);
+        }
         yield wallet.closeChannel();
         yield put(actions.channelClosed(wallet.id));
         break;
@@ -158,7 +161,7 @@ export function* handleWithdrawalRequest(
 
   const walletEngine = state.playerIndex === 0 ? new WalletEngineA(new SelectWithdrawlAddress()) : new WalletEngineB(new SelectWithdrawlAddress());
   yield put(stateActions.stateChanged(walletEngine.state));
-  
+
   const action = yield take(playerActions.SELECT_WITHDRAWL_ADDRESS);
   const destination = action.address;
   walletEngine.selectWithdrawlAddress(action.address);
