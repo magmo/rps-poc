@@ -34,35 +34,35 @@ function* contractSetup() {
     const action = yield take(channel);
 
     switch (action.type) {
-    case blockchainActions.DEPLOY_REQUEST: // Player A
-      try {
-        const deployedContract = yield call(simpleAdjudicatorContract.new, action.channelId, {
-          value: action.amount.toString(),
-        });
+      case blockchainActions.DEPLOY_REQUEST: // Player A
+        try {
+          const deployedContract = yield call(simpleAdjudicatorContract.new, action.channelId, {
+            value: action.amount.toString(),
+          });
 
-        yield put(blockchainActions.deploymentSuccess(deployedContract.address));
-        // TODO: This should probably move out of this scope
-        const eventListener = yield spawn(watchAdjudicator, deployedContract);
-        yield take(blockchainActions.FUNDSRECEIVED_EVENT);
+          yield put(blockchainActions.deploymentSuccess(deployedContract.address));
+          // TODO: This should probably move out of this scope
+          const eventListener = yield spawn(watchAdjudicator, deployedContract);
+          yield take(blockchainActions.FUNDSRECEIVED_EVENT);
 
-        return { simpleAdjudicator: deployedContract, eventListener };
-      } catch (err) {
-        yield handleError(blockchainActions.deploymentFailure, err);
-      }
+          return { simpleAdjudicator: deployedContract, eventListener };
+        } catch (err) {
+          yield handleError(blockchainActions.deploymentFailure, err);
+        }
 
-      break;
-    case blockchainActions.DEPOSIT_REQUEST: // Player B
-      try {
-        const existingContract = yield call(simpleAdjudicatorContract.at, action.address);
-        const transaction = yield call(existingContract.send, action.amount.toString());
-        yield put(blockchainActions.depositSuccess(transaction));
-        const eventListener = yield spawn(watchAdjudicator, existingContract);
+        break;
+      case blockchainActions.DEPOSIT_REQUEST: // Player B
+        try {
+          const existingContract = yield call(simpleAdjudicatorContract.at, action.address);
+          const transaction = yield call(existingContract.send, action.amount.toString());
+          yield put(blockchainActions.depositSuccess(transaction));
+          const eventListener = yield spawn(watchAdjudicator, existingContract);
 
-        return { simpleAdjudicator: existingContract, eventListener };
-      } catch (err) {
-        yield handleError(blockchainActions.depositFailure, err);
-      }
-      break;
+          return { simpleAdjudicator: existingContract, eventListener };
+        } catch (err) {
+          yield handleError(blockchainActions.depositFailure, err);
+        }
+        break;
     }
   }
 }
@@ -71,30 +71,19 @@ function* blockchainWithdrawal(simpleAdjudicator) {
   while (true) {
     const action: blockchainActions.WithdrawRequest = yield take(blockchainActions.WITHDRAW_REQUEST);
     try {
-      const proof : ConclusionProof = action.proof;
-
-      try {
-        yield call(
-          simpleAdjudicator.conclude,
-          proof.fromState.toHex(),
-          proof.toState.toHex(),
-          proof.v,
-          proof.r,
-          proof.s
-        );
-
-      } catch (err) {
-        // for now, assume that the game's been concluded, and continue
-        // TODO: call concludeAndWithdraw instead
-      }
-
+      const proof: ConclusionProof = action.proof;
       const { playerAddress, destination, channelId, v, r, s } = action.withdrawData;
 
-      const transaction = yield simpleAdjudicator.withdraw(
+      const transaction = yield call(
+        simpleAdjudicator.concludeAndWithdraw,
+        proof.fromState.toHex(),
+        proof.toState.toHex(),
         playerAddress,
         destination,
         channelId,
-        v, r, s
+        [...proof.v, parseInt(v, 16)],
+        [...proof.r, r],
+        [...proof.s, s]
       );
 
       yield put(blockchainActions.withdrawSuccess(transaction));
