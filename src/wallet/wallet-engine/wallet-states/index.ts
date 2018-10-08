@@ -27,9 +27,9 @@ export class AdjudicatorReceived {
 
 export class Funded { }
 
-export class SelectWithdrawlAddress { }
+export class SelectWithdrawalAddress { }
 
-export class WaitForWithdrawl {
+export class WaitForWithdrawal {
   depositAddress: string;
   constructor(depositAddress: string) {
     this.depositAddress = depositAddress;

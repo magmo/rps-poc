@@ -14,8 +14,8 @@ export const FundingFailed = CommonState.FundingFailed;
 export const WaitForApproval = CommonState.WaitForApproval;
 export const Funded = CommonState.Funded;
 export const ReadyToDeposit = CommonState.AdjudicatorReceived;
-export const WithdrawAndConclude = CommonState.WaitForWithdrawl;
-export const SelectWithdrawlAddress = CommonState.SelectWithdrawlAddress;
+export const WithdrawAndConclude = CommonState.WaitForWithdrawal;
+export const SelectWithdrawalAddress = CommonState.SelectWithdrawalAddress;
 export type PlayerBState =
   | ReadyToDeposit
   | WaitForAToDeploy
@@ -24,5 +24,5 @@ export type PlayerBState =
   | CommonState.FundingFailed
   | CommonState.AdjudicatorReceived
   | CommonState.Funded
-  | CommonState.SelectWithdrawlAddress
-  | CommonState.WaitForWithdrawl;
+  | CommonState.SelectWithdrawalAddress
+  | CommonState.WaitForWithdrawal;

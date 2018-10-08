@@ -1,7 +1,7 @@
 export const TRY_FUNDING_AGAIN = 'WALLETPLAYER.TRYFUNDINGAGAIN';
 export const APPROVE_FUNDING = 'WALLETPLAYER.APPROVEFUNDING';
 export const DECLINE_FUNDING = 'WALLETPLAYER.DECLINEFUNDING';
-export const SELECT_WITHDRAWL_ADDRESS = 'WALLETPLAYER.SELECTWITHDRAWLADDRESS';
+export const SELECT_WITHDRAWAL_ADDRESS = 'WALLETPLAYER.SELECTWITHDRAWALADDRESS';
 
 export const tryFundingAgain = () => ({
     type: TRY_FUNDING_AGAIN,
@@ -12,12 +12,12 @@ export const approveFunding = () => ({
 export const declineFunding = () => ({
     type: DECLINE_FUNDING,
 });
-export const selectWithdrawlAddress = (address: string) => ({
-    type: SELECT_WITHDRAWL_ADDRESS as typeof SELECT_WITHDRAWL_ADDRESS,
+export const selectWithdrawalAddress = (address: string) => ({
+    type: SELECT_WITHDRAWAL_ADDRESS as typeof SELECT_WITHDRAWAL_ADDRESS,
     address,
 });
 
-export type SelectWithdrawlAddress = ReturnType<typeof selectWithdrawlAddress>;
+export type SelectWithdrawalAddress = ReturnType<typeof selectWithdrawalAddress>;
 export type TryFundingAgain = ReturnType<typeof tryFundingAgain>;
 export type ApproveFunding = ReturnType<typeof approveFunding>;
 export type DeclineFunding = ReturnType<typeof declineFunding>;

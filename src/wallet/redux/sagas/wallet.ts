@@ -12,7 +12,7 @@ import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../.
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import decode from '../../domain/decode';
 import WalletEngineA from '../../wallet-engine/WalletEngineA';
-import { SelectWithdrawlAddress } from '../../wallet-engine/wallet-states/PlayerB';
+import { SelectWithdrawalAddress } from '../../wallet-engine/wallet-states/PlayerB';
 import WalletEngineB from '../../wallet-engine/WalletEngineB';
 import * as stateActions from '../actions/state';
 import * as playerActions from '../actions/player';
@@ -159,12 +159,12 @@ export function* handleWithdrawalRequest(
   // TODO: There's probably enough logic here to pull it out into it's own saga
   const { address: playerAddress, channelId } = wallet;
 
-  const walletEngine = state.playerIndex === 0 ? new WalletEngineA(new SelectWithdrawlAddress()) : new WalletEngineB(new SelectWithdrawlAddress());
+  const walletEngine = state.playerIndex === 0 ? new WalletEngineA(new SelectWithdrawalAddress()) : new WalletEngineB(new SelectWithdrawalAddress());
   yield put(stateActions.stateChanged(walletEngine.state));
 
-  const action = yield take(playerActions.SELECT_WITHDRAWL_ADDRESS);
+  const action = yield take(playerActions.SELECT_WITHDRAWAL_ADDRESS);
   const destination = action.address;
-  walletEngine.selectWithdrawlAddress(action.address);
+  walletEngine.selectWithdrawalAddress(action.address);
   yield put(stateActions.stateChanged(walletEngine.state));
 
   const data = [

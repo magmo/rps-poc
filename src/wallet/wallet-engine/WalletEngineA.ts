@@ -17,8 +17,8 @@ export default class WalletEngineA {
     this.state = state;
   }
 
-  selectWithdrawlAddress(depositAddress:string):State.PlayerAState{
-    if (this.state.constructor!== State.SelectWithdrawlAddress){
+  selectWithdrawalAddress(depositAddress:string):State.PlayerAState{
+    if (this.state.constructor!== State.SelectWithdrawalAddress){
       return this.state;
     }
     return this.transitionTo(new State.WithdrawAndConclude(depositAddress));
