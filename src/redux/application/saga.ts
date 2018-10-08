@@ -14,7 +14,12 @@ import autoOpponentSaga from '../auto-opponent/saga';
 export default function* applicationControllerSaga(userId: string) {
   // need to yield* so that the fork(walletSaga) runs in the context of this saga -
   // otherwise it'll be killed when the setupWallet saga returns
-  const { address } = yield call(setupWallet, userId);
+  const { address, failure } = yield call(setupWallet, userId);
+
+  if (failure) {
+    yield put(applicationActions.initializationFailure("Wallet setup failed."));
+    return;
+  }
 
   yield call(setupAutoOpponent);
 
@@ -60,6 +65,8 @@ function* setupWallet(uid) {
 
   if (failure) {
     yield put(walletActions.initializationFailure('Wallet initialization timed out'));
+    yield cancel(task);
+    return { failure };
   } else {
     const address = (success as walletActions.InitializationSuccess).address;
 
