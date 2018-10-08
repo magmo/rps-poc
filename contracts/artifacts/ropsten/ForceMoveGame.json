@@ -35,14 +35,14 @@
     "absolutePath": "fmg-core/contracts/ForceMoveGame.sol",
     "exportedSymbols": {
       "ForceMoveGame": [
-        853
+        779
       ]
     },
-    "id": 854,
+    "id": 780,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 843,
+        "id": 769,
         "literals": [
           "solidity",
           "^",
@@ -50,7 +50,7 @@
           ".23"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:1"
+        "src": "0:24:4"
       },
       {
         "baseContracts": [],
@@ -58,9 +58,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 853,
+        "id": 779,
         "linearizedBaseContracts": [
-          853
+          779
         ],
         "name": "ForceMoveGame",
         "nodeType": "ContractDefinition",
@@ -68,7 +68,7 @@
           {
             "body": null,
             "documentation": null,
-            "id": 852,
+            "id": 778,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -76,16 +76,16 @@
             "name": "validTransition",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 848,
+              "id": 774,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 845,
+                  "id": 771,
                   "name": "oldState",
                   "nodeType": "VariableDeclaration",
-                  "scope": 852,
-                  "src": "79:14:1",
+                  "scope": 778,
+                  "src": "79:14:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -93,10 +93,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 844,
+                    "id": 770,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "79:5:1",
+                    "src": "79:5:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -107,11 +107,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 847,
+                  "id": 773,
                   "name": "newState",
                   "nodeType": "VariableDeclaration",
-                  "scope": 852,
-                  "src": "95:14:1",
+                  "scope": 778,
+                  "src": "95:14:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -119,10 +119,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 846,
+                    "id": 772,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "95:5:1",
+                    "src": "95:5:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -132,20 +132,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "78:32:1"
+              "src": "78:32:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 851,
+              "id": 777,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 850,
+                  "id": 776,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 852,
-                  "src": "134:4:1",
+                  "scope": 778,
+                  "src": "134:4:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -153,10 +153,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 849,
+                    "id": 775,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "134:4:1",
+                    "src": "134:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -166,33 +166,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "133:6:1"
+              "src": "133:6:4"
             },
-            "scope": 853,
-            "src": "54:86:1",
+            "scope": 779,
+            "src": "54:86:4",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 854,
-        "src": "26:116:1"
+        "scope": 780,
+        "src": "26:116:4"
       }
     ],
-    "src": "0:143:1"
+    "src": "0:143:4"
   },
   "legacyAST": {
     "absolutePath": "fmg-core/contracts/ForceMoveGame.sol",
     "exportedSymbols": {
       "ForceMoveGame": [
-        853
+        779
       ]
     },
-    "id": 854,
+    "id": 780,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 843,
+        "id": 769,
         "literals": [
           "solidity",
           "^",
@@ -200,7 +200,7 @@
           ".23"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:1"
+        "src": "0:24:4"
       },
       {
         "baseContracts": [],
@@ -208,9 +208,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 853,
+        "id": 779,
         "linearizedBaseContracts": [
-          853
+          779
         ],
         "name": "ForceMoveGame",
         "nodeType": "ContractDefinition",
@@ -218,7 +218,7 @@
           {
             "body": null,
             "documentation": null,
-            "id": 852,
+            "id": 778,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -226,16 +226,16 @@
             "name": "validTransition",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 848,
+              "id": 774,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 845,
+                  "id": 771,
                   "name": "oldState",
                   "nodeType": "VariableDeclaration",
-                  "scope": 852,
-                  "src": "79:14:1",
+                  "scope": 778,
+                  "src": "79:14:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -243,10 +243,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 844,
+                    "id": 770,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "79:5:1",
+                    "src": "79:5:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -257,11 +257,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 847,
+                  "id": 773,
                   "name": "newState",
                   "nodeType": "VariableDeclaration",
-                  "scope": 852,
-                  "src": "95:14:1",
+                  "scope": 778,
+                  "src": "95:14:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -269,10 +269,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 846,
+                    "id": 772,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "95:5:1",
+                    "src": "95:5:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -282,20 +282,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "78:32:1"
+              "src": "78:32:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 851,
+              "id": 777,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 850,
+                  "id": 776,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 852,
-                  "src": "134:4:1",
+                  "scope": 778,
+                  "src": "134:4:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -303,10 +303,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 849,
+                    "id": 775,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "134:4:1",
+                    "src": "134:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -316,26 +316,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "133:6:1"
+              "src": "133:6:4"
             },
-            "scope": 853,
-            "src": "54:86:1",
+            "scope": 779,
+            "src": "54:86:4",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 854,
-        "src": "26:116:1"
+        "scope": 780,
+        "src": "26:116:4"
       }
     ],
-    "src": "0:143:1"
+    "src": "0:143:4"
   },
   "compiler": {
     "name": "solc",
     "version": "0.4.24+commit.e67f0147.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "2.0.1",
-  "updatedAt": "2018-10-07T22:12:42.598Z"
+  "schemaVersion": "3.0.0-beta.0",
+  "updatedAt": "2018-10-08T19:58:23.328Z"
 }
