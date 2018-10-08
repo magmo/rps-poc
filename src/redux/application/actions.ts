@@ -4,6 +4,7 @@ import { Challenge } from "./reducer";
 import BN from 'bn.js';
 
 export const INITIALIZATION_FAILURE = 'APPLICATION.INITIALIZATION.FAILURE';
+export const RELOAD = 'APPLICATION.RELOAD';
 export const LOBBY_REQUEST = 'APPLICATION.LOBBY_REQUEST';
 export const WAITING_ROOM_REQUEST = 'APPLICATION.WAITING_ROOM_REQUEST';
 export const GAME_REQUEST = 'APPLICATION.GAME_REQUEST';
@@ -11,9 +12,9 @@ export const LOBBY_SUCCESS = 'APPLICATION.LOBBY_SUCCESS';
 export const WAITING_ROOM_SUCCESS = 'APPLICATION.WAITING_ROOM_SUCCESS';
 export const GAME_SUCCESS = 'APPLICATION.GAME_SUCCESS';
 
-export const initializationFailure = (reason) => ({
+export const initializationFailure = (error) => ({
   type: INITIALIZATION_FAILURE as typeof INITIALIZATION_FAILURE,
-  reason,
+  error,
 });
 
 export const lobbyRequest = () => ({
