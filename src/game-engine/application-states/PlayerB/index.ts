@@ -13,6 +13,7 @@ import {
 } from '../../positions';
 
 export enum PlayerBStateType {
+  WAIT_FOR_CHALLENGE = 'PLAYER_B.WAIT_FOR_CHALLENGE',
   WAIT_FOR_FUNDING = 'PLAYER_B.WAIT_FOR_FUNDING',
   WAIT_FOR_POST_FUND_SETUP = 'PLAYER_B.WAIT_FOR_POST_FUND_SETUP',
   WAIT_FOR_PROPOSE = 'PLAYER_B.WAIT_FOR_PROPOSE',
@@ -67,7 +68,10 @@ export class WaitForReveal extends BasePlayerB<Accept> {
   get bPlay() { return this.position.bPlay; }
   get preCommit() { return this.position.preCommit; }
 }
-
+export class WaitForChallenge extends BasePlayerB<Resting>{
+  readonly type = PlayerBStateType.WAIT_FOR_CHALLENGE;
+  readonly isReadyToSend = false;
+}
 export class ViewResult extends BasePlayerB<Resting> {
   readonly type = PlayerBStateType.VIEW_RESULT;
   readonly isReadyToSend = false;
@@ -104,6 +108,7 @@ export class Concluded extends BasePlayerB<Conclude> {
 }
 
 export type PlayerBState = (
+  WaitForChallenge
   | WaitForFunding
   | WaitForPostFundSetup
   | ChoosePlay

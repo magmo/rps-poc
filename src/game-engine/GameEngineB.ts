@@ -141,6 +141,13 @@ export default class GameEngineB {
     return this.transitionTo(new State.ChoosePlay({ position }));
   }
 
+  challenge(){
+    if (!(this.state instanceof State.WaitForReveal)){
+      return this.state;
+    }
+      return this.transitionTo(new State.WaitForChallenge({position:this.state.position}));
+  }
+
   receivedReveal(position: Reveal) {
     if (!(this.state instanceof State.WaitForReveal)) {
       return this.state;

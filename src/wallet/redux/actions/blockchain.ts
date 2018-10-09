@@ -19,7 +19,7 @@ export type WithdrawSuccess = ReturnType<typeof withdrawSuccess>;
 export type WithdrawFailure = ReturnType<typeof withdrawFailure>;
 export type WithdrawResponse = WithdrawSuccess | WithdrawFailure;
 
-export type RequestAction = DeploymentRequest | DepositRequest | WithdrawRequest;
+export type RequestAction = DeploymentRequest | DepositRequest | WithdrawRequest | CreateChallengeRequest;
 
 export const DEPLOY_REQUEST = 'BLOCKCHAIN.DEPLOY.REQUEST';
 export const DEPLOY_SUCCESS = 'BLOCKCHAIN.DEPLOY.SUCCESS';
@@ -35,11 +35,28 @@ export const WITHDRAW_REQUEST = 'BLOCKCHAIN.WITHDRAW.REQUEST';
 export const WITHDRAW_SUCCESS = 'BLOCKCHAIN.WITHDRAW.SUCCESS';
 export const WITHDRAW_FAILURE = 'BLOCKCHAIN.WITHDRAW.FAILURE';
 
+export const CHALLENGECREATE_REQUEST = 'BLOCKCHAIN.CHALLENGE.CREATE.REQUEST';
+export const CHALLENGECREATE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.CREATE.SUCCESS';
+export const CHALLENGECREATE_FAILURE = 'BLOCKCHAIN.CHALLENGE.CREATE.FAILURE';
+
 export const FUNDSRECEIVED_EVENT = 'BLOCKCHAIN.EVENT.FUNDSRECEIVED';
 export const GAMECONCLUDED_EVENT = 'BLOCKCHAIN.EVENT.GAMECONCLUDED';
 export const FUNDSWITHDRAWN_EVENT = 'BLOCKCHAIN.EVENT.FUNDSWITHDRAWN';
 
 export const UNSUBSCRIBE_EVENTS = 'BLOCKCHAIN.EVENT.UNSUBSCRIBE';
+
+export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
+export const createChallenge = (yourMove: string, theirMove: string, yourSignature: string, theirSignature: string) => ({
+  type: CHALLENGECREATE_REQUEST as typeof CHALLENGECREATE_REQUEST,
+  yourMove,
+  theirMove,
+  yourSignature,
+  theirSignature,
+});
+
+export const createChallengeSuccess = () => ({
+  type:CHALLENGECREATE_SUCCESS  as typeof CHALLENGECREATE_SUCCESS,
+});
 
 export const deploymentRequest = (channelId: any, amount: BN) => ({
   type: DEPLOY_REQUEST,

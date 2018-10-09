@@ -54,4 +54,9 @@ export class WaitForWithdrawal {
   constructor(depositAddress: string) {
     this.depositAddress = depositAddress;
   }
+
 }
+
+export class ChallengeRequested{}
+export class ChallengeResponse{}
+export class ChallengeTimeout{}

@@ -26,6 +26,7 @@ export default function* gameSaga(gameEngine: GameEngine) {
     gameActions.ABANDON_GAME,
     walletActions.FUNDING_SUCCESS,
     walletActions.FUNDING_FAILURE,
+    walletActions.CREATE_CHALLENGE_REQUEST,
   ]);
 
   while (true) {
@@ -46,6 +47,9 @@ export default function* gameSaga(gameEngine: GameEngine) {
       case gameActions.ABANDON_GAME:
         newState = gameEngine.conclude();
         break;
+      case walletActions.CREATE_CHALLENGE_REQUEST:
+      newState = gameEngine.challenge();
+      break;
       case walletActions.FUNDING_SUCCESS:
         // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
         newState = gameEngine.fundingConfirmed();
@@ -90,6 +94,8 @@ function* processState(state) {
       break;
     case PlayerAStateType.CHOOSE_PLAY:
     case PlayerBStateType.CHOOSE_PLAY:
+    case PlayerAStateType.WAIT_FOR_CHALLENGE:
+    case PlayerBStateType.WAIT_FOR_CHALLENGE:
       break; // don't send anything if the next step is to ChoosePlay
     case PlayerAStateType.CONCLUDED:
     case PlayerBStateType.CONCLUDED:

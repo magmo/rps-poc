@@ -15,6 +15,7 @@ import {
 } from '../../positions';
 
 export enum PlayerAStateType {
+  WAIT_FOR_CHALLENGE = 'PLAYER_A.WAIT_FOR_CHALLENGE',
   WAIT_FOR_PRE_FUND_SETUP = 'PLAYER_A.WAIT_FOR_PRE_FUND_SETUP',
   WAIT_FOR_FUNDING = 'PLAYER_A.WAIT_FOR_FUNDING',
   WAIT_FOR_POST_FUND_SETUP = 'PLAYER_A.WAIT_FOR_POST_FUND_SETUP',
@@ -107,6 +108,10 @@ export class WaitForResting extends BasePlayerA<Reveal> {
   }
 }
 
+export class WaitForChallenge extends BasePlayerA<Position>{
+  readonly type = PlayerAStateType.WAIT_FOR_CHALLENGE;
+  readonly isReadyToSend = false;
+}
 // todo: what should Position be here?
 export class InsufficientFunds extends BasePlayerA<Position> {
   readonly type = PlayerAStateType.INSUFFICIENT_FUNDS;
@@ -129,6 +134,7 @@ export class ConcludeReceived extends BasePlayerA<Conclude>{
 
 
 export type PlayerAState =
+  WaitForChallenge
   | WaitForPreFundSetup
   | WaitForFunding
   | WaitForPostFundSetup

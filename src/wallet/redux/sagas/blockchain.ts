@@ -6,16 +6,33 @@ import contract from 'truffle-contract';
 import detectNetwork from 'web3-detect-network';
 import { eventChannel } from 'redux-saga';
 import { ConclusionProof } from '../../domain/ConclusionProof';
+import { CreateChallengeRequest } from '../actions/blockchain';
+import { Signature } from '../../domain/Signature';
 
 export function* blockchainSaga() {
+
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
 
   yield fork(blockchainWithdrawal, simpleAdjudicator);
-
+  yield fork (challengeSetup, simpleAdjudicator);
   yield take(blockchainActions.WITHDRAW_SUCCESS);
   yield cancel(eventListener);
 
   return true;
+}
+function* challengeSetup(simpleAdjudicator) {
+
+  
+  const action: CreateChallengeRequest = yield take(blockchainActions.CHALLENGECREATE_REQUEST);
+  
+  
+  const theirSignature = new Signature(action.theirSignature);
+  const yourSignature = new Signature(action.yourSignature);
+  const v = [theirSignature.v, yourSignature.v];
+  const r = [theirSignature.r, yourSignature.r];
+  const s = [theirSignature.s, yourSignature.s];
+  yield call(simpleAdjudicator.forceMove,action.theirMove, action.yourMove, v, r, s);
+  yield put(blockchainActions.createChallengeSuccess());
 }
 
 function* contractSetup() {

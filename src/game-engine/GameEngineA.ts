@@ -194,6 +194,12 @@ export default class GameEngineA {
     const { stake, balances } = state;
     return stake.gt(balances[0]) || stake.gt(balances[1]);
   }
+  challenge(){
+    if (!(this.state instanceof State.WaitForAccept)){
+      return this.state;
+    }
+      return this.transitionTo(new State.WaitForChallenge({position:this.state.position}));
+  }
 
   receivedConclude(position: Conclude) {
     if (this.state instanceof State.Concluded) {

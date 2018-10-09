@@ -7,9 +7,8 @@ import FundingInProgress from './FundingInProgress';
 import FundingError from './FundingError';
 import React from 'react';
 import ConfirmFunding from './ConfirmFunding';
-import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal } from '../wallet-engine/wallet-states';
+import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested } from '../wallet-engine/wallet-states';
 import WithdrawFunds from './WithdrawFunds';
-
 interface Props {
   walletState: WalletState;
   tryFundingAgain: () => void;
@@ -39,6 +38,8 @@ export default class WalletController extends PureComponent<Props> {
       case SelectWithdrawalAddress:
         return <WithdrawFunds selectAddress={this.props.selectWithdrawalAddress} />;
         break;
+      case ChallengeRequested:
+      return <div>Waiting for challenge</div>;
       case playerA.WaitForBlockchainDeploy:
         return <FundingInProgress message="confirmation of adjudicator deployment" />;
 

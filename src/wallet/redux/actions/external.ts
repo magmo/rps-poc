@@ -201,9 +201,15 @@ export type SendMessage = ReturnType<typeof sendMessage>;
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 export type StoreMessageRequest = ReturnType<typeof storeMessageRequest>;
 
-// DECODING
-// ========
+// Challenge
+// =========
+export const CREATE_CHALLENGE_REQUEST = 'WALLET.CHALLENGE.CREATE';
+
+export const createChallenge= () => ({
+  type: CREATE_CHALLENGE_REQUEST as typeof CREATE_CHALLENGE_REQUEST,
+});
+export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
 
 // Requests
 // ========
-export type RequestAction = OpenChannelRequest | CloseChannelRequest | FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest | StoreMessageRequest;
+export type RequestAction = OpenChannelRequest | CloseChannelRequest | FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest | StoreMessageRequest | CreateChallengeRequest;

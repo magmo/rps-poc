@@ -36,7 +36,8 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
     actions.WITHDRAWAL_REQUEST,
     actions.OPEN_CHANNEL_REQUEST,
     actions.CLOSE_CHANNEL_REQUEST,
-    actions.STORE_MESSAGE_REQUEST
+    actions.STORE_MESSAGE_REQUEST,
+    actions.CREATE_CHALLENGE_REQUEST,
   ]);
   while (true) {
     const action: actions.RequestAction = yield take(channel);
@@ -90,17 +91,23 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
       const { position } = action;
         yield handleWithdrawalRequest(wallet, walletEngine, position);
         break;
-
+      case actions.CREATE_CHALLENGE_REQUEST:
+        yield handleChallengeRequest(wallet);
+        break;
       default:
-      // const _exhaustiveCheck: never = action;
-      // todo: get this to work
-      // currently causes a 'noUnusedLocals' error on compilation
-      // underscored variables should be an exception but there seems to
-      // be a bug in my current version of typescript
-      // https://github.com/Microsoft/TypeScript/issues/15053
+        // @ts-ignore
+        const _exhaustiveCheck: never = action;
     }
   }
 }
+function* handleChallengeRequest(wallet: ChannelWallet) {
+  const { channelId } = wallet;
+  const yourMove = yield fetchLastSentMove(wallet, channelId);
+  const theirMove = yield fetchLastReceivedMove(wallet, channelId);
+  yield  challengeSaga(yourMove.state, theirMove.state, yourMove.signature,theirMove.signature);
+
+}
+
 
 function* handleSignatureRequest(
   wallet: ChannelWallet,
@@ -124,6 +131,21 @@ function* handleStoreMessageRequest(
     `wallets/${wallet.id}/channels/${channelId}/${direction}`,
     { state: positionData, signature, updatedAt: serverTimestamp }
   );
+}
+
+function* fetchLastReceivedMove(wallet: ChannelWallet, channelId: string) {
+  const query = firebase.database().ref(
+    `wallets/${wallet.id}/channels/${channelId}/received`
+  );
+  const move = yield call([query, query.once], 'value');
+  return move.val();
+}
+function* fetchLastSentMove(wallet: ChannelWallet, channelId: string) {
+  const query = firebase.database().ref(
+    `wallets/${wallet.id}/channels/${channelId}/sent`
+  );
+  const move = yield call([query, query.once], 'value');
+  return move.val();
 }
 
 function* handleValidationRequest(

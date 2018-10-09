@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import * as gameActions from '../redux/game/actions';
+import * as walletActions from '../wallet/redux/actions/external';
 
 import WaitingStep from '../components/WaitingStep';
 import SelectPlayPage from '../components/SelectPlayPage';
@@ -24,16 +25,18 @@ interface GameProps {
   choosePlay: (play: Play) => void;
   abandonGame: () => void;
   playAgain: () => void;
+  challengeOnChain: () => void;
 }
 
 function GameContainer(props: GameProps) {
-  const { state, choosePlay, playAgain, abandonGame } = props;
+  const { state, choosePlay, playAgain, abandonGame, challengeOnChain} = props;
 
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
 
     case playerA.WAIT_FOR_FUNDING:
+    case playerA.WAIT_FOR_CHALLENGE:
       return <WalletController />;
 
     case playerA.WAIT_FOR_POST_FUND_SETUP:
@@ -47,6 +50,7 @@ function GameContainer(props: GameProps) {
         <PlaySelectedPage
           message="Waiting for your opponent to choose their move"
           yourPlay={state.aPlay}
+          challengeOnChain={challengeOnChain}
         />
       );
 
@@ -79,6 +83,7 @@ function GameContainer(props: GameProps) {
       return <WalletController />;
 
     case playerB.WAIT_FOR_FUNDING:
+    case playerB.WAIT_FOR_CHALLENGE:
       return <WalletController />;
 
     case playerB.WAIT_FOR_POST_FUND_SETUP:
@@ -95,6 +100,7 @@ function GameContainer(props: GameProps) {
         <PlaySelectedPage
           message="Waiting for your opponent to choose their move"
           yourPlay={state.bPlay}
+          challengeOnChain={challengeOnChain}
         />
       );
 
@@ -120,6 +126,7 @@ const mapDispatchToProps = {
   choosePlay: gameActions.choosePlay,
   playAgain: gameActions.playAgain,
   abandonGame: gameActions.abandonGame,
+  challengeOnChain: walletActions.createChallenge,
 };
 
 export default connect(
