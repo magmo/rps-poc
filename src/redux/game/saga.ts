@@ -1,4 +1,4 @@
-import { take, put, actionChannel } from 'redux-saga/effects';
+import { take, put, actionChannel, call, } from 'redux-saga/effects';
 
 import { GameEngine } from '../../game-engine/GameEngine';
 
@@ -11,6 +11,7 @@ import { default as positionFromHex } from '../../game-engine/positions/decode';
 
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
+import { delay } from 'redux-saga';
 
 export default function* gameSaga(gameEngine: GameEngine) {
   yield put(walletActions.openChannelRequest(gameEngine.state.channel));
@@ -57,11 +58,19 @@ export default function* gameSaga(gameEngine: GameEngine) {
     if (newState && newState !== oldState) {
       yield processState(newState);
     }
+
+    if (newState.type === PlayerBStateType.CONCLUDE_RECEIVED || newState.type === PlayerAStateType.CONCLUDE_RECEIVED) {
+      newState = gameEngine.conclude();
+      // TODO: Handle this properly instead of delaying to make sure the message is stored
+      yield call(delay,500);
+      yield processState(newState);
+    }
   }
 }
 
 function* sendState(state) {
   yield put(messageActions.sendMessage(state.opponentAddress, state.position.toHex()));
+
 }
 
 function* processState(state) {
@@ -78,8 +87,6 @@ function* processState(state) {
       break; // don't send anything if the next step is to ChoosePlay
     case PlayerAStateType.CONCLUDED:
     case PlayerBStateType.CONCLUDED:
-      yield sendState(state);
-      yield put(gameActions.stateChanged(state));
       yield put(walletActions.withdrawalRequest(state));
       yield take(walletActions.WITHDRAWAL_SUCCESS);
       yield put(walletActions.closeChannelRequest());
