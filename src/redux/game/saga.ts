@@ -1,4 +1,4 @@
-import { take, put, actionChannel, call, } from 'redux-saga/effects';
+import { take, put, actionChannel, } from 'redux-saga/effects';
 
 import { GameEngine } from '../../game-engine/GameEngine';
 
@@ -11,7 +11,7 @@ import { default as positionFromHex } from '../../game-engine/positions/decode';
 
 import { PlayerAStateType } from '../../game-engine/application-states/PlayerA';
 import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
-import { delay } from 'redux-saga';
+
 
 export default function* gameSaga(gameEngine: GameEngine) {
   yield put(walletActions.openChannelRequest(gameEngine.state.channel));
@@ -61,8 +61,7 @@ export default function* gameSaga(gameEngine: GameEngine) {
 
     if (newState.type === PlayerBStateType.CONCLUDE_RECEIVED || newState.type === PlayerAStateType.CONCLUDE_RECEIVED) {
       newState = gameEngine.conclude();
-      // TODO: Handle this properly instead of delaying to make sure the message is stored
-      yield call(delay,500);
+      yield take(messageActions.MESSAGE_SENT);
       yield processState(newState);
     }
   }
