@@ -58,14 +58,10 @@ const challengeTransformer = (dict) => {
     // Convert the stake from a string to a BN
     dict.value[key].stake = new BN(dict.value[key].stake);
     return dict.value[key];
-  }).filter((challenge) => {
-    // TODO: filter self challenges
-    return true;
   });
 };
 
 function* challengeSyncer() {
-  // TODO: figure out how to use a Firebase reference here to limit the data
   yield fork(
     reduxSagaFirebase.database.sync,
     'challenges',

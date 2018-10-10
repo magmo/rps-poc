@@ -37,9 +37,10 @@ export default function* waitingRoomSaga(
     stake: stake.toString(),
   };
   
+  yield firebase.database().ref(challengeKey).onDisconnect().remove();
   // use update to allow us to pick our own key
   yield call(reduxSagaFirebase.database.update, challengeKey, serializedChallenge);
-  yield firebase.database().ref(challengeKey).onDisconnect().remove();
+
 
   while (true) {
     const action: ActionType = yield take(channel);
