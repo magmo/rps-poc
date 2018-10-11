@@ -14,7 +14,7 @@ const DEFAULT_BALANCES = 50;
 export default function* lobbySaga(address: string) {
   yield put(applicationActions.lobbySuccess());
   // subscribe to challenges
-  yield fork(challengeSyncer);
+  yield* challengeSyncer();
 
   const channel = yield actionChannel([
     lobbyActions.ACCEPT_CHALLENGE,
