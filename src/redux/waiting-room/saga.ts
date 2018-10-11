@@ -1,4 +1,4 @@
-import { take, actionChannel, put, call } from 'redux-saga/effects';
+import { take, actionChannel, put, call, apply } from 'redux-saga/effects';
 import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
 
 import * as waitingRoomActions from '../waiting-room/actions';
@@ -37,10 +37,10 @@ export default function* waitingRoomSaga(
     stake: stake.toString(),
   };
   
-  yield firebase.database().ref(challengeKey).onDisconnect().remove();
+  const disconnect = firebase.database().ref(challengeKey).onDisconnect();
+  yield apply(disconnect, disconnect.remove);
   // use update to allow us to pick our own key
   yield call(reduxSagaFirebase.database.update, challengeKey, serializedChallenge);
-
 
   while (true) {
     const action: ActionType = yield take(channel);
