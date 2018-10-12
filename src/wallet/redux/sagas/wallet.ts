@@ -121,14 +121,14 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
         break;
 
       case actions.WITHDRAWAL_REQUEST:
-      const { position } = action;
+        const { position } = action;
         yield handleWithdrawalRequest(wallet, walletEngine, position);
         break;
       case actions.CREATE_CHALLENGE_REQUEST:
-        yield handleChallengeRequest(wallet);
+        yield handleChallengeRequest(wallet, walletEngine);
         break;
       case actions.CHALLENGE_RESPONSE_REQUEST:
-        yield handleChallengeResponse(wallet, action.positionData);
+        yield handleChallengeResponse(wallet, walletEngine, action.positionData);
         break;
       default:
         // @ts-ignore
@@ -137,22 +137,38 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
   }
 }
 
-function* handleChallengeResponse(wallet: ChannelWallet, positionData: string) {
+function* handleChallengeRequest(wallet: ChannelWallet, walletEngine: WalletEngine) {
+  const challengeProof = yield loadChallengeProof(wallet, wallet.channelId);
+
+  walletEngine.requestChallenge(challengeProof);
+  yield put (stateActions.stateChanged(walletEngine.state));
+
+  yield put (stateActions.stateChanged(walletEngine.state));
+  yield put(blockchainActions.forceMove(challengeProof));
+  const { createdChallengeProof } = yield take(blockchainActions.CHALLENGECREATED_EVENT);
+
+  walletEngine.createChallenge(createdChallengeProof);
+  yield put (stateActions.stateChanged(walletEngine.state));
+
+  yield take(actions.CHALLENGE_CONCLUDED);
+  walletEngine.concludeChallenge();
+  yield put (stateActions.stateChanged(walletEngine.state));
+}
+
+function* handleChallengeResponse(wallet: ChannelWallet, walletEngine: WalletEngine, positionData: string) {
   const signature = new Signature(wallet.sign(positionData));
   // We store the latest message manually as it won't be sent as a message 
   // and stored automatically.
-  yield handleStoreMessageRequest(wallet, positionData, signature.signature,"sent");
-  yield put(blockchainActions.challengeResponseRequest(positionData, signature));
-  yield take(blockchainActions.CHALLENGERESPONSE_SUCCESS);
+  yield handleStoreMessageRequest(wallet, positionData, signature.signature, "sent");
+  yield put(blockchainActions.respondWithMoveRequest(positionData, signature));
+  yield take([
+    blockchainActions.CHALLENGECONCLUDED_EVENT,
+    blockchainActions.RESPONDWITHMOVE_FAILURE,
+  ]);
+
+  walletEngine.concludeChallenge();
+  yield put (stateActions.stateChanged(walletEngine.state));
 }
-function* handleChallengeRequest(wallet: ChannelWallet) {
-  const challengeProof = yield loadChallengeProof(wallet, wallet.channelId);
-  yield put(blockchainActions.createChallenge(challengeProof));
-
-  yield take(blockchainActions.CHALLENGECREATE_SUCCESS);
-
-}
-
 
 function* handleSignatureRequest(
   wallet: ChannelWallet,
@@ -286,6 +302,7 @@ function* loadConclusionProof(
     );
   }
 }
+
 function* loadChallengeProof(
   wallet: ChannelWallet,
   channelId: string
