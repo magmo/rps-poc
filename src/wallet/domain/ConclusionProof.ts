@@ -1,15 +1,8 @@
-import {State} from 'fmg-core';
-import decode from './decode';
-import {Signature} from './Signature';
+import { State } from 'fmg-core';
 import { ChallengeProof } from './ChallengeProof';
+import decode from 'src/wallet/domain/decode';
 
 export class ConclusionProof extends ChallengeProof {
-  // TODO: move to fmg-core
-  fromState: State;
-  toState: State;
-
-  fromSignature: Signature;
-  toSignature: Signature;
 
   constructor(
     fromState: string,
@@ -17,29 +10,12 @@ export class ConclusionProof extends ChallengeProof {
     fromSignature: string,
     toSignature: string,
   ) {
-    this.fromState = decode(fromState);
-    this.toState = decode(toState);
-
+    super(fromState, toState, fromSignature, toSignature);
+    const decodedFromState = decode(fromState);
+    const decodedToState = decode(toState);
     // TODO: call SimpleAdjudicator.validConclusionProof instead
-    if( this.toState.stateType !== State.StateType.Conclude || this.fromState.stateType !== State.StateType.Conclude ) {
+    if (decodedFromState.stateType !== State.StateType.Conclude || decodedToState.stateType!== State.StateType.Conclude) {
       throw new Error("States must be Conclude states");
     }
-    if (this.toState.turnNum !== this.fromState.turnNum + 1) {
-      throw new Error("States must have consequetive turn numbers");
-    }
-
-    this.fromSignature = new Signature(fromSignature);
-    this.toSignature = new Signature(toSignature);
   }
-
-  get r() {
-    return [this.fromSignature.r, this.toSignature.r];
-  }
-
-  get s() {
-    return [this.fromSignature.s, this.toSignature.s];
-  }
-  get v() {
-    return [this.fromSignature.v, this.toSignature.v];
-  } 
 }

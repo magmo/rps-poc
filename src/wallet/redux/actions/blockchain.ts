@@ -1,6 +1,8 @@
 import BN from 'bn.js';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import { State } from 'fmg-core';
+import { ChallengeProof } from '../../domain/ChallengeProof';
+import { Signature } from 'src/wallet/domain/Signature';
 
 export type DeploymentRequest = ReturnType<typeof deploymentRequest>;
 export type DeploymentSuccess = ReturnType<typeof deploymentSuccess>;
@@ -18,6 +20,8 @@ export type WithdrawRequest = ReturnType<typeof withdrawRequest>;
 export type WithdrawSuccess = ReturnType<typeof withdrawSuccess>;
 export type WithdrawFailure = ReturnType<typeof withdrawFailure>;
 export type WithdrawResponse = WithdrawSuccess | WithdrawFailure;
+
+export type ChallengeDetected = ReturnType<typeof challengeDetected>;
 
 export type RequestAction = DeploymentRequest | DepositRequest | WithdrawRequest | CreateChallengeRequest;
 
@@ -42,20 +46,22 @@ export const CHALLENGECREATE_FAILURE = 'BLOCKCHAIN.CHALLENGE.CREATE.FAILURE';
 export const FUNDSRECEIVED_EVENT = 'BLOCKCHAIN.EVENT.FUNDSRECEIVED';
 export const GAMECONCLUDED_EVENT = 'BLOCKCHAIN.EVENT.GAMECONCLUDED';
 export const FUNDSWITHDRAWN_EVENT = 'BLOCKCHAIN.EVENT.FUNDSWITHDRAWN';
+export const CHALLENGECREATED_EVENT = 'BLOCKCHAIN.EVENT.CHALLENGECREATED';
+export const CHALLENGECONCLUDED_EVENT = 'BLOCKCHAIN.EVENT.CHALLENGECONCLUDED';
+export const CHALLENGERESPONSE_REQUEST = 'BLOCKCHAIN.CHALLENGE.RESPONSE.REQUEST';
+export const CHALLENGERESPONSE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.RESPONSE.SUCCESS';
+export const CHALLENGERESPONSE_FAILURE = 'BLOCKCHAIN.CHALLENGE.RESPONSE.FAILURE';
 
 export const UNSUBSCRIBE_EVENTS = 'BLOCKCHAIN.EVENT.UNSUBSCRIBE';
 
 export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
-export const createChallenge = (yourMove: string, theirMove: string, yourSignature: string, theirSignature: string) => ({
+export const createChallenge = (challengeProof: ChallengeProof) => ({
   type: CHALLENGECREATE_REQUEST as typeof CHALLENGECREATE_REQUEST,
-  yourMove,
-  theirMove,
-  yourSignature,
-  theirSignature,
+  challengeProof,
 });
 
 export const createChallengeSuccess = () => ({
-  type:CHALLENGECREATE_SUCCESS  as typeof CHALLENGECREATE_SUCCESS,
+  type: CHALLENGECREATE_SUCCESS as typeof CHALLENGECREATE_SUCCESS,
 });
 
 export const deploymentRequest = (channelId: any, amount: BN) => ({
@@ -140,3 +146,32 @@ export const fundsWithdrawnEvent = (amountWithdrawn, adjudicatorBalance, sender)
   adjudicatorBalance,
   sender,
 });
+
+export const challengeDetected = ({ state, expirationTime }) => ({
+  type: CHALLENGECREATED_EVENT as typeof CHALLENGECREATED_EVENT,
+  state,
+  expirationTime,
+});
+
+export const challengeResponseRequest= (positionData:string,signature:Signature) => ({
+  type: CHALLENGERESPONSE_REQUEST as typeof CHALLENGERESPONSE_REQUEST,
+  positionData,
+  signature,
+});
+
+export const challengeResponseSuccess = ()=>({
+  type: CHALLENGERESPONSE_SUCCESS as typeof CHALLENGERESPONSE_SUCCESS,
+});
+
+export const challengeResponseFailure = (error)=>({
+  type: CHALLENGERESPONSE_FAILURE as typeof CHALLENGERESPONSE_FAILURE,
+  error,
+});
+
+export const challengeConcluded=(responseState)=>({
+  type: CHALLENGECONCLUDED_EVENT as typeof CHALLENGECONCLUDED_EVENT,
+  responseState,
+
+});
+
+export type ChallengeResponseRequest = ReturnType<typeof challengeResponseRequest>;

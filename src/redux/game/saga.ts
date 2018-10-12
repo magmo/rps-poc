@@ -14,6 +14,7 @@ import { PlayerBStateType } from '../../game-engine/application-states/PlayerB';
 
 
 export default function* gameSaga(gameEngine: GameEngine) {
+
   yield put(walletActions.openChannelRequest(gameEngine.state.channel));
   yield take(walletActions.CHANNEL_OPENED);
   yield put(applicationActions.gameSuccess(gameEngine.state));
@@ -27,6 +28,8 @@ export default function* gameSaga(gameEngine: GameEngine) {
     walletActions.FUNDING_SUCCESS,
     walletActions.FUNDING_FAILURE,
     walletActions.CREATE_CHALLENGE_REQUEST,
+    walletActions.CHALLENGE_DETECTED,
+    gameActions.CHALLENGE_RESPONSE,
   ]);
 
   while (true) {
@@ -48,8 +51,14 @@ export default function* gameSaga(gameEngine: GameEngine) {
         newState = gameEngine.conclude();
         break;
       case walletActions.CREATE_CHALLENGE_REQUEST:
-      newState = gameEngine.challenge();
-      break;
+        newState = gameEngine.challenge();
+        break;
+      case walletActions.CHALLENGE_DETECTED:
+        newState = gameEngine.challengeReceived(action.expirationDate, oldState.position);
+        break;
+      case gameActions.CHALLENGE_RESPONSE:
+        newState = gameEngine.respondToChallenge(action.play);
+        break;
       case walletActions.FUNDING_SUCCESS:
         // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
         newState = gameEngine.fundingConfirmed();
@@ -96,7 +105,13 @@ function* processState(state) {
     case PlayerBStateType.CHOOSE_PLAY:
     case PlayerAStateType.WAIT_FOR_CHALLENGE:
     case PlayerBStateType.WAIT_FOR_CHALLENGE:
+    case PlayerAStateType.CHALLENGE_RECEIVED:
+    case PlayerBStateType.CHALLENGE_RECEIVED:
       break; // don't send anything if the next step is to ChoosePlay
+    case PlayerAStateType.CHALLENGE_RESPONSE:
+    case PlayerBStateType.CHALLENGE_RESPONSE:
+      yield put(walletActions.challengeResponseRequest(state.position.toHex()));
+      break;
     case PlayerAStateType.CONCLUDED:
     case PlayerBStateType.CONCLUDED:
       yield put(walletActions.withdrawalRequest(state));

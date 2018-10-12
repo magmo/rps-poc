@@ -6,33 +6,38 @@ import contract from 'truffle-contract';
 import detectNetwork from 'web3-detect-network';
 import { eventChannel } from 'redux-saga';
 import { ConclusionProof } from '../../domain/ConclusionProof';
-import { CreateChallengeRequest } from '../actions/blockchain';
-import { Signature } from '../../domain/Signature';
 
 export function* blockchainSaga() {
 
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
 
   yield fork(blockchainWithdrawal, simpleAdjudicator);
-  yield fork (challengeSetup, simpleAdjudicator);
+  yield fork(blockchainChallenge, simpleAdjudicator);
   yield take(blockchainActions.WITHDRAW_SUCCESS);
   yield cancel(eventListener);
 
   return true;
 }
-function* challengeSetup(simpleAdjudicator) {
+function* blockchainChallenge(simpleAdjudicator) {
+  const channel = yield actionChannel([
+    blockchainActions.CHALLENGERESPONSE_REQUEST,
+    blockchainActions.CHALLENGECREATE_REQUEST,
+  ]);
+  const action = yield take(channel);
 
-  
-  const action: CreateChallengeRequest = yield take(blockchainActions.CHALLENGECREATE_REQUEST);
-  
-  
-  const theirSignature = new Signature(action.theirSignature);
-  const yourSignature = new Signature(action.yourSignature);
-  const v = [theirSignature.v, yourSignature.v];
-  const r = [theirSignature.r, yourSignature.r];
-  const s = [theirSignature.s, yourSignature.s];
-  yield call(simpleAdjudicator.forceMove,action.theirMove, action.yourMove, v, r, s);
-  yield put(blockchainActions.createChallengeSuccess());
+  switch (action.type) {
+    case blockchainActions.CHALLENGECREATE_REQUEST:
+      const { fromState, toState, v, r, s } = action.challengeProof;
+      yield call(simpleAdjudicator.forceMove, fromState, toState, v, r, s);
+      yield put(blockchainActions.createChallengeSuccess());
+      break;
+
+    case blockchainActions.CHALLENGERESPONSE_REQUEST:
+      const { positionData, signature } = action;
+      yield call(simpleAdjudicator.respondWithMove, positionData, signature.v, signature.r, signature.s);
+      yield put(blockchainActions.challengeResponseSuccess());
+      break;
+  }
 }
 
 function* contractSetup() {
@@ -93,8 +98,8 @@ function* blockchainWithdrawal(simpleAdjudicator) {
 
       const transaction = yield call(
         simpleAdjudicator.concludeAndWithdraw,
-        proof.fromState.toHex(),
-        proof.toState.toHex(),
+        proof.fromState,
+        proof.toState,
         playerAddress,
         destination,
         channelId,
@@ -125,7 +130,12 @@ function* watchAdjudicator(deployedContract) {
       yield put(blockchainActions.fundsReceivedEvent({ ...result.args }));
     } else if (result.event === "GameConcluded") {
       yield put(blockchainActions.gameConcluded({ ...result.args }));
+    } else if (result.event === "ChallengeCreated") {
+      yield put(blockchainActions.challengeDetected({ ...result.args }));
+    } else if (result.event === "RespondedWithMove") {
+      yield put(blockchainActions.challengeConcluded({ ...result.args }));
     }
+
   }
 }
 

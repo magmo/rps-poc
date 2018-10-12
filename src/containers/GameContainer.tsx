@@ -10,6 +10,7 @@ import GameProposedPage from '../components/GameProposedPage';
 import FundingConfirmedPage from '../components/FundingConfirmedPage';
 import PlaySelectedPage from '../components/PlaySelectedPage';
 import ResultPage from '../components/ResultPage';
+import ChallengeReceived from '../components/ChallengeReceived';
 import { WalletController } from '../wallet';
 
 import { SiteState } from '../redux/reducer';
@@ -23,13 +24,14 @@ import { Play } from '../game-engine/positions';
 interface GameProps {
   state: GameState;
   choosePlay: (play: Play) => void;
+  respondToChallenge: (play: Play) => void;
   abandonGame: () => void;
   playAgain: () => void;
   challengeOnChain: () => void;
 }
 
 function GameContainer(props: GameProps) {
-  const { state, choosePlay, playAgain, abandonGame, challengeOnChain} = props;
+  const { state, choosePlay, playAgain, abandonGame, challengeOnChain, respondToChallenge } = props;
 
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
@@ -44,6 +46,9 @@ function GameContainer(props: GameProps) {
 
     case playerA.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
+    case playerA.CHALLENGE_RECEIVED:
+    case playerB.CHALLENGE_RECEIVED:
+      return <ChallengeReceived respondToChallenge={respondToChallenge} abandonGame={abandonGame} challengeExpirationDate={state.expirationDate} />;
 
     case playerA.WAIT_FOR_ACCEPT:
       return (
@@ -94,7 +99,9 @@ function GameContainer(props: GameProps) {
 
     case playerB.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
-
+    case playerA.CHALLENGE_RESPONSE:
+    case playerB.CHALLENGE_RESPONSE:
+      return <div>waiting for adjudicator</div>;
     case playerB.WAIT_FOR_REVEAL:
       return (
         <PlaySelectedPage
@@ -127,6 +134,7 @@ const mapDispatchToProps = {
   playAgain: gameActions.playAgain,
   abandonGame: gameActions.abandonGame,
   challengeOnChain: walletActions.createChallenge,
+  respondToChallenge: gameActions.respondToChallenge,
 };
 
 export default connect(

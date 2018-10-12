@@ -1,11 +1,10 @@
-import {State} from 'fmg-core';
 import decode from './decode';
 import {Signature} from './Signature';
 
 export class ChallengeProof {
   // TODO: move to fmg-core
-  fromState: State;
-  toState: State;
+  fromState: string;
+  toState: string;
 
   fromSignature: Signature;
   toSignature: Signature;
@@ -16,14 +15,18 @@ export class ChallengeProof {
     fromSignature: string,
     toSignature: string,
   ) {
-    this.fromState = decode(fromState);
-    this.toState = decode(toState);
+    // Currently the State class in FMG core does not know about any additional game data
+    // so if we decode and then call toHex we'll lose all game information
+    // For now we just decode for some validation but keep the states as strings
+    const decodedFromState = decode(fromState);
+    const decodedToState = decode(toState);
 
-
-    if (this.toState.turnNum !== this.fromState.turnNum + 1) {
+    if (decodedToState.turnNum !== decodedFromState.turnNum + 1) {
       throw new Error("States must have consequetive turn numbers");
     }
 
+    this.fromState = fromState;
+    this.toState = toState;
     this.fromSignature = new Signature(fromSignature);
     this.toSignature = new Signature(toSignature);
   }

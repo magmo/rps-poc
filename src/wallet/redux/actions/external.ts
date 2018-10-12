@@ -204,12 +204,39 @@ export type StoreMessageRequest = ReturnType<typeof storeMessageRequest>;
 // Challenge
 // =========
 export const CREATE_CHALLENGE_REQUEST = 'WALLET.CHALLENGE.CREATE';
+export const CHALLENGE_DETECTED = 'WALLET.CHALLENGE.DETECTED';
+export const CHALLENGE_CONCLUDED = 'WALLET.CHALLENGE.CONCLUDED';
+export const CHALLENGE_RESPONSE_REQUEST = 'WALLET.CHALLENGE.RESPONSE';
+export const challengeConcluded=(responseState)=>({
+  type: CHALLENGE_CONCLUDED as typeof CHALLENGE_CONCLUDED,
+  responseState,
+});
+export const challengeDetected = (expirationDate) => ({
+  type: CHALLENGE_DETECTED,
+  expirationDate,
+});
 
-export const createChallenge= () => ({
+export const createChallenge = () => ({
   type: CREATE_CHALLENGE_REQUEST as typeof CREATE_CHALLENGE_REQUEST,
 });
-export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
 
+export const challengeResponseRequest = (positionData: string) => ({
+  type: CHALLENGE_RESPONSE_REQUEST as typeof CHALLENGE_RESPONSE_REQUEST,
+  positionData,
+});
+
+export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
+export type ChallengeDetected = ReturnType<typeof challengeDetected>;
+export type ChallengeResponseRequest = ReturnType<typeof challengeResponseRequest>;
 // Requests
 // ========
-export type RequestAction = OpenChannelRequest | CloseChannelRequest | FundingRequest | SignatureRequest | ValidationRequest | WithdrawalRequest | StoreMessageRequest | CreateChallengeRequest;
+export type RequestAction =
+  OpenChannelRequest |
+  CloseChannelRequest |
+  FundingRequest |
+  SignatureRequest |
+  ValidationRequest |
+  WithdrawalRequest |
+  StoreMessageRequest |
+  CreateChallengeRequest |
+  ChallengeResponseRequest;

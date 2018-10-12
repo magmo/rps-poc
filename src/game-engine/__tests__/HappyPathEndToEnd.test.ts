@@ -8,9 +8,9 @@ const stake = new BN(1);
 const initialBals = [new BN(5), new BN(4)];
 const me = '0xa';
 const opponent = '0xb';
-
+const libraryAddress = '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d'; 
 describe('game engine runthrough', () => {
-  const gameEngineA = GameEngine.setupGame({me, opponent, stake, balances: initialBals});
+  const gameEngineA = GameEngine.setupGame({me, opponent, stake, balances: initialBals,libraryAddress},);
   const aWaitForPreFundSetup = gameEngineA.state;
   // a sends PreFundSetupA to b
   const gameEngineB = GameEngine.fromProposal(aWaitForPreFundSetup.position);

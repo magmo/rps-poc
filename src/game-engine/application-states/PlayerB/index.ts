@@ -24,6 +24,8 @@ export enum PlayerBStateType {
   INSUFFICIENT_FUNDS = 'PLAYER_B.INSUFFICIENT_FUNDS',
   CONCLUDED = 'PLAYER_B.CONCLUDED',
   CONCLUDE_RECEIVED = 'PLAYER_B.CONCLUDE_RECEIVED',
+  CHALLENGE_RECEIVED='PLAYER_B.CHALLENGE_RECEIVED',
+  CHALLENGE_RESPONSE = 'PLAYER_B.CHALLENGE_RESPONSE',
 }
 
 class BasePlayerB<T extends Position> extends BaseState<T> {
@@ -106,6 +108,21 @@ export class Concluded extends BasePlayerB<Conclude> {
   readonly type = PlayerBStateType.CONCLUDED;
   readonly isReadyToSend = false;
 }
+export class ChallengeReceived extends BasePlayerB<Propose>{
+  readonly type = PlayerBStateType.CHALLENGE_RECEIVED;
+  get stake() { return this.position.stake; }
+  get preCommit() { return this.position.preCommit; }
+  expirationDate:number;
+  constructor({expirationDate, position}){
+    super({position});
+    this.expirationDate = expirationDate;
+  }
+}
+
+export class ChallengeResponse extends BasePlayerB<Accept>{
+  readonly type = PlayerBStateType.CHALLENGE_RESPONSE;
+}
+
 
 export type PlayerBState = (
   WaitForChallenge
@@ -119,4 +136,6 @@ export type PlayerBState = (
   | WaitForConclude
   | ConcludeReceived
   | Concluded
+  | ChallengeReceived
+  | ChallengeResponse
 );

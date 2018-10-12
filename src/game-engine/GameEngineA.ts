@@ -18,14 +18,13 @@ import {
 } from './positions';
 import BN from 'bn.js';
 
-const fakeGameLibraryAddress = '0xc1912fee45d61c87cc5ea59dae31190fffff232d';
 
 export default class GameEngineA {
-  static setupGame({ me, opponent, stake, balances }:
-    { me: string, opponent: string, stake: BN, balances: BN[] }
+  static setupGame({ me, opponent, stake, balances, libraryAddress }:
+    { me: string, opponent: string, stake: BN, balances: BN[], libraryAddress:string }
   ) {
     const participants = [me, opponent];
-    const channel = new Channel(fakeGameLibraryAddress, 456, participants);
+    const channel = new Channel(libraryAddress, 456, participants);
 
     const position = new PreFundSetupA(channel, 0, balances, 0, stake);
 
@@ -194,13 +193,31 @@ export default class GameEngineA {
     const { stake, balances } = state;
     return stake.gt(balances[0]) || stake.gt(balances[1]);
   }
-  challenge(){
-    if (!(this.state instanceof State.WaitForAccept)){
+  challenge() {
+    if (!(this.state instanceof State.WaitForAccept)) {
       return this.state;
     }
-      return this.transitionTo(new State.WaitForChallenge({position:this.state.position}));
+    return this.transitionTo(new State.WaitForChallenge({ position: this.state.position }));
   }
+  challengeReceived(expirationDate: number, position: Position) {
+    return this.transitionTo(new State.ChallengeReceived({ expirationDate, position }));
+  }
+  respondToChallenge(play:Play){
+    if (!(this.state instanceof State.ChallengeReceived)) { return this.state; }
+    const { balances, turnNum, stake, channel } = this.state;
+    const salt = 'salt'; // todo: make random
 
+    const newPosition = Propose.createWithPlayAndSalt(
+      channel,
+      turnNum + 1,
+      balances,
+      stake,
+      play,
+      salt,
+    );
+    return this.transitionTo(new State.ChallengeResponse({position:newPosition}));
+  }
+  
   receivedConclude(position: Conclude) {
     if (this.state instanceof State.Concluded) {
       return this.state;
