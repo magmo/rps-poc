@@ -115,6 +115,8 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
 
       case actions.FUNDING_REQUEST:
         walletEngine.setup(action);
+        // Save the initial state
+        yield put(stateActions.stateChanged(walletEngine.state));
         yield fork(handleFundingRequest, wallet, walletEngine, action.playerIndex);
         break;
 
