@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
 
 import ErrorPage from '../components/ErrorPage';
+import { SiteState } from '../redux/reducer';
 
-const mapStateToProps = (error: string) => ({
-  error,
-});
+const mapStateToProps = (state: SiteState) => {
+  return { error: state.app.error };
+};
 
 const mapDispatchToProps = {
 };

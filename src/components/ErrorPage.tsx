@@ -5,7 +5,7 @@ interface Props {
   error: string;
 }
 
-const initialState = { error: "Application Error" };
+const initialState = {};
 type State = Readonly<typeof initialState>;
 
 export default class ErrorPage extends React.PureComponent<Props, State> {
@@ -16,6 +16,6 @@ export default class ErrorPage extends React.PureComponent<Props, State> {
   }
 
   render() {
-    return <div> Error: {this.state.error} </div>;
+    return <div> Error: {this.props.error} </div>;
   }
 }

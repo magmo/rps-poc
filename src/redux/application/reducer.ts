@@ -27,6 +27,7 @@ export interface ApplicationState {
   gameState?: GameState;
   challenges?: Challenge[];
   myChallenge?: Challenge;
+  error?: string;
 }
 
 const initialState = {
