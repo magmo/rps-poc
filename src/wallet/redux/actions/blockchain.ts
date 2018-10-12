@@ -21,9 +21,10 @@ export type WithdrawSuccess = ReturnType<typeof withdrawSuccess>;
 export type WithdrawFailure = ReturnType<typeof withdrawFailure>;
 export type WithdrawResponse = WithdrawSuccess | WithdrawFailure;
 
-export type ChallengeDetected = ReturnType<typeof challengeDetected>;
+export type ForceMoveRequest = ReturnType<typeof forceMove>;
+export type RespondWithMoveRequest = ReturnType<typeof respondWithMoveRequest>;
 
-export type RequestAction = DeploymentRequest | DepositRequest | WithdrawRequest | CreateChallengeRequest;
+export type RequestAction = DeploymentRequest | DepositRequest | WithdrawRequest | ForceMoveRequest | RespondWithMoveRequest;
 
 export const DEPLOY_REQUEST = 'BLOCKCHAIN.DEPLOY.REQUEST';
 export const DEPLOY_SUCCESS = 'BLOCKCHAIN.DEPLOY.SUCCESS';
@@ -39,29 +40,48 @@ export const WITHDRAW_REQUEST = 'BLOCKCHAIN.WITHDRAW.REQUEST';
 export const WITHDRAW_SUCCESS = 'BLOCKCHAIN.WITHDRAW.SUCCESS';
 export const WITHDRAW_FAILURE = 'BLOCKCHAIN.WITHDRAW.FAILURE';
 
-export const CHALLENGECREATE_REQUEST = 'BLOCKCHAIN.CHALLENGE.CREATE.REQUEST';
-export const CHALLENGECREATE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.CREATE.SUCCESS';
-export const CHALLENGECREATE_FAILURE = 'BLOCKCHAIN.CHALLENGE.CREATE.FAILURE';
+export const FORCEMOVE_REQUEST = 'BLOCKCHAIN.CHALLENGE.FORCE_MOVE.REQUEST';
+export const FORCEMOVE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.FORCE_MOVE.SUCCESS';
+export const FORCEMOVE_FAILURE = 'BLOCKCHAIN.CHALLENGE.FORCE_MOVE.FAILURE';
+export const RESPONDWITHMOVE_REQUEST = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_MOVE.REQUEST';
+export const RESPONDWITHMOVE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_MOVE.SUCCESS';
+export const RESPONDWITHMOVE_FAILURE = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_MOVE.FAILURE';
 
 export const FUNDSRECEIVED_EVENT = 'BLOCKCHAIN.EVENT.FUNDSRECEIVED';
 export const GAMECONCLUDED_EVENT = 'BLOCKCHAIN.EVENT.GAMECONCLUDED';
 export const FUNDSWITHDRAWN_EVENT = 'BLOCKCHAIN.EVENT.FUNDSWITHDRAWN';
 export const CHALLENGECREATED_EVENT = 'BLOCKCHAIN.EVENT.CHALLENGECREATED';
+export const CHALLENGECANCELLED_EVENT = 'BLOCKCHAIN.EVENT.CHALLENGECANCELLED';
 export const CHALLENGECONCLUDED_EVENT = 'BLOCKCHAIN.EVENT.CHALLENGECONCLUDED';
-export const CHALLENGERESPONSE_REQUEST = 'BLOCKCHAIN.CHALLENGE.RESPONSE.REQUEST';
-export const CHALLENGERESPONSE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.RESPONSE.SUCCESS';
-export const CHALLENGERESPONSE_FAILURE = 'BLOCKCHAIN.CHALLENGE.RESPONSE.FAILURE';
 
 export const UNSUBSCRIBE_EVENTS = 'BLOCKCHAIN.EVENT.UNSUBSCRIBE';
 
-export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
-export const createChallenge = (challengeProof: ChallengeProof) => ({
-  type: CHALLENGECREATE_REQUEST as typeof CHALLENGECREATE_REQUEST,
+export const forceMove = (challengeProof: ChallengeProof) => ({
+  type: FORCEMOVE_REQUEST as typeof FORCEMOVE_REQUEST,
   challengeProof,
 });
 
-export const createChallengeSuccess = () => ({
-  type: CHALLENGECREATE_SUCCESS as typeof CHALLENGECREATE_SUCCESS,
+export const forceMoveSuccess = () => ({
+  type: FORCEMOVE_SUCCESS as typeof FORCEMOVE_SUCCESS,
+});
+
+export const forceMoveFailure = () => ({
+  type: FORCEMOVE_FAILURE as typeof FORCEMOVE_FAILURE,
+});
+
+export const respondWithMoveRequest= (positionData:string, signature:Signature) => ({
+  type: RESPONDWITHMOVE_REQUEST as typeof RESPONDWITHMOVE_REQUEST,
+  positionData,
+  signature,
+});
+
+export const respondWithMoveSuccess = ()=>({
+  type: RESPONDWITHMOVE_SUCCESS as typeof RESPONDWITHMOVE_SUCCESS,
+});
+
+export const respondWithMoveFailure = (error)=>({
+  type: RESPONDWITHMOVE_FAILURE as typeof RESPONDWITHMOVE_FAILURE,
+  error,
 });
 
 export const deploymentRequest = (channelId: any, amount: BN) => ({
@@ -125,7 +145,12 @@ export const unsubscribeForEvents = () => ({
   type: UNSUBSCRIBE_EVENTS,
 });
 
+// EVENTS
 // TODO: Create an event type with the properties we're interested in
+
+export type ChallengeCreated = ReturnType<typeof challengeCreatedEvent>;
+export type ChallengeConcluded = ReturnType<typeof challengeConcludedEvent>;
+
 export const fundsReceivedEvent = ({ amountReceived, adjudicatorBalance, sender }) => ({
   type: FUNDSRECEIVED_EVENT,
   amountReceived,
@@ -147,31 +172,13 @@ export const fundsWithdrawnEvent = (amountWithdrawn, adjudicatorBalance, sender)
   sender,
 });
 
-export const challengeDetected = ({ state, expirationTime }) => ({
+export const challengeCreatedEvent = ({ state, expirationTime }) => ({
   type: CHALLENGECREATED_EVENT as typeof CHALLENGECREATED_EVENT,
   state,
   expirationTime,
 });
 
-export const challengeResponseRequest= (positionData:string,signature:Signature) => ({
-  type: CHALLENGERESPONSE_REQUEST as typeof CHALLENGERESPONSE_REQUEST,
-  positionData,
-  signature,
-});
-
-export const challengeResponseSuccess = ()=>({
-  type: CHALLENGERESPONSE_SUCCESS as typeof CHALLENGERESPONSE_SUCCESS,
-});
-
-export const challengeResponseFailure = (error)=>({
-  type: CHALLENGERESPONSE_FAILURE as typeof CHALLENGERESPONSE_FAILURE,
-  error,
-});
-
-export const challengeConcluded=(responseState)=>({
+export const challengeConcludedEvent = (responseState)=>({
   type: CHALLENGECONCLUDED_EVENT as typeof CHALLENGECONCLUDED_EVENT,
   responseState,
-
 });
-
-export type ChallengeResponseRequest = ReturnType<typeof challengeResponseRequest>;
