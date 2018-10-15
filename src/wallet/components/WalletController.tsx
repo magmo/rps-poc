@@ -9,7 +9,7 @@ import React from 'react';
 import ConfirmFunding from './ConfirmFunding';
 import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire } from '../wallet-engine/wallet-states';
 import WithdrawFunds from './WithdrawFunds';
-import { ChallengeState } from '../redux/reducers/challenge-reducer';
+import { ChallengeState } from '../redux/reducers/challenge';
 interface Props {
   walletState: WalletState;
   challengeState: ChallengeState;

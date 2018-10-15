@@ -10,7 +10,6 @@ import GameProposedPage from '../components/GameProposedPage';
 import FundingConfirmedPage from '../components/FundingConfirmedPage';
 import PlaySelectedPage from '../components/PlaySelectedPage';
 import ResultPage from '../components/ResultPage';
-import ChallengeReceived from '../components/ChallengeReceived';
 import { WalletController } from '../wallet';
 
 import { SiteState } from '../redux/reducer';
@@ -23,7 +22,7 @@ import { Play } from '../game-engine/positions';
 
 interface GameProps {
   state: GameState;
-  challengePresent: boolean;
+  showWallet: boolean;
   choosePlay: (play: Play) => void;
   respondToChallenge: (play: Play) => void;
   abandonGame: () => void;
@@ -32,27 +31,20 @@ interface GameProps {
 }
 
 function GameContainer(props: GameProps) {
-  const { state, choosePlay, playAgain, abandonGame, challengeOnChain, respondToChallenge } = props;
+  const { state, choosePlay, playAgain, abandonGame, challengeOnChain } = props;
 
-  if (props.challengePresent) {
+  if (props.showWallet) {
     return <WalletController/>;
   }
 
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
-    case playerA.WAIT_FOR_FUNDING:
-    case playerA.WAIT_FOR_CHALLENGE:
-      return <WalletController/>;
-
     case playerA.WAIT_FOR_POST_FUND_SETUP:
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
     case playerA.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
-    case playerA.CHALLENGE_RECEIVED:
-    case playerB.CHALLENGE_RECEIVED:
-      return <ChallengeReceived respondToChallenge={respondToChallenge} abandonGame={abandonGame} challengeExpirationDate={state.expirationDate} />;
 
     case playerA.WAIT_FOR_ACCEPT:
       return (
@@ -90,11 +82,6 @@ function GameContainer(props: GameProps) {
     case playerA.CONCLUDE_RECEIVED:
     case playerB.CONCLUDE_RECEIVED:
       return <WalletController />;
-
-    case playerB.WAIT_FOR_FUNDING:
-    case playerB.WAIT_FOR_CHALLENGE:
-      return <WalletController />;
-
     case playerB.WAIT_FOR_POST_FUND_SETUP:
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
@@ -103,9 +90,6 @@ function GameContainer(props: GameProps) {
 
     case playerB.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
-    case playerA.CHALLENGE_RESPONSE:
-    case playerB.CHALLENGE_RESPONSE:
-      return <div>waiting for adjudicator</div>;
     case playerB.WAIT_FOR_REVEAL:
       return (
         <PlaySelectedPage
@@ -131,7 +115,7 @@ function GameContainer(props: GameProps) {
 
 const mapStateToProps = (state: SiteState) => ({
   state: state.app.gameState as GameState,
-  challengePresent: state.wallet.challenge,
+  showWallet: state.wallet.showWallet,
 });
 
 const mapDispatchToProps = {

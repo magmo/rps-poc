@@ -5,7 +5,7 @@ import {
   Position,
   PreFundSetupA,
   PostFundSetupA,
-  PreFundSetupB,
+
   PostFundSetupB,
   Propose,
   Reveal,
@@ -15,9 +15,7 @@ import {
 } from '../../positions';
 
 export enum PlayerAStateType {
-  WAIT_FOR_CHALLENGE = 'PLAYER_A.WAIT_FOR_CHALLENGE',
   WAIT_FOR_PRE_FUND_SETUP = 'PLAYER_A.WAIT_FOR_PRE_FUND_SETUP',
-  WAIT_FOR_FUNDING = 'PLAYER_A.WAIT_FOR_FUNDING',
   WAIT_FOR_POST_FUND_SETUP = 'PLAYER_A.WAIT_FOR_POST_FUND_SETUP',
   CHOOSE_PLAY = 'PLAYER_A.CHOOSE_PLAY',
   WAIT_FOR_ACCEPT = 'PLAYER_A.WAIT_FOR_ACCEPT',
@@ -26,8 +24,6 @@ export enum PlayerAStateType {
   CONCLUDED = 'PLAYER_A.CONCLUDED',
   INSUFFICIENT_FUNDS = 'PLAYER_A.INSUFFICIENT_FUNDS',
   CONCLUDE_RECEIVED = 'PLAYER_A.CONCLUDE_RECEIVED',
-  CHALLENGE_RECEIVED = 'PLAYER_A.CHALLENGE_RECEIVED',
-  CHALLENGE_RESPONSE = 'PLAYER_B.CHALLENGE_RESPONSE',
 }
 
 class BasePlayerA<T extends Position> extends BaseState<T> {
@@ -38,15 +34,6 @@ export class WaitForPreFundSetup extends BasePlayerA<PreFundSetupA> {
   readonly type = PlayerAStateType.WAIT_FOR_PRE_FUND_SETUP;
   readonly isReadyToSend = false;
 
-  get stake() {
-    return this.position.stake;
-  }
-}
-
-export class WaitForFunding extends BasePlayerA<PreFundSetupB> {
-  readonly type = PlayerAStateType.WAIT_FOR_FUNDING;
-  readonly isReadyForFunding = false;
-  readonly isReadyToSend = false;
   get stake() {
     return this.position.stake;
   }
@@ -109,11 +96,6 @@ export class WaitForResting extends BasePlayerA<Reveal> {
     return calculateResult(this.aPlay, this.bPlay);
   }
 }
-
-export class WaitForChallenge extends BasePlayerA<Position>{
-  readonly type = PlayerAStateType.WAIT_FOR_CHALLENGE;
-  readonly isReadyToSend = false;
-}
 // todo: what should Position be here?
 export class InsufficientFunds extends BasePlayerA<Position> {
   readonly type = PlayerAStateType.INSUFFICIENT_FUNDS;
@@ -129,22 +111,6 @@ export class Concluded extends BasePlayerA<Conclude> {
   readonly type = PlayerAStateType.CONCLUDED;
   readonly isReadyToSend = false;
 }
-export class ChallengeReceived extends BasePlayerA<PostFundSetupB | Resting>{
-  readonly type = PlayerAStateType.CHALLENGE_RECEIVED;
-  expirationDate:number;
-  constructor({expirationDate, position}){
-    super({position});
-    this.expirationDate = expirationDate;
-  }
-  get stake() {
-    return this.position.stake;
-  }
-}
-
-export class ChallengeResponse extends BasePlayerA<Propose|Reveal>{
-  readonly type = PlayerAStateType.CHALLENGE_RESPONSE;
-}
-
 
 export class ConcludeReceived extends BasePlayerA<Conclude>{
   readonly type = PlayerAStateType.CONCLUDE_RECEIVED;
@@ -152,9 +118,7 @@ export class ConcludeReceived extends BasePlayerA<Conclude>{
 
 
 export type PlayerAState =
-  WaitForChallenge
   | WaitForPreFundSetup
-  | WaitForFunding
   | WaitForPostFundSetup
   | ChoosePlay
   | WaitForAccept
@@ -162,7 +126,4 @@ export type PlayerAState =
   | InsufficientFunds
   | WaitForConclude
   | ConcludeReceived
-  | Concluded
-  | ChallengeReceived
-  | ChallengeResponse;
-
+  | Concluded;

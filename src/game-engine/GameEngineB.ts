@@ -25,7 +25,7 @@ export default class GameEngineB {
 
     const nextPosition = new PreFundSetupB(channel, turnNum + 1, balances, stateCount + 1, stake);
 
-    const appState = new State.WaitForFunding({ position: nextPosition });
+    const appState = new State.WaitForPostFundSetup({ position: nextPosition });
 
     return new GameEngineB(appState);
   }
@@ -56,16 +56,6 @@ export default class GameEngineB {
     }
   }
 
-  fundingConfirmed() {
-    if (!(this.state instanceof State.WaitForFunding)) {
-      return this.state;
-    }
-
-    return this.transitionTo(
-      new State.WaitForPostFundSetup({ position: this.state.position }),
-    );
-  }
-
   choosePlay(bPlay: Play) {
     if (!(this.state instanceof State.ChoosePlay)) {
       return this.state;
@@ -90,25 +80,6 @@ export default class GameEngineB {
     const position = this.state.position;
 
     return this.transitionTo(new State.WaitForPropose({ position }));
-  }
-
-  challengeReceived(expirationDate: number, position: Position) {
-    return this.transitionTo(new State.ChallengeReceived({ expirationDate, position }));
-  }
-
-  respondToChallenge(play:Play){
-    if (!(this.state instanceof State.ChallengeReceived)) {
-      return this.state;
-    }
-    const { channel, stake, balances, preCommit, turnNum } = this.state;
-
-    const newBalances: BN[] = [];
-    newBalances[0] = balances[0].sub(stake);
-    newBalances[1] = balances[1].add(stake);
-
-    const newPosition = new Accept(channel, turnNum + 1, newBalances, stake, preCommit, play);
-
-    return this.transitionTo(new State.ChallengeResponse({position:newPosition}));
   }
 
   conclude() {
@@ -159,12 +130,7 @@ export default class GameEngineB {
 
     return this.transitionTo(new State.ChoosePlay({ position }));
   }
-  challenge(){
-    if (!(this.state instanceof State.WaitForReveal)){
-      return this.state;
-    }
-      return this.transitionTo(new State.WaitForChallenge({position:this.state.position}));
-  }
+
   receivedReveal(position: Reveal) {
     if (!(this.state instanceof State.WaitForReveal)) {
       return this.state;
