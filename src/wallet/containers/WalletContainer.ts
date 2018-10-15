@@ -5,7 +5,7 @@ import * as playerActions from '../redux/actions/player';
 
 const mapStateToProps = (state: SiteState) => {
   return {
-    walletState: state.wallet,
+    walletState: state.wallet.walletState,
   };
 };
 
