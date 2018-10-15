@@ -29,7 +29,7 @@ function* blockchainEventListener(wallet: ChannelWallet) {
   );
   const myMove = yield call([myQuery, myQuery.once], 'value');
   const { state: myState } = myMove.val();
-  if (action.state.toUpperCase() !== myState.toUpperCase()) {
+  if (action.state.toLowerCase() !== myState.toLowerCase()) {
     switch (action.type) {
 
       case blockchainActions.CHALLENGECREATED_EVENT:
@@ -206,7 +206,7 @@ function* handleValidationRequest(
   // that the player has received.
   // So, we need to read the channel off of the decoded data, rather than the wallet.
   const state = decode(data);
-  if (state.channel.participants[opponentIndex] !== address) {
+  if (state.channel.participants[opponentIndex].toLowerCase() !== address.toLowerCase()) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
 
