@@ -1,4 +1,4 @@
-import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects';
+import { fork, take, call, put, actionChannel } from 'redux-saga/effects';
 import { buffers } from 'redux-saga';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -8,8 +8,6 @@ import { actions as walletActions } from '../../wallet';
 import { AUTO_OPPONENT_ADDRESS } from '../../constants';
 import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
-import { getApplicationState } from 'src/redux/store';
-import { ApplicationState } from '../application/reducer';
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
@@ -76,13 +74,8 @@ function* receiveFromFirebaseSaga(address: string) {
 }
 
 function* validateMessage(data, signature) {
-  const appState: ApplicationState = yield select(getApplicationState);
-  let opponentIndex = 0;
-  if (appState.gameState) {
-    opponentIndex = 1 - appState.gameState.playerIndex;
-  }
   const requestId = hash(data + Date.now());
-  yield put(walletActions.validationRequest(requestId, data, signature, opponentIndex));
+  yield put(walletActions.validationRequest(requestId, data, signature));
   const actionFilter = [walletActions.VALIDATION_SUCCESS, walletActions.VALIDATION_FAILURE];
   let action: walletActions.ValidationResponse = yield take(actionFilter);
   while (action.requestId !== requestId) {

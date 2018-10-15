@@ -87,7 +87,6 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
           action.requestId,
           action.data,
           action.signature,
-          action.opponentIndex,
         );
         break;
 
@@ -163,14 +162,13 @@ function* handleValidationRequest(
   requestId,
   data: SignableData,
   signature: string,
-  opponentIndex,
 ) {
   const address = wallet.recover(data, signature);
   // The wallet should also have the channel, except when the data is the first message
   // that the player has received.
   // So, we need to read the channel off of the decoded data, rather than the wallet.
   const state = decode(data);
-  if (state.channel.participants[opponentIndex].toLowerCase() !== address.toLowerCase()) {
+  if (state.mover.toLowerCase() !== address.toLowerCase()) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
 

@@ -78,12 +78,11 @@ export const VALIDATION_REQUEST = 'WALLET.VALIDATION.REQUEST';
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 
-export const validationRequest = (requestId: string, data: SignableData, signature: string, opponentIndex: number) => ({
+export const validationRequest = (requestId: string, data: SignableData, signature: string) => ({
   type: VALIDATION_REQUEST as typeof VALIDATION_REQUEST,
   requestId,
   data,
   signature,
-  opponentIndex,
 });
 export const validationSuccess = (requestId: string) => ({
   type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
