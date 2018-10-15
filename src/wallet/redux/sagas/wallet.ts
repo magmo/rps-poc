@@ -13,6 +13,7 @@ import * as actions from '../actions/external';
 import * as blockchainActions from '../actions/blockchain';
 import * as stateActions from '../actions/state';
 import * as playerActions from '../actions/player';
+import * as displayActions from '../actions/display';
 
 import { initializeWallet } from './initialization';
 import { fundingSaga } from './funding';
@@ -92,6 +93,7 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
         break;
 
       case actions.FUNDING_REQUEST:
+
         walletEngine.setup(action);
         // Save the initial state
         yield put(stateActions.stateChanged(walletEngine.state));
@@ -178,6 +180,7 @@ function* handleValidationRequest(
 }
 
 function* handleFundingRequest(wallet: ChannelWallet, walletEngine: WalletEngine) {
+  yield put(displayActions.showWallet());
   let success;
   if (walletEngine.opponentAddress === AUTO_OPPONENT_ADDRESS) {
     success = true;
@@ -190,6 +193,7 @@ function* handleFundingRequest(wallet: ChannelWallet, walletEngine: WalletEngine
   } else {
     yield put(actions.fundingFailure(wallet.channelId, 'Something went wrong'));
   }
+  yield put(displayActions.hideWallet());
   return true;
 }
 

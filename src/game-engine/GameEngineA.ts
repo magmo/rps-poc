@@ -63,20 +63,6 @@ export default class GameEngineA {
     }
   }
 
-  fundingConfirmed() {
-    if (!(this.state instanceof State.WaitForFunding)) { return this.state; }
-
-    const { channel, stake, balances } = this.state;
-    const stateCount = 0;
-    const turnNum = 2;
-    const newPosition = new PostFundSetupA(channel, turnNum, balances, stateCount, stake);
-    return this.transitionTo(
-      new State.WaitForPostFundSetup({
-        position: newPosition,
-      })
-    );
-  }
-
   choosePlay(aPlay: Play) {
     if (!(this.state instanceof State.ChoosePlay)) { return this.state; }
 
@@ -140,8 +126,14 @@ export default class GameEngineA {
   receivedPreFundSetup(position: PreFundSetupB) {
     if (!(this.state instanceof State.WaitForPreFundSetup)) { return this.state; }
 
+    const { channel, stake, balances } = this.state;
+    const stateCount = 0;
+    const turnNum = 2;
+    const newPosition = new PostFundSetupA(channel, turnNum, balances, stateCount, stake);
     return this.transitionTo(
-      new State.WaitForFunding({ position })
+      new State.WaitForPostFundSetup({
+        position: newPosition,
+      })
     );
   }
 
@@ -193,31 +185,7 @@ export default class GameEngineA {
     const { stake, balances } = state;
     return stake.gt(balances[0]) || stake.gt(balances[1]);
   }
-  challenge() {
-    if (!(this.state instanceof State.WaitForAccept)) {
-      return this.state;
-    }
-    return this.transitionTo(new State.WaitForChallenge({ position: this.state.position }));
-  }
-  challengeReceived(expirationDate: number, position: Position) {
-    return this.transitionTo(new State.ChallengeReceived({ expirationDate, position }));
-  }
-  respondToChallenge(play:Play){
-    if (!(this.state instanceof State.ChallengeReceived)) { return this.state; }
-    const { balances, turnNum, stake, channel } = this.state;
-    const salt = 'salt'; // todo: make random
 
-    const newPosition = Propose.createWithPlayAndSalt(
-      channel,
-      turnNum + 1,
-      balances,
-      stake,
-      play,
-      salt,
-    );
-    return this.transitionTo(new State.ChallengeResponse({position:newPosition}));
-  }
-  
   receivedConclude(position: Conclude) {
     if (this.state instanceof State.Concluded) {
       return this.state;

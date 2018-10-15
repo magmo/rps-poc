@@ -13,8 +13,6 @@ import {
 } from '../../positions';
 
 export enum PlayerBStateType {
-  WAIT_FOR_CHALLENGE = 'PLAYER_B.WAIT_FOR_CHALLENGE',
-  WAIT_FOR_FUNDING = 'PLAYER_B.WAIT_FOR_FUNDING',
   WAIT_FOR_POST_FUND_SETUP = 'PLAYER_B.WAIT_FOR_POST_FUND_SETUP',
   WAIT_FOR_PROPOSE = 'PLAYER_B.WAIT_FOR_PROPOSE',
   CHOOSE_PLAY = 'PLAYER_B.CHOOSE_PLAY',
@@ -24,20 +22,10 @@ export enum PlayerBStateType {
   INSUFFICIENT_FUNDS = 'PLAYER_B.INSUFFICIENT_FUNDS',
   CONCLUDED = 'PLAYER_B.CONCLUDED',
   CONCLUDE_RECEIVED = 'PLAYER_B.CONCLUDE_RECEIVED',
-  CHALLENGE_RECEIVED='PLAYER_B.CHALLENGE_RECEIVED',
-  CHALLENGE_RESPONSE = 'PLAYER_B.CHALLENGE_RESPONSE',
 }
 
 class BasePlayerB<T extends Position> extends BaseState<T> {
   readonly player = Player.PlayerB;
-}
-
-export class WaitForFunding extends BasePlayerB<PreFundSetupB> {
-  readonly type = PlayerBStateType.WAIT_FOR_FUNDING;
-  readonly isReadyForFunding = false;
-  readonly isReadyToSend = false;
-
-  get stake() { return this.position.stake; }
 }
 
 export class WaitForPostFundSetup extends BasePlayerB<PreFundSetupB> {
@@ -69,10 +57,6 @@ export class WaitForReveal extends BasePlayerB<Accept> {
   get stake() { return this.position.stake; }
   get bPlay() { return this.position.bPlay; }
   get preCommit() { return this.position.preCommit; }
-}
-export class WaitForChallenge extends BasePlayerB<Resting>{
-  readonly type = PlayerBStateType.WAIT_FOR_CHALLENGE;
-  readonly isReadyToSend = false;
 }
 export class ViewResult extends BasePlayerB<Resting> {
   readonly type = PlayerBStateType.VIEW_RESULT;
@@ -108,25 +92,8 @@ export class Concluded extends BasePlayerB<Conclude> {
   readonly type = PlayerBStateType.CONCLUDED;
   readonly isReadyToSend = false;
 }
-export class ChallengeReceived extends BasePlayerB<Propose>{
-  readonly type = PlayerBStateType.CHALLENGE_RECEIVED;
-  get stake() { return this.position.stake; }
-  get preCommit() { return this.position.preCommit; }
-  expirationDate:number;
-  constructor({expirationDate, position}){
-    super({position});
-    this.expirationDate = expirationDate;
-  }
-}
-
-export class ChallengeResponse extends BasePlayerB<Accept>{
-  readonly type = PlayerBStateType.CHALLENGE_RESPONSE;
-}
-
 
 export type PlayerBState = (
-  WaitForChallenge
-  | WaitForFunding
   | WaitForPostFundSetup
   | ChoosePlay
   | WaitForPropose
@@ -136,6 +103,4 @@ export type PlayerBState = (
   | WaitForConclude
   | ConcludeReceived
   | Concluded
-  | ChallengeReceived
-  | ChallengeResponse
 );

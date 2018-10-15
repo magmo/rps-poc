@@ -1,6 +1,6 @@
 import { State } from 'fmg-core';
 import { ChallengeProof } from './ChallengeProof';
-import decode from 'src/wallet/domain/decode';
+import decode from './decode';
 
 export class ConclusionProof extends ChallengeProof {
 

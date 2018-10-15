@@ -47,11 +47,6 @@ export default function* gameSaga(gameEngine: GameEngine) {
       case gameActions.ABANDON_GAME:
         newState = gameEngine.conclude();
         break;
-      case walletActions.FUNDING_SUCCESS:
-        // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason
-        newState = gameEngine.fundingConfirmed();
-        // We've received funding so we need to update the game state again
-        break;
       default:
       // do nothing
     }
@@ -75,30 +70,18 @@ function* sendState(state) {
 
 function* processState(state) {
   switch (state.type) {
-    case PlayerAStateType.WAIT_FOR_FUNDING:
-    case PlayerBStateType.WAIT_FOR_FUNDING:
-      const { myAddress, opponentAddress, myBalance, opponentBalance } = state;
-      const playerIndex = (state.type === PlayerAStateType.WAIT_FOR_FUNDING) ? 0 : 1;
-      yield put(walletActions.fundingRequest(
-        state.channelId,
-        myAddress,
-        opponentAddress,
-        myBalance,
-        opponentBalance,
-        playerIndex,
- ));
+    case PlayerBStateType.WAIT_FOR_POST_FUND_SETUP:
+      // Send the state to player A and then proceed with funding
+      yield sendState(state);
+      yield requestFunding(state);
+      yield sendState(state);
+      break;
+    case PlayerAStateType.WAIT_FOR_POST_FUND_SETUP:
+      yield requestFunding(state);
       yield sendState(state);
       break;
     case PlayerAStateType.CHOOSE_PLAY:
     case PlayerBStateType.CHOOSE_PLAY:
-    case PlayerAStateType.WAIT_FOR_CHALLENGE:
-    case PlayerBStateType.WAIT_FOR_CHALLENGE:
-    case PlayerAStateType.CHALLENGE_RECEIVED:
-    case PlayerBStateType.CHALLENGE_RECEIVED:
-      break; // don't send anything if the next step is to ChoosePlay
-    case PlayerAStateType.CHALLENGE_RESPONSE:
-    case PlayerBStateType.CHALLENGE_RESPONSE:
-      yield put(walletActions.challengeResponseRequest(state.position.toHex()));
       break;
     case PlayerAStateType.CONCLUDED:
     case PlayerBStateType.CONCLUDED:
@@ -112,4 +95,18 @@ function* processState(state) {
       yield sendState(state);
   }
   yield put(gameActions.stateChanged(state));
+}
+
+function* requestFunding(state) {
+  const { myAddress, opponentAddress, myBalance, opponentBalance } = state;
+  const playerIndex = (state.type === PlayerAStateType.WAIT_FOR_POST_FUND_SETUP) ? 0 : 1;
+  yield put(walletActions.fundingRequest(
+    state.channelId,
+    myAddress,
+    opponentAddress,
+    myBalance,
+    opponentBalance,
+    playerIndex,
+  ));
+  yield take(walletActions.FUNDING_SUCCESS);
 }

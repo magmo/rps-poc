@@ -8,8 +8,8 @@ export default function* challengeSaga(challenge, myState: string) {
 
   const expirationTime = 100;
   if (userIsChallenger) {
-    yield put(challengeActions.showWaitingScreen(expirationTime));
+    yield put(challengeActions.setChallenge(expirationTime,[],userIsChallenger));
   } else {
-    yield put(challengeActions.showResponseScreen([ResponseOption.RespondWithMove], expirationTime));
+    yield put(challengeActions.setChallenge(expirationTime,[ResponseOption.RespondWithMove],userIsChallenger));
   }
 }

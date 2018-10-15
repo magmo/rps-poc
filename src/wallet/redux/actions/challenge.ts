@@ -1,31 +1,22 @@
-export const SHOW_WAITING_SCREEN = 'CHALLENGE.WAITING_SCREEN.SHOW';
-export const CLOSE_WAITING_SCREEN = 'CHALLENGE.WAITING_SCREEN.CLOSE';
+export const SET_CHALLENGE = 'CHALLENGE.SET_CHALLENGE';
+export const CLEAR_CHALLENGE = 'CHALLENGE.CLEAR_CHALLENGE';
 
-export const SHOW_RESPONSE_SCREEN = 'CHALLENGE.RESPONSE_SCREEN.SHOW';
-export const CLOSE_RESPONSE_SCREEN = 'CHALLENGE.RESPONSE_SCREEN.CLOSE';
-
-export const showWaitingScreen = (expirationTime) => ({
-  type: SHOW_WAITING_SCREEN as typeof SHOW_WAITING_SCREEN,
+export const setChallenge = (expirationTime, responseOptions:ResponseOption[],userIsChallenger:boolean) => ({
+  type: SET_CHALLENGE as typeof SET_CHALLENGE,
   expirationTime,
-});
-export const closeWaitingScreen = () => ({
-  type: CLOSE_WAITING_SCREEN as typeof CLOSE_WAITING_SCREEN,
-});
-
-export const showResponseScreen = (responseOptions: ResponseOption[], expirationTime) => ({
-  type: SHOW_RESPONSE_SCREEN as typeof SHOW_RESPONSE_SCREEN,
   responseOptions,
-  expirationTime,
-});
-export const closeResponseScreen = () => ({
-  type: CLOSE_RESPONSE_SCREEN as typeof CLOSE_RESPONSE_SCREEN,
+  userIsChallenger,
 });
 
-export type ShowWaitingScreen = ReturnType<typeof showWaitingScreen>;
-export type CloseWaitingScreen = ReturnType<typeof closeWaitingScreen>;
+export const clearChallenge = () => ({
+  type: CLEAR_CHALLENGE as typeof CLEAR_CHALLENGE,
+});
 
-export type ShowResponseScreen = ReturnType<typeof showResponseScreen>;
-export type CloseResponseScreen = ReturnType<typeof closeResponseScreen>;
+
+
+export type SetChallenge = ReturnType<typeof setChallenge>;
+export type ClearChallenge = ReturnType<typeof clearChallenge>;
+
 
 export enum ResponseOption {
   RespondWithMove,

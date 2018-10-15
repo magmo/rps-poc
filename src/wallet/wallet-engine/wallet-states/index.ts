@@ -50,6 +50,9 @@ export class Funded {
   }
 }
 
+export class FundingDeclined{
+}
+
 export class SelectWithdrawalAddress { }
 
 export class WaitForWithdrawal {
