@@ -1,7 +1,5 @@
 import BN from 'bn.js';
 
-import { ChallengeProof } from '../domain/ChallengeProof';
-
 import * as PlayerA from './wallet-states/PlayerA';
 import * as PlayerB from './wallet-states/PlayerB';
 import { PlayerIndex } from './wallet-states';
@@ -103,30 +101,6 @@ export default class WalletEngine {
   selectWithdrawalAddress(depositAddress:string): State {
     if (this.state instanceof CommonState.SelectWithdrawalAddress){
       return this.transitionTo(new CommonState.WaitForWithdrawal(depositAddress));
-    }
-
-    return this.state;
-  }
-
-  requestChallenge(challengeProof: ChallengeProof): State {
-    if (this.state instanceof CommonState.Funded) {
-      return this.transitionTo(new CommonState.ChallengeRequested(this.state.adjudicatorAddress, challengeProof));
-    }
-
-    return this.state;
-  }
-
-  createChallenge(challengeProof: ChallengeProof): State {
-    if (this.state instanceof CommonState.ChallengeRequested) {
-      return this.transitionTo(new CommonState.WaitForChallengeConcludeOrExpire(this.state.adjudicator, challengeProof));
-    }
-
-    return this.state;
-  }
-
-  concludeChallenge(): State {
-    if (this.state instanceof CommonState.WaitForChallengeConcludeOrExpire) {
-      return this.transitionTo(new CommonState.Funded(this.state.adjudicator));
     }
 
     return this.state;

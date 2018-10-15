@@ -23,6 +23,7 @@ import { Play } from '../game-engine/positions';
 
 interface GameProps {
   state: GameState;
+  challengePresent: boolean;
   choosePlay: (play: Play) => void;
   respondToChallenge: (play: Play) => void;
   abandonGame: () => void;
@@ -33,13 +34,16 @@ interface GameProps {
 function GameContainer(props: GameProps) {
   const { state, choosePlay, playAgain, abandonGame, challengeOnChain, respondToChallenge } = props;
 
+  if (props.challengePresent) {
+    return <WalletController/>;
+  }
+
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
-
     case playerA.WAIT_FOR_FUNDING:
     case playerA.WAIT_FOR_CHALLENGE:
-      return <WalletController />;
+      return <WalletController/>;
 
     case playerA.WAIT_FOR_POST_FUND_SETUP:
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
@@ -127,6 +131,7 @@ function GameContainer(props: GameProps) {
 
 const mapStateToProps = (state: SiteState) => ({
   state: state.app.gameState as GameState,
+  challengePresent: state.wallet.challenge,
 });
 
 const mapDispatchToProps = {

@@ -19,29 +19,7 @@ import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { ChallengeProof } from '../../domain/ChallengeProof';
 import { Signature } from 'src/wallet/domain/Signature';
-
-function* blockchainEventListener(wallet: ChannelWallet) {
-  const channel = yield actionChannel([blockchainActions.CHALLENGECONCLUDED_EVENT, blockchainActions.CHALLENGECREATED_EVENT]);
-
-  const action = yield take(channel);
-  const myQuery = firebase.database().ref(
-    `wallets/${wallet.id}/channels/${wallet.channelId}/sent`
-  );
-  const myMove = yield call([myQuery, myQuery.once], 'value');
-  const { state: myState } = myMove.val();
-  if (action.state.toUpperCase() !== myState.toUpperCase()) {
-    switch (action.type) {
-
-      case blockchainActions.CHALLENGECREATED_EVENT:
-        yield put(actions.challengeDetected(action.expirationTime.toNumber() * 1000));
-
-        break;
-      case blockchainActions.CHALLENGECONCLUDED_EVENT:
-        yield put(actions.challengeConcluded(action.challengeState));
-        break;
-    }
-  }
-}
+import challengeSaga from './challenge';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
@@ -140,19 +118,8 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
 function* handleChallengeRequest(wallet: ChannelWallet, walletEngine: WalletEngine) {
   const challengeProof = yield loadChallengeProof(wallet, wallet.channelId);
 
-  walletEngine.requestChallenge(challengeProof);
-  yield put (stateActions.stateChanged(walletEngine.state));
-
-  yield put (stateActions.stateChanged(walletEngine.state));
   yield put(blockchainActions.forceMove(challengeProof));
-  const { createdChallengeProof } = yield take(blockchainActions.CHALLENGECREATED_EVENT);
-
-  walletEngine.createChallenge(createdChallengeProof);
-  yield put (stateActions.stateChanged(walletEngine.state));
-
-  yield take(actions.CHALLENGE_CONCLUDED);
-  walletEngine.concludeChallenge();
-  yield put (stateActions.stateChanged(walletEngine.state));
+  // const { createdChallengeProof } = yield take(blockchainActions.CHALLENGECREATED_EVENT);
 }
 
 function* handleChallengeResponse(wallet: ChannelWallet, walletEngine: WalletEngine, positionData: string) {
@@ -165,9 +132,6 @@ function* handleChallengeResponse(wallet: ChannelWallet, walletEngine: WalletEng
     blockchainActions.CHALLENGECONCLUDED_EVENT,
     blockchainActions.RESPONDWITHMOVE_FAILURE,
   ]);
-
-  walletEngine.concludeChallenge();
-  yield put (stateActions.stateChanged(walletEngine.state));
 }
 
 function* handleSignatureRequest(
@@ -206,7 +170,7 @@ function* handleValidationRequest(
   // that the player has received.
   // So, we need to read the channel off of the decoded data, rather than the wallet.
   const state = decode(data);
-  if (state.channel.participants[opponentIndex] !== address) {
+  if (state.channel.participants[opponentIndex].toLowerCase() !== address.toLowerCase()) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
 
@@ -269,6 +233,27 @@ export function* handleWithdrawalRequest(
   }
 
   return true;
+}
+
+function* blockchainEventListener(wallet: ChannelWallet) {
+  const channel = yield actionChannel([blockchainActions.CHALLENGECONCLUDED_EVENT, blockchainActions.CHALLENGECREATED_EVENT]);
+
+  const action = yield take(channel);
+  const myQuery = firebase.database().ref(
+    `wallets/${wallet.id}/channels/${wallet.channelId}/sent`
+  );
+  const myMove = yield call([myQuery, myQuery.once], 'value');
+  const { state: myState } = myMove.val();
+
+  switch (action.type) {
+    case blockchainActions.CHALLENGECREATED_EVENT:
+      const challengeHandler = yield fork(challengeSaga, action, myState);
+
+      break;
+    case blockchainActions.CHALLENGECONCLUDED_EVENT:
+      yield cancel(challengeHandler);
+      break;
+  }
 }
 
 function* loadConclusionProof(

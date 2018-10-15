@@ -27,9 +27,6 @@ export default function* gameSaga(gameEngine: GameEngine) {
     gameActions.ABANDON_GAME,
     walletActions.FUNDING_SUCCESS,
     walletActions.FUNDING_FAILURE,
-    walletActions.CREATE_CHALLENGE_REQUEST,
-    walletActions.CHALLENGE_DETECTED,
-    gameActions.CHALLENGE_RESPONSE,
   ]);
 
   while (true) {
@@ -49,15 +46,6 @@ export default function* gameSaga(gameEngine: GameEngine) {
         break;
       case gameActions.ABANDON_GAME:
         newState = gameEngine.conclude();
-        break;
-      case walletActions.CREATE_CHALLENGE_REQUEST:
-        newState = gameEngine.challenge();
-        break;
-      case walletActions.CHALLENGE_DETECTED:
-        newState = gameEngine.challengeReceived(action.expirationDate, oldState.position);
-        break;
-      case gameActions.CHALLENGE_RESPONSE:
-        newState = gameEngine.respondToChallenge(action.play);
         break;
       case walletActions.FUNDING_SUCCESS:
         // TODO: We'll need the gameEngine to handle what happens if the funding fails for some reason

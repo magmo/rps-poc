@@ -41,7 +41,7 @@ function* sendMessagesSaga() {
     if (to === AUTO_OPPONENT_ADDRESS) {
       yield put(autoOpponentActions.messageFromApp(data));
     } else {
-      yield call(reduxSagaFirebase.database.create, `/messages/${to}`, message);
+      yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
     }
     yield put(messageActions.messageSent());
   }
@@ -50,7 +50,7 @@ function* sendMessagesSaga() {
 function* receiveFromFirebaseSaga(address: string) {
   const channel = yield call(
     reduxSagaFirebase.database.channel,
-    `/messages/${address}`,
+    `/messages/${address.toLowerCase()}`,
     'child_added',
     buffers.fixed(10),
   );
