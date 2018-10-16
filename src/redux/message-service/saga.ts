@@ -46,9 +46,10 @@ function* sendMessagesSaga() {
 }
 
 function* receiveFromFirebaseSaga(address: string) {
+  address = address.toLowerCase();
   const channel = yield call(
     reduxSagaFirebase.database.channel,
-    `/messages/${address.toLowerCase()}`,
+    `/messages/${address}`,
     'child_added',
     buffers.fixed(10),
   );
