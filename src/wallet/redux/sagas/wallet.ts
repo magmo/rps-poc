@@ -2,7 +2,7 @@ import { actionChannel, take, put, fork, call, cancel, } from 'redux-saga/effect
 import { State, SolidityType, decodeSignature } from 'fmg-core';
 
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
-import { default as firebase, reduxSagaFirebase, serverTimestamp } from '../../../gateways/firebase';
+import { default as firebase } from '../../../gateways/firebase';
 
 import ChannelWallet, { SignableData } from '../../domain/ChannelWallet';
 import { ConclusionProof } from '../../domain/ConclusionProof';
@@ -19,15 +19,15 @@ import { initializeWallet } from './initialization';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { ChallengeProof } from '../../domain/ChallengeProof';
-import { Signature } from 'src/wallet/domain/Signature';
 import challengeSaga from './challenge';
+import { messageListenerSaga } from './messaging';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
   const walletEngine = new WalletEngine();
 
   yield put(actions.initializationSuccess(wallet.address));
-
+  yield fork(messageListenerSaga,wallet);
   yield fork(handleRequests, wallet, walletEngine);
 }
 
@@ -41,7 +41,6 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
     actions.WITHDRAWAL_REQUEST,
     actions.OPEN_CHANNEL_REQUEST,
     actions.CLOSE_CHANNEL_REQUEST,
-    actions.STORE_MESSAGE_REQUEST,
     actions.CREATE_CHALLENGE_REQUEST,
     actions.CHALLENGE_RESPONSE_REQUEST,
   ]);
@@ -72,16 +71,6 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
       case actions.SIGNATURE_REQUEST:
         yield handleSignatureRequest(wallet, action.requestId, action.data);
         break;
-
-      case actions.STORE_MESSAGE_REQUEST:
-        yield handleStoreMessageRequest(
-          wallet,
-          action.positionData,
-          action.signature,
-          action.direction,
-        );
-        break;
-
       case actions.VALIDATION_REQUEST:
         yield handleValidationRequest(
           wallet,
@@ -106,9 +95,6 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
       case actions.CREATE_CHALLENGE_REQUEST:
         yield handleChallengeRequest(wallet, walletEngine);
         break;
-      case actions.CHALLENGE_RESPONSE_REQUEST:
-        yield handleChallengeResponse(wallet, walletEngine, action.positionData);
-        break;
       default:
         // @ts-ignore
         const _exhaustiveCheck: never = action;
@@ -123,18 +109,6 @@ function* handleChallengeRequest(wallet: ChannelWallet, walletEngine: WalletEngi
   // const { createdChallengeProof } = yield take(blockchainActions.CHALLENGECREATED_EVENT);
 }
 
-function* handleChallengeResponse(wallet: ChannelWallet, walletEngine: WalletEngine, positionData: string) {
-  const signature = new Signature(wallet.sign(positionData));
-  // We store the latest message manually as it won't be sent as a message 
-  // and stored automatically.
-  yield handleStoreMessageRequest(wallet, positionData, signature.signature, "sent");
-  yield put(blockchainActions.respondWithMoveRequest(positionData, signature));
-  yield take([
-    blockchainActions.CHALLENGECONCLUDED_EVENT,
-    blockchainActions.RESPONDWITHMOVE_FAILURE,
-  ]);
-}
-
 function* handleSignatureRequest(
   wallet: ChannelWallet,
   requestId: string,
@@ -143,20 +117,6 @@ function* handleSignatureRequest(
   // TODO: Validate transition
   const signature: string = wallet.sign(data);
   yield put(actions.signatureSuccess(requestId, signature));
-}
-
-function* handleStoreMessageRequest(
-  wallet: ChannelWallet,
-  positionData: string,
-  signature: string,
-  direction: "sent" | "received"
-) {
-  const channelId = decode(positionData).channel.id;
-  yield call(
-    reduxSagaFirebase.database.update,
-    `wallets/${wallet.id}/channels/${channelId}/${direction}`,
-    { state: positionData, signature, updatedAt: serverTimestamp }
-  );
 }
 
 function* handleValidationRequest(
@@ -248,7 +208,7 @@ function* blockchainEventListener(wallet: ChannelWallet) {
       const { position: theirPosition} = yield loadPosition(wallet, channelId, 'received');
       const { position: myPosition} = yield loadPosition(wallet, channelId, 'sent');
     yield put(displayActions.showWallet());
-      const challengeHandler = yield fork(challengeSaga,wallet, action, theirPosition, myPosition);
+      const challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
 
       break;
     case blockchainActions.CHALLENGECONCLUDED_EVENT:

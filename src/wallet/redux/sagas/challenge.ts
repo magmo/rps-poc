@@ -7,11 +7,10 @@ import * as blockchainActions from '../actions/blockchain';
 
 import decode from "../../domain/decode";
 import { Refute, ChallengeResponse, RespondWithMove, RespondWithAlternativeMove, RespondWithExistingMove } from "../../domain/ChallengeResponse";
-import ChannelWallet from "src/wallet/domain/ChannelWallet";
 import { Signature } from "src/wallet/domain/Signature";
 import { ChallengeStatus } from '../actions/challenge';
 
-export default function* challengeSaga(wallet: ChannelWallet, challenge, theirPositionString: string, myPositionString: string) {
+export default function* challengeSaga(challenge, theirPositionString: string, myPositionString: string) {
   const { expirationTime } = challenge;
   const myPosition = decode(myPositionString);
   const theirPosition = decode(theirPositionString);
@@ -44,12 +43,11 @@ export default function* challengeSaga(wallet: ChannelWallet, challenge, theirPo
     switch (action.type) {
       case challengeActions.SELECT_MOVE_RESPONSE:
         yield put(displayActions.hideWallet());
-        // TODO: We want to refactor this so the app is simply letting the wallet know a message is sent.
-        const storeMessageAction: externalActions.StoreMessageRequest = yield take(externalActions.STORE_MESSAGE_REQUEST);
+        const messageSentAction: externalActions.MessageSent = yield take(externalActions.MESSAGE_SENT);
         yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForBlockchain));
         yield put(displayActions.showWallet());
-        const signature = new Signature(wallet.sign(storeMessageAction.positionData));
-        yield put(blockchainActions.respondWithMoveRequest(storeMessageAction.positionData, signature));
+        const signature = new Signature(messageSentAction.signature);
+        yield put(blockchainActions.respondWithMoveRequest(messageSentAction.positionData, signature));
         yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
         yield put(displayActions.hideWallet());
         break;

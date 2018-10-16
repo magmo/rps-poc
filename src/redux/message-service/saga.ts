@@ -13,10 +13,7 @@ export enum Queue {
   GAME_ENGINE = 'GAME_ENGINE',
 }
 
-enum Direction {
-  Sent = "sent",
-  Received = "received",
-}
+
 
 function* sendMessagesSaga() {
   const channel = yield actionChannel([messageActions.SEND_MESSAGE, walletActions.SEND_MESSAGE]);
@@ -31,6 +28,7 @@ function* sendMessagesSaga() {
       queue = Queue.GAME_ENGINE;
       const signature = yield signMessage(data);
       message = { data, queue, signature };
+      yield put(walletActions.messageSent(data,signature));
     } else {
       queue = Queue.WALLET;
       message = { data, queue };
@@ -66,6 +64,7 @@ function* receiveFromFirebaseSaga(address: string) {
       if (!validMessage) {
         // TODO: Handle this
       }
+      yield put(walletActions.messageReceived(data,signature));
       yield put(messageActions.messageReceived(data));
     } else {
       yield put(walletActions.receiveMessage(data));
@@ -83,7 +82,6 @@ function* validateMessage(data, signature) {
     action = yield take(actionFilter);
   }
   if (action.type === walletActions.VALIDATION_SUCCESS) {
-    yield put(walletActions.storeMessageRequest(data, signature, Direction.Received));
     return true;
   } else {
     // TODO: Properly handle this.
@@ -101,8 +99,6 @@ function* signMessage(data) {
   while (signatureResponse.requestId !== requestId) {
     signatureResponse = yield take(actionFilter);
   }
-
-  yield put(walletActions.storeMessageRequest(data, signatureResponse.signature, Direction.Sent));
   return signatureResponse.signature;
 }
 
