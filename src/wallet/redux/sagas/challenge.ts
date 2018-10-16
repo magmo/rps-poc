@@ -61,6 +61,9 @@ export default function* challengeSaga(wallet: ChannelWallet, challenge, theirPo
 }
 
 function* selectMove(wallet: ChannelWallet) {
+  // Hide the wallet to allow the user to select a move in the app
+  yield put(displayActions.hideWallet());
+
   // TODO: We want to refactor this so the app is simply letting the wallet know a message is sent.
   const storeMessageAction: externalActions.StoreMessageRequest = yield take(externalActions.STORE_MESSAGE_REQUEST);
   yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForBlockchain));
