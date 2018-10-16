@@ -62,9 +62,9 @@ function* selectMove() {
   // Hide the wallet to allow the user to select a move in the app
   yield put(displayActions.hideWallet());
 
-  // TODO: We want to refactor this so the app is simply letting the wallet know a message is sent.
   const messageSentAction: externalActions.MessageSent = yield take(externalActions.MESSAGE_SENT);
-yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
+  yield put(displayActions.showWallet());
+  yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
 
   const signature = new Signature(messageSentAction.signature);
   yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));

@@ -72,7 +72,7 @@ function GameContainer(props: GameProps) {
       // todo: add into the logic about who it was that ran out of funds
       // Also todo: replace with new component (WaitingStep is just a filler)
       return (
-        <WaitingStep message="About to conclude the game – either you or your opponent has run out of funds!" />
+        <WaitingStep challengeOnChain={challengeOnChain} message="About to conclude the game – either you or your opponent has run out of funds!" />
       );
 
     case playerA.WAIT_FOR_CONCLUDE:
@@ -86,7 +86,7 @@ function GameContainer(props: GameProps) {
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
     case playerB.WAIT_FOR_PROPOSE:
-      return <WaitingStep message="Waiting for your opponent to choose their move" />;
+      return <WaitingStep challengeOnChain={challengeOnChain} message="Waiting for your opponent to choose their move" />;
 
     case playerB.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;

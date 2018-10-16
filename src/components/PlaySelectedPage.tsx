@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Play } from '../game-engine/positions';
 import MoveIcon from './MoveIcon';
-import Button from './Button';
+import Button from 'reactstrap/lib/Button';
 
 interface Props {
   message: string;
