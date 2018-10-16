@@ -8,9 +8,17 @@ import { actions as walletActions } from '../../wallet';
 import { AUTO_OPPONENT_ADDRESS } from '../../constants';
 import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
+import * as challengeActions from '../../wallet/redux/actions/challenge';
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
+}
+
+export default function* messageSaga(address: string) {
+  yield fork(sendMessagesSaga);
+  yield fork(receiveFromFirebaseSaga, address);
+  yield fork(receiveFromWalletSaga);
+  yield fork(receiveFromAutoOpponentSaga);
 }
 
 enum Direction {
@@ -74,6 +82,13 @@ function* receiveFromFirebaseSaga(address: string) {
   }
 }
 
+function* receiveFromWalletSaga() {
+  while (true) {
+    const { position } = yield take(challengeActions.SEND_CHALLENGE_POSITION);
+    yield put(messageActions.messageReceived(position));
+  }
+}
+
 function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
   yield put(walletActions.validationRequest(requestId, data, signature));
@@ -113,10 +128,4 @@ function* receiveFromAutoOpponentSaga() {
     const action: autoOpponentActions.MessageToApp = yield take(channel);
     yield put(messageActions.messageReceived(action.data));
   }
-}
-
-export default function* messageSaga(address: string) {
-  yield fork(sendMessagesSaga);
-  yield fork(receiveFromFirebaseSaga, address);
-  yield fork(receiveFromAutoOpponentSaga);
 }

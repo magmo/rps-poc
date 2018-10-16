@@ -19,7 +19,7 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
     responseOptions.push(new RespondWithMove({ response: myPosition }));
   }
   if (theirPosition.equals(challengePosition) && theirPosition.turnNum > myPosition.turnNum) {
-    // TODO: make sure we sent the move to the app
+    yield put(challengeActions.sendChallengePosition(challenge.state));
     responseOptions.push(new RespondWithMove({}));
   }
   if (!theirPosition.equals(challengePosition) && theirPosition.turnNum === challengePosition.turnNum) {
