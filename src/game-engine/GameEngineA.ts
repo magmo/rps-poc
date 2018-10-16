@@ -190,6 +190,7 @@ export default class GameEngineA {
     if (this.state instanceof State.Concluded) {
       return this.state;
     }
+
     if (this.state instanceof State.WaitForConclude) {
       return this.transitionTo(new State.Concluded({
         position: this.state.position,

@@ -88,7 +88,6 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
           action.requestId,
           action.data,
           action.signature,
-          action.opponentIndex,
         );
         break;
 
@@ -165,14 +164,13 @@ function* handleValidationRequest(
   requestId,
   data: SignableData,
   signature: string,
-  opponentIndex,
 ) {
   const address = wallet.recover(data, signature);
   // The wallet should also have the channel, except when the data is the first message
   // that the player has received.
   // So, we need to read the channel off of the decoded data, rather than the wallet.
   const state = decode(data);
-  if (state.channel.participants[opponentIndex].toLowerCase() !== address.toLowerCase()) {
+  if (state.mover.toLowerCase() !== address.toLowerCase()) {
     yield put(actions.validationFailure(requestId, 'INVALID SIGNATURE'));
   }
 
@@ -221,7 +219,7 @@ export function* handleWithdrawalRequest(
 
   const { v, r, s } = decodeSignature(wallet.sign(data));
 
-  const proof = yield call(loadConclusionProof, wallet, position);
+  const proof = yield call(loadConclusionProof, wallet, position.channel.id);
 
   yield put(blockchainActions.withdrawRequest(proof, { playerAddress, channelId, destination, v, r, s }));
   const { transaction, reason: failureReason } = yield take([
@@ -243,15 +241,14 @@ function* blockchainEventListener(wallet: ChannelWallet) {
   const channel = yield actionChannel([blockchainActions.CHALLENGECONCLUDED_EVENT, blockchainActions.CHALLENGECREATED_EVENT]);
 
   const action = yield take(channel);
-  const myQuery = firebase.database().ref(
-    `wallets/${wallet.id}/channels/${wallet.channelId}/sent`
-  );
-  const myMove = yield call([myQuery, myQuery.once], 'value');
-  const { state: myState } = myMove.val();
 
   switch (action.type) {
     case blockchainActions.CHALLENGECREATED_EVENT:
-      const challengeHandler = yield fork(challengeSaga, action, myState);
+      const channelId = decode(action.state).channel.id;
+      const { position: theirPosition} = yield loadPosition(wallet, channelId, 'received');
+      const { position: myPosition} = yield loadPosition(wallet, channelId, 'sent');
+
+      const challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
 
       break;
     case blockchainActions.CHALLENGECONCLUDED_EVENT:
@@ -262,32 +259,24 @@ function* blockchainEventListener(wallet: ChannelWallet) {
 
 function* loadConclusionProof(
   wallet: ChannelWallet,
-  state: State
+  channelId: string,
 ) {
-  const yourQuery = firebase.database().ref(
-    `wallets/${wallet.id}/channels/${state.channel.id}/received`
-  );
-  const yourMove = yield call([yourQuery, yourQuery.once], 'value');
-  const { state: yourState, signature: yourSignature, updatedAt: yourUpdatedAt } = yourMove.val();
+  const { position: theirPosition, signature: theirSignature } = yield loadPosition(wallet, channelId, 'received');
+  const { position: myPosition, signature: mySignature } = yield loadPosition(wallet, channelId, 'sent');
 
-  const myQuery = firebase.database().ref(
-    `wallets/${wallet.id}/channels/${state.channel.id}/sent`
-  );
-  const myMove = yield call([myQuery, myQuery.once], 'value');
-  const { state: myState, signature: mySignature, updatedAt: myUpdatedAt } = myMove.val();
-  if (myUpdatedAt > yourUpdatedAt) {
+  if (decode(myPosition).turnNum > decode(theirPosition).turnNum) {
     return new ConclusionProof(
-      yourState,
-      myState,
-      yourSignature,
+      theirPosition,
+      myPosition,
+      theirSignature,
       mySignature,
     );
   } else {
     return new ConclusionProof(
-      myState,
-      yourState,
+      myPosition,
+      theirPosition,
       mySignature,
-      yourSignature,
+      theirSignature,
     );
   }
 }
@@ -296,22 +285,26 @@ function* loadChallengeProof(
   wallet: ChannelWallet,
   channelId: string
 ) {
-  const yourQuery = firebase.database().ref(
-    `wallets/${wallet.id}/channels/${channelId}/received`
-  );
-  const yourMove = yield call([yourQuery, yourQuery.once], 'value');
-  const { state: yourState, signature: yourSignature } = yourMove.val();
-
-  const myQuery = firebase.database().ref(
-    `wallets/${wallet.id}/channels/${channelId}/sent`
-  );
-  const myMove = yield call([myQuery, myQuery.once], 'value');
-  const { state: myState, signature: mySignature } = myMove.val();
+  const { position: theirPosition, signature: theirSignature } = yield loadPosition(wallet, channelId, 'received');
+  const { position: myPosition, signature: mySignature } = yield loadPosition(wallet, channelId, 'sent');
 
   return new ChallengeProof(
-    yourState,
-    myState,
-    yourSignature,
+    theirPosition,
+    myPosition,
+    theirSignature,
     mySignature,
   );
+}
+
+function* loadPosition(
+  wallet: ChannelWallet,
+  channelId: string,
+  direction: 'sent' | 'received',
+) {
+  const query = firebase.database().ref(
+    `wallets/${wallet.id}/channels/${channelId}/${direction}`
+  );
+  const move = yield call([query, query.once], 'value');
+  const { state: position, signature } = move.val();
+  return { position, signature };
 }
