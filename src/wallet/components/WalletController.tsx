@@ -1,19 +1,23 @@
+import React from 'react';
+import { PureComponent } from 'react';
+
+import { ChallengeStatus } from '../domain/ChallengeStatus';
 import * as playerA from '../wallet-engine/wallet-states/PlayerA';
 import * as playerB from '../wallet-engine/wallet-states/PlayerB';
+import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire } from '../wallet-engine/wallet-states';
 import { WalletState } from '../redux/reducers/wallet-state';
-import { PureComponent } from 'react';
+import { ChallengeState } from '../redux/reducers/challenge';
+
 import WalletLayout from './WalletLayout';
 import FundingInProgress from './FundingInProgress';
 import FundingError from './FundingError';
-import React from 'react';
 import ConfirmFunding from './ConfirmFunding';
-import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire } from '../wallet-engine/wallet-states';
 import WithdrawFunds from './WithdrawFunds';
-import { ChallengeState } from '../redux/reducers/challenge';
 import ChallengeIssued from './ChallengeIssued';
 import ChallengeResponse from './ChallengeResponse';
-import { ChallengeStatus } from '../redux/actions/challenge';
-import ChallengeWaiting from './ChallengeWaiting';
+import WaitingForCreateChallenge from './WaitingForCreateChallenge';
+import WaitingForConcludeChallenge from './WaitingForConcludeChallenge';
+
 interface Props {
   walletState: WalletState;
   challengeState: ChallengeState;
@@ -34,11 +38,15 @@ export default class WalletController extends PureComponent<Props> {
     if (challengeState !== null) {
       switch (challengeState.status){
         case ChallengeStatus.WaitingForUserSelection:
-        return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} selectMoveResponse={this.props.selectMoveResponse} />);
+          return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} selectMoveResponse={this.props.selectMoveResponse} />);
         case ChallengeStatus.WaitingOnOtherPlayer:
-        return (<ChallengeIssued expiryTime={challengeState.expirationTime}/>);
-        case ChallengeStatus.WaitingForBlockchain:
-        return <ChallengeWaiting />;
+          return (<ChallengeIssued expiryTime={challengeState.expirationTime}/>);
+        case ChallengeStatus.WaitingForCreateChallenge:
+          return <WaitingForCreateChallenge />;
+        case ChallengeStatus.WaitingForCreateChallenge:
+          return <WaitingForCreateChallenge />;
+        case ChallengeStatus.WaitingForConcludeChallenge:
+          return <WaitingForConcludeChallenge />;
       }
     }
 

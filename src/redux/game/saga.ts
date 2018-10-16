@@ -65,7 +65,6 @@ export default function* gameSaga(gameEngine: GameEngine) {
 
 function* sendState(state) {
   yield put(messageActions.sendMessage(state.opponentAddress, state.position.toHex()));
-
 }
 
 function* processState(state) {

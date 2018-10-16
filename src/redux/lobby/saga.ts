@@ -77,8 +77,6 @@ function* challengeSyncer() {
 // TODO: This should be moved somewhere else
 function* getLibraryAddress() {
   const selectedNetworkId = parseInt(yield cps(web3.version.getNetwork), 10);
-  // tslint:disable-next-line:no-console
-  console.log(RPSGameArtifact.networks[selectedNetworkId]);
   return RPSGameArtifact.networks[selectedNetworkId].address;
 }
 
