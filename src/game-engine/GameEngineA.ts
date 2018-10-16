@@ -141,7 +141,7 @@ export default class GameEngineA {
     if (!(this.state instanceof State.WaitForPreFundSetup)) { return this.state; }
 
     return this.transitionTo(
-      new State.WaitForFunding({ position })
+      new State.WaitForFunding({ position: this.state.position })
     );
   }
 
@@ -222,6 +222,7 @@ export default class GameEngineA {
     if (this.state instanceof State.Concluded) {
       return this.state;
     }
+
     if (this.state instanceof State.WaitForConclude) {
       return this.transitionTo(new State.Concluded({
         position: this.state.position,
