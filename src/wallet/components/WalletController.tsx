@@ -10,6 +10,10 @@ import ConfirmFunding from './ConfirmFunding';
 import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire } from '../wallet-engine/wallet-states';
 import WithdrawFunds from './WithdrawFunds';
 import { ChallengeState } from '../redux/reducers/challenge';
+import ChallengeIssued from './ChallengeIssued';
+import ChallengeResponse from './ChallengeResponse';
+import { ChallengeStatus } from '../redux/actions/challenge';
+import ChallengeWaiting from './ChallengeWaiting';
 interface Props {
   walletState: WalletState;
   challengeState: ChallengeState;
@@ -17,6 +21,7 @@ interface Props {
   approveFunding: () => void;
   declineFunding: () => void;
   selectWithdrawalAddress: (address: string) => void;
+  selectMoveResponse: ()=>void;
 }
 
 export default class WalletController extends PureComponent<Props> {
@@ -27,10 +32,13 @@ export default class WalletController extends PureComponent<Props> {
     }
 
     if (challengeState !== null) {
-      if (challengeState.responseOptions) {
-        return (<div> `Please respond to one of the ${challengeState.responseOptions.length} options.`</div>);
-      } else {
-        return (<div> 'Waiting for response'</div>);
+      switch (challengeState.status){
+        case ChallengeStatus.WaitingForUserSelection:
+        return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} selectMoveResponse={this.props.selectMoveResponse} />);
+        case ChallengeStatus.WaitingOnOtherPlayer:
+        return (<ChallengeIssued expiryTime={challengeState.expirationTime}/>);
+        case ChallengeStatus.WaitingForBlockchain:
+        return <ChallengeWaiting />;
       }
     }
 
