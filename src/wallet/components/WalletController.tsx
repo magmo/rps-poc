@@ -9,8 +9,10 @@ import React from 'react';
 import ConfirmFunding from './ConfirmFunding';
 import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire } from '../wallet-engine/wallet-states';
 import WithdrawFunds from './WithdrawFunds';
+import { ChallengeState } from '../redux/reducers/challenge-reducer';
 interface Props {
   walletState: WalletState;
+  challengeState: ChallengeState;
   tryFundingAgain: () => void;
   approveFunding: () => void;
   declineFunding: () => void;
@@ -19,9 +21,17 @@ interface Props {
 
 export default class WalletController extends PureComponent<Props> {
   renderWallet() {
-    const { walletState } = this.props;
+    const { walletState, challengeState } = this.props;
     if (walletState === null) {
       return null;
+    }
+
+    if (challengeState !== null) {
+      if (challengeState.responseOptions) {
+        return (<div> `Please respond to one of the ${challengeState.responseOptions.length} options.`</div>);
+      } else {
+        return (<div> 'Waiting for response'</div>);
+      }
     }
 
     switch (walletState && walletState.constructor) {
