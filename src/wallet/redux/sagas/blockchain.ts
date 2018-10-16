@@ -73,20 +73,22 @@ function* blockchainChallenge(simpleAdjudicator) {
     blockchainActions.RESPONDWITHMOVE_REQUEST,
     blockchainActions.FORCEMOVE_REQUEST,
   ]);
-  const action = yield take(channel);
+  while (true) {
+    const action = yield take(channel);
 
-  switch (action.type) {
-    case blockchainActions.FORCEMOVE_REQUEST:
-      const { fromState, toState, v, r, s } = action.challengeProof;
-      // TODO: handle errors
-      yield call(simpleAdjudicator.forceMove, fromState, toState, v, r, s);
-      break;
+    switch (action.type) {
+      case blockchainActions.FORCEMOVE_REQUEST:
+        const { fromState, toState, v, r, s } = action.challengeProof;
+        // TODO: handle errors
+        yield call(simpleAdjudicator.forceMove, fromState, toState, v, r, s);
+        break;
 
-    case blockchainActions.RESPONDWITHMOVE_REQUEST:
-      const { positionData, signature } = action;
-      // TODO: handle errors
-      yield call(simpleAdjudicator.respondWithMove, positionData, signature.v, signature.r, signature.s);
-      break;
+      case blockchainActions.RESPONDWITHMOVE_REQUEST:
+        const { positionData, signature } = action;
+        // TODO: handle errors
+        yield call(simpleAdjudicator.respondWithMove, positionData, signature.v, signature.r, signature.s);
+        break;
+    }
   }
 }
 
@@ -134,8 +136,8 @@ function* watchAdjudicator(deployedContract) {
     } else if (result.event === "ChallengeCreated") {
       yield put(blockchainActions.challengeCreatedEvent({ ...result.args }));
     } else if (
-      result.event === "RespondedWithMove" || 
-      result.event === "Refuted" || 
+      result.event === "RespondedWithMove" ||
+      result.event === "Refuted" ||
       result.event === "RespondedWithAlternativeMove"
     ) {
       yield put(blockchainActions.challengeConcludedEvent({ ...result.args }));

@@ -29,7 +29,7 @@ export function* walletSaga(uid: string): IterableIterator<any> {
   const walletEngine = new WalletEngine();
 
   yield put(actions.initializationSuccess(wallet.address));
-  yield fork(messageListenerSaga,wallet);
+  yield fork(messageListenerSaga, wallet);
   yield fork(handleRequests, wallet, walletEngine);
 }
 
@@ -202,21 +202,24 @@ export function* handleWithdrawalRequest(
 
 function* blockchainEventListener(wallet: ChannelWallet) {
   const channel = yield actionChannel([blockchainActions.CHALLENGECONCLUDED_EVENT, blockchainActions.CHALLENGECREATED_EVENT]);
+  while (true) {
+    const action = yield take(channel);
+    let challengeHandler = null;
+    switch (action.type) {
+      case blockchainActions.CHALLENGECREATED_EVENT:
+        const channelId = decode(action.state).channel.id;
+        const { position: theirPosition } = yield loadPosition(wallet, channelId, 'received');
+        const { position: myPosition } = yield loadPosition(wallet, channelId, 'sent');
 
-  const action = yield take(channel);
+        challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
 
-  switch (action.type) {
-    case blockchainActions.CHALLENGECREATED_EVENT:
-      const channelId = decode(action.state).channel.id;
-      const { position: theirPosition} = yield loadPosition(wallet, channelId, 'received');
-      const { position: myPosition} = yield loadPosition(wallet, channelId, 'sent');
-
-      const challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
-
-      break;
-    case blockchainActions.CHALLENGECONCLUDED_EVENT:
-      yield cancel(challengeHandler);
-      break;
+        break;
+      case blockchainActions.CHALLENGECONCLUDED_EVENT:
+        if (challengeHandler != null) {
+          yield cancel(challengeHandler);
+        }
+        break;
+    }
   }
 }
 
