@@ -14,20 +14,28 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
 
   const userIsChallenger = myPosition.mover.toLowerCase() === challengePosition.mover.toLowerCase();
 
-  if (theirPosition.equals(challengePosition) && theirPosition.turnNum < myPosition.turnNum) {
-    // We assume that you'd want to respond in the same way
-    responseOptions.push(new RespondWithMove({ response: myPosition }));
+  if (theirPosition.equals(challengePosition)) {
+    if (theirPosition.turnNum < myPosition.turnNum) {
+      // Assume the user would respond in the same way.
+      responseOptions.push(new RespondWithMove({ response: myPosition }));
+    } else {
+      responseOptions.push(new RespondWithMove({}));
+    }
   }
-  if (theirPosition.equals(challengePosition) && theirPosition.turnNum > myPosition.turnNum) {
-    yield put(challengeActions.sendChallengePosition(challenge.state));
-    responseOptions.push(new RespondWithMove({}));
+
+  if (!theirPosition.equals(challengePosition)) {
+    if (theirPosition.turnNum >= challengePosition.turnNum) {
+      responseOptions.push(new RespondWithAlternativeMove({ theirPosition, myPosition }));
+    }
+    if (theirPosition.turnNum > challengePosition.turnNum) {
+      responseOptions.push(new Refute({ theirPosition }));
+    }
+    if (challengePosition.turnNum > myPosition.turnNum) {
+      yield put(challengeActions.sendChallengePosition(challenge.state));
+      responseOptions.push(new RespondWithMove({}));
+    }
   }
-  if (!theirPosition.equals(challengePosition) && theirPosition.turnNum === challengePosition.turnNum) {
-    responseOptions.push(new RespondWithAlternativeMove({ theirPosition, myPosition }));
-  }
-  if (theirPosition.turnNum > challengePosition.turnNum) {
-    responseOptions.push(new Refute({ theirPosition }));
-  }
+
 
   yield put(challengeActions.setChallenge(expirationTime, responseOptions, userIsChallenger));
 }
