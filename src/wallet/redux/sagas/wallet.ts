@@ -118,7 +118,7 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
 
 function* handleChallengeRequest(wallet: ChannelWallet, walletEngine: WalletEngine) {
   const challengeProof = yield loadChallengeProof(wallet, wallet.channelId);
-
+  yield put(displayActions.showWallet());
   yield put(blockchainActions.forceMove(challengeProof));
   // const { createdChallengeProof } = yield take(blockchainActions.CHALLENGECREATED_EVENT);
 }
@@ -247,8 +247,8 @@ function* blockchainEventListener(wallet: ChannelWallet) {
       const channelId = decode(action.state).channel.id;
       const { position: theirPosition} = yield loadPosition(wallet, channelId, 'received');
       const { position: myPosition} = yield loadPosition(wallet, channelId, 'sent');
-
-      const challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
+    yield put(displayActions.showWallet());
+      const challengeHandler = yield fork(challengeSaga,wallet, action, theirPosition, myPosition);
 
       break;
     case blockchainActions.CHALLENGECONCLUDED_EVENT:

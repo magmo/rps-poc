@@ -1,9 +1,12 @@
 import { State as Position } from "fmg-core";
 import { ConclusionProof } from "./ConclusionProof";
 
-export type ChallengeResponse = RespondWithMove | RespondWithAlternativeMove | Refute | Conclude;
+export type ChallengeResponse = RespondWithMove | RespondWithExistingMove | RespondWithAlternativeMove | Refute | Conclude;
 
 export class RespondWithMove {
+}
+
+export class RespondWithExistingMove{
   response?: Position;
 
   constructor({ response }: { response?: Position }) {
