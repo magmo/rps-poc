@@ -46,6 +46,7 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
 
   if (userIsChallenger) {
     yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
+    yield put(challengeActions.clearChallenge());
     yield put(displayActions.hideWallet());
   } else {
     const action = yield take(challengeActions.SELECT_MOVE_RESPONSE);
@@ -71,6 +72,6 @@ function* selectMove() {
   yield put(blockchainActions.respondWithMoveRequest(messageSentAction.positionData, signature));
 
   yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
-  yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
+  yield put(challengeActions.clearChallenge());
   yield put(displayActions.hideWallet());
 }
