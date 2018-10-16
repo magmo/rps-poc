@@ -14,6 +14,7 @@ import * as blockchainActions from '../actions/blockchain';
 import * as stateActions from '../actions/state';
 import * as playerActions from '../actions/player';
 import * as displayActions from '../actions/display';
+import * as challengeActions from '../actions/challenge';
 
 import { initializeWallet } from './initialization';
 import { fundingSaga } from './funding';
@@ -21,6 +22,7 @@ import { blockchainSaga } from './blockchain';
 import { ChallengeProof } from '../../domain/ChallengeProof';
 import { Signature } from 'src/wallet/domain/Signature';
 import challengeSaga from './challenge';
+import { ChallengeStatus } from '../../domain/ChallengeStatus';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
   const wallet = (yield initializeWallet(uid)) as ChannelWallet;
@@ -117,10 +119,11 @@ function* handleRequests(wallet: ChannelWallet, walletEngine: WalletEngine) {
 }
 
 function* handleChallengeRequest(wallet: ChannelWallet, walletEngine: WalletEngine) {
-  const challengeProof = yield loadChallengeProof(wallet, wallet.channelId);
+  yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForCreateChallenge));
   yield put(displayActions.showWallet());
+
+  const challengeProof = yield loadChallengeProof(wallet, wallet.channelId);
   yield put(blockchainActions.forceMove(challengeProof));
-  // const { createdChallengeProof } = yield take(blockchainActions.CHALLENGECREATED_EVENT);
 }
 
 function* handleChallengeResponse(wallet: ChannelWallet, walletEngine: WalletEngine, positionData: string) {
@@ -247,7 +250,7 @@ function* blockchainEventListener(wallet: ChannelWallet) {
       const channelId = decode(action.state).channel.id;
       const { position: theirPosition} = yield loadPosition(wallet, channelId, 'received');
       const { position: myPosition} = yield loadPosition(wallet, channelId, 'sent');
-    yield put(displayActions.showWallet());
+
       const challengeHandler = yield fork(challengeSaga,wallet, action, theirPosition, myPosition);
 
       break;
