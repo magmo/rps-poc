@@ -5,8 +5,6 @@ import decode from "../../domain/decode";
 import { Refute, ChallengeResponse, RespondWithMove, RespondWithAlternativeMove } from "../../domain/ChallengeResponse";
 
 export default function* challengeSaga(challenge, theirPositionString: string, myPositionString: string) {
-  const userIsChallenger = myPositionString.toLowerCase() === challenge.state.toLowerCase();
-
   const expirationTime = 100;
   const responseOptions: ChallengeResponse[] = [];
 
@@ -14,20 +12,22 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
   const theirPosition = decode(theirPositionString);
   const challengePosition = decode(challenge.state);
 
-  if (theirPosition === challengePosition && theirPosition.turnNum < myPosition.turnNum) {
+  const userIsChallenger = myPosition.mover.toLowerCase() === challengePosition.mover.toLowerCase();
+
+  if (theirPosition.equals(challengePosition) && theirPosition.turnNum < myPosition.turnNum) {
     // We assume that you'd want to respond in the same way
     responseOptions.push(new RespondWithMove({ response: myPosition }));
   }
-  if (theirPosition === challengePosition && theirPosition.turnNum > myPosition.turnNum) {
+  if (theirPosition.equals(challengePosition) && theirPosition.turnNum > myPosition.turnNum) {
     // TODO: make sure we sent the move to the app
     responseOptions.push(new RespondWithMove({}));
   }
-  if (theirPosition.turnNum === challengePosition.turnNum && theirPosition !== challengePosition) {
+  if (!theirPosition.equals(challengePosition) && theirPosition.turnNum === challengePosition.turnNum) {
     responseOptions.push(new RespondWithAlternativeMove({ theirPosition, myPosition }));
   }
   if (theirPosition.turnNum > challengePosition.turnNum) {
     responseOptions.push(new Refute({ theirPosition }));
   }
 
-  yield put(challengeActions.setChallenge(expirationTime,[],userIsChallenger));
+  yield put(challengeActions.setChallenge(expirationTime, responseOptions, userIsChallenger));
 }
