@@ -241,9 +241,10 @@ function* blockchainEventListener(wallet: ChannelWallet) {
   switch (action.type) {
     case blockchainActions.CHALLENGECREATED_EVENT:
       const channelId = decode(action.state).channel.id;
+      const { position: theirPosition} = yield loadPosition(wallet, channelId, 'received');
       const { position: myPosition} = yield loadPosition(wallet, channelId, 'sent');
 
-      const challengeHandler = yield fork(challengeSaga, action, myPosition);
+      const challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
 
       break;
     case blockchainActions.CHALLENGECONCLUDED_EVENT:
