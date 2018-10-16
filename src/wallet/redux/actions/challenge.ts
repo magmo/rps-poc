@@ -1,3 +1,6 @@
+import { ChallengeResponse } from "../..//domain/ChallengeResponse";
+
+
 export const SET_CHALLENGE = 'CHALLENGE.SET_CHALLENGE';
 export const CLEAR_CHALLENGE = 'CHALLENGE.CLEAR_CHALLENGE';
 
