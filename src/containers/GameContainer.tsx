@@ -107,7 +107,7 @@ function RenderGame(props:GameProps){
         />
       );
 
-    case playerB.VIEW_RESULT:
+    case playerB.PLAY_AGAIN:
       return (
         <ResultPage
           message="Waiting for opponent to suggest a new game"

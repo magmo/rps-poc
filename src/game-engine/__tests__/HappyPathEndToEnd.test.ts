@@ -50,7 +50,7 @@ describe('game engine runthrough', () => {
     testStateType(bChoosePlay, PlayerBStateType.CHOOSE_PLAY);
     testStateType(bWaitForReveal, PlayerBStateType.WAIT_FOR_REVEAL);
     testStateType(aWaitForResting, PlayerAStateType.WAIT_FOR_RESTING);
-    testStateType(bViewResult, PlayerBStateType.VIEW_RESULT);
+    testStateType(bViewResult, PlayerBStateType.PLAY_AGAIN);
   });
 
   // turnNum

@@ -18,7 +18,7 @@ export enum PlayerBStateType {
   CHOOSE_PLAY = 'PLAYER_B.CHOOSE_PLAY',
   WAIT_FOR_REVEAL = 'PLAYER_B.WAIT_FOR_REVEAL',
   WAIT_FOR_CONCLUDE = 'PLAYER_B.WAIT_FOR_CONCLUDE',
-  VIEW_RESULT = 'PLAYER_B.VIEW_RESULT',
+  PLAY_AGAIN = 'PLAYER_B.PLAY_AGAIN',
   INSUFFICIENT_FUNDS = 'PLAYER_B.INSUFFICIENT_FUNDS',
   CONCLUDED = 'PLAYER_B.CONCLUDED',
   CONCLUDE_RECEIVED = 'PLAYER_B.CONCLUDE_RECEIVED',
@@ -59,7 +59,7 @@ export class WaitForReveal extends BasePlayerB<Accept> {
   get preCommit() { return this.position.preCommit; }
 }
 export class ViewResult extends BasePlayerB<Resting> {
-  readonly type = PlayerBStateType.VIEW_RESULT;
+  readonly type = PlayerBStateType.PLAY_AGAIN;
   readonly isReadyToSend = false;
   aPlay: Play;
   bPlay: Play;

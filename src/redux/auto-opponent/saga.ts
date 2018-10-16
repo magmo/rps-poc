@@ -40,7 +40,7 @@ export default function* autoOpponentSaga() {
       case StateType.WAIT_FOR_POST_FUND_SETUP:
         yield put(autoOpponentActions.messageToApp(state.position.toHex()));
         break;
-      case StateType.VIEW_RESULT:
+      case StateType.PLAY_AGAIN:
         yield put(autoOpponentActions.messageToApp(state.position.toHex()));
         gameEngine.playAgain();
         break;
