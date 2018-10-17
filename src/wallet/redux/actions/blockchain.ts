@@ -43,9 +43,22 @@ export const WITHDRAW_FAILURE = 'BLOCKCHAIN.WITHDRAW.FAILURE';
 export const FORCEMOVE_REQUEST = 'BLOCKCHAIN.CHALLENGE.FORCE_MOVE.REQUEST';
 export const FORCEMOVE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.FORCE_MOVE.SUCCESS';
 export const FORCEMOVE_FAILURE = 'BLOCKCHAIN.CHALLENGE.FORCE_MOVE.FAILURE';
+
 export const RESPONDWITHMOVE_REQUEST = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_MOVE.REQUEST';
 export const RESPONDWITHMOVE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_MOVE.SUCCESS';
 export const RESPONDWITHMOVE_FAILURE = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_MOVE.FAILURE';
+
+export const RESPONDWITHALTERNATIVEMOVE_REQUEST = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_ALTERNATIVE_MOVE.REQUEST';
+export const RESPONDWITHALTERNATIVEMOVE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_ALTERNATIVE_MOVE.SUCCESS';
+export const RESPONDWITHALTERNATIVEMOVE_FAILURE = 'BLOCKCHAIN.CHALLENGE.RESPOND_WITH_ALTERNATIVE_MOVE.FAILURE';
+
+export const REFUTE_REQUEST = 'BLOCKCHAIN.CHALLENGE.REFUTE.REQUEST';
+export const REFUTE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.REFUTE.SUCCESS';
+export const REFUTE_FAILURE = 'BLOCKCHAIN.CHALLENGE.REFUTE.FAILURE';
+
+export const CONCLUDE_REQUEST = 'BLOCKCHAIN.CHALLENGE.CONCLUDE.REQUEST';
+export const CONCLUDE_SUCCESS = 'BLOCKCHAIN.CHALLENGE.CONCLUDE.SUCCESS';
+export const CONCLUDE_FAILURE = 'BLOCKCHAIN.CHALLENGE.CONCLUDE.FAILURE';
 
 export const FUNDSRECEIVED_EVENT = 'BLOCKCHAIN.EVENT.FUNDSRECEIVED';
 export const GAMECONCLUDED_EVENT = 'BLOCKCHAIN.EVENT.GAMECONCLUDED';
@@ -81,6 +94,52 @@ export const respondWithMoveSuccess = ()=>({
 
 export const respondWithMoveFailure = (error)=>({
   type: RESPONDWITHMOVE_FAILURE as typeof RESPONDWITHMOVE_FAILURE,
+  error,
+});
+
+export const respondWithAlternativeMoveRequest= (alternativePosition: string, alternativeSignature: Signature, response: string, responseSignature: Signature) => ({
+  type: RESPONDWITHALTERNATIVEMOVE_REQUEST as typeof RESPONDWITHALTERNATIVEMOVE_REQUEST,
+  alternativePosition,
+  alternativeSignature,
+  response,
+  responseSignature,
+});
+
+export const respondWithAlternativeMoveSuccess = ()=>({
+  type: RESPONDWITHALTERNATIVEMOVE_SUCCESS as typeof RESPONDWITHALTERNATIVEMOVE_SUCCESS,
+});
+
+export const respondWithAlternativeMoveFailure = (error)=>({
+  type: RESPONDWITHALTERNATIVEMOVE_FAILURE as typeof RESPONDWITHALTERNATIVEMOVE_FAILURE,
+  error,
+});
+
+export const refuteRequest = (positionData:string, signature:Signature) => ({
+  type: REFUTE_REQUEST as typeof REFUTE_REQUEST,
+  positionData,
+  signature,
+});
+
+export const refuteSuccess = ()=>({
+  type: REFUTE_SUCCESS as typeof REFUTE_SUCCESS,
+});
+
+export const refuteFailure = (error)=>({
+  type: REFUTE_FAILURE as typeof REFUTE_FAILURE,
+  error,
+});
+
+export const concludeRequest = (proof: ConclusionProof) => ({
+  type: CONCLUDE_REQUEST as typeof CONCLUDE_REQUEST,
+  proof,
+});
+
+export const concludeSuccess = ()=>({
+  type: CONCLUDE_SUCCESS as typeof CONCLUDE_SUCCESS,
+});
+
+export const concludeFailure = (error)=>({
+  type: CONCLUDE_FAILURE as typeof CONCLUDE_FAILURE,
   error,
 });
 
