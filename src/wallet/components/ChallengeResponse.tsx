@@ -4,12 +4,12 @@ import { ChallengeResponse as ResponseOption, RespondWithMove, RespondWithAltern
 interface Props {
     responseOptions: ResponseOption[];
     expiryTime: number;
-    selectMoveResponse: ()=>void;
+    respondWithMove: ()=>void;
 }
 
 export default class ChallengeResponse extends React.PureComponent<Props> {
     render() {
-        const { responseOptions, expiryTime, selectMoveResponse } = this.props;
+        const { responseOptions, expiryTime, respondWithMove } = this.props;
         const parsedExpiryDate = new Date(expiryTime * 1000).toLocaleDateString();
         return (
             <div>
@@ -23,7 +23,7 @@ export default class ChallengeResponse extends React.PureComponent<Props> {
                 <div>
                     {responseOptions.map(option => {
                         if (option instanceof RespondWithMove) {
-                            return <Button onClick={selectMoveResponse} key={option.toString()} >Respond with Move</Button>;
+                            return <Button onClick={respondWithMove} key={option.toString()} >Respond with Move</Button>;
                         }
                         else if (option instanceof RespondWithAlternativeMove) {
                             return <Button key={option.toString()} >Respond with Alternative Move</Button>;

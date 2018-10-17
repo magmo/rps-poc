@@ -16,7 +16,7 @@ const mapDispatchToProps = {
   approveFunding: playerActions.approveFunding,
   declineFunding: playerActions.declineFunding,
   selectWithdrawalAddress: playerActions.selectWithdrawalAddress,
-  selectMoveResponse: challengeActions.selectMoveResponse,
+  respondWithMove: challengeActions.respondWithMove,
 };
 export default connect(
   mapStateToProps,

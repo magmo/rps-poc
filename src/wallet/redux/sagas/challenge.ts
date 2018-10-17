@@ -45,9 +45,9 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
   yield put(displayActions.showWallet());
 
   if (!userIsChallenger) {
-    const action = yield take(challengeActions.SELECT_MOVE_RESPONSE);
+    const action: challengeActions.ResponseAction = yield take(challengeActions.RESPONSE_ACTIONS);
     switch (action.type) {
-      case challengeActions.SELECT_MOVE_RESPONSE:
+      case challengeActions.RESPOND_WITH_MOVE:
         yield selectMove();
       default:
         break;

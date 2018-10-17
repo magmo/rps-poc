@@ -6,7 +6,12 @@ export const SET_CHALLENGE = 'CHALLENGE.SET_CHALLENGE';
 export const SEND_CHALLENGE_POSITION = 'CHALLENGE.POSITION.SEND';
 export const SET_CHALLENGE_STATUS = 'CHALLENGE.SET_CHALLENGE_STATUS';
 export const CLEAR_CHALLENGE = 'CHALLENGE.CLEAR_CHALLENGE';
-export const SELECT_MOVE_RESPONSE = "CHALLENGE.SELECT_MOVE_RESPONSE";
+
+export const RESPOND_WITH_MOVE = "CHALLENGE.RESPOND.RESPOND_WITH_MOVE";
+
+export const RESPONSE_ACTIONS = [
+  RESPOND_WITH_MOVE,
+];
 
 export const setChallenge = (expirationTime, responseOptions: ChallengeResponse[], status: ChallengeStatus, ) => ({
   type: SET_CHALLENGE as typeof SET_CHALLENGE,
@@ -28,18 +33,15 @@ export const clearChallenge = () => ({
   type: CLEAR_CHALLENGE as typeof CLEAR_CHALLENGE,
 });
 
-export const selectMoveResponse = () => ({
-  type: SELECT_MOVE_RESPONSE as typeof SELECT_MOVE_RESPONSE,
+export const respondWithMove = () => ({
+  type: RESPOND_WITH_MOVE as typeof RESPOND_WITH_MOVE,
 });
-
 
 
 export type SetChallenge = ReturnType<typeof setChallenge>;
 export type SendChallengePosition = ReturnType<typeof sendChallengePosition>;
 export type ClearChallenge = ReturnType<typeof clearChallenge>;
 export type SetChallengeStatus = ReturnType<typeof setChallengeStatus>;
-export type SelectMoveResponse = ReturnType<typeof selectMoveResponse>;
+export type RespondWithMove = ReturnType<typeof respondWithMove>;
 
-
-
-
+export type ResponseAction = RespondWithMove;

@@ -25,7 +25,7 @@ interface Props {
   approveFunding: () => void;
   declineFunding: () => void;
   selectWithdrawalAddress: (address: string) => void;
-  selectMoveResponse: ()=>void;
+  respondWithMove: ()=>void;
 }
 
 export default class WalletController extends PureComponent<Props> {
@@ -38,7 +38,7 @@ export default class WalletController extends PureComponent<Props> {
     if (challengeState !== null) {
       switch (challengeState.status){
         case ChallengeStatus.WaitingForUserSelection:
-          return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} selectMoveResponse={this.props.selectMoveResponse} />);
+          return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} />);
         case ChallengeStatus.WaitingOnOtherPlayer:
           return (<ChallengeIssued expiryTime={challengeState.expirationTime}/>);
         case ChallengeStatus.WaitingForCreateChallenge:
