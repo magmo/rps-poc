@@ -44,10 +44,7 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
   yield put(challengeActions.setChallenge(expirationTime, responseOptions, userIsChallenger ? ChallengeStatus.WaitingOnOtherPlayer : ChallengeStatus.WaitingForUserSelection));
   yield put(displayActions.showWallet());
 
-  if (userIsChallenger) {
-    yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
-    yield put(displayActions.hideWallet());
-  } else {
+  if (!userIsChallenger) {
     const action = yield take(challengeActions.SELECT_MOVE_RESPONSE);
     switch (action.type) {
       case challengeActions.SELECT_MOVE_RESPONSE:
@@ -56,6 +53,8 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
         break;
     }
   }
+
+  return true;
 }
 
 function* selectMove() {
@@ -63,14 +62,9 @@ function* selectMove() {
   yield put(displayActions.hideWallet());
 
   const messageSentAction: externalActions.MessageSent = yield take(externalActions.MESSAGE_SENT);
-  yield put(displayActions.showWallet());
   yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
+  yield put(displayActions.showWallet());
 
   const signature = new Signature(messageSentAction.signature);
-  yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
   yield put(blockchainActions.respondWithMoveRequest(messageSentAction.positionData, signature));
-
-  yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
-  yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
-  yield put(displayActions.hideWallet());
 }
