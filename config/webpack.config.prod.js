@@ -397,7 +397,7 @@ module.exports = {
     new webpack.NormalModuleReplacementPlugin(
       /.*\.sol/,
       function(resource) {
-        resource.request = resource.request.replace(/.*contracts/,paths.appContractArtifacts).replace('.sol','.json');
+        resource.request = resource.request.replace(/.*contracts/, paths.appContractArtifacts).replace('.sol', '.json');
       }),
       new webpack.EnvironmentPlugin({
         FIREBASE_PROJECT: 'rock-paper-scissors123',
