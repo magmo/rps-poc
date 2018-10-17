@@ -213,17 +213,7 @@ export type MessageReceived = ReturnType<typeof messageReceived>;
 // Challenge
 // =========
 export const CREATE_CHALLENGE_REQUEST = 'WALLET.CHALLENGE.CREATE';
-export const CHALLENGE_DETECTED = 'WALLET.CHALLENGE.DETECTED';
-export const CHALLENGE_CONCLUDED = 'WALLET.CHALLENGE.CONCLUDED';
 export const CHALLENGE_RESPONSE_REQUEST = 'WALLET.CHALLENGE.RESPONSE';
-export const challengeConcluded=(responseState)=>({
-  type: CHALLENGE_CONCLUDED as typeof CHALLENGE_CONCLUDED,
-  responseState,
-});
-export const challengeDetected = (expirationDate) => ({
-  type: CHALLENGE_DETECTED,
-  expirationDate,
-});
 
 export const createChallenge = () => ({
   type: CREATE_CHALLENGE_REQUEST as typeof CREATE_CHALLENGE_REQUEST,
@@ -235,7 +225,6 @@ export const challengeResponseRequest = (positionData: string) => ({
 });
 
 export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
-export type ChallengeDetected = ReturnType<typeof challengeDetected>;
 export type ChallengeResponseRequest = ReturnType<typeof challengeResponseRequest>;
 // Requests
 // ========
