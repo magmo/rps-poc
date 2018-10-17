@@ -27,7 +27,7 @@ require('babel-register'); // To handle es6 syntax in the tests
     },
     kovan: {
       provider: () => new HDWalletProvider(process.env.ETH_ACCOUNT_MNENOMIC, "https://kovan.infura.io/v3/" + process.env.INFURA_API_KEY),
-      network_id: 5,
+      network_id: 42,
       gas: process.env.DEFAULT_GAS,
       gasPrice: process.env.DEFAULT_GAS_PRICE,
     },
