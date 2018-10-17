@@ -26,7 +26,6 @@ interface GameProps {
   showWallet: boolean;
   showWalletHeader: boolean;
   choosePlay: (play: Play) => void;
-  respondToChallenge: (play: Play) => void;
   abandonGame: () => void;
   playAgain: () => void;
   challengeOnChain: () => void;
@@ -132,7 +131,6 @@ const mapDispatchToProps = {
   playAgain: gameActions.playAgain,
   abandonGame: gameActions.abandonGame,
   challengeOnChain: walletActions.createChallenge,
-  respondToChallenge: gameActions.respondToChallenge,
 };
 
 export default connect(
