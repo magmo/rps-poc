@@ -1,4 +1,4 @@
-import { actionChannel, take, put, fork, call, cancel, } from 'redux-saga/effects';
+import { actionChannel, take, put, fork, call, cancel, race, } from 'redux-saga/effects';
 import { State, SolidityType, decodeSignature } from 'fmg-core';
 
 import { AUTO_OPPONENT_ADDRESS } from '../../../constants';
@@ -201,25 +201,26 @@ export function* handleWithdrawalRequest(
 }
 
 function* blockchainEventListener(wallet: ChannelWallet) {
-  const channel = yield actionChannel([blockchainActions.CHALLENGECONCLUDED_EVENT, blockchainActions.CHALLENGECREATED_EVENT]);
   while (true) {
-    const action = yield take(channel);
-    let challengeHandler = null;
-    switch (action.type) {
-      case blockchainActions.CHALLENGECREATED_EVENT:
-        const channelId = decode(action.state).channel.id;
-        const { position: theirPosition } = yield loadPosition(wallet, channelId, 'received');
-        const { position: myPosition } = yield loadPosition(wallet, channelId, 'sent');
+    const action = yield take(blockchainActions.CHALLENGECREATED_EVENT);
+    const channelId = decode(action.state).channel.id;
+    const { position: theirPosition } = yield loadPosition(wallet, channelId, 'received');
+    const { position: myPosition } = yield loadPosition(wallet, channelId, 'sent');
 
-        challengeHandler = yield fork(challengeSaga, action, theirPosition, myPosition);
+    const { challengeHandler } = yield race({
+      challengeHandler: call(challengeSaga, action, theirPosition, myPosition),
+      conclusionAction: take(blockchainActions.CHALLENGECONCLUDED_EVENT),
+    });
 
-        break;
-      case blockchainActions.CHALLENGECONCLUDED_EVENT:
-        if (challengeHandler != null) {
-          yield cancel(challengeHandler);
-        }
-        break;
+    if (challengeHandler) {
+      // The challenge should have been handled, but has not yet
+      // been concluded by the blockchain, so we block until the transaction
+      // has succeeded
+      yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
     }
+
+    yield put(challengeActions.clearChallenge());
+    yield put(displayActions.hideWallet());
   }
 }
 
