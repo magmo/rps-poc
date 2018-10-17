@@ -7,7 +7,7 @@ import Button from 'reactstrap/lib/Button';
 interface Props {
   message: string;
   yourPlay: Play;
-  challengeOnChain: ()=>void;
+  createBlockchainChallenge: ()=>void;
 }
 
 export default class PlaySelectedPage extends React.PureComponent<Props> {
@@ -16,7 +16,7 @@ export default class PlaySelectedPage extends React.PureComponent<Props> {
   };
 
   render() {
-    const { message, yourPlay,challengeOnChain } = this.props;
+    const { message, yourPlay, createBlockchainChallenge } = this.props;
 
     return (
       <div className="container centered-container">
@@ -29,7 +29,7 @@ export default class PlaySelectedPage extends React.PureComponent<Props> {
           <div className="mb-5">
             <MoveIcon play={yourPlay} />`
           </div>
-          <Button onClick={challengeOnChain}>Challenge</Button>
+          <Button onClick={createBlockchainChallenge}>Challenge</Button>
           <p>{message}</p>
         </div>
       </div>

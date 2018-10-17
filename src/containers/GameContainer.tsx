@@ -28,7 +28,7 @@ interface GameProps {
   choosePlay: (play: Play) => void;
   abandonGame: () => void;
   playAgain: () => void;
-  challengeOnChain: () => void;
+  createBlockchainChallenge: () => void;
 }
 
 function GameContainer(props: GameProps) {
@@ -44,7 +44,7 @@ function GameContainer(props: GameProps) {
   
 }
 function RenderGame(props:GameProps){
-  const { state, choosePlay, playAgain, abandonGame, challengeOnChain } = props;
+  const { state, choosePlay, playAgain, abandonGame, createBlockchainChallenge } = props;
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
@@ -59,7 +59,7 @@ function RenderGame(props:GameProps){
         <PlaySelectedPage
           message="Waiting for your opponent to choose their move"
           yourPlay={state.aPlay}
-          challengeOnChain={challengeOnChain}
+          createBlockchainChallenge={createBlockchainChallenge}
         />
       );
 
@@ -80,7 +80,7 @@ function RenderGame(props:GameProps){
       // todo: add into the logic about who it was that ran out of funds
       // Also todo: replace with new component (WaitingStep is just a filler)
       return (
-        <WaitingStep challengeOnChain={challengeOnChain} message="About to conclude the game – either you or your opponent has run out of funds!" />
+        <WaitingStep createBlockchainChallenge={createBlockchainChallenge} message="About to conclude the game – either you or your opponent has run out of funds!" />
       );
 
     case playerA.WAIT_FOR_CONCLUDE:
@@ -94,7 +94,7 @@ function RenderGame(props:GameProps){
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
     case playerB.WAIT_FOR_PROPOSE:
-      return <WaitingStep challengeOnChain={challengeOnChain} message="Waiting for your opponent to choose their move" />;
+      return <WaitingStep createBlockchainChallenge={createBlockchainChallenge} message="Waiting for your opponent to choose their move" />;
 
     case playerB.CHOOSE_PLAY:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
@@ -103,7 +103,7 @@ function RenderGame(props:GameProps){
         <PlaySelectedPage
           message="Waiting for your opponent to choose their move"
           yourPlay={state.bPlay}
-          challengeOnChain={challengeOnChain}
+          createBlockchainChallenge={createBlockchainChallenge}
         />
       );
 
@@ -130,7 +130,7 @@ const mapDispatchToProps = {
   choosePlay: gameActions.choosePlay,
   playAgain: gameActions.playAgain,
   abandonGame: gameActions.abandonGame,
-  challengeOnChain: walletActions.createChallenge,
+  createBlockchainChallenge: walletActions.createChallenge,
 };
 
 export default connect(
