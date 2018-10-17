@@ -19,10 +19,12 @@ import { PlayerBStateType as playerB } from '../game-engine/application-states/P
 
 import { State as GameState } from '../game-engine/application-states';
 import { Play } from '../game-engine/positions';
+import WalletHeader from 'src/wallet/containers/WalletHeader';
 
 interface GameProps {
   state: GameState;
   showWallet: boolean;
+  showWalletHeader: boolean;
   choosePlay: (play: Play) => void;
   respondToChallenge: (play: Play) => void;
   abandonGame: () => void;
@@ -31,12 +33,19 @@ interface GameProps {
 }
 
 function GameContainer(props: GameProps) {
-  const { state, choosePlay, playAgain, abandonGame, challengeOnChain } = props;
 
   if (props.showWallet) {
     return <WalletController/>;
   }
-
+  else if (props.showWalletHeader){
+    return <WalletHeader>{RenderGame(props)}</WalletHeader>;
+  }else{
+    return RenderGame(props);
+  }
+  
+}
+function RenderGame(props:GameProps){
+  const { state, choosePlay, playAgain, abandonGame, challengeOnChain } = props;
   switch (state.type) {
     case playerA.WAIT_FOR_PRE_FUND_SETUP:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
@@ -112,10 +121,10 @@ function GameContainer(props: GameProps) {
       );
   }
 }
-
 const mapStateToProps = (state: SiteState) => ({
   state: state.app.gameState as GameState,
-  showWallet: state.wallet.showWallet,
+  showWallet: state.wallet.display.showWallet,
+  showWalletHeader: state.wallet.display.showHeader,
 });
 
 const mapDispatchToProps = {

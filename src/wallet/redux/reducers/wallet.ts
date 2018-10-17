@@ -1,17 +1,17 @@
 import { combineReducers } from 'redux';
 import { WalletState, walletStateReducer } from './wallet-state';
 import { ChallengeState, challengeReducer } from './challenge';
-import { displayReducer } from './display';
+import { displayReducer, DisplayState } from './display';
 
 export interface Wallet {
   walletState: WalletState;
   challenge: ChallengeState;
-  showWallet:boolean;
+  display: DisplayState;
   
 }
 
 export const walletReducer = combineReducers<Wallet>({
   walletState: walletStateReducer,
   challenge: challengeReducer,
-  showWallet:  displayReducer,
+  display:  displayReducer,
 });

@@ -46,8 +46,7 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
 
   if (userIsChallenger) {
     yield take(blockchainActions.CHALLENGECONCLUDED_EVENT);
-    yield put(challengeActions.clearChallenge());
-    yield put(displayActions.hideWallet());
+ 
   } else {
     const action = yield take(challengeActions.SELECT_MOVE_RESPONSE);
     switch (action.type) {
@@ -62,9 +61,11 @@ export default function* challengeSaga(challenge, theirPositionString: string, m
 function* selectMove() {
   // Hide the wallet to allow the user to select a move in the app
   yield put(displayActions.hideWallet());
+  yield put(displayActions.showHeader());
 
   const messageSentAction: externalActions.MessageSent = yield take(externalActions.MESSAGE_SENT);
   yield put(displayActions.showWallet());
+  yield put(displayActions.hideHeader());
   yield put(challengeActions.setChallengeStatus(ChallengeStatus.WaitingForConcludeChallenge));
 
   const signature = new Signature(messageSentAction.signature);
