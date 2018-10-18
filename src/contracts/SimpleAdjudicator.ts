@@ -4,10 +4,11 @@ import BN from 'bn.js';
 // @ts-ignore
 import simpleAdjudicatorArtifact from 'fmg-simple-adjudicator/contracts/SimpleAdjudicator.sol';
 
-import connectedWeb3 from '../wallet/web3';
+import { connectWeb3 } from '../wallet/web3';
 
 export async function deploySimpleAdjudicator({ channelId, amount }: { channelId: string, amount: BN }) {
-  const truffleContract = await setupContract();
+  const connectedWeb3 = connectWeb3();
+  const truffleContract = await setupContract(connectedWeb3);
 
   let contractBytecode;
   contractBytecode = truffleContract.bytecode;
@@ -34,7 +35,7 @@ export async function simpleAdjudicatorAt({ address, amount } : { address: strin
   return await truffleContract.at(address, { value: amount.toString() });
 }
 
-async function setupContract() {
+async function setupContract(connectedWeb3?) {
   const simpleAdjudicatorContract = contract(simpleAdjudicatorArtifact);
   simpleAdjudicatorContract.setProvider(connectedWeb3.currentProvider);
 
