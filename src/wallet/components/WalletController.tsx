@@ -1,10 +1,12 @@
 import React from 'react';
 import { PureComponent } from 'react';
 
-import { ChallengeStatus } from '../domain/ChallengeStatus';
+import { ChallengeStatus, Signature, ConclusionProof } from '../domain';
+
 import * as playerA from '../wallet-engine/wallet-states/PlayerA';
 import * as playerB from '../wallet-engine/wallet-states/PlayerB';
 import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire } from '../wallet-engine/wallet-states';
+
 import { WalletState } from '../redux/reducers/wallet-state';
 import { ChallengeState } from '../redux/reducers/challenge';
 
@@ -25,7 +27,10 @@ interface Props {
   approveFunding: () => void;
   declineFunding: () => void;
   selectWithdrawalAddress: (address: string) => void;
-  respondWithMove: ()=>void;
+  respondWithMove: () => void;
+  respondWithAlternativeMove: (alternativePosition: string, alternativeSignature: Signature, response: string, responseSignature: Signature) => void;
+  refute: (newerPosition: string, signature: Signature)=>void;
+  conclude: (proof: ConclusionProof)=>void;
 }
 
 export default class WalletController extends PureComponent<Props> {
@@ -38,7 +43,7 @@ export default class WalletController extends PureComponent<Props> {
     if (challengeState !== null) {
       switch (challengeState.status){
         case ChallengeStatus.WaitingForUserSelection:
-          return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} />);
+          return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} respondWithAlternativeMove={this.props.respondWithAlternativeMove} refute={this.props.refute} conclude={this.props.conclude} />);
         case ChallengeStatus.WaitingOnOtherPlayer:
           return (<ChallengeIssued expiryTime={challengeState.expirationTime}/>);
         case ChallengeStatus.WaitingForCreateChallenge:

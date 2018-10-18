@@ -17,7 +17,11 @@ const mapDispatchToProps = {
   declineFunding: playerActions.declineFunding,
   selectWithdrawalAddress: playerActions.selectWithdrawalAddress,
   respondWithMove: challengeActions.respondWithMove,
+  respondWithAlternativeMove: challengeActions.respondWithAlternativeMove,
+  refute: challengeActions.refute,
+  conclude: challengeActions.conclude,
 };
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps,

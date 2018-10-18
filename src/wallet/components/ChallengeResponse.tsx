@@ -1,15 +1,34 @@
 import React from 'react';
 import Button from 'reactstrap/lib/Button';
 import { ChallengeResponse as ResponseOption, RespondWithMove, RespondWithAlternativeMove, Refute, Conclude } from '../domain/ChallengeResponse';
+import { Signature, ConclusionProof } from '../domain';
 interface Props {
     responseOptions: ResponseOption[];
     expiryTime: number;
     respondWithMove: ()=>void;
+    respondWithAlternativeMove: (alternativePosition: string, alternativeSignature: Signature, response: string, responseSignature: Signature) => void;
+    refute: (newerPosition: string, signature: Signature)=>void;
+    conclude: (proof: ConclusionProof)=>void;
 }
 
 export default class ChallengeResponse extends React.PureComponent<Props> {
+    handleRespondWithMove() {
+        this.props.respondWithMove();
+    }
+    handleRespondWithAlternativeMove(option: RespondWithAlternativeMove) {
+        this.props.respondWithAlternativeMove(option.theirPosition.toHex(), option.theirSignature, option.myPosition.toHex(), option.mySignature);
+    }
+
+    handleRefute(option: Refute) {
+        this.props.refute(option.theirPosition.toHex(), option.theirSignature);
+    }
+
+    handleConclude(option: Conclude) {
+        this.props.conclude(option.conclusionProof);
+    }
+
     render() {
-        const { responseOptions, expiryTime, respondWithMove } = this.props;
+        const { responseOptions, expiryTime } = this.props;
         const parsedExpiryDate = new Date(expiryTime * 1000).toLocaleDateString();
         return (
             <div>
@@ -23,16 +42,16 @@ export default class ChallengeResponse extends React.PureComponent<Props> {
                 <div>
                     {responseOptions.map(option => {
                         if (option instanceof RespondWithMove) {
-                            return <Button onClick={respondWithMove} key={option.toString()} >Respond with Move</Button>;
+                            return <Button onClick={this.handleRespondWithMove} key={option.constructor.name} >Respond with Move</Button>;
                         }
                         else if (option instanceof RespondWithAlternativeMove) {
-                            return <Button key={option.toString()} >Respond with Alternative Move</Button>;
+                            return <Button onClick={() => { this.handleRespondWithAlternativeMove(option); }} key={option.constructor.name} >Respond with Alternative Move</Button>;
                         }
                         else if (option instanceof Refute) {
-                            return <Button key={option.toString()} >Refute</Button>;
+                            return <Button onClick={() => { this.handleRefute(option); }} key={option.constructor.name} >Refute</Button>;
                         }
                         else if (option instanceof Conclude) {
-                            return <Button key={option.toString()} >Conclude</Button>;
+                            return <Button onClick={() => { this.handleConclude(option); }} key={option.constructor.name} >Conclude</Button>;
                         } else {
                             return null;
                         }

@@ -114,7 +114,7 @@ export const respondWithAlternativeMoveFailure = (error)=>({
   error,
 });
 
-export const refuteRequest = (positionData:string, signature:Signature) => ({
+export const refuteRequest = (positionData: string, signature: Signature) => ({
   type: REFUTE_REQUEST as typeof REFUTE_REQUEST,
   positionData,
   signature,

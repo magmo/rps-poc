@@ -204,11 +204,11 @@ function* blockchainEventListener(wallet: ChannelWallet) {
   while (true) {
     const action = yield take(blockchainActions.CHALLENGECREATED_EVENT);
     const channelId = decode(action.state).channel.id;
-    const { position: theirPosition } = yield loadPosition(wallet, channelId, 'received');
-    const { position: myPosition } = yield loadPosition(wallet, channelId, 'sent');
+    const { position: theirPosition, signature: theirSignature } = yield loadPosition(wallet, channelId, 'received');
+    const { position: myPosition, signature: mySignature } = yield loadPosition(wallet, channelId, 'sent');
 
     const { challengeHandler } = yield race({
-      challengeHandler: call(challengeSaga, action, theirPosition, myPosition),
+      challengeHandler: call(challengeSaga, action, theirPosition, theirSignature, myPosition, mySignature),
       conclusionAction: take(blockchainActions.CHALLENGECONCLUDED_EVENT),
     });
 
