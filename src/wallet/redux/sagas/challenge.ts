@@ -25,7 +25,7 @@ export default function* challengeSaga(challenge, theirPositionString: string, t
   if (theirPosition.equals(challengePosition)) {
     if (theirPosition.turnNum < myPosition.turnNum) {
       // Assume the user would respond in the same way.
-      responseOptions.push(new RespondWithExistingMove({ response: myPosition }));
+      responseOptions.push(new RespondWithExistingMove({ response: myPositionString }));
     } else {
       responseOptions.push(new RespondWithMove());
     }
@@ -33,10 +33,10 @@ export default function* challengeSaga(challenge, theirPositionString: string, t
 
   if (!theirPosition.equals(challengePosition)) {
     if (theirPosition.turnNum >= challengePosition.turnNum) {
-      responseOptions.push(new RespondWithAlternativeMove({ theirPosition, theirSignature, myPosition, mySignature }));
+      responseOptions.push(new RespondWithAlternativeMove({ theirPosition: theirPositionString, theirSignature, myPosition: myPositionString, mySignature }));
     }
     if (theirPosition.turnNum > challengePosition.turnNum) {
-      responseOptions.push(new Refute({ theirPosition, theirSignature }));
+      responseOptions.push(new Refute({ theirPosition: theirPositionString, theirSignature }));
     }
     if (challengePosition.turnNum > myPosition.turnNum) {
       yield put(challengeActions.sendChallengePosition(challenge.state));

@@ -16,11 +16,11 @@ export default class ChallengeResponse extends React.PureComponent<Props> {
         this.props.respondWithMove();
     }
     handleRespondWithAlternativeMove(option: RespondWithAlternativeMove) {
-        this.props.respondWithAlternativeMove(option.theirPosition.toHex(), option.theirSignature, option.myPosition.toHex(), option.mySignature);
+        this.props.respondWithAlternativeMove(option.theirPosition, option.theirSignature, option.myPosition, option.mySignature);
     }
 
     handleRefute(option: Refute) {
-        this.props.refute(option.theirPosition.toHex(), option.theirSignature);
+        this.props.refute(option.theirPosition, option.theirSignature);
     }
 
     handleConclude(option: Conclude) {
