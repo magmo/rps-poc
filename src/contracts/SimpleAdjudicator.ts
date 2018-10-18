@@ -6,7 +6,7 @@ import simpleAdjudicatorArtifact from 'fmg-simple-adjudicator/contracts/SimpleAd
 
 import connectedWeb3 from '../wallet/web3';
 
-export async function deploySimpleAdjudicator(channelId: string, amount: BN) {
+export async function deploySimpleAdjudicator({ channelId, amount }: { channelId: string, amount: BN }) {
   const truffleContract = await setupContract();
 
   let contractBytecode;
@@ -29,9 +29,9 @@ export async function deploySimpleAdjudicator(channelId: string, amount: BN) {
   return await truffleContract.at(deployedContract.options.address);
 }
 
-export async function simpleAdjudicatorAt(address: string) {
+export async function simpleAdjudicatorAt({ address, amount } : { address: string, amount: BN }) {
   const truffleContract = await setupContract();
-  return await truffleContract.at(address);
+  return await truffleContract.at(address, { value: amount.toString() });
 }
 
 async function setupContract() {

@@ -30,7 +30,8 @@ function* contractSetup() {
     switch (action.type) {
       case blockchainActions.DEPLOY_REQUEST: // Player A
         try {
-          const deployedContract = yield call(deploySimpleAdjudicator, action.channelId, action.amount);
+          const { channelId, amount } = action;
+          const deployedContract = yield call(deploySimpleAdjudicator, { channelId, amount });
 
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
           // TODO: This should probably move out of this scope
@@ -45,7 +46,8 @@ function* contractSetup() {
         break;
       case blockchainActions.DEPOSIT_REQUEST: // Player B
         try {
-          const existingContract = yield call(simpleAdjudicatorAt, action.address);
+          const { address, amount } = action;
+          const existingContract = yield call(simpleAdjudicatorAt, { address, amount });
           const transaction = yield call(existingContract.send, action.amount.toString());
           yield put(blockchainActions.depositSuccess(transaction));
           const eventListener = yield spawn(watchAdjudicator, existingContract);
