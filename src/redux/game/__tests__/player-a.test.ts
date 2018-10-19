@@ -190,6 +190,7 @@ describe('player A\'s app', () => {
       myMove: aPlay,
       theirMove: bPlay,
       result: aResult,
+      balances: aWinsBalances,
     };
 
     describe('if the player decides to continue', () => {
@@ -237,6 +238,7 @@ describe('player A\'s app', () => {
       myMove: aPlay,
       theirMove: bPlay,
       result: aResult,
+      balances: insufficientFundsBalances,
     };
 
     describe('when Conclude arrives', () => {
@@ -253,6 +255,7 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitForResignationAcknowledgement,
       latestPosition: conclude,
+      balances: aWinsBalances,
     };
 
     describe('when Conclude arrives', () => {
