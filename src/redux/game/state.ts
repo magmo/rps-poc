@@ -50,7 +50,7 @@ interface Base extends TwoChannel {
   turnNum: number;
   balances: [BN, BN];
   stateCount: number;
-  gameBuyIn: BN;
+  roundBuyIn: BN;
   myName: string;
   opponentName: string;
   latestPosition: Position;
@@ -64,7 +64,7 @@ export function baseProperties(state: GameState) {
     turnNum,
     balances,
     stateCount,
-    gameBuyIn,
+    roundBuyIn,
     myName,
     opponentName,
     latestPosition,
@@ -78,7 +78,7 @@ export function baseProperties(state: GameState) {
     turnNum,
     balances,
     stateCount,
-    gameBuyIn,
+    roundBuyIn,
     myName,
     opponentName,
     latestPosition,
