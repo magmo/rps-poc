@@ -248,7 +248,7 @@ describe('player A\'s app', () => {
   });
 
 
-  describe('when in InsufficientFunds', () => {
+  describe.only('when in InsufficientFunds', () => {
     const gameState: state.InsufficientFunds = {
       ...aProps,
       name: state.StateName.InsufficientFunds,

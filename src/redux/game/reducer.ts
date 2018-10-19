@@ -108,8 +108,8 @@ function localActionReducer(jointState: JointState, action: actions.GameAction):
     //   return playAgainReducer(gameState, messageState, action);
     // case state.StateName.WaitForRestingA:
     //   return waitForRestingAReducer(gameState, messageState, action);
-    // case state.StateName.InsufficientFunds:
-    //   return insufficientFundsReducer(gameState, messageState, action);
+    case state.StateName.InsufficientFunds:
+      return insufficientFundsReducer(gameState, messageState, action);
     case state.StateName.WaitToResign:
       return waitToResignReducer(gameState, messageState, action);
     // case state.StateName.OpponentResigned:
@@ -229,8 +229,30 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
 // function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: MessageState, action: actions.GameAction) {
 // }
 
-// function insufficientFundsReducer(gameState: state.InsufficientFunds, messageState: MessageState, action: actions.GameAction) {
-// }
+function insufficientFundsReducer(gameState: state.InsufficientFunds, messageState: MessageState, action: actions.GameAction) {
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+
+  const position = action.position;
+  if (position.constructor.name !== 'Conclude') { return { gameState, messageState }; }
+  const { channel, turnNum, resolution: balances } = position;
+
+  if (gameState.player === Player.PlayerA) {
+    // send conclude if player A
+
+    const conclude = new Conclude(channel, turnNum + 1, balances);
+
+    messageState = { ...messageState, opponentOutbox: conclude };
+  }
+
+  // transition to gameOver
+  const newGameState: state.GameOver = { 
+    ...state.baseProperties(gameState),
+    name: state.StateName.GameOver,
+    turnNum: turnNum + 1,
+  };
+
+  return { gameState: newGameState, messageState };
+}
 
 function waitToResignReducer(gameState: state.WaitToResign, messageState: MessageState, action: actions.GameAction) {
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
