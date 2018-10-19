@@ -49,11 +49,11 @@ export async function deploySimpleAdjudicator({ channelId, amount }: { channelId
 }
 
 export async function simpleAdjudicatorAt({ address, amount } : { address: string, amount: BN }) {
-  const truffleContract = await setupContract();
+  const truffleContract = await setupContract(connectWeb3());
   return await truffleContract.at(address, { value: amount.toString() });
 }
 
-async function setupContract(connectedWeb3?) {
+async function setupContract(connectedWeb3) {
   const simpleAdjudicatorContract = contract(simpleAdjudicatorArtifact);
   simpleAdjudicatorContract.setProvider(connectedWeb3.currentProvider);
 
