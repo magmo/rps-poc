@@ -9,6 +9,6 @@ export type State = PlayerAState | PlayerBState;
 export type Concluded = ConcludedA | ConcludedB ;
 
 export enum Player {
-  PlayerA,
-  PlayerB,
+  PlayerA=0,
+  PlayerB=1,
 }
