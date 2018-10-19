@@ -2,17 +2,17 @@ import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects
 import { buffers } from 'redux-saga';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
-import * as messageActions from './actions';
-import * as autoOpponentActions from '../auto-opponent/actions';
+
 import { actions as walletActions } from '../../wallet';
-import { AUTO_OPPONENT_ADDRESS } from '../../constants';
-import { SignatureSuccess } from '../../wallet/redux/actions/external';
+import { SignatureSuccess, FUNDING_REQUEST } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
 import * as challengeActions from '../../wallet/redux/actions/challenge';
 import decode from 'src/game-engine/positions/decode';
 import { State } from 'fmg-core';
 import * as gameActions from '../game/actions';
 import { MessageState } from '../game/reducer';
+import { GameState, baseProperties } from '../game/state';
+import { Player } from 'src/game-engine/application-states';
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
@@ -45,6 +45,11 @@ export function* sendMessagesSaga(opponentAddress: string) {
         const signature = yield signMessage(data);
         const message = { data, queue, signature };
         yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message;
+      }
+      if (messageState.walletOutbox!=null){
+        const getGameState = state => ({});
+        const gameState: GameState = yield select(getGameState);
+        handleWalletMessage(messageState.walletOutbox,gameState);
       }
     }
   }
@@ -81,6 +86,17 @@ function* receiveFromFirebaseSaga(address: string) {
       yield put(walletActions.receiveMessage(data));
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
+  }
+}
+function* handleWalletMessage(type, state: GameState){
+  switch (type){
+    case "FUNDING_REQUEST":
+    const properties = baseProperties(state);
+    const {myAddress,opponentAddress, channelId, myBalance, opponentBalance} = properties;
+  const playerIndex = properties.player === Player.PlayerA ? 0:1;
+    yield put(walletActions.fundingRequest(channelId,myAddress,opponentAddress,myBalance,opponentBalance,playerIndex));
+    yield take(walletActions.FUNDING_SUCCESS);
+    break;
   }
 }
 
