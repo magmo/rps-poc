@@ -1,10 +1,15 @@
 var HDWalletProvider = require("truffle-hdwallet-provider");
 require('dotenv').config()
 
-require('ts-node/register'); // To handle typescript dependencies in the test
+// We only want this loaded in a test environment 
+// so we can load and parse this file from the app
+if (process.env.NODE_ENV === 'test') {
+  require('ts-node/register'); 
+}
+
 require('babel-register'); // To handle es6 syntax in the tests
 
- module.exports = {
+module.exports = {
   networks: {
     development: {
       host: process.env.DEV_GANACHE_HOST,
