@@ -1,5 +1,5 @@
 import BN from "bn.js";
-import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA } from "../../../game-engine/positions";
+import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA, Result } from "../../../game-engine/positions";
 import { Channel } from "fmg-core";
 import { gameReducer } from '../reducer';
 import { Player } from '../../../game-engine/application-states';
@@ -20,7 +20,7 @@ const aPlay = Play.Rock;
 const salt = '0x123';
 const preCommit = '0x12345a';
 const bPlay = Play.Scissors;
-
+const aResult = Result.YouWin;
 
 const sharedProps = {
   libraryAddress,
@@ -39,10 +39,14 @@ const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 1, roundBuy
 const postFundSetupA = new PostFundSetupA(channel, 2, initialBalances, 0, roundBuyIn);
 const postFundSetupB = new PostFundSetupB(channel, 3, initialBalances, 1, roundBuyIn);
 const propose = Propose.createWithPlayAndSalt(channel, 4, initialBalances, roundBuyIn, aPlay, salt);
-const accept = new Accept(channel, 5, initialBalances, roundBuyIn, preCommit, bPlay);
-const reveal = new Reveal(channel, 6, initialBalances, roundBuyIn, bPlay, aPlay, salt);
+const accept = new Accept(channel, 5, bWinsBalances, roundBuyIn, preCommit, bPlay);
+const reveal = new Reveal(channel, 6, aWinsBalances, roundBuyIn, bPlay, aPlay, salt);
+const resting = new Resting(channel, 7, aWinsBalances, roundBuyIn);
+const conclude = new Conclude(channel, 8, aWinsBalances);
+const conclude2 = new Conclude(channel, 9, aWinsBalances);
 const revealInsufficientFunds = new Reveal(channel, 6, insufficientFundsBalances, roundBuyIn, bPlay, aPlay, salt);
-const resting = new Resting(channel, 7, initialBalances, roundBuyIn);
+const concludeInsufficientFunds = new Conclude(channel, 7, insufficientFundsBalances);
+const concludeInsufficientFunds2 = new Conclude(channel, 8, insufficientFundsBalances);
 
 const waitForGameConfirmationA = { ...sharedProps }
 const confirmGameB = { ...sharedProps }
@@ -161,6 +165,11 @@ describe('player A\'s app', () => {
 
         itSends(reveal, updatedState);
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
+        it('sets theirMove and the result', () => {
+          const gameState = updatedState.gameState as state.PlayAgain;
+          expect(gameState.theirMove).toEqual(bPlay);
+          expect(gameState.result).toEqual(aResult);
+        });
       });
 
       describe('when not enough funds to continue', () => {
@@ -174,37 +183,83 @@ describe('player A\'s app', () => {
   });
 
   describe('when in PlayAgain', () => {
+    const gameState: state.PlayAgain = {
+      ...aProps,
+      name: state.StateName.PlayAgain,
+      latestPosition: reveal,
+      myMove: aPlay,
+      theirMove: bPlay,
+      result: aResult,
+    };
+
     describe('if the player decides to continue', () => {
-      it('transitions to WaitForRestingA', () => {});
+      const action = actions.playAgain();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.WaitForRestingA, updatedState);
     });
+
     describe('if the player decides not to continue', () => {
-      it('transitions to WaitToResign', () => {});
+      const action = actions.resign();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.WaitToResign, updatedState);
     });
 
     describe('if Resting arrives', () => {
-      it('stores the action for later', () => {});
+      const action = actions.positionReceived(resting);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itStoresAction(action, updatedState);
+
       describe('if the player decides to continue', () => {
-        it('transitions to PickMove', () => {});
-      });
-      describe('if the player decides not to continue', () => {
-        it('sends Conclude', () => {});
-        it('transitions to WaitForResignationAcknowledgement', () => {});
+        const action = actions.playAgain();
+        const updatedState = gameReducer({ messageState, gameState }, action);
+
+        itTransitionsTo(state.StateName.PickMove, updatedState);
       });
 
+      describe('if the player decides not to continue', () => {
+        const action = actions.resign();
+        const updatedState = gameReducer({ messageState, gameState }, action);
+
+        itSends(conclude, updatedState);
+        itTransitionsTo(state.StateName.WaitToResign, updatedState);
+      });
     });
   });
 
   describe('when in InsufficientFunds', () => {
+    const gameState: state.InsufficientFunds = {
+      ...aProps,
+      name: state.StateName.InsufficientFunds,
+      latestPosition: revealInsufficientFunds,
+      myMove: aPlay,
+      theirMove: bPlay,
+      result: aResult,
+    };
+
     describe('when Conclude arrives', () => {
-      it('sends Conclude', () => {});
-      it('transitions to GameOver', () => { });
+      const action = actions.positionReceived(concludeInsufficientFunds);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itSends(concludeInsufficientFunds2, updatedState);
+      itTransitionsTo(state.StateName.GameOver, updatedState);
     });
   });
 
   describe('when in WaitForResignationAcknowledgement', () => {
+    const gameState: state.WaitForResignationAcknowledgement = {
+      ...aProps,
+      name: state.StateName.WaitForResignationAcknowledgement,
+      latestPosition: conclude,
+    };
+
     describe('when Conclude arrives', () => {
-      it('transitions to GameOver', () => { });
+      const action = actions.positionReceived(conclude);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.GameOver, updatedState);
     });
   });
-
 });
