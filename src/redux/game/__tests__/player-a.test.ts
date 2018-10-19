@@ -251,7 +251,7 @@ describe('player A\'s app', () => {
     });
   });
 
-  describe('when in WaitForResignationAcknowledgement', () => {
+  describe.only('when in WaitForResignationAcknowledgement', () => {
     const gameState: state.WaitForResignationAcknowledgement = {
       ...aProps,
       name: state.StateName.WaitForResignationAcknowledgement,

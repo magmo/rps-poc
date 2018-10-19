@@ -2,7 +2,6 @@ import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects
 import { buffers } from 'redux-saga';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
-
 import { actions as walletActions } from '../../wallet';
 import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
@@ -44,13 +43,13 @@ export function* sendMessagesSaga(opponentAddress: string) {
         const data = messageState.opponentOutbox.toHex();
         const signature = yield signMessage(data);
         const message = { data, queue, signature };
-        yield put(walletActions.messageSent(data,signature));
+        yield put(walletActions.messageSent(data, signature));
         yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
       }
-      if (messageState.walletOutbox!=null){
+      if (messageState.walletOutbox != null) {
         const getGameState = state => ({});
         const gameState: GameState = yield select(getGameState);
-        handleWalletMessage(messageState.walletOutbox,gameState);
+        handleWalletMessage(messageState.walletOutbox, gameState);
       }
     }
   }
@@ -77,7 +76,7 @@ function* receiveFromFirebaseSaga(address: string) {
       if (!validMessage) {
         // TODO: Handle this
       }
-      yield put(walletActions.messageReceived(data,signature));
+      yield put(walletActions.messageReceived(data, signature));
       const position = decode(data);
       if (position.stateType === State.StateType.Conclude) {
         yield put(gameActions.opponentResigned(position));
@@ -90,22 +89,28 @@ function* receiveFromFirebaseSaga(address: string) {
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
 }
-function* handleWalletMessage(type, state: GameState){
-  switch (type){
+function* handleWalletMessage(type, state: GameState) {
+  switch (type) {
     case "FUNDING_REQUEST":
-    const properties = baseProperties(state);
-    const {myAddress,opponentAddress, channelId, myBalance, opponentBalance} = properties;
-  const playerIndex = properties.player === Player.PlayerA ? 0:1;
-    yield put(walletActions.fundingRequest(channelId,myAddress,opponentAddress,myBalance,opponentBalance,playerIndex));
-    yield take(walletActions.FUNDING_SUCCESS);
-    break;
+      const properties = baseProperties(state);
+      const { latestPosition, player, balances, participants } = properties;
+
+      const myIndex = player === Player.PlayerA ? 0 : 1;
+
+      const channelId = latestPosition.channel.id;
+      const opponentAddress = participants[1 - myIndex];
+      const myAddress = participants[myIndex];
+      const myBalance = balances[myIndex];
+      const opponentBalance = balances[1 - myIndex];
+
+      yield put(walletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
+      yield take(walletActions.FUNDING_SUCCESS);
+      break;
     case "WITHDRAWAL_REQUEST":
-    yield put(walletActions.withdrawalRequest(state.latestPosition));
-    yield take(walletActions.WITHDRAWAL_SUCCESS);
+      yield put(walletActions.withdrawalRequest(state.latestPosition));
+      yield take(walletActions.WITHDRAWAL_SUCCESS);
 
   }
-
-  
 }
 
 function* receiveFromWalletSaga() {
