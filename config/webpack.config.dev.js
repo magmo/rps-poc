@@ -22,8 +22,6 @@ const publicPath = '/';
 const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
-const deployContractsFromLoader = filename=>process.env.TARGET_NETWORK==='development';
-
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
@@ -125,8 +123,10 @@ module.exports = {
         // back to the "file" loader at the end of the loader list.
         oneOf: [
           {
-            test: /\.sol/,
-            include: deployContractsFromLoader,
+            test: (path) => {
+              return process.env.TARGET_NETWORK==='development' &&
+              /\.sol$/.test(path);  
+          }, 
             use: [
               {
                 loader: 'json-loader'
@@ -139,7 +139,7 @@ module.exports = {
               }
             ]
           },
-          { 
+          {
             test: /\.(scss)$/,
             use: [{
               loader: 'style-loader', // inject CSS to page
@@ -258,7 +258,9 @@ module.exports = {
      new webpack.NormalModuleReplacementPlugin(
       /.*\.sol/,
       function(resource) {
-        resource.request = resource.request.replace(/.*contracts/, paths.appContractArtifacts).replace('.sol', '.json');
+        if (process.env.TARGET_NETWORK!=='development'){
+          resource.request = resource.request.replace(/.*contracts/, paths.appContractArtifacts).replace('.sol', '.json');
+        }
       }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
