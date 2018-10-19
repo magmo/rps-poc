@@ -1,5 +1,6 @@
 import BN from 'bn.js';
-import { Position } from '../../game-engine/positions';
+import { Position, Result, Play as Move } from '../../game-engine/positions';
+import { Player } from '../../game-engine/application-states';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -21,23 +22,6 @@ export enum StateName {
   WaitForResignationAcknowledgement = 'WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT',
   GameOver = 'GAME_OVER',
   WaitForWithdrawal = 'WAIT_FOR_WITHDRAWAL',
-}
-
-export enum Player {
-  A,
-  B,
-}
-
-export enum Move {
-  Rock,
-  Paper,
-  Scissors,
-}
-
-export enum Result {
-  youWon,
-  youLost,
-  draw,
 }
 
 interface TwoChannel {
@@ -88,12 +72,12 @@ export function baseProperties(state: GameState) {
 
 export interface WaitForGameConfirmationA extends Base {
   name: StateName.WaitForGameConfirmationA;
-  player: Player.A;
+  player: Player.PlayerA;
 }
 
 export interface ConfirmGameB extends Base {
   name: StateName.ConfirmGameB;
-  player: Player.B;
+  player: Player.PlayerB;
 }
 
 export interface WaitForFunding extends Base {
@@ -115,19 +99,19 @@ export interface WaitForOpponentToPickMoveA extends Base {
   name: StateName.WaitForOpponentToPickMoveA;
   myMove: Move;
   salt: string;
-  player: Player.A;
+  player: Player.PlayerA;
 }
 
 export interface WaitForOpponentToPickMoveB extends Base {
   name: StateName.WaitForOpponentToPickMoveB;
   myMove: Move;
-  player: Player.B;
+  player: Player.PlayerB;
 }
 
 export interface WaitForRevealB extends Base {
   name: StateName.WaitForRevealB;
   myMove: Move;
-  player: Player.B;
+  player: Player.PlayerB;
 }
 
 export interface PlayAgain extends Base {
@@ -141,7 +125,7 @@ export interface PlayAgain extends Base {
 export interface WaitForRestingA extends Base {
   name: StateName.WaitForRestingA;
   myMove: Move;
-  player: Player.A;
+  player: Player.PlayerA;
 }
 
 export interface InsufficientFunds extends Base {
@@ -199,5 +183,5 @@ export type GameState = (
 export function itsMyTurn(gameState: GameState) {
   const turnNum = gameState.turnNum;
 
-  return gameState.player === Player.A ? turnNum % 2 === 0 : turnNum % 2 === 1;
+  return gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 === 1;
 }
