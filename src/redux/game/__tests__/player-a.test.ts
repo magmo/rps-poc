@@ -16,6 +16,7 @@ const initialBalances: [BN, BN] = [new BN(5), new BN(5)];
 const aWinsBalances: [BN, BN] = [new BN(6), new BN(4)];
 const bWinsBalances: [BN, BN] = [new BN(4), new BN(6)];
 const bLowFundsBalances: [BN, BN] = [new BN(9), new BN(1)];
+const bLowButWinsFundsBalances: [BN, BN] = [new BN(8), new BN(2)];
 const insufficientFundsBalances: [BN, BN] = [new BN(10), new BN(0)];
 const aPlay = Play.Rock;
 const salt = randomHex(64);
@@ -46,6 +47,9 @@ const reveal = new Reveal(channel, 6, aWinsBalances, roundBuyIn, bPlay, aPlay, s
 const resting = new Resting(channel, 7, aWinsBalances, roundBuyIn);
 const conclude = new Conclude(channel, 8, aWinsBalances);
 const conclude2 = new Conclude(channel, 9, aWinsBalances);
+
+const proposeBLow = Propose.createWithPlayAndSalt(channel, 4, bLowFundsBalances, roundBuyIn, aPlay, salt);
+const acceptBLow = new Accept(channel, 5, bLowButWinsFundsBalances, roundBuyIn, preCommit, bPlay);
 const revealInsufficientFunds = new Reveal(channel, 6, insufficientFundsBalances, roundBuyIn, bPlay, aPlay, salt);
 const concludeInsufficientFunds = new Conclude(channel, 7, insufficientFundsBalances);
 const concludeInsufficientFunds2 = new Conclude(channel, 8, insufficientFundsBalances);
@@ -93,7 +97,7 @@ describe('player A\'s app', () => {
       });
 
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
-    })
+    });
   });
 
   describe('when in waitForFunding', () => {
@@ -143,9 +147,9 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.WaitForOpponentToPickMoveA, updatedState);
 
       it('stores the move and salt', () => {
-        const gameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(gameState.myMove).toEqual(aPlay);
-        expect(gameState.salt).toEqual(salt);
+        const newGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
+        expect(newGameState.myMove).toEqual(aPlay);
+        expect(newGameState.salt).toEqual(salt);
       });
     });
   });
@@ -154,14 +158,15 @@ describe('player A\'s app', () => {
     const gameState: state.WaitForOpponentToPickMoveA = {
       ...aProps,
       name: state.StateName.WaitForOpponentToPickMoveA,
-      latestPosition: postFundSetupB,
+      latestPosition: propose,
       myMove: aPlay,
       salt,
+      turnNum: 4,
     };
     describe('when Accept arrives', () => {
-      const action = actions.positionReceived(accept);
-
       describe('when enough funds to continue', () => {
+        const action = actions.positionReceived(accept);
+
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itSends(reveal, updatedState);
@@ -174,7 +179,8 @@ describe('player A\'s app', () => {
       });
 
       describe('when not enough funds to continue', () => {
-        const gameState2 = { ...gameState, balances: bLowFundsBalances };
+        const action = actions.positionReceived(acceptBLow);
+        const gameState2 = { ...gameState, balances: bLowFundsBalances, latestPosition: proposeBLow };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
 
         itSends(revealInsufficientFunds, updatedState);
