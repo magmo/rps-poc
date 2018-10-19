@@ -1,8 +1,10 @@
 import { Channel } from 'fmg-core';
 import { Reducer } from 'redux';
+import BN from 'bn.js';
+
 import * as actions from './actions';
 import * as state from './state';
-import { Position, Conclude, PostFundSetupA, Propose, Accept, Reveal } from '../../game-engine/positions';
+import { Position, Conclude, PostFundSetupA, Propose, Accept, Reveal, Result, calculateResult } from '../../game-engine/positions';
 import { randomHex } from '../../utils/randomHex';
 import { Player } from '../../game-engine/application-states';
 
@@ -183,8 +185,6 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
     return { gameState, messageState };
   }
 
-  // function waitForOpponentToPickMoveAReducer(gameState: state.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction) {
-  // }
   let newGameState: state.WaitForOpponentToPickMoveA | state.WaitForOpponentToPickMoveB;
   const { turnNum, balances, roundBuyIn, libraryAddress, channelNonce, participants } = gameState;
   const { play } = action;
@@ -215,6 +215,63 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
     // };
     return { gameState, messageState };
   }
+}
+
+function waitForOpponentToPickMoveAReducer(gameState: state.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type !== actions.POSITION_RECEIVED) {
+    return { gameState, messageState};
+  }
+
+  const { libraryAddress, channelNonce, participants, roundBuyIn, turnNum, myMove, salt } = gameState;
+  const { position: theirPosition } = action;
+  if (!(theirPosition instanceof Accept)) {
+    return { gameState, messageState };
+  }
+  const { bPlay: theirMove, resolution: balances } = theirPosition;
+  const channel = new Channel(libraryAddress, channelNonce, participants);
+  const result = calculateResult(myMove, theirMove);
+
+  const newBalances = [balances[0], balances[1]];
+  if (result === Result.YouWin) {
+    newBalances[Player.PlayerA] = balances[Player.PlayerA].add(new BN(roundBuyIn.muln(2)));
+    newBalances[Player.PlayerB] = balances[Player.PlayerB].sub(new BN(roundBuyIn.muln(2)));
+  } else if (result === Result.Tie) {
+    newBalances[Player.PlayerA] = balances[Player.PlayerA].add(new BN(roundBuyIn.muln(1)));
+    newBalances[Player.PlayerB] = balances[Player.PlayerB].sub(new BN(roundBuyIn.muln(1)));
+  }
+
+  const nextPosition = new Reveal(channel, turnNum + 2, newBalances, roundBuyIn, theirMove, myMove, salt);
+
+  let newGameState;
+  if (newBalances[0] < roundBuyIn || newBalances[1] < roundBuyIn) {
+    newGameState = {
+      ...state.baseProperties(gameState), 
+      name: state.StateName.InsufficientFunds,
+      turnNum: turnNum + 2,
+      latestPosition: nextPosition,
+      myMove,
+      theirMove,
+      player: Player.PlayerA,
+      result,
+      balances: newBalances as [BN, BN],
+    } as state.InsufficientFunds;
+  } else {
+    newGameState = {
+      ...state.baseProperties(gameState), 
+      name: state.StateName.PlayAgain,
+      turnNum: turnNum + 2,
+      latestPosition: nextPosition,
+      myMove,
+      theirMove,
+      player: Player.PlayerA,
+      result,
+      balances: newBalances as [BN, BN],
+    } as state.PlayAgain;
+  }
+
+  const newMessageState = { ...NULL_MESSAGE_STATE, opponentOutbox: nextPosition };
+
+  return { gameState: newGameState, messageState: newMessageState };
 }
 
 // function waitForOpponentToPickMoveBReducer(gameState: state.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction) {
