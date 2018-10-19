@@ -1,5 +1,7 @@
 import { Channel } from 'fmg-core';
+import BN from 'bn.js';
 
+import { randomHex } from '../utils/randomHex';
 import * as State from './application-states/PlayerA';
 import {
   calculateResult,
@@ -16,8 +18,6 @@ import {
   Resting,
   Conclude,
 } from './positions';
-import BN from 'bn.js';
-
 
 export default class GameEngineA {
   static setupGame({ me, opponent, stake, balances, libraryAddress }:
@@ -68,7 +68,7 @@ export default class GameEngineA {
 
     const { balances, turnNum, stake, channel } = this.state;
 
-    const salt = 'salt'; // todo: make random
+    const salt = randomHex(64);
 
     const newPosition = Propose.createWithPlayAndSalt(
       channel,
