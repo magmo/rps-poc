@@ -14,10 +14,12 @@ const roundBuyIn = new BN(1);
 const initialBalances: [BN, BN] = [new BN(5), new BN(5)];
 const aWinsBalances: [BN, BN] = [new BN(6), new BN(4)];
 const bWinsBalances: [BN, BN] = [new BN(4), new BN(6)];
-const preCommit = '0x12345a';
+const bLowFundsBalances: [BN, BN] = [new BN(9), new BN(1)];
+const insufficientFundsBalances: [BN, BN] = [new BN(10), new BN(0)];
 const aPlay = Play.Rock;
-const bPlay = Play.Scissors;
 const salt = '0x123';
+const preCommit = '0x12345a';
+const bPlay = Play.Scissors;
 
 
 const sharedProps = {
@@ -33,13 +35,14 @@ const sharedProps = {
 }
 const channel = new Channel(libraryAddress, channelNonce, participants);
 const preFundSetupA = new PreFundSetupA(channel, 0, initialBalances, 0, roundBuyIn);
-const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 0, roundBuyIn);
+const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 1, roundBuyIn);
 const postFundSetupA = new PostFundSetupA(channel, 2, initialBalances, 0, roundBuyIn);
-const postFundSetupB = new PostFundSetupB(channel, 3, initialBalances, 0, roundBuyIn);
-const propose = new Propose(channel, 0, initialBalances, roundBuyIn, preCommit);
-const accept = new Accept(channel, 0, initialBalances, roundBuyIn, preCommit, bPlay);
-const reveal = new Reveal(channel, 0, initialBalances, roundBuyIn, bPlay, aPlay, salt);
-const resting = new Resting(channel, 0, initialBalances, roundBuyIn);
+const postFundSetupB = new PostFundSetupB(channel, 3, initialBalances, 1, roundBuyIn);
+const propose = Propose.createWithPlayAndSalt(channel, 4, initialBalances, roundBuyIn, aPlay, salt);
+const accept = new Accept(channel, 5, initialBalances, roundBuyIn, preCommit, bPlay);
+const reveal = new Reveal(channel, 6, initialBalances, roundBuyIn, bPlay, aPlay, salt);
+const revealInsufficientFunds = new Reveal(channel, 6, insufficientFundsBalances, roundBuyIn, bPlay, aPlay, salt);
+const resting = new Resting(channel, 7, initialBalances, roundBuyIn);
 
 const waitForGameConfirmationA = { ...sharedProps }
 const confirmGameB = { ...sharedProps }
@@ -57,6 +60,13 @@ const itTransitionsTo = (stateName, state) => {
     expect(state.gameState.name).toEqual(stateName);
   });
 };
+
+const itStoresAction = (action, state) => {
+  it(`stores action to retry`, () => {
+    expect(state.messageState.actionToRetry).toEqual(action);
+  });
+};
+
 
 describe('player A\'s app', () => {
   const aProps = { ...sharedProps, player: Player.PlayerA as Player.PlayerA };
@@ -99,28 +109,66 @@ describe('player A\'s app', () => {
   });
 
   describe('when in WaitForPostFundSetup', () => {
+    const gameState: state.WaitForPostFundSetup = {
+      ...aProps,
+      name: state.StateName.WaitForPostFundSetup,
+      latestPosition: postFundSetupA,
+    };
     describe('when PostFundSetupB arrives', () => {
-      it('transitions to PickMove', () => {});
+      const action = actions.positionReceived(postFundSetupB);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.PickMove, updatedState)
     });
   });
 
   describe('when in PickMove', () => {
+    const gameState: state.PickMove = {
+      ...aProps,
+      name: state.StateName.PickMove,
+      latestPosition: postFundSetupB,
+    };
+
     describe('when a move is chosen', () => {
-      it('sends Propose', () => {});
-      it('transitions to WaitForOpponentToPickMoveA', () => {});
+      const action = actions.choosePlay(aPlay);
+      // todo: will need to stub out the randomness in the salt somehow
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itSends(propose, updatedState);
+      itTransitionsTo(state.StateName.WaitForOpponentToPickMoveA, updatedState);
+
+      it('stores the move and salt', () => {
+        const gameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
+        expect(gameState.myMove).toEqual(aPlay);
+        expect(gameState.salt).toEqual(salt);
+      });
     });
   });
 
   describe('when in WaitForOpponentToPickMoveA', () => {
+    const gameState: state.WaitForOpponentToPickMoveA = {
+      ...aProps,
+      name: state.StateName.WaitForOpponentToPickMoveA,
+      latestPosition: postFundSetupB,
+      myMove: aPlay,
+      salt: salt,
+    };
     describe('when Accept arrives', () => {
-      it('sends Reveal', () => {});
+      const action = actions.positionReceived(accept);
 
       describe('when enough funds to continue', () => {
-        it('transitions to PlayAgain', () => {});
+        const updatedState = gameReducer({ messageState, gameState }, action);
+
+        itSends(reveal, updatedState);
+        itTransitionsTo(state.StateName.PlayAgain, updatedState);
       });
 
       describe('when not enough funds to continue', () => {
-        it('transitions to InsufficientFunds', () => {});
+        const gameState2 = { ...gameState, balances: bLowFundsBalances };
+        const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
+
+        itSends(revealInsufficientFunds, updatedState);
+        itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
       });
     });
   });
