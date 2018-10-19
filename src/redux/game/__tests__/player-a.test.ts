@@ -90,9 +90,7 @@ describe('player A\'s app', () => {
         expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
       });
 
-      it('transitions to WaitForFunding', () => {
-        expect(updatedState.gameState.name).toEqual(state.StateName.WaitForFunding);
-      });
+      itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     })
   });
 
@@ -215,17 +213,17 @@ describe('player A\'s app', () => {
 
       describe('if the player decides to continue', () => {
         const action = actions.playAgain();
-        const updatedState = gameReducer({ messageState, gameState }, action);
+        const updatedState2 = gameReducer(updatedState, action);
 
-        itTransitionsTo(state.StateName.PickMove, updatedState);
+        itTransitionsTo(state.StateName.PickMove, updatedState2);
       });
 
       describe('if the player decides not to continue', () => {
         const action = actions.resign();
-        const updatedState = gameReducer({ messageState, gameState }, action);
+        const updatedState2 = gameReducer(updatedState, action);
 
-        itSends(conclude, updatedState);
-        itTransitionsTo(state.StateName.WaitToResign, updatedState);
+        itSends(conclude, updatedState2);
+        itTransitionsTo(state.StateName.WaitToResign, updatedState2);
       });
     });
   });
@@ -262,6 +260,7 @@ describe('player A\'s app', () => {
       const action = actions.positionReceived(conclude);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
+      itSends(conclude2, updatedState);
       itTransitionsTo(state.StateName.GameOver, updatedState);
     });
   });
