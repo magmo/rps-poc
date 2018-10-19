@@ -1,10 +1,11 @@
 import BN from "bn.js";
-import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA, Result } from "../../../game-engine/positions";
+import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA, Result, hashCommitment } from "../../../game-engine/positions";
 import { Channel } from "fmg-core";
 import { gameReducer } from '../reducer';
 import { Player } from '../../../game-engine/application-states';
 import * as actions from '../actions';
 import * as state from '../state';
+import { randomHex } from "../../../utils/randomHex";
 
 
 const libraryAddress = '0x' + '1'.repeat(40);
@@ -17,8 +18,8 @@ const bWinsBalances: [BN, BN] = [new BN(4), new BN(6)];
 const bLowFundsBalances: [BN, BN] = [new BN(9), new BN(1)];
 const insufficientFundsBalances: [BN, BN] = [new BN(10), new BN(0)];
 const aPlay = Play.Rock;
-const salt = '0x123';
-const preCommit = '0x12345a';
+const salt = randomHex(64);
+const preCommit = hashCommitment(aPlay, salt);
 const bPlay = Play.Scissors;
 const aResult = Result.YouWin;
 
@@ -32,7 +33,8 @@ const sharedProps = {
   roundBuyIn,
   myName: 'Tom',
   opponentName: 'Alex',
-}
+};
+
 const channel = new Channel(libraryAddress, channelNonce, participants);
 const preFundSetupA = new PreFundSetupA(channel, 0, initialBalances, 0, roundBuyIn);
 const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 1, roundBuyIn);
@@ -65,9 +67,9 @@ const itTransitionsTo = (stateName, jointState) => {
   });
 };
 
-const itStoresAction = (action, state) => {
+const itStoresAction = (action, jointState) => {
   it(`stores action to retry`, () => {
-    expect(state.messageState.actionToRetry).toEqual(action);
+    expect(jointState.messageState.actionToRetry).toEqual(action);
   });
 };
 
@@ -127,6 +129,7 @@ describe('player A\'s app', () => {
   describe('when in PickMove', () => {
     const gameState: state.PickMove = {
       ...aProps,
+      turnNum: 2,
       name: state.StateName.PickMove,
       latestPosition: postFundSetupB,
     };
@@ -153,7 +156,7 @@ describe('player A\'s app', () => {
       name: state.StateName.WaitForOpponentToPickMoveA,
       latestPosition: postFundSetupB,
       myMove: aPlay,
-      salt: salt,
+      salt,
     };
     describe('when Accept arrives', () => {
       const action = actions.positionReceived(accept);
@@ -164,9 +167,9 @@ describe('player A\'s app', () => {
         itSends(reveal, updatedState);
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
         it('sets theirMove and the result', () => {
-          const gameState = updatedState.gameState as state.PlayAgain;
-          expect(gameState.theirMove).toEqual(bPlay);
-          expect(gameState.result).toEqual(aResult);
+          const newGameState = updatedState.gameState as state.PlayAgain;
+          expect(newGameState.theirMove).toEqual(bPlay);
+          expect(newGameState.result).toEqual(aResult);
         });
       });
 

@@ -2,13 +2,17 @@ import { Channel } from 'fmg-core';
 import { Reducer } from 'redux';
 import * as actions from './actions';
 import * as state from './state';
-import { Position, Conclude, PostFundSetupA } from '../../game-engine/positions';
+import { Position, Conclude, PostFundSetupA, Propose, Accept, Reveal } from '../../game-engine/positions';
+import { randomHex } from '../../utils/randomHex';
+import { Player } from '../../game-engine/application-states';
 
 export interface MessageState {
-  opponentOutbox?: Position;
-  walletOutbox?: string;
-  actionToRetry?: actions.PositionReceived;
+  opponentOutbox: Position | null;
+  walletOutbox: string | null;
+  actionToRetry: actions.PositionReceived | null;
 }
+
+const NULL_MESSAGE_STATE = { opponentOutbox: null, walletOutbox: null, actionToRetry: null };
 
 interface JointState {
   gameState: state.GameState;
@@ -34,7 +38,7 @@ export const gameReducer: Reducer<JointState> = (jointState: JointState, action:
   }
 };
 
-function attemptRetry(jointState) {
+function attemptRetry(jointState: JointState): JointState {
   let { messageState } = jointState;
   const { gameState } = jointState;
 
@@ -92,10 +96,10 @@ function localActionReducer(jointState: JointState, action: actions.GameAction):
       return waitForFundingReducer(gameState, messageState, action);
     case state.StateName.WaitForPostFundSetup:
       return waitForPostFundSetupReducer(gameState, messageState, action);
-    // case state.StateName.PickMove:
-    //   return pickMoveReducer(gameState, messageState, action);
-    // case state.StateName.WaitForOpponentToPickMoveA:
-    //   return waitForOpponentToPickMoveAReducer(gameState, messageState, action);
+    case state.StateName.PickMove:
+      return pickMoveReducer(gameState, messageState, action);
+    case state.StateName.WaitForOpponentToPickMoveA:
+      return waitForOpponentToPickMoveAReducer(gameState, messageState, action);
     // case state.StateName.WaitForOpponentToPickMoveB:
     //   return waitForOpponentToPickMoveBReducer(gameState, messageState, action);
     // case state.StateName.WaitForRevealB:
@@ -161,26 +165,57 @@ function waitForFundingReducer(
     latestPosition: postFundSetupA,
     name: state.StateName.WaitForPostFundSetup,
   };
-  const newMessageState = { opponentOutbox: postFundSetupA };
+  const newMessageState = { ...NULL_MESSAGE_STATE, opponentOutbox: postFundSetupA };
   return { gameState: newGameState, messageState: newMessageState };
 }
 
-function waitForPostFundSetupReducer(
-  gameState: state.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction
-): JointState {
+function waitForPostFundSetupReducer( gameState: state.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type !== actions.POSITION_RECEIVED) {
     return { gameState, messageState };
   }
   const newGameState: state.PickMove = { ...state.baseProperties(gameState), name: state.StateName.PickMove };
 
-  return { gameState: newGameState, messageState: {} };
+  return { gameState: newGameState, messageState: NULL_MESSAGE_STATE };
 }
 
-// function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, action: actions.GameAction) {
-// }
+function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type !== actions.CHOOSE_PLAY) {
+    return { gameState, messageState };
+  }
 
 // function waitForOpponentToPickMoveAReducer(gameState: state.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction) {
 // }
+  let newGameState: state.WaitForOpponentToPickMoveA | state.WaitForOpponentToPickMoveB;
+  const { turnNum, balances, roundBuyIn, libraryAddress, channelNonce, participants } = gameState;
+  const { play } = action;
+  const channel = new Channel(libraryAddress, channelNonce, participants);
+  if (gameState.player === Player.PlayerA) {
+    const salt = randomHex(64);
+    const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 2, balances, roundBuyIn, play, salt)
+
+    newGameState = {
+      ...state.baseProperties(gameState),
+      player: gameState.player,
+      myMove: action.play,
+      salt,
+      latestPosition,
+      name: state.StateName.WaitForOpponentToPickMoveA,
+    };
+    const newMessageState = { ...messageState, opponentOutbox: latestPosition };
+
+    return { gameState: newGameState, messageState: newMessageState };
+  } else {
+    // const { preCommit } = gameState;
+    // const latestPosition = new Accept(channel, turnNum, balances, roundBuyIn, preCommit, play);
+    // newGameState = {
+    //   ...state.baseProperties(gameState),
+    //   player: gameState.player,
+    //   myMove: action.play,
+    //   name: state.StateName.WaitForOpponentToPickMoveB,
+    // };
+    return { gameState, messageState };
+  }
+}
 
 // function waitForOpponentToPickMoveBReducer(gameState: state.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction) {
 // }
