@@ -106,8 +106,8 @@ function localActionReducer(jointState: JointState, action: actions.GameAction):
     //   return waitForRevealBReducer(gameState, messageState, action);
     // case state.StateName.PlayAgain:
     //   return playAgainReducer(gameState, messageState, action);
-    // case state.StateName.WaitForRestingA:
-    //   return waitForRestingAReducer(gameState, messageState, action);
+    case state.StateName.WaitForRestingA:
+      return waitForRestingAReducer(gameState, messageState, action);
     case state.StateName.InsufficientFunds:
       return insufficientFundsReducer(gameState, messageState, action);
     case state.StateName.WaitToResign:
@@ -226,8 +226,20 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
 // function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState, action: actions.GameAction) {
 // }
 
-// function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: MessageState, action: actions.GameAction) {
-// }
+function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: MessageState, action: actions.GameAction) {
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
+
+  const position = action.position;
+  if (position.constructor.name !== 'Resting') { return { gameState, messageState }; }
+
+  const newGameState: state.PickMove = { 
+    ...state.baseProperties(gameState),
+    name: state.StateName.PickMove,
+    turnNum: position.turnNum,
+  };
+
+  return { gameState: newGameState, messageState };
+}
 
 function insufficientFundsReducer(gameState: state.InsufficientFunds, messageState: MessageState, action: actions.GameAction) {
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
@@ -235,12 +247,14 @@ function insufficientFundsReducer(gameState: state.InsufficientFunds, messageSta
   const position = action.position;
   if (position.constructor.name !== 'Conclude') { return { gameState, messageState }; }
   const { channel, turnNum, resolution: balances } = position;
+  let latestPosition = gameState.latestPosition;
 
   if (gameState.player === Player.PlayerA) {
     // send conclude if player A
 
     const conclude = new Conclude(channel, turnNum + 1, balances);
 
+    latestPosition = conclude;
     messageState = { ...messageState, opponentOutbox: conclude };
   }
 
@@ -249,6 +263,7 @@ function insufficientFundsReducer(gameState: state.InsufficientFunds, messageSta
     ...state.baseProperties(gameState),
     name: state.StateName.GameOver,
     turnNum: turnNum + 1,
+    latestPosition,
   };
 
   return { gameState: newGameState, messageState };

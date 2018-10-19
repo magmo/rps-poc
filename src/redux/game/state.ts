@@ -125,6 +125,8 @@ export interface PlayAgain extends Base {
 export interface WaitForRestingA extends Base {
   name: StateName.WaitForRestingA;
   myMove: Move;
+  theirMove: Move;
+  result: Result;
   player: Player.PlayerA;
 }
 
