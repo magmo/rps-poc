@@ -52,11 +52,25 @@ function attemptRetry(jointState: JointState): JointState {
   return jointState;
 }
 
+function itsMyTurnNext(jointState: JointState) {
+  const { gameState, messageState } = jointState;
+  const extraState = messageState.actionToRetry ? 1 : 0;
+  const turnNum = gameState.turnNum + 1 + extraState;
+
+  return gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 === 1;
+}
+
 function resignationReducer(jointState: JointState) {
   let { messageState, gameState } = jointState;
 
-  if (state.itsMyTurn(gameState)) {
-    const { channel, turnNum, resolution: balances } = gameState.latestPosition;
+  if (itsMyTurnNext(jointState)) {
+    let position;
+    if (messageState.actionToRetry) {
+      position = messageState.actionToRetry.position;
+    } else {
+      position = gameState.latestPosition;
+    }
+    const { channel, turnNum, resolution: balances } = position;
 
     const conclude = new Conclude(channel, turnNum + 1, balances);
 
@@ -296,7 +310,7 @@ function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState
           result,
           player: Player.PlayerA,
         };
-        return { newGameState, messageState };
+        return { gameState: newGameState, messageState };
       } else {
         const { channel, turnNum, resolution: balances, stake } = gameState.latestPosition as Reveal;
         const resting = new Resting(channel, turnNum + 1, balances, stake);
@@ -310,7 +324,7 @@ function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState
           name: state.StateName.PickMove,
         };
 
-        return { newGameState, messageState };
+        return { gameState: newGameState, messageState };
       }
 
     case actions.POSITION_RECEIVED:

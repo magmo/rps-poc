@@ -198,6 +198,7 @@ describe('player A\'s app', () => {
       theirMove: bPlay,
       result: aResult,
       balances: aWinsBalances,
+      turnNum: reveal.turnNum,
     };
 
     describe('if the player decides to continue', () => {
@@ -232,7 +233,7 @@ describe('player A\'s app', () => {
         const updatedState2 = gameReducer(updatedState, action);
 
         itSends(conclude, updatedState2);
-        itTransitionsTo(state.StateName.WaitToResign, updatedState2);
+        itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState2);
       });
     });
   });

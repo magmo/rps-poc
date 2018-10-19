@@ -181,9 +181,3 @@ export type GameState = (
   | GameOver
   | WaitForWithdrawal
 );
-
-export function itsMyTurn(gameState: GameState) {
-  const turnNum = gameState.turnNum;
-
-  return gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 === 1;
-}
