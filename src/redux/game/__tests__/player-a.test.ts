@@ -251,7 +251,7 @@ describe('player A\'s app', () => {
     });
   });
 
-  describe.only('when in WaitForResignationAcknowledgement', () => {
+  describe('when in WaitForResignationAcknowledgement', () => {
     const gameState: state.WaitForResignationAcknowledgement = {
       ...aProps,
       name: state.StateName.WaitForResignationAcknowledgement,
@@ -263,7 +263,6 @@ describe('player A\'s app', () => {
       const action = actions.positionReceived(conclude);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itSends(conclude2, updatedState);
       itTransitionsTo(state.StateName.GameOver, updatedState);
     });
   });
