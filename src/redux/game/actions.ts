@@ -7,6 +7,7 @@ export const RESIGN = 'GAME.RESIGN';
 export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
 export const OPPONENT_RESIGNED = 'GAME.OPPONENT_RESIGNED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
+export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
 
 export const confirmGame = () => ({
@@ -40,6 +41,10 @@ export const fundingSuccess = () => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
 });
 
+export const withdrawalRequest = () => ({
+  type: WITHDRAWAL_REQUEST as typeof WITHDRAWAL_REQUEST,
+});
+
 export const withdrawalSuccess = () => ({
   type: WITHDRAWAL_SUCCESS as typeof WITHDRAWAL_SUCCESS,
 });
@@ -52,6 +57,7 @@ export type PositionReceived = ReturnType<typeof positionReceived>;
 export type OpponentResigned = ReturnType<typeof opponentResigned>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
+export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 
 export type GameAction = (
   | ConfirmGame
@@ -62,4 +68,5 @@ export type GameAction = (
   | OpponentResigned
   | FundingSuccess
   | WithdrawalSuccess
+  | WithdrawalRequest
 );
