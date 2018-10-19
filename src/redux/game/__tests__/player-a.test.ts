@@ -7,9 +7,9 @@ import * as actions from '../actions';
 import * as state from '../state';
 
 
-const libraryAddress = '0x123';
+const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = '4';
-const participants: [string, string] = ['0xa', '0xb'];
+const participants: [string, string] = ['0x' + 'a'.repeat(40), '0x' + 'b'.repeat(40)];
 const roundBuyIn = new BN(1);
 const initialBalances: [BN, BN] = [new BN(5), new BN(5)];
 const aWinsBalances: [BN, BN] = [new BN(6), new BN(4)];
@@ -48,20 +48,20 @@ const revealInsufficientFunds = new Reveal(channel, 6, insufficientFundsBalances
 const concludeInsufficientFunds = new Conclude(channel, 7, insufficientFundsBalances);
 const concludeInsufficientFunds2 = new Conclude(channel, 8, insufficientFundsBalances);
 
-const waitForGameConfirmationA = { ...sharedProps }
-const confirmGameB = { ...sharedProps }
+const waitForGameConfirmationA = { ...sharedProps };
+const confirmGameB = { ...sharedProps };
 
 const messageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
 
-const itSends = (position, state) => {
+const itSends = (position, jointState) => {
   it(`sends ${position.constructor.name}`, () => {
-    expect(state.messageState.opponentOutbox).toEqual(position);
+    expect(jointState.messageState.opponentOutbox).toEqual(position);
   });
 };
 
-const itTransitionsTo = (stateName, state) => {
+const itTransitionsTo = (stateName, jointState) => {
   it(`transitions to ${stateName}`, () => {
-    expect(state.gameState.name).toEqual(stateName);
+    expect(jointState.gameState.name).toEqual(stateName);
   });
 };
 
