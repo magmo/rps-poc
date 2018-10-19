@@ -1,12 +1,13 @@
+import { Channel } from 'fmg-core';
 import { Reducer } from 'redux';
 import * as actions from './actions';
 import * as state from './state';
-import { Position, Conclude } from '../../game-engine/positions';
+import { Position, Conclude, PostFundSetupA } from '../../game-engine/positions';
 
 export interface MessageState {
-  opponentOutbox: Position | null;
-  walletOutbox: string | null;
-  actionToRetry: actions.PositionReceived | null;
+  opponentOutbox?: Position;
+  walletOutbox?: string;
+  actionToRetry?: actions.PositionReceived;
 }
 
 interface JointState {
@@ -29,12 +30,13 @@ export const gameReducer: Reducer<JointState> = (jointState: JointState, action:
       // if we have a saved position in the inbox, try to apply it
       jointState = attemptRetry(jointState);
 
-      return jointState
+      return jointState;
   }
 };
 
 function attemptRetry(jointState) {
-  let { messageState, gameState } = jointState;
+  let { messageState } = jointState;
+  const { gameState } = jointState;
 
   const actionToRetry = messageState.actionToRetry;
   if (actionToRetry) {
@@ -78,42 +80,42 @@ function opponentResignationReducer(jointState: JointState) {
   return { gameState, messageState };
 }
 
-function localActionReducer(jointState: JointState, action: actions.GameAction) {
-  let { messageState, gameState } = jointState;
+function localActionReducer(jointState: JointState, action: actions.GameAction): JointState {
+  const { messageState, gameState } = jointState;
 
   switch (gameState.name) {
     case state.StateName.WaitForGameConfirmationA:
       return waitForGameConfirmationAReducer(gameState, messageState, action);
-    case state.StateName.ConfirmGameB:
-      return confirmGameBReducer(gameState, messageState, action);
+    // case state.StateName.ConfirmGameB:
+    //   return confirmGameBReducer(gameState, messageState, action);
     case state.StateName.WaitForFunding:
       return waitForFundingReducer(gameState, messageState, action);
     case state.StateName.WaitForPostFundSetup:
       return waitForPostFundSetupReducer(gameState, messageState, action);
-    case state.StateName.PickMove:
-      return pickMoveReducer(gameState, messageState, action);
-    case state.StateName.WaitForOpponentToPickMoveA:
-      return waitForOpponentToPickMoveAReducer(gameState, messageState, action);
-    case state.StateName.WaitForOpponentToPickMoveB:
-      return waitForOpponentToPickMoveBReducer(gameState, messageState, action);
-    case state.StateName.WaitForRevealB:
-      return waitForRevealBReducer(gameState, messageState, action);
-    case state.StateName.PlayAgain:
-      return playAgainReducer(gameState, messageState, action);
-    case state.StateName.WaitForRestingA:
-      return waitForRestingAReducer(gameState, messageState, action);
-    case state.StateName.InsufficientFunds:
-      return insufficientFundsReducer(gameState, messageState, action);
-    case state.StateName.WaitToResign:
-      return waitToResignReducer(gameState, messageState, action);
-    case state.StateName.OpponentResigned:
-      return opponentResignedReducer(gameState, messageState, action);
-    case state.StateName.WaitForResignationAcknowledgement:
-      return waitForResignationAcknowledgementReducer(gameState, messageState, action);
-    case state.StateName.GameOver:
-      return gameOverReducer(gameState, messageState, action);
-    case state.StateName.WaitForWithdrawal:
-      return waitForWithdrawalReducer(gameState, messageState, action);
+    // case state.StateName.PickMove:
+    //   return pickMoveReducer(gameState, messageState, action);
+    // case state.StateName.WaitForOpponentToPickMoveA:
+    //   return waitForOpponentToPickMoveAReducer(gameState, messageState, action);
+    // case state.StateName.WaitForOpponentToPickMoveB:
+    //   return waitForOpponentToPickMoveBReducer(gameState, messageState, action);
+    // case state.StateName.WaitForRevealB:
+    //   return waitForRevealBReducer(gameState, messageState, action);
+    // case state.StateName.PlayAgain:
+    //   return playAgainReducer(gameState, messageState, action);
+    // case state.StateName.WaitForRestingA:
+    //   return waitForRestingAReducer(gameState, messageState, action);
+    // case state.StateName.InsufficientFunds:
+    //   return insufficientFundsReducer(gameState, messageState, action);
+    // case state.StateName.WaitToResign:
+    //   return waitToResignReducer(gameState, messageState, action);
+    // case state.StateName.OpponentResigned:
+    //   return opponentResignedReducer(gameState, messageState, action);
+    // case state.StateName.WaitForResignationAcknowledgement:
+    //   return waitForResignationAcknowledgementReducer(gameState, messageState, action);
+    // case state.StateName.GameOver:
+    //   return gameOverReducer(gameState, messageState, action);
+    // case state.StateName.WaitForWithdrawal:
+    //   return waitForWithdrawalReducer(gameState, messageState, action);
     default:
       // should be unreachable
       return jointState;
@@ -122,7 +124,7 @@ function localActionReducer(jointState: JointState, action: actions.GameAction) 
 
 function waitForGameConfirmationAReducer(
   gameState: state.WaitForGameConfirmationA, messageState: MessageState, action: actions.GameAction
-) {
+) : JointState {
   // only action we need to handle in this state is to receiving a PreFundSetup
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
   if (action.position.constructor.name !== 'PreFundSetup') { return { gameState, messageState }; }
@@ -131,53 +133,81 @@ function waitForGameConfirmationAReducer(
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   // transition to Wait for Funding
-  const newGameState = { ...state.baseProperties(gameState), name: state.StateName.WaitForFunding };
+  const newGameState: state.WaitForFunding = { ...state.baseProperties(gameState), name: state.StateName.WaitForFunding };
 
   return { messageState, gameState: newGameState };
 }
 
-function confirmGameBReducer(gameState: state.ConfirmGameB, messageState: MessageState, action: actions.GameAction) {
+// function confirmGameBReducer(gameState: state.ConfirmGameB, messageState: MessageState, action: actions.GameAction) : JointState {
+// }
 
+function waitForFundingReducer(
+  gameState: state.WaitForFunding, messageState: MessageState, action: actions.GameAction
+): JointState {
+  if (action.type !== actions.FUNDING_SUCCESS) {
+    return { gameState, messageState };
+  }
+
+  const { libraryAddress, channelNonce, participants, turnNum, balances, roundBuyIn } = gameState;
+  const postFundSetupA = new PostFundSetupA(
+    new Channel(libraryAddress, channelNonce, participants),
+    turnNum + 2,
+    balances,
+    0,
+    roundBuyIn
+  );
+  const newGameState: state.WaitForPostFundSetup = {
+    ...state.baseProperties(gameState),
+    latestPosition: postFundSetupA,
+    name: state.StateName.WaitForPostFundSetup,
+  };
+  const newMessageState = { opponentOutbox: postFundSetupA };
+  return { gameState: newGameState, messageState: newMessageState };
 }
 
-function waitForFundingReducer(gameState: state.WaitForFunding, messageState: MessageState, action: actions.GameAction) {
+function waitForPostFundSetupReducer(
+  gameState: state.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction
+): JointState {
+  if (action.type !== actions.POSITION_RECEIVED) {
+    return { gameState, messageState };
+  }
+  const newGameState: state.PickMove = { ...state.baseProperties(gameState), name: state.StateName.PickMove };
+
+  return { gameState: newGameState, messageState: {} };
 }
 
-function waitForPostFundSetupReducer(gameState: state.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction) {
-}
+// function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitForOpponentToPickMoveAReducer(gameState: state.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function waitForOpponentToPickMoveAReducer(gameState: state.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitForOpponentToPickMoveBReducer(gameState: state.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function waitForOpponentToPickMoveBReducer(gameState: state.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitForRevealBReducer(gameState: state.WaitForRevealB, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function waitForRevealBReducer(gameState: state.WaitForRevealB, messageState: MessageState, action: actions.GameAction) {
-}
+// function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: MessageState, action: actions.GameAction) {
-}
+// function insufficientFundsReducer(gameState: state.InsufficientFunds, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function insufficientFundsReducer(gameState: state.InsufficientFunds, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitToResignReducer(gameState: state.WaitToResign, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function waitToResignReducer(gameState: state.WaitToResign, messageState: MessageState, action: actions.GameAction) {
-}
+// function opponentResignedReducer(gameState: state.OpponentResigned, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function opponentResignedReducer(gameState: state.OpponentResigned, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitForResignationAcknowledgementReducer(gameState: state.WaitForResignationAcknowledgement, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function waitForResignationAcknowledgementReducer(gameState: state.WaitForResignationAcknowledgement, messageState: MessageState, action: actions.GameAction) {
-}
+// function gameOverReducer(gameState: state.GameOver, messageState: MessageState, action: actions.GameAction) {
+// }
 
-function gameOverReducer(gameState: state.GameOver, messageState: MessageState, action: actions.GameAction) {
-}
-
-function waitForWithdrawalReducer(gameState: state.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
-}
+// function waitForWithdrawalReducer(gameState: state.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
+// }
