@@ -22,7 +22,6 @@ export interface Challenge {
 
 export interface ApplicationState {
   currentRoom: Room;
-  gameState?: GameState;
   challenges?: Challenge[];
   myChallenge?: Challenge;
   error?: string;
@@ -52,7 +51,6 @@ export const applicationReducer: Reducer<ApplicationState> = (state = initialSta
     case applicationActions.GAME_SUCCESS:
       return {
         currentRoom: Room.game,
-        gameState: action.state,
       };
     case applicationActions.INITIALIZATION_FAILURE:
       return {

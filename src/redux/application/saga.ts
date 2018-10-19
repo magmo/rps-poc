@@ -42,9 +42,6 @@ export default function* applicationControllerSaga(userId: string) {
         const isPublic = true;
         currentRoom = yield fork(waitingRoomSaga, address, action.name, action.stake, isPublic);
         break;
-      case applicationActions.GAME_REQUEST:
-        // TODO: Nothing we need to do here, so this can be removed
-        break;
       default:
         // todo: check for unreachability
     }

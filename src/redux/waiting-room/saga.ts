@@ -3,8 +3,7 @@ import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase'
 
 import * as waitingRoomActions from '../waiting-room/actions';
 import * as applicationActions from '../application/actions';
-import GameEngineB from '../../game-engine/GameEngineB';
-import decode from '../../game-engine/positions/decode';
+
 import BN from 'bn.js';
 import * as gameActions from '../game/actions';
 
@@ -53,7 +52,7 @@ export default function* waitingRoomSaga(
       case gameActions.POSITION_RECEIVED:
         // todo: handle error if it isn't a propose state with the right properties
         yield call(reduxSagaFirebase.database.delete, challengeKey);
-        yield put(applicationActions.gameRequest(action.position));
+        yield put(applicationActions.gameRequest());
         break;
     }
   }

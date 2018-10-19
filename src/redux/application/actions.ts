@@ -29,9 +29,8 @@ export const waitingRoomRequest = (name: string, stake: BN) => ({
   stake,
 });
 
-export const gameRequest = (initialState: Position) => ({
+export const gameRequest = () => ({
   type: GAME_REQUEST as typeof GAME_REQUEST,
-  initialState,
 });
 
 export const lobbySuccess = () => ({

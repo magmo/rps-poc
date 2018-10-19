@@ -14,12 +14,10 @@ import { WalletController } from '../wallet';
 
 import { SiteState } from '../redux/reducer';
 
-import { PlayerAStateType as playerA } from '../game-engine/application-states/PlayerA';
-import { PlayerBStateType as playerB } from '../game-engine/application-states/PlayerB';
 
-import { State as GameState } from '../game-engine/application-states';
 import { Play } from '../game-engine/positions';
 import WalletHeader from 'src/wallet/containers/WalletHeader';
+import { GameState,StateName } from 'src/redux/game/state';
 
 interface GameProps {
   state: GameState;
@@ -45,83 +43,67 @@ function GameContainer(props: GameProps) {
 }
 function RenderGame(props:GameProps){
   const { state, choosePlay, playAgain, abandonGame, createBlockchainChallenge } = props;
-  switch (state.type) {
-    case playerA.WAIT_FOR_PRE_FUND_SETUP:
+  switch (state.name) {
+    case StateName.WaitForGameConfirmationA:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
-    case playerA.WAIT_FOR_POST_FUND_SETUP:
+    case StateName.ConfirmGameB:
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
-    case playerA.CHOOSE_PLAY:
+    case StateName.PickMove:
       return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
 
-    case playerA.WAIT_FOR_ACCEPT:
+    case StateName.WaitForOpponentToPickMoveA:
       return (
         <PlaySelectedPage
           message="Waiting for your opponent to choose their move"
-          yourPlay={state.aPlay}
+          yourPlay={state.myMove}
           createBlockchainChallenge={createBlockchainChallenge}
         />
       );
 
-    case playerA.WAIT_FOR_RESTING:
+    case StateName.WaitForRestingA:
       return (
-        <ResultPage
-          message="Waiting for resting"
-          yourPlay={state.aPlay}
-          theirPlay={state.bPlay}
-          result={state.result}
-          playAgain={playAgain}
-          abandonGame={abandonGame}
-        />
+        <PlaySelectedPage
+        message="Waiting for resting"
+        yourPlay={state.myMove}
+        createBlockchainChallenge={createBlockchainChallenge}
+      />
       );
 
-    case playerA.INSUFFICIENT_FUNDS:
-    case playerB.INSUFFICIENT_FUNDS:
-      // todo: add into the logic about who it was that ran out of funds
-      // Also todo: replace with new component (WaitingStep is just a filler)
-      return (
-        <WaitingStep createBlockchainChallenge={createBlockchainChallenge} message="About to conclude the game – either you or your opponent has run out of funds!" />
-      );
-
-    case playerA.WAIT_FOR_CONCLUDE:
-    case playerB.WAIT_FOR_CONCLUDE:
-    case playerA.CONCLUDED:
-    case playerB.CONCLUDED:
-    case playerA.CONCLUDE_RECEIVED:
-    case playerB.CONCLUDE_RECEIVED:
+case StateName.GameOver:
       return <WalletController />;
-    case playerB.WAIT_FOR_POST_FUND_SETUP:
+    case StateName.WaitForPostFundSetup:
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
-    case playerB.WAIT_FOR_PROPOSE:
+    case StateName.WaitForOpponentToPickMoveB:
       return <WaitingStep createBlockchainChallenge={createBlockchainChallenge} message="Waiting for your opponent to choose their move" />;
 
-    case playerB.CHOOSE_PLAY:
-      return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
-    case playerB.WAIT_FOR_REVEAL:
+    case StateName.WaitForRevealB:
       return (
         <PlaySelectedPage
           message="Waiting for your opponent to choose their move"
-          yourPlay={state.bPlay}
+          yourPlay={state.myMove}
           createBlockchainChallenge={createBlockchainChallenge}
         />
       );
 
-    case playerB.PLAY_AGAIN:
+    case StateName.PlayAgain:
       return (
         <ResultPage
           message="Waiting for opponent to suggest a new game"
-          yourPlay={state.bPlay}
-          theirPlay={state.aPlay}
+          yourPlay={state.myMove}
+          theirPlay={state.theirMove}
           result={state.result}
           playAgain={playAgain}
           abandonGame={abandonGame}
         />
       );
+      default:
+      return <div>View not created for {state.name}</div>;
   }
 }
 const mapStateToProps = (state: SiteState) => ({
-  state: state.app.gameState as GameState,
+  state: state.game.gameState as GameState,
   showWallet: state.wallet.display.showWallet,
   showWalletHeader: state.wallet.display.showHeader,
 });

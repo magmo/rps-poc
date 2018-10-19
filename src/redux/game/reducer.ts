@@ -14,7 +14,7 @@ export interface MessageState {
 
 const NULL_MESSAGE_STATE = { opponentOutbox: null, walletOutbox: null, actionToRetry: null };
 
-interface JointState {
+export interface JointState {
   gameState: state.GameState;
   messageState: MessageState;
 }
