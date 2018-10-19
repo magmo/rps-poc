@@ -1,7 +1,9 @@
-import { GameEngine } from "../../game-engine/GameEngine";
+
 import { State as GameState } from "../../game-engine/application-states";
 import { Challenge } from "./reducer";
 import BN from 'bn.js';
+import { Position } from '../../game-engine/positions';
+
 
 export const INITIALIZATION_FAILURE = 'APPLICATION.INITIALIZATION.FAILURE';
 export const RELOAD = 'APPLICATION.RELOAD';
@@ -27,9 +29,9 @@ export const waitingRoomRequest = (name: string, stake: BN) => ({
   stake,
 });
 
-export const gameRequest = (gameEngine: GameEngine) => ({
+export const gameRequest = (initialState: Position) => ({
   type: GAME_REQUEST as typeof GAME_REQUEST,
-  gameEngine,
+  initialState,
 });
 
 export const lobbySuccess = () => ({

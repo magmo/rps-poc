@@ -2,13 +2,13 @@ import { take, actionChannel, put, call, apply } from 'redux-saga/effects';
 import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
 
 import * as waitingRoomActions from '../waiting-room/actions';
-import * as messageActions from '../message-service/actions';
 import * as applicationActions from '../application/actions';
 import GameEngineB from '../../game-engine/GameEngineB';
 import decode from '../../game-engine/positions/decode';
 import BN from 'bn.js';
+import * as gameActions from '../game/actions';
 
-type ActionType = waitingRoomActions.CancelChallenge | messageActions.MessageReceived;
+type ActionType = waitingRoomActions.CancelChallenge | gameActions.PositionReceived;
 
 export default function* waitingRoomSaga(
   address: string,
@@ -18,7 +18,7 @@ export default function* waitingRoomSaga(
 ) {
   const channel = yield actionChannel([
     waitingRoomActions.CANCEL_CHALLENGE,
-    messageActions.MESSAGE_RECEIVED,
+    gameActions.POSITION_RECEIVED
   ]);
 
   const commonChallengeProps = {
@@ -50,12 +50,10 @@ export default function* waitingRoomSaga(
         yield put(applicationActions.lobbyRequest());
         break;
 
-      case messageActions.MESSAGE_RECEIVED:
-        const position = decode(action.message);
-        const gameEngine = GameEngineB.fromProposal(position);
+      case gameActions.POSITION_RECEIVED:
         // todo: handle error if it isn't a propose state with the right properties
         yield call(reduxSagaFirebase.database.delete, challengeKey);
-        yield put(applicationActions.gameRequest(gameEngine));
+        yield put(applicationActions.gameRequest(action.position));
         break;
     }
   }

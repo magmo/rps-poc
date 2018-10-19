@@ -34,7 +34,8 @@ export default function* lobbySaga(address: string) {
           libraryAddress,
           balances: [action.stake.mul(new BN(DEFAULT_BALANCES)), action.stake.mul(new BN(DEFAULT_BALANCES))],
         });
-        yield put(applicationActions.gameRequest(gameEngine));
+        const initialState = gameEngine.state.position;
+        yield put(applicationActions.gameRequest(initialState));
         break;
 
       case lobbyActions.CREATE_CHALLENGE:

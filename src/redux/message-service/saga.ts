@@ -4,7 +4,7 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 
 
 import { actions as walletActions } from '../../wallet';
-import { SignatureSuccess, FUNDING_REQUEST } from '../../wallet/redux/actions/external';
+import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
 import * as challengeActions from '../../wallet/redux/actions/challenge';
 import decode from 'src/game-engine/positions/decode';
@@ -44,7 +44,7 @@ export function* sendMessagesSaga(opponentAddress: string) {
         const data = messageState.opponentOutbox.toHex();
         const signature = yield signMessage(data);
         const message = { data, queue, signature };
-        yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message;
+        yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
       }
       if (messageState.walletOutbox!=null){
         const getGameState = state => ({});

@@ -39,7 +39,6 @@ type StateAction =
   | applicationActions.WaitingRoomSuccess
   | applicationActions.GameSuccess
   | applicationActions.InitializationFailure
-  | gameActions.StateChanged
   | lobbyActions.SyncChallenge;
 
 export const applicationReducer: Reducer<ApplicationState> = (state = initialState, action: StateAction) => {
@@ -61,11 +60,6 @@ export const applicationReducer: Reducer<ApplicationState> = (state = initialSta
         ...state,
         currentRoom: Room.error,
         error: action.error,
-      };
-    case gameActions.STATE_CHANGED:
-      return {
-        ...state,
-        gameState: action.state,
       };
     case lobbyActions.SYNC_CHALLENGES:
       return {
