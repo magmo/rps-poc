@@ -55,8 +55,6 @@ export function baseProperties(state: GameState) {
     player,
   } = state;
 
-  const myIndex = player === Player.PlayerA ? 0 : 1;
-
   return {
     libraryAddress,
     channelNonce,
@@ -69,11 +67,6 @@ export function baseProperties(state: GameState) {
     opponentName,
     latestPosition,
     player,
-    channelId: latestPosition.channel.id,
-    opponentAddress: participants[1 - myIndex],
-    myAddress: participants[myIndex],
-    myBalance: balances[myIndex],
-    opponentBalance: balances[1 - myIndex],
   };
 }
 
