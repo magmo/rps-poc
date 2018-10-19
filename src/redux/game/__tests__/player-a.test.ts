@@ -231,7 +231,26 @@ describe('player A\'s app', () => {
     });
   });
 
-  describe.only('when in WaitToResign', () => {
+  describe.only('when in WaitForRestingA', () => {
+    const gameState: state.WaitForRestingA = {
+      ...aProps,
+      name: state.StateName.WaitForRestingA,
+      latestPosition: reveal,
+      myMove: aPlay,
+      theirMove: bPlay,
+      result: aResult,
+    };
+
+    describe('when resting arrives', () => {
+      const action = actions.positionReceived(resting);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.PickMove, updatedState);
+    });
+  });
+
+
+  describe('when in WaitToResign', () => {
     const gameState: state.WaitToResign = {
       ...aProps,
       name: state.StateName.WaitToResign,
