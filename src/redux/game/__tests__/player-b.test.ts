@@ -203,7 +203,7 @@ describe('player B\'s app', () => {
     });
   });
 
-  describe('when in PlayAgain', () => {
+  describe.only('when in PlayAgain', () => {
     const gameState: state.PlayAgain = {
       ...bProps,
       name: state.StateName.PlayAgain,

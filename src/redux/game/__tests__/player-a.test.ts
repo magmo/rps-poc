@@ -189,7 +189,7 @@ describe('player A\'s app', () => {
     });
   });
 
-  describe('when in PlayAgain', () => {
+  describe.only('when in PlayAgain', () => {
     const gameState: state.PlayAgain = {
       ...aProps,
       name: state.StateName.PlayAgain,
@@ -237,7 +237,7 @@ describe('player A\'s app', () => {
     });
   });
 
-  describe.only('when in WaitForRestingA', () => {
+  describe('when in WaitForRestingA', () => {
     const gameState: state.WaitForRestingA = {
       ...aProps,
       name: state.StateName.WaitForRestingA,

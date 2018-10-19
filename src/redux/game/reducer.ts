@@ -4,7 +4,7 @@ import BN from 'bn.js';
 
 import * as actions from './actions';
 import * as state from './state';
-import { Position, Conclude, PostFundSetupA, Propose, Accept, Reveal, Result, calculateResult } from '../../game-engine/positions';
+import { Position, Conclude, PostFundSetupA, Propose, Accept, Reveal, Result, Resting, calculateResult } from '../../game-engine/positions';
 import { randomHex } from '../../utils/randomHex';
 import { Player } from '../../game-engine/application-states';
 
@@ -106,8 +106,8 @@ function localActionReducer(jointState: JointState, action: actions.GameAction):
     //   return waitForOpponentToPickMoveBReducer(gameState, messageState, action);
     // case state.StateName.WaitForRevealB:
     //   return waitForRevealBReducer(gameState, messageState, action);
-    // case state.StateName.PlayAgain:
-    //   return playAgainReducer(gameState, messageState, action);
+    case state.StateName.PlayAgain:
+      return playAgainReducer(gameState, messageState, action);
     case state.StateName.WaitForRestingA:
       return waitForRestingAReducer(gameState, messageState, action);
     case state.StateName.InsufficientFunds:
@@ -280,8 +280,52 @@ function waitForOpponentToPickMoveAReducer(gameState: state.WaitForOpponentToPic
 // function waitForRevealBReducer(gameState: state.WaitForRevealB, messageState: MessageState, action: actions.GameAction) {
 // }
 
-// function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState, action: actions.GameAction) {
-// }
+function playAgainReducer(gameState: state.PlayAgain, messageState: MessageState, action: actions.GameAction) {
+  switch (action.type) {
+    // case actions.RESIGN: // handled globally
+    // case actions.OPPONENT_RESIGNED: // handled globally
+    case actions.PLAY_AGAIN:
+      if (gameState.player === Player.PlayerA) {
+        // transition to WaitForResting
+        const { myMove, theirMove, result } = gameState;
+        const newGameState: state.WaitForRestingA = {
+          ...state.baseProperties(gameState),
+          name: state.StateName.WaitForRestingA,
+          myMove,
+          theirMove,
+          result,
+          player: Player.PlayerA,
+        };
+        return { newGameState, messageState };
+      } else {
+        const { channel, turnNum, resolution: balances, stake } = gameState.latestPosition as Reveal;
+        const resting = new Resting(channel, turnNum + 1, balances, stake);
+
+        // send Resting
+        messageState = { ...messageState, opponentOutbox: resting };
+
+        // transition to PickMove
+        const newGameState: state.PickMove = { 
+          ...state.baseProperties(gameState),
+          name: state.StateName.PickMove,
+        };
+
+        return { newGameState, messageState };
+      }
+
+    case actions.POSITION_RECEIVED:
+      const position = action.position;
+      if (position.constructor.name !== 'Resting') { return { gameState, messageState }; }
+
+      messageState = { ...messageState, actionToRetry: action };
+      return { gameState, messageState };
+
+    default:
+      return { gameState, messageState };
+
+  }
+
+}
 
 function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: MessageState, action: actions.GameAction) {
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
@@ -289,7 +333,7 @@ function waitForRestingAReducer(gameState: state.WaitForRestingA, messageState: 
   const position = action.position;
   if (position.constructor.name !== 'Resting') { return { gameState, messageState }; }
 
-  const newGameState: state.PickMove = { 
+  const newGameState: state.PickMove = {
     ...state.baseProperties(gameState),
     name: state.StateName.PickMove,
     turnNum: position.turnNum,
@@ -316,7 +360,7 @@ function insufficientFundsReducer(gameState: state.InsufficientFunds, messageSta
   }
 
   // transition to gameOver
-  const newGameState: state.GameOver = { 
+  const newGameState: state.GameOver = {
     ...state.baseProperties(gameState),
     name: state.StateName.GameOver,
     turnNum: turnNum + 1,
