@@ -3,7 +3,7 @@ import * as actions from './actions';
 import * as state from './state';
 import { Position, Conclude } from '../../game-engine/positions';
 
-interface MessageState {
+export interface MessageState {
   opponentOutbox: Position | null;
   walletOutbox: string | null;
   actionToRetry: actions.PositionReceived | null;

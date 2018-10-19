@@ -1,4 +1,4 @@
-import { fork, take, call, put, actionChannel } from 'redux-saga/effects';
+import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects';
 import { buffers } from 'redux-saga';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -9,43 +9,44 @@ import { AUTO_OPPONENT_ADDRESS } from '../../constants';
 import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import hash from 'object-hash';
 import * as challengeActions from '../../wallet/redux/actions/challenge';
+import decode from 'src/game-engine/positions/decode';
+import { State } from 'fmg-core';
+import * as gameActions from '../game/actions';
+import { MessageState } from '../game/reducer';
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
 }
 
 export default function* messageSaga(address: string) {
-  yield fork(sendMessagesSaga);
   yield fork(receiveFromFirebaseSaga, address);
   yield fork(receiveFromWalletSaga);
-  yield fork(receiveFromAutoOpponentSaga);
 }
 
-function* sendMessagesSaga() {
-  const channel = yield actionChannel([messageActions.SEND_MESSAGE, walletActions.SEND_MESSAGE]);
+export function* sendMessagesSaga(opponentAddress: string) {
+  const channel = yield actionChannel([gameActions.POSITION_RECEIVED, gameActions.OPPONENT_RESIGNED, walletActions.SEND_MESSAGE]);
 
   while (true) {
-    const action: messageActions.SendMessage | walletActions.SendMessage = yield take(channel);
+    // We take any action that might trigger the outbox to be updated
+    const action: gameActions.OpponentResigned | gameActions.PositionReceived | walletActions.SendMessage = yield take(channel);
 
-    const { to, data } = action;
-    let message = {};
-    let queue;
-    if (action.type === messageActions.SEND_MESSAGE) {
-      queue = Queue.GAME_ENGINE;
-      const signature = yield signMessage(data);
-      message = { data, queue, signature };
-      yield put(walletActions.messageSent(data,signature));
+    if (action.type === walletActions.SEND_MESSAGE) {
+      const queue = Queue.WALLET;
+      const { data } = action;
+      const message = { data, queue };
+      yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
     } else {
-      queue = Queue.WALLET;
-      message = { data, queue };
+      // TODO: Select the actual state once it's wired up.
+      const getMessageState = state => ({});
+      const messageState: MessageState = yield select(getMessageState);
+      if (messageState.opponentOutbox != null) {
+        const queue = Queue.GAME_ENGINE;
+        const data = messageState.opponentOutbox.toHex();
+        const signature = yield signMessage(data);
+        const message = { data, queue, signature };
+        yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message;
+      }
     }
-
-    if (to === AUTO_OPPONENT_ADDRESS) {
-      yield put(autoOpponentActions.messageFromApp(data));
-    } else {
-      yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
-    }
-    yield put(messageActions.messageSent());
   }
 }
 
@@ -70,8 +71,12 @@ function* receiveFromFirebaseSaga(address: string) {
       if (!validMessage) {
         // TODO: Handle this
       }
-      yield put(walletActions.messageReceived(data,signature));
-      yield put(messageActions.messageReceived(data));
+      const position = decode(data);
+      if (position.stateType === State.StateType.Conclude) {
+        yield put(gameActions.opponentResigned(position));
+      } else {
+        yield put(gameActions.positionReceived(position));
+      }
     } else {
       yield put(walletActions.receiveMessage(data));
     }
@@ -82,7 +87,7 @@ function* receiveFromFirebaseSaga(address: string) {
 function* receiveFromWalletSaga() {
   while (true) {
     const { position } = yield take(challengeActions.SEND_CHALLENGE_POSITION);
-    yield put(messageActions.messageReceived(position));
+    yield put(gameActions.positionReceived(position));
   }
 }
 
@@ -103,7 +108,7 @@ function* validateMessage(data, signature) {
 }
 
 function* signMessage(data) {
-  const requestId = hash(data+Date.now());
+  const requestId = hash(data + Date.now());
 
   yield put(walletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
@@ -113,13 +118,4 @@ function* signMessage(data) {
     signatureResponse = yield take(actionFilter);
   }
   return signatureResponse.signature;
-}
-
-function* receiveFromAutoOpponentSaga() {
-  const channel = yield actionChannel(autoOpponentActions.MESSAGE_TO_APP);
-
-  while (true) {
-    const action: autoOpponentActions.MessageToApp = yield take(channel);
-    yield put(messageActions.messageReceived(action.data));
-  }
 }
