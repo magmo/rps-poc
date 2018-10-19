@@ -44,6 +44,7 @@ export function* sendMessagesSaga(opponentAddress: string) {
         const data = messageState.opponentOutbox.toHex();
         const signature = yield signMessage(data);
         const message = { data, queue, signature };
+        yield put(walletActions.messageSent(data,signature));
         yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
       }
       if (messageState.walletOutbox!=null){
@@ -76,6 +77,7 @@ function* receiveFromFirebaseSaga(address: string) {
       if (!validMessage) {
         // TODO: Handle this
       }
+      yield put(walletActions.messageReceived(data,signature));
       const position = decode(data);
       if (position.stateType === State.StateType.Conclude) {
         yield put(gameActions.opponentResigned(position));
@@ -97,7 +99,13 @@ function* handleWalletMessage(type, state: GameState){
     yield put(walletActions.fundingRequest(channelId,myAddress,opponentAddress,myBalance,opponentBalance,playerIndex));
     yield take(walletActions.FUNDING_SUCCESS);
     break;
+    case "WITHDRAWAL_REQUEST":
+    yield put(walletActions.withdrawalRequest(state.latestPosition));
+    yield take(walletActions.WITHDRAWAL_SUCCESS);
+
   }
+
+  
 }
 
 function* receiveFromWalletSaga() {

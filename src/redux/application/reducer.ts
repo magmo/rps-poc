@@ -1,6 +1,5 @@
 import { Reducer } from 'redux';
 import * as applicationActions from './actions';
-import * as gameActions from '../game/actions';
 import * as lobbyActions from '../lobby/actions';
 
 import { State as GameState } from '../../game-engine/application-states';
