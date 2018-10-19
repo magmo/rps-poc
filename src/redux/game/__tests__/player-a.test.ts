@@ -267,4 +267,24 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.GameOver, updatedState);
     });
   });
+
+  describe('when in GameOver', () => {
+    const gameState: state.GameOver = {
+      ...aProps,
+      name: state.StateName.GameOver,
+      latestPosition: conclude,
+      balances: aWinsBalances,
+    };
+
+    describe('when the player wants to withdraw their funds', () => {
+      const action = actions.withdrawalRequest();
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itTransitionsTo(state.StateName.WaitForWithdrawal, updatedState);
+
+      it('requests a withdrawal from the wallet', () => {
+        expect(updatedState.messageState.walletOutbox).toEqual('WITHDRAWAL');
+      });
+    });
+  });
 });

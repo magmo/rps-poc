@@ -116,8 +116,8 @@ function localActionReducer(jointState: JointState, action: actions.GameAction):
     //   return opponentResignedReducer(gameState, messageState, action);
     // case state.StateName.WaitForResignationAcknowledgement:
     //   return waitForResignationAcknowledgementReducer(gameState, messageState, action);
-    // case state.StateName.GameOver:
-    //   return gameOverReducer(gameState, messageState, action);
+    case state.StateName.GameOver:
+      return gameOverReducer(gameState, messageState, action);
     // case state.StateName.WaitForWithdrawal:
     //   return waitForWithdrawalReducer(gameState, messageState, action);
     default:
@@ -241,8 +241,14 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
 // function waitForResignationAcknowledgementReducer(gameState: state.WaitForResignationAcknowledgement, messageState: MessageState, action: actions.GameAction) {
 // }
 
-// function gameOverReducer(gameState: state.GameOver, messageState: MessageState, action: actions.GameAction) {
-// }
+function gameOverReducer(gameState: state.GameOver, messageState: MessageState, action: actions.GameAction) {
+  if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState}; }
+
+  const newGameState =  { ...state.baseProperties(gameState), name: state.StateName.WaitForWithdrawal };
+  messageState = { ...messageState, walletOutbox: 'WITHDRAWAL' };
+
+  return { gameState: newGameState, messageState};
+}
 
 // function waitForWithdrawalReducer(gameState: state.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
 // }
