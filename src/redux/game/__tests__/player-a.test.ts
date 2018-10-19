@@ -231,6 +231,23 @@ describe('player A\'s app', () => {
     });
   });
 
+  describe.only('when in WaitToResign', () => {
+    const gameState: state.WaitToResign = {
+      ...aProps,
+      name: state.StateName.WaitToResign,
+      latestPosition: revealInsufficientFunds,
+    };
+
+    describe('when any position arrives', () => {
+      const action = actions.positionReceived(resting);
+      const updatedState = gameReducer({ messageState, gameState }, action);
+
+      itSends(conclude, updatedState);
+      itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState);
+    });
+  });
+
+
   describe('when in InsufficientFunds', () => {
     const gameState: state.InsufficientFunds = {
       ...aProps,
