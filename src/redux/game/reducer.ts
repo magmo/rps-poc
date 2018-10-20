@@ -108,7 +108,8 @@ function resignationReducer(jointState: JointState) {
 }
 
 function opponentResignationReducer(jointState: JointState, position: Conclude) {
-  let { messageState, gameState } = jointState;
+  let { messageState } = jointState;
+  const { gameState } = jointState;
 
   // for the time being, we're just trusting it was their turn - which the
   // wallet will enforce
