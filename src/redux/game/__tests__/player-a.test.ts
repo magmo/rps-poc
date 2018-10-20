@@ -1,7 +1,7 @@
 import BN from "bn.js";
 import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA, Result, hashCommitment } from "../../../game-engine/positions";
 import { Channel } from "fmg-core";
-import { gameReducer } from '../reducer';
+import { gameReducer, JointState } from '../reducer';
 import { Player } from '../../../game-engine/application-states';
 import * as actions from '../actions';
 import * as state from '../state';
@@ -77,6 +77,44 @@ const itStoresAction = (action, jointState) => {
   });
 };
 
+const itHandlesResignWhenTheirMove = (jointState: JointState) => {
+  describe('when resigning', () => {
+    it ('transitions to WaitToResign', () => {
+      const { gameState } = jointState;
+      const { latestPosition: oldPosition } = gameState;
+      const updatedState = gameReducer(jointState, actions.resign());
+      const { latestPosition: position } = updatedState.gameState;
+
+      expect(updatedState.gameState.name).toEqual(state.StateName.WaitToResign);
+      expect(updatedState.gameState).toMatchObject({
+        name: state.StateName.WaitToResign,
+        turnNum: oldPosition.turnNum,
+      });
+      expect(position).toEqual(oldPosition);
+    });
+  });
+};
+
+const itHandlesResignWhenMyMove = (jointState: JointState) => {
+  describe('when my opponent resigns', () => {
+    it ('transitions to WaitToResign', () => {
+      const { gameState } = jointState;
+      const { latestPosition: oldPosition } = gameState;
+      const updatedState = gameReducer(jointState, actions.resign());
+      const { latestPosition: position } = updatedState.gameState;
+
+      expect(updatedState.gameState.name).toEqual(state.StateName.WaitForResignationAcknowledgement);
+      expect(updatedState.gameState).toMatchObject({
+        name: state.StateName.WaitForResignationAcknowledgement,
+        turnNum: oldPosition.turnNum + 1,
+        balances: gameState.balances,
+        player: Player.PlayerA,
+      });
+      const newConclude = new Conclude(channel, oldPosition.turnNum + 1, oldPosition.resolution);
+      expect(position).toEqual(newConclude);
+    });
+  });
+};
 
 describe('player A\'s app', () => {
   const aProps = { ...sharedProps, player: Player.PlayerA as Player.PlayerA };
@@ -98,6 +136,8 @@ describe('player A\'s app', () => {
 
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     });
+
+    itHandlesResignWhenTheirMove({ messageState, gameState });
   });
 
   describe('when in waitForFunding', () => {
@@ -105,6 +145,8 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitForFunding,
       latestPosition: preFundSetupB,
+      turnNum: preFundSetupB.turnNum,
+      stateCount: preFundSetupB.stateCount,
     };
 
     describe('when funding is successful', () => {
@@ -114,6 +156,8 @@ describe('player A\'s app', () => {
       itSends(postFundSetupA, updatedState);
       itTransitionsTo(state.StateName.WaitForPostFundSetup, updatedState);
     });
+
+    itHandlesResignWhenMyMove({ messageState, gameState });
   });
 
   describe('when in WaitForPostFundSetup', () => {
@@ -121,21 +165,26 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitForPostFundSetup,
       latestPosition: postFundSetupA,
+      turnNum: postFundSetupA.turnNum,
+      stateCount: postFundSetupA.stateCount,
     };
     describe('when PostFundSetupB arrives', () => {
       const action = actions.positionReceived(postFundSetupB);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itTransitionsTo(state.StateName.PickMove, updatedState)
+      itTransitionsTo(state.StateName.PickMove, updatedState);
     });
+
+    itHandlesResignWhenTheirMove({ messageState, gameState});
   });
 
   describe('when in PickMove', () => {
     const gameState: state.PickMove = {
       ...aProps,
-      turnNum: 2,
       name: state.StateName.PickMove,
       latestPosition: postFundSetupB,
+      turnNum: postFundSetupB.turnNum,
+      stateCount: postFundSetupB.stateCount,
     };
 
     describe('when a move is chosen', () => {
@@ -151,7 +200,10 @@ describe('player A\'s app', () => {
         expect(newGameState.myMove).toEqual(aPlay);
         expect(newGameState.salt).toEqual(salt);
       });
+
     });
+
+    itHandlesResignWhenMyMove({ messageState, gameState});
   });
 
   describe('when in WaitForOpponentToPickMoveA', () => {
@@ -161,8 +213,9 @@ describe('player A\'s app', () => {
       latestPosition: propose,
       myMove: aPlay,
       salt,
-      turnNum: 4,
+      turnNum: propose.turnNum,
     };
+
     describe('when Accept arrives', () => {
       describe('when enough funds to continue', () => {
         const action = actions.positionReceived(accept);
@@ -187,9 +240,11 @@ describe('player A\'s app', () => {
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
       });
     });
+
+    itHandlesResignWhenTheirMove({ messageState, gameState});
   });
 
-  describe.only('when in PlayAgain', () => {
+  describe('when in PlayAgain', () => {
     const gameState: state.PlayAgain = {
       ...aProps,
       name: state.StateName.PlayAgain,
@@ -222,15 +277,15 @@ describe('player A\'s app', () => {
       itStoresAction(action, updatedState);
 
       describe('if the player decides to continue', () => {
-        const action = actions.playAgain();
-        const updatedState2 = gameReducer(updatedState, action);
+        const playAction = actions.playAgain();
+        const updatedState2 = gameReducer(updatedState, playAction);
 
         itTransitionsTo(state.StateName.PickMove, updatedState2);
       });
 
       describe('if the player decides not to continue', () => {
-        const action = actions.resign();
-        const updatedState2 = gameReducer(updatedState, action);
+        const resignAction = actions.resign();
+        const updatedState2 = gameReducer(updatedState, resignAction);
 
         itSends(conclude, updatedState2);
         itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState2);
@@ -246,6 +301,7 @@ describe('player A\'s app', () => {
       myMove: aPlay,
       theirMove: bPlay,
       result: aResult,
+      turnNum: reveal.turnNum,
     };
 
     describe('when resting arrives', () => {
@@ -254,6 +310,8 @@ describe('player A\'s app', () => {
 
       itTransitionsTo(state.StateName.PickMove, updatedState);
     });
+
+    itHandlesResignWhenTheirMove({ messageState, gameState});
   });
 
 
@@ -262,6 +320,7 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitToResign,
       latestPosition: revealInsufficientFunds,
+      turnNum: revealInsufficientFunds.turnNum,
     };
 
     describe('when any position arrives', () => {
@@ -283,6 +342,7 @@ describe('player A\'s app', () => {
       theirMove: bPlay,
       result: aResult,
       balances: insufficientFundsBalances,
+      turnNum: revealInsufficientFunds.turnNum,
     };
 
     describe('when Conclude arrives', () => {
@@ -300,6 +360,7 @@ describe('player A\'s app', () => {
       name: state.StateName.WaitForResignationAcknowledgement,
       latestPosition: conclude,
       balances: aWinsBalances,
+      turnNum: conclude.turnNum,
     };
 
     describe('when Conclude arrives', () => {
