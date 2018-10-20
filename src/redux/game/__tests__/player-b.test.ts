@@ -6,6 +6,8 @@ import { Player } from '../../../game-engine/application-states';
 import * as actions from '../actions';
 import * as state from '../state';
 
+import { randomHex } from "../../../utils/randomHex";
+
 const libraryAddress = '0x123';
 const channelNonce = '4';
 const participants: [string, string] = ['0xa', '0xb'];
@@ -16,8 +18,7 @@ const bWinsBalances: [BN, BN] = [new BN(4), new BN(6)];
 const bLowFundsBalances: [BN, BN] = [new BN(9), new BN(1)];
 const insufficientFundsBalances: [BN, BN] = [new BN(10), new BN(0)];
 const aPlay = Play.Rock;
-const salt = '0x123';
-const preCommit = '0x12345a';
+const salt = randomHex(64);
 const bPlay = Play.Scissors;
 const bResult = Result.YouLose;
 
@@ -38,6 +39,7 @@ const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 1, roundBuy
 const postFundSetupA = new PostFundSetupA(channel, 2, initialBalances, 0, roundBuyIn);
 const postFundSetupB = new PostFundSetupB(channel, 3, initialBalances, 1, roundBuyIn);
 const propose = Propose.createWithPlayAndSalt(channel, 4, initialBalances, roundBuyIn, aPlay, salt);
+const preCommit = propose.preCommit;
 const accept = new Accept(channel, 5, bWinsBalances, roundBuyIn, preCommit, bPlay);
 const reveal = new Reveal(channel, 6, aWinsBalances, roundBuyIn, bPlay, aPlay, salt);
 const resting = new Resting(channel, 7, aWinsBalances, roundBuyIn);
@@ -67,6 +69,14 @@ const itStoresAction = (action, state) => {
   });
 };
 
+const itsPropertiesAreConsistentWithItsPosition = (state) => {
+  it(`updates its properties to be consistent with the latest position`, () => {
+    const gameState = state.gameState;
+    const position = gameState.latestPosition;
+    expect(gameState.balances).toEqual(position.resolution);
+    expect(gameState.turnNum).toEqual(position.turnNum);
+  });
+}
 
 describe('player B\'s app', () => {
   const bProps = { ...sharedProps, player: Player.PlayerB as Player.PlayerB };
@@ -83,6 +93,7 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itSends(preFundSetupB, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
 
       it('requests funding from the wallet', () => {
         expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
@@ -105,6 +116,7 @@ describe('player B\'s app', () => {
       const action = actions.fundingSuccess();
       const updatedState = gameReducer({ messageState, gameState }, action);
 
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
       itTransitionsTo(state.StateName.WaitForPostFundSetup, updatedState);
     });
   });
@@ -121,6 +133,7 @@ describe('player B\'s app', () => {
 
       itTransitionsTo(state.StateName.PickMove, updatedState);
       itSends(postFundSetupB, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 
@@ -129,6 +142,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.PickMove,
       latestPosition: postFundSetupB,
+      turnNum: postFundSetupB.turnNum,
     };
 
     describe('when a move is chosen', () => {
@@ -136,6 +150,7 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.WaitForOpponentToPickMoveB, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
 
       it('stores the move', () => {
         const gameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
@@ -148,6 +163,7 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itStoresAction(action, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
 
       describe('when a move is chosen', () => {
         const action = actions.choosePlay(bPlay);
@@ -173,6 +189,7 @@ describe('player B\'s app', () => {
 
       itSends(accept, updatedState);
       itTransitionsTo(state.StateName.WaitForRevealB, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 
@@ -191,6 +208,7 @@ describe('player B\'s app', () => {
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
+        itsPropertiesAreConsistentWithItsPosition(updatedState);
       });
 
       describe('if there are not sufficient funds', () => {
@@ -199,11 +217,12 @@ describe('player B\'s app', () => {
 
         itSends(concludeInsufficientFunds, updatedState);
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
+        itsPropertiesAreConsistentWithItsPosition(updatedState);
       });
     });
   });
 
-  describe.only('when in PlayAgain', () => {
+  describe('when in PlayAgain', () => {
     const gameState: state.PlayAgain = {
       ...bProps,
       name: state.StateName.PlayAgain,
@@ -220,6 +239,7 @@ describe('player B\'s app', () => {
 
       itSends(resting, updatedState);
       itTransitionsTo(state.StateName.PickMove, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
 
     describe('if the player decides not to continue', () => {
@@ -228,10 +248,11 @@ describe('player B\'s app', () => {
 
       itSends(conclude, updatedState);
       itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 
-  describe.only('when in InsufficientFunds', () => {
+  describe('when in InsufficientFunds', () => {
     const gameState: state.InsufficientFunds = {
       ...bProps,
       name: state.StateName.InsufficientFunds,
@@ -247,6 +268,7 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.GameOver, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 
@@ -263,6 +285,7 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.GameOver, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 
@@ -279,6 +302,7 @@ describe('player B\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.WaitForWithdrawal, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
 
       it('requests a withdrawal from the wallet', () => {
         expect(updatedState.messageState.walletOutbox).toEqual('WITHDRAWAL');
