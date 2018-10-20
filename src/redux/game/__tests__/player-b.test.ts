@@ -79,6 +79,19 @@ const itsPropertiesAreConsistentWithItsPosition = (state) => {
   });
 }
 
+const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => {
+  const { channel, turnNum, balances } = gameState.latestPosition;
+  const isTheirTurn = gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;
+  const newTurnNum = isTheirTurn ? turnNum : turnNum + 1;
+  const conclude = new Conclude(channel, newTurnNum, balances);
+  const action = actions.opponentResigned(conclude);
+
+  const updatedState = gameReducer({ gameState, messageState }, action);
+
+  itTransitionsTo(state.StateName.OpponentResigned, updatedState);
+  itSends(new Conclude(channel, newTurnNum + 1, balances), updatedState);
+}
+
 describe('player B\'s app', () => {
   const bProps = { ...sharedProps, player: Player.PlayerB as Player.PlayerB };
 
@@ -88,6 +101,8 @@ describe('player B\'s app', () => {
       name: state.StateName.ConfirmGameB,
       latestPosition: preFundSetupA,
     };
+
+    itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when player B confirms', () => {
       const action = actions.confirmGame();
@@ -113,6 +128,8 @@ describe('player B\'s app', () => {
       latestPosition: preFundSetupB,
     };
 
+    itCanHandleTheOpponentResigning({ gameState, messageState });
+
     describe('when funding is successful', () => {
       const action = actions.fundingSuccess();
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -128,6 +145,8 @@ describe('player B\'s app', () => {
       name: state.StateName.WaitForPostFundSetup,
       latestPosition: preFundSetupB,
     };
+    itCanHandleTheOpponentResigning({ gameState, messageState });
+
     describe('when PostFundSetupA arrives', () => {
       const action = actions.positionReceived(postFundSetupA);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -145,6 +164,8 @@ describe('player B\'s app', () => {
       latestPosition: postFundSetupB,
       turnNum: postFundSetupB.turnNum,
     };
+
+    itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when a move is chosen', () => {
       const action = actions.choosePlay(bPlay);
@@ -184,6 +205,8 @@ describe('player B\'s app', () => {
       myMove: bPlay,
     };
 
+    itCanHandleTheOpponentResigning({ gameState, messageState });
+
     describe('when Propose arrives', () => {
       const action = actions.positionReceived(propose);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -201,6 +224,8 @@ describe('player B\'s app', () => {
       latestPosition: accept,
       myMove: bPlay,
     };
+
+    itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when Reveal arrives', () => {
       describe('if there are sufficient funds', () => {
@@ -234,6 +259,8 @@ describe('player B\'s app', () => {
       balances: aWinsBalances,
     };
 
+    itCanHandleTheOpponentResigning({ gameState, messageState });
+
     describe('if the player decides to continue', () => {
       const action = actions.playAgain();
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -264,6 +291,8 @@ describe('player B\'s app', () => {
       balances: insufficientFundsBalances,
     };
 
+    itCanHandleTheOpponentResigning({ gameState, messageState });
+
     describe('when Conclude arrives', () => {
       const action = actions.positionReceived(concludeInsufficientFunds2);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -281,6 +310,9 @@ describe('player B\'s app', () => {
       balances: aWinsBalances,
       turnNum: conclude.turnNum,
     };
+
+    // todo: is this right? seems like it shouldn't handle it
+    // itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when Conclude arrives', () => {
       const action = actions.positionReceived(conclude);

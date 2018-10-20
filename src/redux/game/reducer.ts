@@ -32,7 +32,7 @@ export const gameReducer: Reducer<JointState> = (jointState: JointState, action:
     case actions.RESIGN:
       return resignationReducer(jointState);
     case actions.OPPONENT_RESIGNED:
-      return opponentResignationReducer(jointState);
+      return opponentResignationReducer(jointState, action.position);
     case actions.ACCEPT_GAME:
     case actions.CONFIRM_GAME:
     case actions.CHOOSE_PLAY:
@@ -107,14 +107,23 @@ function resignationReducer(jointState: JointState) {
   return { gameState, messageState };
 }
 
-function opponentResignationReducer(jointState: JointState) {
-  // let { messageState, gameState } = jointState;
+function opponentResignationReducer(jointState: JointState, position: Conclude) {
+  let { messageState, gameState } = jointState;
 
-  // // gameState = transitionToOpponentResigned(gameState);
-  // messageState = addToOutbox(gameState.latestSendablePosition);
+  // for the time being, we're just trusting it was their turn - which the
+  // wallet will enforce
+  const { channel, resolution, turnNum } = position;
+  const newPosition = new Conclude(channel, turnNum + 1, resolution);
 
-  // return { gameState, messageState };
-  return jointState;
+  messageState = { ...messageState, opponentOutbox: newPosition };
+  const newGameState: state.OpponentResigned = {
+    ...state.baseProperties(gameState),
+    name: state.StateName.OpponentResigned,
+    latestPosition: newPosition,
+    turnNum: turnNum + 1,
+  };
+
+  return { gameState: newGameState, messageState };
 }
 
 function localActionReducer(jointState: JointState, action: actions.LocalAction): JointState {
