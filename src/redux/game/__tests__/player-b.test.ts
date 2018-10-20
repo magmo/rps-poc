@@ -43,6 +43,7 @@ const preCommit = propose.preCommit;
 const accept = new Accept(channel, 5, bWinsBalances, roundBuyIn, preCommit, bPlay);
 const reveal = new Reveal(channel, 6, aWinsBalances, roundBuyIn, bPlay, aPlay, salt);
 const resting = new Resting(channel, 7, aWinsBalances, roundBuyIn);
+const concludeResign = new Conclude(channel, 7, aWinsBalances);
 const conclude = new Conclude(channel, 8, aWinsBalances);
 const conclude2 = new Conclude(channel, 9, aWinsBalances);
 const revealInsufficientFunds = new Reveal(channel, 6, insufficientFundsBalances, roundBuyIn, bPlay, aPlay, salt);
@@ -180,7 +181,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.WaitForOpponentToPickMoveB,
       latestPosition: postFundSetupB,
-      myMove: aPlay,
+      myMove: bPlay,
     };
 
     describe('when Propose arrives', () => {
@@ -202,9 +203,8 @@ describe('player B\'s app', () => {
     };
 
     describe('when Reveal arrives', () => {
-      const action = actions.positionReceived(reveal);
-
       describe('if there are sufficient funds', () => {
+        const action = actions.positionReceived(reveal);
         const updatedState = gameReducer({ messageState, gameState }, action);
 
         itTransitionsTo(state.StateName.PlayAgain, updatedState);
@@ -212,6 +212,7 @@ describe('player B\'s app', () => {
       });
 
       describe('if there are not sufficient funds', () => {
+        const action = actions.positionReceived(revealInsufficientFunds);
         const gameState2 = { ...gameState, balances: insufficientFundsBalances };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
 
@@ -246,7 +247,7 @@ describe('player B\'s app', () => {
       const action = actions.resign();
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itSends(conclude, updatedState);
+      itSends(concludeResign, updatedState);
       itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState);
       itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
@@ -278,6 +279,7 @@ describe('player B\'s app', () => {
       name: state.StateName.WaitForResignationAcknowledgement,
       latestPosition: conclude,
       balances: aWinsBalances,
+      turnNum: conclude.turnNum,
     };
 
     describe('when Conclude arrives', () => {
@@ -295,6 +297,7 @@ describe('player B\'s app', () => {
       name: state.StateName.GameOver,
       latestPosition: conclude,
       balances: aWinsBalances,
+      turnNum: conclude.turnNum,
     };
 
     describe('when the player wants to withdraw their funds', () => {

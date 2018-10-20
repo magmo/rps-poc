@@ -338,6 +338,7 @@ describe('player A\'s app', () => {
       name: state.StateName.WaitToResign,
       latestPosition: revealInsufficientFunds,
       turnNum: revealInsufficientFunds.turnNum,
+      balances: revealInsufficientFunds.resolution as [BN, BN],
     };
 
     describe('when any position arrives', () => {
@@ -397,6 +398,7 @@ describe('player A\'s app', () => {
       name: state.StateName.GameOver,
       latestPosition: conclude,
       balances: aWinsBalances,
+      turnNum: conclude.turnNum,
     };
 
     describe('when the player wants to withdraw their funds', () => {
