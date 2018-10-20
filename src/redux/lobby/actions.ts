@@ -4,10 +4,12 @@ export const ACCEPT_CHALLENGE = 'LOBBY.ACCEPT_CHALLENGE';
 export const CREATE_CHALLENGE = 'LOBBY.CREATE_CHALLENGE';
 export const SYNC_CHALLENGES = 'LOBBY.SYNC_CHALLENGES';
 
-export const acceptChallenge = (address: string, stake: BN) => ({
+export const acceptChallenge = (address: string, stake: BN, opponentName: string, opponentAddress: string) => ({
   type: ACCEPT_CHALLENGE as typeof ACCEPT_CHALLENGE,
   address,
   stake,
+  opponentName,
+  opponentAddress,
 });
 
 export const createChallenge = (name: string, stake: BN) => ({

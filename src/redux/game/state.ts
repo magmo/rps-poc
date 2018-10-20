@@ -6,6 +6,7 @@ import { Player } from '../../game-engine/application-states';
 // States of the form *B are player B only
 // All other states are both players
 export enum StateName {
+  NotStarted = 'NotStarted',
   WaitForGameConfirmationA = 'WAIT_FOR_GAME_CONFIRMATION_A',
   ConfirmGameB = 'CONFIRM_GAME_B',
   WaitForFunding = 'WAIT_FOR_FUNDING',
@@ -70,6 +71,9 @@ export function baseProperties(state: GameState) {
   };
 }
 
+export interface NotStarted {
+  name: StateName.NotStarted;
+}
 export interface WaitForGameConfirmationA extends Base {
   name: StateName.WaitForGameConfirmationA;
   player: Player.PlayerA;

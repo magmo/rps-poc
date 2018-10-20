@@ -23,7 +23,11 @@ export default function* messageSaga(address: string) {
 }
 
 export function* sendMessagesSaga(opponentAddress: string) {
-  const channel = yield actionChannel([gameActions.POSITION_RECEIVED, gameActions.OPPONENT_RESIGNED, walletActions.SEND_MESSAGE]);
+  const channel = yield actionChannel([
+    gameActions.POSITION_RECEIVED,
+    gameActions.OPPONENT_RESIGNED,
+    walletActions.SEND_MESSAGE
+  ]);
 
   while (true) {
     // We take any action that might trigger the outbox to be updated

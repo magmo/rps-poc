@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import { Play, Conclude, Position } from '../../game-engine/positions';
 
+export const CREATE_GAME = 'GAME.CREATE_GAME';
 export const ACCEPT_GAME = 'GAME.ACCEPT_GAME';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
 export const CHOOSE_PLAY = 'GAME.CHOOSE_PLAY';
@@ -12,9 +13,41 @@ export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
 
-export const acceptGame = (libraryAddress: string, stake: BN) => ({
-  type: ACCEPT_GAME as typeof ACCEPT_GAME,
+export const createGame = (
+  myName: string,
+  myAddress: string,
+  opponentName: string,
+  opponentAddress: string,
+  libraryAddress: string,
+  channelNonce: string,
+  stake: BN,
+) => ({
+  type: CREATE_GAME as typeof ACCEPT_GAME,
+  myName,
+  myAddress,
+  opponentName,
+  opponentAddress,
   libraryAddress,
+  channelNonce,
+  stake,
+});
+
+export const acceptGame = (
+  myName: string,
+  myAddress: string,
+  opponentName: string,
+  opponentAddress: string,
+  libraryAddress: string,
+  channelNonce: string,
+  stake: BN,
+) => ({
+  type: ACCEPT_GAME as typeof ACCEPT_GAME,
+  myName,
+  myAddress,
+  opponentName,
+  opponentAddress,
+  libraryAddress,
+  channelNonce,
   stake,
 });
 
@@ -58,6 +91,7 @@ export const withdrawalSuccess = () => ({
 });
 
 export type AcceptGame = ReturnType<typeof acceptGame>;
+export type CreateGame = ReturnType<typeof createGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
 export type ChoosePlay = ReturnType<typeof choosePlay>;
 export type PlayAgain = ReturnType<typeof playAgain>;
@@ -68,8 +102,8 @@ export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 
+export type StartAction = AcceptGame | CreateGame;
 export type LocalAction = (
-  | AcceptGame
   | ConfirmGame
   | ChoosePlay
   | PlayAgain
@@ -78,5 +112,6 @@ export type LocalAction = (
   | WithdrawalSuccess
   | WithdrawalRequest
 );
+export type ResignAction = Resign | OpponentResigned;
 
-export type GameAction = (Resign | OpponentResigned | LocalAction);
+export type GameAction = (StartAction | LocalAction | ResignAction);

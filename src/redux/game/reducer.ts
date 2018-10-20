@@ -21,19 +21,31 @@ export interface JointState {
   messageState: MessageState;
 }
 
-const initialJointState = { gameState: {}, messageState: NULL_MESSAGE_STATE};
+export class StartState {
+  gameState: state.NotStarted;
+  messageState: (typeof NULL_MESSAGE_STATE);
+}
 
-export const gameReducer: Reducer<JointState> = (jointState: JointState, action: actions.GameAction) => {
+const initialJointState: StartState = {
+  gameState: {name: state.StateName.NotStarted},
+  messageState: NULL_MESSAGE_STATE,
+};
+
+export const gameReducer: Reducer<JointState | StartState> = (jointState: JointState | StartState, action: actions.GameAction) => {
   jointState = jointState || initialJointState;
 
   // resign and opponent resigned are global actions can be applied to any  jointState
   // see if we have one of those first
   switch (action.type) {
-    case actions.RESIGN:
-      return resignationReducer(jointState);
-    case actions.OPPONENT_RESIGNED:
-      return opponentResignationReducer(jointState, action.position);
     case actions.ACCEPT_GAME:
+      if (jointState.gameState.name !== state.StateName.NotStarted) {
+        throw new Error(`invalid start state: ${jointState.gameState.name}`);
+      }
+      return acceptGameReducer(action);
+    case actions.RESIGN:
+      return resignationReducer(jointState as JointState);
+    case actions.OPPONENT_RESIGNED:
+      return opponentResignationReducer(jointState as JointState, action.position);
     case actions.CONFIRM_GAME:
     case actions.CHOOSE_PLAY:
     case actions.PLAY_AGAIN:
@@ -43,7 +55,7 @@ export const gameReducer: Reducer<JointState> = (jointState: JointState, action:
     case actions.WITHDRAWAL_REQUEST:
       // these actions can only be applied to one or two jointStates
       // we call this a 'local' action
-      jointState = localActionReducer(jointState, action);
+      jointState = localActionReducer(jointState as JointState, action);
       // if we have a saved position in the inbox, try to apply it
       jointState = attemptRetry(jointState);
     default:
@@ -69,6 +81,43 @@ function itsMyTurnNext(jointState: JointState) {
   const nextTurnNum = gameState.turnNum + 1 + extraState;
 
   return nextTurnNum % 2 === gameState.player;
+}
+
+function acceptGameReducer(action: actions.AcceptGame): JointState {
+  const player = Player.PlayerA;
+  const {
+    stake,
+    myName,
+    myAddress,
+    opponentName,
+    opponentAddress,
+    libraryAddress,
+    channelNonce,
+  } = action;
+
+  const balances: [BN, BN] = [(new BN(stake)).muln(5), (new BN(stake)).muln(5)];
+  const participants: [string, string] = [myAddress, opponentAddress];
+  const channel = new Channel(libraryAddress, channelNonce, participants);
+  const turnNum = 0;
+  const stateCount = 0;
+  const preFundSetupA = new PreFundSetupA(channel, turnNum, balances, stateCount, stake);
+  const newGameState: state.WaitForGameConfirmationA = {
+    name: state.StateName.WaitForGameConfirmationA,
+    player,
+    turnNum,
+    roundBuyIn: stake,
+    balances,
+    stateCount,
+    myName,
+    opponentName,
+    latestPosition: preFundSetupA,
+    libraryAddress,
+    channelNonce,
+    participants,
+  };
+
+  const messageState = { ...NULL_MESSAGE_STATE, opponentOutbox: preFundSetupA, };
+  return { gameState: newGameState, messageState };
 }
 
 function resignationReducer(jointState: JointState) {
@@ -131,6 +180,8 @@ function localActionReducer(jointState: JointState, action: actions.LocalAction)
   const { messageState, gameState } = jointState;
 
   switch (gameState.name) {
+    case state.StateName.WaitForGameConfirmationA:
+      return waitForGameConfirmationAReducer(gameState, messageState, action);
     case state.StateName.WaitForGameConfirmationA:
       return waitForGameConfirmationAReducer(gameState, messageState, action);
     case state.StateName.ConfirmGameB:
