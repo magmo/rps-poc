@@ -61,6 +61,11 @@ function itsMyTurnNext(jointState: JointState) {
 }
 
 function resignationReducer(jointState: JointState) {
+  const { name } = jointState.gameState;
+  if (name ===  state.StateName.WaitToResign || name === state.StateName.WaitForResignationAcknowledgement) {
+    return jointState;
+  }
+
   let { messageState, gameState } = jointState;
 
   if (itsMyTurnNext(jointState)) {
@@ -171,7 +176,7 @@ function waitForFundingReducer(
   const { libraryAddress, channelNonce, participants, turnNum, balances, roundBuyIn } = gameState;
   const postFundSetupA = new PostFundSetupA(
     new Channel(libraryAddress, channelNonce, participants),
-    turnNum + 2,
+    turnNum + 1,
     balances,
     0,
     roundBuyIn
@@ -205,7 +210,7 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
   const channel = new Channel(libraryAddress, channelNonce, participants);
   if (gameState.player === Player.PlayerA) {
     const salt = randomHex(64);
-    const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 2, balances, roundBuyIn, play, salt)
+    const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 1, balances, roundBuyIn, play, salt)
 
     newGameState = {
       ...state.baseProperties(gameState),
