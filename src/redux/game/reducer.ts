@@ -55,9 +55,9 @@ function attemptRetry(jointState: JointState): JointState {
 function itsMyTurnNext(jointState: JointState) {
   const { gameState, messageState } = jointState;
   const extraState = messageState.actionToRetry ? 1 : 0;
-  const turnNum = gameState.turnNum + 1 + extraState;
+  const nextTurnNum = gameState.turnNum + 1 + extraState;
 
-  return gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 === 1;
+  return nextTurnNum % 2 === gameState.player;
 }
 
 function resignationReducer(jointState: JointState) {
