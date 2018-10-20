@@ -9,7 +9,9 @@ import { randomHex } from "../../../utils/randomHex";
 
 const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = '4';
-const participants: [string, string] = ['0x' + 'a'.repeat(40), '0x' + 'b'.repeat(40)];
+const addrPlayerA = '0x' + 'a'.repeat(40);
+const addrPlayerB = '0x' + 'b'.repeat(40);
+const participants: [string, string] = [addrPlayerA, addrPlayerB];
 const roundBuyIn = new BN(1);
 const initialBalances: [BN, BN] = [new BN(5), new BN(5)];
 const aWinsBalances: [BN, BN] = [new BN(6), new BN(4)];
@@ -141,16 +143,23 @@ describe('when in NotStarted', () => {
     };
 
     describe('when accepting a game', () => {
-      // const action = actions.acceptGame();
-      // const updatedState = gameReducer({ messageState: nullMessageState, gameState }, action);
+      const myName = 'myName';
+      const opponentName = 'opponentName';
+      const action = actions.acceptGame(
+        myName,
+        addrPlayerA,
+        opponentName,
+        addrPlayerB,
+        libraryAddress,
+        channelNonce,
+        roundBuyIn,
+      );
 
-      it('works', () => {
-        //
-      });
+      const updatedState = gameReducer({ messageState: nullMessageState, gameState }, action);
 
-      // itSends(preFundSetupA, updatedState);
-      // itTransitionsTo(state.StateName.WaitForGameConfirmationA, updatedState);
-      // itsPropertiesAreConsistentWithItsPosition(updatedState);
+      itSends(preFundSetupA, updatedState);
+      itTransitionsTo(state.StateName.WaitForGameConfirmationA, updatedState);
+      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 });
