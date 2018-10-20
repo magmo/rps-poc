@@ -8,6 +8,8 @@ import * as state from '../state';
 
 import { randomHex } from "../../../utils/randomHex";
 
+import { itSends, itTransitionsTo, itStoresAction, itsPropertiesAreConsistentWithItsPosition, itCanHandleTheOpponentResigning } from './game-reducer.test';
+
 const libraryAddress = '0x123';
 const channelNonce = '4';
 const participants: [string, string] = ['0xa', '0xb'];
@@ -32,7 +34,8 @@ const sharedProps = {
   roundBuyIn,
   myName: 'Tom',
   opponentName: 'Alex',
-}
+};
+
 const channel = new Channel(libraryAddress, channelNonce, participants);
 const preFundSetupA = new PreFundSetupA(channel, 0, initialBalances, 0, roundBuyIn);
 const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 1, roundBuyIn);
@@ -51,46 +54,6 @@ const concludeInsufficientFunds = new Conclude(channel, 7, insufficientFundsBala
 const concludeInsufficientFunds2 = new Conclude(channel, 8, insufficientFundsBalances);
 
 const messageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
-
-const itSends = (position, state) => {
-  it(`sends ${position.constructor.name}`, () => {
-    expect(state.messageState.opponentOutbox).toEqual(position);
-  });
-};
-
-const itTransitionsTo = (stateName, state) => {
-  it(`transitions to ${stateName}`, () => {
-    expect(state.gameState.name).toEqual(stateName);
-  });
-};
-
-const itStoresAction = (action, state) => {
-  it(`stores action to retry`, () => {
-    expect(state.messageState.actionToRetry).toEqual(action);
-  });
-};
-
-const itsPropertiesAreConsistentWithItsPosition = (state) => {
-  it(`updates its properties to be consistent with the latest position`, () => {
-    const gameState = state.gameState;
-    const position = gameState.latestPosition;
-    expect(gameState.balances).toEqual(position.resolution);
-    expect(gameState.turnNum).toEqual(position.turnNum);
-  });
-}
-
-const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => {
-  const { channel, turnNum, balances } = gameState.latestPosition;
-  const isTheirTurn = gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;
-  const newTurnNum = isTheirTurn ? turnNum : turnNum + 1;
-  const conclude = new Conclude(channel, newTurnNum, balances);
-  const action = actions.opponentResigned(conclude);
-
-  const updatedState = gameReducer({ gameState, messageState }, action);
-
-  itTransitionsTo(state.StateName.OpponentResigned, updatedState);
-  itSends(new Conclude(channel, newTurnNum + 1, balances), updatedState);
-}
 
 describe('player B\'s app', () => {
   const bProps = { ...sharedProps, player: Player.PlayerB as Player.PlayerB };

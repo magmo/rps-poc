@@ -1,12 +1,13 @@
 import BN from "bn.js";
 import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA, Result, hashCommitment } from "../../../game-engine/positions";
 import { Channel } from "fmg-core";
-import { gameReducer, JointState } from '../reducer';
+import { gameReducer } from '../reducer';
 import { Player } from '../../../game-engine/application-states';
 import * as actions from '../actions';
 import * as state from '../state';
 import { randomHex } from "../../../utils/randomHex";
 
+import { itSends, itTransitionsTo, itStoresAction, itsPropertiesAreConsistentWithItsPosition, itHandlesResignWhenMyTurn, itHandlesResignWhenTheirTurn, } from './game-reducer.test';
 
 const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = '4';
@@ -55,72 +56,6 @@ const concludeInsufficientFunds = new Conclude(channel, 7, insufficientFundsBala
 const concludeInsufficientFunds2 = new Conclude(channel, 8, insufficientFundsBalances);
 
 const messageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
-
-const itSends = (position, jointState) => {
-  it(`sends ${position.constructor.name}`, () => {
-    expect(jointState.messageState.opponentOutbox).toEqual(position);
-  });
-};
-
-const itTransitionsTo = (stateName, jointState) => {
-  it(`transitions to ${stateName}`, () => {
-    expect(jointState.gameState.name).toEqual(stateName);
-  });
-};
-
-const itStoresAction = (action, jointState) => {
-  it(`stores action to retry`, () => {
-    expect(jointState.messageState.actionToRetry).toEqual(action);
-  });
-};
-
-const itsPropertiesAreConsistentWithItsPosition = (state) => {
-  it(`updates its properties to be consistent with the latest position`, () => {
-    const gameState = state.gameState;
-    const position = gameState.latestPosition;
-    expect(gameState.balances).toEqual(position.resolution);
-    expect(gameState.turnNum).toEqual(position.turnNum);
-  });
-};
-
-const itHandlesResignWhenTheirTurn = (jointState: JointState) => {
-  describe('when resigning on their turn', () => {
-    it ('transitions to WaitToResign', () => {
-      const { gameState } = jointState;
-      const { latestPosition: oldPosition } = gameState;
-      const updatedState = gameReducer(jointState, actions.resign());
-      const { latestPosition: position } = updatedState.gameState;
-
-      expect(updatedState.gameState.name).toEqual(state.StateName.WaitToResign);
-      expect(updatedState.gameState).toMatchObject({
-        name: state.StateName.WaitToResign,
-        turnNum: oldPosition.turnNum,
-      });
-      expect(position).toEqual(oldPosition);
-    });
-  });
-};
-
-const itHandlesResignWhenMyTurn = (jointState: JointState) => {
-  describe('when resigning on my turn', () => {
-    it ('transitions to WaitToResign', () => {
-      const { gameState } = jointState;
-      const { latestPosition: oldPosition } = gameState;
-      const updatedState = gameReducer(jointState, actions.resign());
-      const { latestPosition: position } = updatedState.gameState;
-
-      expect(updatedState.gameState.name).toEqual(state.StateName.WaitForResignationAcknowledgement);
-      expect(updatedState.gameState).toMatchObject({
-        name: state.StateName.WaitForResignationAcknowledgement,
-        turnNum: oldPosition.turnNum + 1,
-        balances: gameState.balances,
-        player: Player.PlayerA,
-      });
-      const newConclude = new Conclude(channel, oldPosition.turnNum + 1, oldPosition.resolution);
-      expect(position).toEqual(newConclude);
-    });
-  });
-};
 
 describe('player A\'s app', () => {
   const aProps = { ...sharedProps, player: Player.PlayerA as Player.PlayerA };
