@@ -2,7 +2,6 @@ import { Reducer } from 'redux';
 import * as applicationActions from './actions';
 import * as lobbyActions from '../lobby/actions';
 
-import { State as GameState } from '../../game-engine/application-states';
 import BN from 'bn.js';
 
 export enum Room {

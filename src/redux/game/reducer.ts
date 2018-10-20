@@ -21,7 +21,11 @@ export interface JointState {
   messageState: MessageState;
 }
 
+const initialJointState = { gameState: {}, messageState: NULL_MESSAGE_STATE};
+
 export const gameReducer: Reducer<JointState> = (jointState: JointState, action: actions.GameAction) => {
+  jointState = jointState || initialJointState;
+
   // resign and opponent resigned are global actions can be applied to any  jointState
   // see if we have one of those first
   switch (action.type) {
@@ -29,13 +33,20 @@ export const gameReducer: Reducer<JointState> = (jointState: JointState, action:
       return resignationReducer(jointState);
     case actions.OPPONENT_RESIGNED:
       return opponentResignationReducer(jointState);
-    default:
-      // otherwise, we have an action can only be applied to one or two jointStates
+    case actions.ACCEPT_GAME:
+    case actions.CONFIRM_GAME:
+    case actions.CHOOSE_PLAY:
+    case actions.PLAY_AGAIN:
+    case actions.POSITION_RECEIVED:
+    case actions.FUNDING_SUCCESS:
+    case actions.WITHDRAWAL_SUCCESS:
+    case actions.WITHDRAWAL_REQUEST:
+      // these actions can only be applied to one or two jointStates
       // we call this a 'local' action
       jointState = localActionReducer(jointState, action);
       // if we have a saved position in the inbox, try to apply it
       jointState = attemptRetry(jointState);
-
+    default:
       return jointState;
   }
 };
@@ -97,15 +108,16 @@ function resignationReducer(jointState: JointState) {
 }
 
 function opponentResignationReducer(jointState: JointState) {
-  let { messageState, gameState } = jointState;
+  // let { messageState, gameState } = jointState;
 
-  gameState = transitionToOpponentResigned(gameState);
-  messageState = addToOutbox(gameState.latestSendablePosition);
+  // // gameState = transitionToOpponentResigned(gameState);
+  // messageState = addToOutbox(gameState.latestSendablePosition);
 
-  return { gameState, messageState };
+  // return { gameState, messageState };
+  return jointState;
 }
 
-function localActionReducer(jointState: JointState, action: actions.GameAction): JointState {
+function localActionReducer(jointState: JointState, action: actions.LocalAction): JointState {
   const { messageState, gameState } = jointState;
 
   switch (gameState.name) {
@@ -142,8 +154,7 @@ function localActionReducer(jointState: JointState, action: actions.GameAction):
     // case state.StateName.WaitForWithdrawal:
     //   return waitForWithdrawalReducer(gameState, messageState, action);
     default:
-      // should be unreachable
-      return jointState;
+      throw new Error("Unreachable code");
   }
 }
 
@@ -237,7 +248,7 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
   if (gameState.player === Player.PlayerA) {
     if (action.type !== actions.CHOOSE_PLAY) { return { gameState, messageState }; }
     const salt = randomHex(64);
-    const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 1, balances, roundBuyIn, action.play, salt)
+    const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 1, balances, roundBuyIn, action.play, salt);
 
     const newGameStateA: state.WaitForOpponentToPickMoveA = {
       ...state.baseProperties(gameState),
@@ -253,7 +264,7 @@ function pickMoveReducer(gameState: state.PickMove, messageState: MessageState, 
     return { gameState: newGameStateA, messageState };
   } else {
     if (action.type === actions.POSITION_RECEIVED && action.position.constructor.name === 'Propose') {
-      messageState = { ...messageState, actionToRetry: action }
+      messageState = { ...messageState, actionToRetry: action };
       return { gameState, messageState };
     } else if (action.type === actions.CHOOSE_PLAY) {
 

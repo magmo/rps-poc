@@ -2,7 +2,6 @@
 import { State as GameState } from "../../game-engine/application-states";
 import { Challenge } from "./reducer";
 import BN from 'bn.js';
-import { Position } from '../../game-engine/positions';
 
 
 export const INITIALIZATION_FAILURE = 'APPLICATION.INITIALIZATION.FAILURE';

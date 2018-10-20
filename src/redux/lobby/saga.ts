@@ -5,12 +5,11 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 import * as lobbyActions from './actions';
 import * as applicationActions from '../application/actions';
 
-import GameEngineA from '../../game-engine/GameEngineA';
+import { acceptGame } from '../../redux/game/actions';
 import BN from 'bn.js';
 
 // @ts-ignore
 import RPSGameArtifact from '../../../contracts/RockPaperScissorsGame.sol';
-const DEFAULT_BALANCES = 50;
 
 export default function* lobbySaga(address: string) {
   yield put(applicationActions.lobbySuccess());
@@ -27,15 +26,8 @@ export default function* lobbySaga(address: string) {
     switch (action.type) {
       case lobbyActions.ACCEPT_CHALLENGE:
         const libraryAddress = yield getLibraryAddress();
-        const gameEngine = GameEngineA.setupGame({
-          me: address,
-          opponent: action.address,
-          stake: action.stake,
-          libraryAddress,
-          balances: [action.stake.mul(new BN(DEFAULT_BALANCES)), action.stake.mul(new BN(DEFAULT_BALANCES))],
-        });
-        const initialState = gameEngine.state.position;
-        yield put(applicationActions.gameRequest(initialState));
+        const { stake } = action;
+        yield put(acceptGame(libraryAddress, stake));
         break;
 
       case lobbyActions.CREATE_CHALLENGE:

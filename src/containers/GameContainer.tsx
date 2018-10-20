@@ -17,7 +17,7 @@ import { SiteState } from '../redux/reducer';
 
 import { Play } from '../game-engine/positions';
 import WalletHeader from 'src/wallet/containers/WalletHeader';
-import { GameState,StateName } from 'src/redux/game/state';
+import { GameState, StateName } from 'src/redux/game/state';
 
 interface GameProps {
   state: GameState;
@@ -30,18 +30,18 @@ interface GameProps {
 }
 
 function GameContainer(props: GameProps) {
-
   if (props.showWallet) {
     return <WalletController/>;
   }
   else if (props.showWalletHeader){
     return <WalletHeader>{RenderGame(props)}</WalletHeader>;
-  }else{
+  } else {
     return RenderGame(props);
   }
   
 }
-function RenderGame(props:GameProps){
+
+function RenderGame(props: GameProps){
   const { state, choosePlay, playAgain, abandonGame, createBlockchainChallenge } = props;
   switch (state.name) {
     case StateName.WaitForGameConfirmationA:
