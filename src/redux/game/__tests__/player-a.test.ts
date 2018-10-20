@@ -81,10 +81,10 @@ const itsPropertiesAreConsistentWithItsPosition = (state) => {
     expect(gameState.balances).toEqual(position.resolution);
     expect(gameState.turnNum).toEqual(position.turnNum);
   });
-}
+};
 
-const itHandlesResignWhenTheirMove = (jointState: JointState) => {
-  describe('when resigning', () => {
+const itHandlesResignWhenTheirTurn = (jointState: JointState) => {
+  describe('when resigning on their turn', () => {
     it ('transitions to WaitToResign', () => {
       const { gameState } = jointState;
       const { latestPosition: oldPosition } = gameState;
@@ -101,8 +101,8 @@ const itHandlesResignWhenTheirMove = (jointState: JointState) => {
   });
 };
 
-const itHandlesResignWhenMyMove = (jointState: JointState) => {
-  describe('when my opponent resigns', () => {
+const itHandlesResignWhenMyTurn = (jointState: JointState) => {
+  describe('when resigning on my turn', () => {
     it ('transitions to WaitToResign', () => {
       const { gameState } = jointState;
       const { latestPosition: oldPosition } = gameState;
@@ -144,7 +144,7 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     });
 
-    itHandlesResignWhenTheirMove({ messageState, gameState });
+    itHandlesResignWhenTheirTurn({ messageState, gameState });
   });
 
   describe('when in waitForFunding', () => {
@@ -165,7 +165,7 @@ describe('player A\'s app', () => {
       itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
 
-    itHandlesResignWhenMyMove({ messageState, gameState });
+    itHandlesResignWhenMyTurn({ messageState, gameState });
   });
 
   describe('when in WaitForPostFundSetup', () => {
@@ -184,7 +184,7 @@ describe('player A\'s app', () => {
       itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
 
-    itHandlesResignWhenTheirMove({ messageState, gameState});
+    itHandlesResignWhenTheirTurn({ messageState, gameState});
   });
 
   describe('when in PickMove', () => {
@@ -213,7 +213,7 @@ describe('player A\'s app', () => {
 
     });
 
-    itHandlesResignWhenMyMove({ messageState, gameState});
+    itHandlesResignWhenMyTurn({ messageState, gameState});
   });
 
   describe('when in WaitForOpponentToPickMoveA', () => {
@@ -253,7 +253,7 @@ describe('player A\'s app', () => {
       });
     });
 
-    itHandlesResignWhenTheirMove({ messageState, gameState});
+    itHandlesResignWhenTheirTurn({ messageState, gameState});
   });
 
   describe('when in PlayAgain', () => {
@@ -328,7 +328,7 @@ describe('player A\'s app', () => {
       itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
 
-    itHandlesResignWhenTheirMove({ messageState, gameState});
+    itHandlesResignWhenTheirTurn({ messageState, gameState});
   });
 
 
