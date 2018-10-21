@@ -2,7 +2,7 @@ import { gameReducer } from '../reducer';
 import * as actions from '../actions';
 import * as state from '../state';
 import { scenarios } from '../../../core';
-import { itSends, itTransitionsTo, itsPropertiesAreConsistentWithItsPosition } from './helpers';
+import { itSends, itTransitionsTo } from './helpers';
 
 const nullMessageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
 
@@ -38,7 +38,6 @@ describe('when in NotStarted', () => {
 
       itSends(preFundSetupA, updatedState);
       itTransitionsTo(state.StateName.WaitForGameConfirmationA, updatedState);
-      itsPropertiesAreConsistentWithItsPosition(updatedState);
     });
   });
 });
