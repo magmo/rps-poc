@@ -1,17 +1,10 @@
 import { State } from 'fmg-core';
-
-import { Play, GamePositionType } from '.';
-import PreFundSetupA from './PreFundSetupA';
-import PreFundSetupB from './PreFundSetupB';
-import PostFundSetupA from './PostFundSetupA';
-import PostFundSetupB from './PostFundSetupB';
-import Propose from './Propose';
-import Accept from './Accept';
-import Reveal from './Reveal';
-import Resting from './Resting';
-import Conclude from './Conclude';
 import BN from 'bn.js';
-import decodeState from '../../wallet/domain/decode';
+import decodeState from '../wallet/domain/decode';
+
+import * as positions from './positions';
+import { Move } from './moves';
+import { GamePositionType } from './encode';
 
 const PREFIX_CHARS = 2; // the 0x takes up 2 characters
 const CHARS_PER_BYTE = 2;
@@ -31,7 +24,6 @@ function extractBytes(hexString: string, byteOffset: number = 0, numBytes: numbe
   const charOffset = PREFIX_CHARS + byteOffset * CHARS_PER_BYTE;
   return '0x' + hexString.substr(charOffset, numBytes * CHARS_PER_BYTE);
 }
-
 
 // RockPaperScissors State Fields
 // (relative to gamestate offset)
@@ -57,11 +49,11 @@ function extractPreCommit(hexString: string) {
 }
 
 function extractBPlay(hexString: string) {
-  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 3 * 32) as Play;
+  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 3 * 32) as Move;
 }
 
 function extractAPlay(hexString: string) {
-  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 4 * 32) as Play;
+  return extractInt(hexString, GAME_ATTRIBUTE_OFFSET + 4 * 32) as Move;
 }
 
 function extractSalt(hexString: string) {
@@ -69,58 +61,62 @@ function extractSalt(hexString: string) {
 }
 
 export default function decode(hexString: string) {
-
   const state = decodeState(hexString);
-  const channel = state.channel;
-  const turnNum = state.turnNum;
-  const stateType = state.stateType;
-  const balances = state.resolution;
+  const { channel, turnNum, stateType, resolution: balances } = state;
+  const { channelType: libraryAddress, channelNonce, participants } = channel;
+  const base = { libraryAddress, channelNonce, participants, turnNum, balances: balances as [BN, BN] };
+
+  // conclude is a special case as it doesn't have the buyIn
+  if (stateType === State.StateType.Conclude) {
+    return positions.conclude(base);
+  };
+
+  const roundBuyIn = extractStake(hexString);
+  const stateCount = state.stateCount;
 
   switch (stateType) {
-    case State.StateType.Conclude:
-      return new Conclude(channel, turnNum, balances);
+    case State.StateType.Game:
+      return decodeGameState(state, roundBuyIn, hexString);
     case State.StateType.PreFundSetup:
-      const stateCountPre = state.stateCount;
-      const stakePre = extractStake(hexString);
-      if (stateCountPre === 0) {
-        return new PreFundSetupA(channel, turnNum, balances, stateCountPre, stakePre);
+      if (stateCount === 0) {
+        return positions.preFundSetupA({ ...base, stateCount, roundBuyIn });
       } else {
-        return new PreFundSetupB(channel, turnNum, balances, stateCountPre, stakePre);
+        return positions.preFundSetupB({ ...base, stateCount, roundBuyIn });
       }
     case State.StateType.PostFundSetup:
-      const stateCountPost = state.stateCount;
-      const stakePost = extractStake(hexString);
-      if (stateCountPost === 0) {
-        return new PostFundSetupA(channel, turnNum, balances, stateCountPost, stakePost);
+      if (stateCount === 0) {
+        return positions.postFundSetupA({ ...base, stateCount, roundBuyIn });
       } else {
-        return new PostFundSetupB(channel, turnNum, balances, stateCountPost, stakePost);
+        return positions.postFundSetupB({ ...base, stateCount, roundBuyIn });
       }
-    case State.StateType.Game:
-      return decodeGameState(channel, turnNum, balances, hexString);
+
     default:
       throw new Error('unreachable');
   }
 }
 
-export function decodeGameState(channel, turnNum: number, balances: BN[], hexString: string) {
+export function decodeGameState(state: State, roundBuyIn: BN, hexString: string) {
   const position = extractGamePositionType(hexString);
-  const stake = extractStake(hexString);
+  const { channel, turnNum, resolution: balances } = state;
+  const { channelType: libraryAddress, channelNonce, participants } = channel;
+  const channelParams = { libraryAddress, channelNonce, participants };
+  const base = { ...channelParams, turnNum, roundBuyIn, balances: balances as [BN, BN] };
 
   switch (position) {
     case GamePositionType.Resting:
-      return new Resting(channel, turnNum, balances, stake);
+      return positions.resting(base);
     case GamePositionType.Propose:
-      const preCommitPro = extractPreCommit(hexString);
-      return new Propose(channel, turnNum, balances, stake, preCommitPro);
+      const preCommit0 = extractPreCommit(hexString);
+      return positions.propose({...base, preCommit: preCommit0 });
     case GamePositionType.Accept:
-      const preCommitAcc = extractPreCommit(hexString);
-      const bPlayAcc = extractBPlay(hexString);
-      return new Accept(channel, turnNum, balances, stake, preCommitAcc, bPlayAcc);
+      const preCommit1 = extractPreCommit(hexString);
+      const bsMove1 = extractBPlay(hexString);
+      return positions.accept({...base, preCommit: preCommit1, bsMove: bsMove1 });
     case GamePositionType.Reveal:
-      const bPlayRev = extractBPlay(hexString);
-      const aPlay = extractAPlay(hexString);
+      const bsMove2 = extractBPlay(hexString);
+      const asMove2 = extractAPlay(hexString);
       const salt = extractSalt(hexString);
-      return new Reveal(channel, turnNum, balances, stake, bPlayRev, aPlay, salt);
+      return positions.reveal({...base, asMove: asMove2, bsMove: bsMove2, salt });
   }
 }
 
