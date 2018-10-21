@@ -92,7 +92,7 @@ function acceptGameReducer(action: actions.AcceptGame): JointState {
   const stateCount = 0;
 
   const newGameState = states.waitForGameConfirmationA({
-    ...action, balances, participants, turnNum, stateCount
+    ...action, balances, participants, turnNum, stateCount,
   });
 
   const messageState = { ...NULL_MESSAGE_STATE, opponentOutbox: positions.preFundSetupA(newGameState), };

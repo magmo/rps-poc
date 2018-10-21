@@ -34,7 +34,7 @@ const shared = {
   addrPlayerB,
   myName: 'Tom',
   opponentName: 'Alex',
-}
+};
 
 export const standard = {
   ...shared,

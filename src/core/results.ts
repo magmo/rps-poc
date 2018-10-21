@@ -4,7 +4,7 @@ export enum Result {
   Tie,
   YouWin,
   YouLose,
-};
+}
 
 export function calculateResult(yourMove: Move, theirMove: Move): Result {
   const x = (yourMove - theirMove + 2) % 3;
@@ -16,4 +16,4 @@ export function calculateResult(yourMove: Move, theirMove: Move): Result {
     default:
       return Result.Tie;
   }
-};
+}

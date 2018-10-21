@@ -75,7 +75,7 @@ describe('player B\'s app', () => {
       it('transitions to WaitForFunding', () => {
         expect(updatedState.gameState.name).toEqual(state.StateName.WaitForFunding);
       });
-    })
+    });
   });
 
   describe('when in waitForFunding', () => {
@@ -151,7 +151,7 @@ describe('player B\'s app', () => {
         itSends(accept, updatedState2);
         itTransitionsTo(state.StateName.WaitForRevealB, updatedState2);
       });
-    })
+    });
   });
 
   describe('when in WaitForOpponentToPickMoveB', () => {

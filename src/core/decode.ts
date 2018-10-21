@@ -69,7 +69,7 @@ export default function decode(hexString: string) {
   // conclude is a special case as it doesn't have the buyIn
   if (stateType === State.StateType.Conclude) {
     return positions.conclude(base);
-  };
+  }
 
   const roundBuyIn = extractStake(hexString);
   const stateCount = state.stateCount;

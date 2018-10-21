@@ -20,7 +20,7 @@ export default function encode(position: positions.Position) {
     stateType: stateType(position),
     turnNum,
     stateCount,
-    resolution: balances
+    resolution: balances,
   });
 
   return state.toHex() + encodeGameAttributes(position);
@@ -66,7 +66,7 @@ export enum GamePositionType {
 
 export function packRestingAttributes(stake: BN) {
   return toHex32(GamePositionType.Resting).substr(2) + packBN(stake);
-};
+}
 
 export function packProposeAttributes(position: positions.Propose) {
   const { roundBuyIn, preCommit } = position;

@@ -73,61 +73,61 @@ export function base(state: IncludesBase) {
 
 export interface NotStarted {
   name: StateName.NotStarted;
-};
+}
 
 export interface WaitForGameConfirmationA extends Base {
   name: StateName.WaitForGameConfirmationA;
   player: Player.PlayerA;
-};
+}
 export function waitForGameConfirmationA(state: IncludesBase): WaitForGameConfirmationA {
   return { ...base(state), name: StateName.WaitForGameConfirmationA, player: Player.PlayerA };
-};
+}
 
 export interface ConfirmGameB extends Base {
   name: StateName.ConfirmGameB;
   player: Player.PlayerB;
-};
+}
 export function confirmGameB(state: IncludesBase): ConfirmGameB {
   return { ...base(state), name: StateName.ConfirmGameB, player: Player.PlayerB };
-};
+}
 
 export interface WaitForFunding extends Base {
   name: StateName.WaitForFunding;
   player: Player;
-};
+}
 export function waitForFunding(state: IncludesBase): WaitForFunding {
   return { ...base(state), name: StateName.WaitForFunding };
-};
+}
 
 export interface WaitForPostFundSetup extends Base {
   name: StateName.WaitForPostFundSetup;
   player: Player;
-};
+}
 export function waitForPostFundSetup(state: IncludesBase): WaitForPostFundSetup {
   return { ...base(state), name: StateName.WaitForPostFundSetup };
-};
+}
 
 export interface PickMove extends Base {
   name: StateName.PickMove;
   player: Player;
-};
+}
 export function pickMove(state: IncludesBase): PickMove {
   return { ...base(state), name: StateName.PickMove };
-};
+}
 
 export interface WaitForOpponentToPickMoveA extends Base {
   name: StateName.WaitForOpponentToPickMoveA;
   myMove: Move;
   salt: string;
   player: Player.PlayerA;
-};
+}
 interface IncludesMove extends IncludesBase {
   myMove: Move;
-};
+}
 
 interface IncludesMoveAndSalt extends IncludesMove {
   salt: string;
-};
+}
 export function waitForOpponentToPickMoveA(state: IncludesMoveAndSalt): WaitForOpponentToPickMoveA {
   return {
     ...base(state),
@@ -135,26 +135,26 @@ export function waitForOpponentToPickMoveA(state: IncludesMoveAndSalt): WaitForO
     myMove: state.myMove,
     salt: state.salt,
   };
-};
+}
 
 export interface WaitForOpponentToPickMoveB extends Base {
   name: StateName.WaitForOpponentToPickMoveB;
   myMove: Move;
   player: Player.PlayerB;
-};
+}
 export function waitForOpponentToPickMoveB(state: IncludesMove): WaitForOpponentToPickMoveB {
   return {
     ...base(state),
     name: StateName.WaitForOpponentToPickMoveB,
     myMove: state.myMove,
   };
-};
+}
 
 export interface WaitForRevealB extends Base {
   name: StateName.WaitForRevealB;
   myMove: Move;
   player: Player.PlayerB;
-};
+}
 export function waitForRevealB(state: IncludesMove): WaitForRevealB {
   return {
     ...base(state),
@@ -187,11 +187,11 @@ export interface WaitForRestingA extends Base {
   theirMove: Move;
   result: Result;
   player: Player.PlayerA;
-};
+}
 export function waitForRestingA(state: IncludesResult): WaitForRestingA {
   const { myMove, theirMove, result } = state;
   return { ...base(state), name: StateName.WaitForRestingA, myMove, theirMove, result };
-};
+}
 
 export interface InsufficientFunds extends Base {
   name: StateName.InsufficientFunds;
@@ -199,51 +199,51 @@ export interface InsufficientFunds extends Base {
   theirMove: Move;
   result: Result;
   player: Player;
-};
+}
 export function insufficientFunds(state: IncludesResult): InsufficientFunds {
   const { myMove, theirMove, result } = state;
   return { ...base(state), name: StateName.InsufficientFunds, myMove, theirMove, result };
-};
+}
 
 export interface WaitToResign extends Base {
   name: StateName.WaitToResign;
   player: Player;
-};
+}
 export function waitToResign(state: IncludesBase): WaitToResign {
   return { ...base(state), name: StateName.WaitToResign };
-};
+}
 
 export interface OpponentResigned extends Base {
   name: StateName.OpponentResigned;
   player: Player;
-};
+}
 export function opponentResigned(state: IncludesBase): OpponentResigned {
   return { ...base(state), name: StateName.OpponentResigned };
-};
+}
 
 export interface WaitForResignationAcknowledgement extends Base {
   name: StateName.WaitForResignationAcknowledgement;
   player: Player;
-};
+}
 export function waitForResignationAcknowledgement(state: IncludesBase): WaitForResignationAcknowledgement {
   return { ...base(state), name: StateName.WaitForResignationAcknowledgement };
-};
+}
 
 export interface GameOver extends Base {
   name: StateName.GameOver;
   player: Player;
-};
+}
 export function gameOver(state: IncludesBase): GameOver {
   return { ...base(state), name: StateName.GameOver };
-};
+}
 
 export interface WaitForWithdrawal extends Base {
   name: StateName.WaitForWithdrawal;
   player: Player;
-};
+}
 export function waitForWithdrawal(state: IncludesBase): WaitForWithdrawal {
   return { ...base(state), name: StateName.WaitForWithdrawal };
-};
+}
 
 export type GameState = (
   | WaitForGameConfirmationA

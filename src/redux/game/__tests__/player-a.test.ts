@@ -171,7 +171,7 @@ describe('player A\'s app', () => {
         const gameState2 = {
           ...gameState,
           balances: proposeInsufficientFunds.balances,
-          latestPosition: proposeInsufficientFunds
+          latestPosition: proposeInsufficientFunds,
         };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
 
