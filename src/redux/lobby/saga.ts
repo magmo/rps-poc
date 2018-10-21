@@ -5,7 +5,7 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 import * as lobbyActions from './actions';
 import * as applicationActions from '../application/actions';
 
-import { acceptGame } from '../../redux/game/actions';
+import { createGame } from '../../redux/game/actions';
 import BN from 'bn.js';
 
 // @ts-ignore
@@ -27,8 +27,8 @@ export default function* lobbySaga(address: string) {
       case lobbyActions.ACCEPT_CHALLENGE:
         const libraryAddress = yield getLibraryAddress();
         const { stake, opponentName, opponentAddress } = action;
-        const channelNonce = '0x123'; // TODO: make random?
-        yield put(acceptGame(
+        const channelNonce = 0; // TODO: make random?
+        yield put(createGame(
           'myName',
           '0x123',
           opponentName,

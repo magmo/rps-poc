@@ -7,11 +7,10 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 import { actions as walletActions } from '../../wallet';
 import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import * as challengeActions from '../../wallet/redux/actions/challenge';
-import decode from '../../game-engine/positions/decode';
+import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
 import { MessageState } from '../game/reducer';
-import { GameState, baseProperties } from '../game/state';
-import { Player } from '../../game-engine/application-states';
+import * as gameStates from '../game/state';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -24,15 +23,11 @@ export default function* messageSaga(address: string) {
 }
 
 export function* sendMessagesSaga(opponentAddress: string) {
-  const channel = yield actionChannel([
-    gameActions.POSITION_RECEIVED,
-    gameActions.OPPONENT_RESIGNED,
-    walletActions.SEND_MESSAGE
-  ]);
+  const channel = yield actionChannel('*');
 
   while (true) {
     // We take any action that might trigger the outbox to be updated
-    const action: gameActions.OpponentResigned | gameActions.PositionReceived | walletActions.SendMessage = yield take(channel);
+    const action = yield take(channel);
 
     if (action.type === walletActions.SEND_MESSAGE) {
       const queue = Queue.WALLET;
@@ -45,7 +40,7 @@ export function* sendMessagesSaga(opponentAddress: string) {
       const messageState: MessageState = yield select(getMessageState);
       if (messageState.opponentOutbox != null) {
         const queue = Queue.GAME_ENGINE;
-        const data = messageState.opponentOutbox.toHex();
+        const data = encode(messageState.opponentOutbox);
         const signature = yield signMessage(data);
         const message = { data, queue, signature };
         yield put(walletActions.messageSent(data, signature));
@@ -53,7 +48,7 @@ export function* sendMessagesSaga(opponentAddress: string) {
       }
       if (messageState.walletOutbox != null) {
         const getGameState = state => ({});
-        const gameState: GameState = yield select(getGameState);
+        const gameState: gameStates.GameState = yield select(getGameState);
         handleWalletMessage(messageState.walletOutbox, gameState);
       }
     }
@@ -83,8 +78,9 @@ function* receiveFromFirebaseSaga(address: string) {
       }
       yield put(walletActions.messageReceived(data, signature));
       const position = decode(data);
-      if (position.stateType === State.StateType.Conclude) {
-        yield put(gameActions.opponentResigned(position));
+      if (position.name === positions.PRE_FUND_SETUP_A) {
+        // todo: how do we get actual names in here - will need to look up from firebase
+        yield put(gameActions.initialPositionReceived(position, 'Me', 'Opponent'));
       } else {
         yield put(gameActions.positionReceived(position));
       }
