@@ -1,7 +1,6 @@
 import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects';
 import { buffers } from 'redux-saga';
 import hash from 'object-hash';
-import { State } from 'fmg-core';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
 import { actions as walletActions } from '../../wallet';
@@ -11,6 +10,7 @@ import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
 import { MessageState } from '../game/reducer';
 import * as gameStates from '../game/state';
+import { Channel, State } from 'fmg-core';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -90,15 +90,16 @@ function* receiveFromFirebaseSaga(address: string) {
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
 }
-function* handleWalletMessage(type, state: GameState) {
+function* handleWalletMessage(type, state: gameStates.GameState) {
+  const { libraryAddress, channelNonce, player, balances, participants } = state;
+  const channel = new Channel(libraryAddress, channelNonce, participants);
+  const channelId = channel.id;
+
   switch (type) {
     case "FUNDING_REQUEST":
-      const properties = baseProperties(state);
-      const { latestPosition, player, balances, participants } = properties;
 
       const myIndex = player === Player.PlayerA ? 0 : 1;
 
-      const channelId = latestPosition.channel.id;
       const opponentAddress = participants[1 - myIndex];
       const myAddress = participants[myIndex];
       const myBalance = balances[myIndex];
@@ -108,7 +109,15 @@ function* handleWalletMessage(type, state: GameState) {
       yield take(walletActions.FUNDING_SUCCESS);
       break;
     case "WITHDRAWAL_REQUEST":
-      yield put(walletActions.withdrawalRequest(state.latestPosition));
+      const { turnNum } = positions.conclude(state);
+      const channelState = new State({
+        channel,
+        stateType: State.StateType.Conclude,
+        turnNum,
+        resolution: balances,
+        stateCount: 0,
+      });
+      yield put(walletActions.withdrawalRequest(channelState));
       yield take(walletActions.WITHDRAWAL_SUCCESS);
 
   }
