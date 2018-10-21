@@ -229,63 +229,38 @@ function waitForFundingReducer( gameState: states.WaitForFunding, messageState: 
 }
 
 function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type !== actions.POSITION_RECEIVED) {
-    return { gameState, messageState };
-  }
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
-  let latestPosition;
-  if (gameState.player === Player.PlayerA) {
-    latestPosition = action.position;
-  } else {
-    const { channel, turnNum, resolution, stake } = (action.position as PostFundSetupA);
-    latestPosition = new PostFundSetupB(channel, turnNum + 1, resolution, 1, stake);
-    messageState = { ...messageState, opponentOutbox: latestPosition };
+  const { turnNum } = gameState;
+  const newGameState = states.pickMove({ ...gameState, turnNum: turnNum + 1 });
+  if (gameState.player === Player.PlayerB) {
+    messageState = { ...messageState, opponentOutbox: positions.postFundSetupB(newGameState) };
   }
-
-  const newGameState: states.PickMove = {
-    ...states.base(gameState),
-    name: states.StateName.PickMove,
-    latestPosition,
-    turnNum: latestPosition.turnNum,
-  };
 
   return { gameState: newGameState, messageState };
 }
 
 function pickMoveReducer(gameState: states.PickMove, messageState: MessageState, action: actions.GameAction): JointState {
-  const { channel, turnNum, resolution: balances } = gameState.latestPosition;
-  const roundBuyIn = gameState.roundBuyIn;
+  const turnNum = gameState.turnNum;
 
   if (gameState.player === Player.PlayerA) {
     if (action.type !== actions.CHOOSE_PLAY) { return { gameState, messageState }; }
     const salt = randomHex(64);
-    const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 1, balances, roundBuyIn, action.play, salt);
+    const asMove = action.play;
 
-    const newGameStateA: states.WaitForOpponentToPickMoveA = {
-      ...states.base(gameState),
-      player: gameState.player,
-      myMove: action.play,
-      salt,
-      latestPosition,
-      turnNum: turnNum + 1,
-      name: states.StateName.WaitForOpponentToPickMoveA,
-    };
-    messageState = { ...messageState, opponentOutbox: latestPosition };
+    const propose = positions.proposeFromSalt({...gameState, asMove, salt, turnNum: turnNum + 1});
+    const newGameStateA = states.waitForOpponentToPickMoveA({ ...gameState, ...propose, salt, myMove: asMove });
+
+    messageState = { ...messageState, opponentOutbox: propose };
 
     return { gameState: newGameStateA, messageState };
   } else {
-    if (action.type === actions.POSITION_RECEIVED && action.position.constructor.name === 'Propose') {
+    if (action.type === actions.POSITION_RECEIVED && action.position.name === positions.PROPOSE) {
       messageState = { ...messageState, actionToRetry: action };
       return { gameState, messageState };
     } else if (action.type === actions.CHOOSE_PLAY) {
 
-      const newGameStateB: states.WaitForOpponentToPickMoveB = {
-        ...states.base(gameState),
-        player: gameState.player,
-        myMove: action.play,
-        turnNum,
-        name: states.StateName.WaitForOpponentToPickMoveB,
-      };
+      const newGameStateB = states.waitForOpponentToPickMoveB({ ...gameState, myMove: action.play });
 
       return { gameState: newGameStateB, messageState };
     }
@@ -299,16 +274,14 @@ function insufficientFunds(balances: [BN, BN], roundBuyIn: BN): boolean {
 }
 
 function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type !== actions.POSITION_RECEIVED) {
-    return { gameState, messageState };
-  }
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const { libraryAddress, channelNonce, participants, roundBuyIn, turnNum, myMove, salt } = gameState;
   const { position: theirPosition } = action;
-  if (!(theirPosition instanceof Accept)) {
-    return { gameState, messageState };
-  }
-  const { bPlay: theirMove, resolution: balances } = theirPosition;
+
+  if (theirPosition.name !== positions.ACCEPT) { return { gameState, messageState }; }
+
+  const { bsMove: theirMove, balances } = theirPosition;
   const channel = new Channel(libraryAddress, channelNonce, participants);
   const result = calculateResult(myMove, theirMove);
 
