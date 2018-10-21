@@ -5,17 +5,17 @@ import * as gameActions from '../redux/game/actions';
 import * as walletActions from '../wallet/redux/actions/external';
 
 import WaitingStep from '../components/WaitingStep';
-import SelectPlayPage from '../components/SelectPlayPage';
+import SelectMovePage from '../components/SelectMovePage';
 import GameProposedPage from '../components/GameProposedPage';
 import FundingConfirmedPage from '../components/FundingConfirmedPage';
-import PlaySelectedPage from '../components/PlaySelectedPage';
+import MoveSelectedPage from '../components/MoveSelectedPage';
 import ResultPage from '../components/ResultPage';
 import { WalletController } from '../wallet';
 
 import { SiteState } from '../redux/reducer';
 
 
-import { Play } from '../game-engine/positions';
+import { Move } from '../core';
 import WalletHeader from 'src/wallet/containers/WalletHeader';
 import { GameState, StateName } from 'src/redux/game/state';
 
@@ -23,7 +23,7 @@ interface GameProps {
   state: GameState;
   showWallet: boolean;
   showWalletHeader: boolean;
-  choosePlay: (play: Play) => void;
+  chooseMove: (move: Move) => void;
   abandonGame: () => void;
   playAgain: () => void;
   createBlockchainChallenge: () => void;
@@ -42,7 +42,7 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, choosePlay, playAgain, abandonGame, createBlockchainChallenge } = props;
+  const { state, chooseMove, playAgain, abandonGame, createBlockchainChallenge } = props;
   switch (state.name) {
     case StateName.WaitForGameConfirmationA:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
@@ -50,22 +50,22 @@ function RenderGame(props: GameProps) {
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
     case StateName.PickMove:
-      return <SelectPlayPage choosePlay={choosePlay} abandonGame={abandonGame} />;
+      return <SelectMovePage chooseMove={chooseMove} abandonGame={abandonGame} />;
 
     case StateName.WaitForOpponentToPickMoveA:
       return (
-        <PlaySelectedPage
+        <MoveSelectedPage
           message="Waiting for your opponent to choose their move"
-          yourPlay={state.myMove}
+          yourMove={state.myMove}
           createBlockchainChallenge={createBlockchainChallenge}
         />
       );
 
     case StateName.WaitForRestingA:
       return (
-        <PlaySelectedPage
+        <MoveSelectedPage
           message="Waiting for resting"
-          yourPlay={state.myMove}
+          yourMove={state.myMove}
           createBlockchainChallenge={createBlockchainChallenge}
         />
       );
@@ -80,9 +80,9 @@ function RenderGame(props: GameProps) {
 
     case StateName.WaitForRevealB:
       return (
-        <PlaySelectedPage
+        <MoveSelectedPage
           message="Waiting for your opponent to choose their move"
-          yourPlay={state.myMove}
+          yourMove={state.myMove}
           createBlockchainChallenge={createBlockchainChallenge}
         />
       );
@@ -91,8 +91,8 @@ function RenderGame(props: GameProps) {
       return (
         <ResultPage
           message="Waiting for opponent to suggest a new game"
-          yourPlay={state.myMove}
-          theirPlay={state.theirMove}
+          yourMove={state.myMove}
+          theirMove={state.theirMove}
           result={state.result}
           playAgain={playAgain}
           abandonGame={abandonGame}
@@ -109,8 +109,8 @@ const mapStateToProps = (state: SiteState) => ({
 });
 
 const mapDispatchToProps = {
-  choosePlay: gameActions.choosePlay,
-  playAgain: gameActions.playAgain,
+  chooseMove: gameActions.chooseMove,
+  moveAgain: gameActions.playAgain,
   abandonGame: gameActions.resign,
   createBlockchainChallenge: walletActions.createChallenge,
 };

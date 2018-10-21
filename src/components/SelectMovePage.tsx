@@ -1,32 +1,32 @@
 import React from 'react';
 
-import { Play } from '../game-engine/positions';
+import { Move } from '../core';
 
 import { Button } from 'reactstrap';
 import MoveIcon from './MoveIcon';
 
 interface Props {
-  choosePlay: (play: Play) => void;
+  chooseMove: (move: Move) => void;
   abandonGame: () => void;
   afterOpponent?: any;
   challengeExpirationDate?:number;
 
 }
 
-export default class SelectPlayStep extends React.PureComponent<Props> {
-  renderChooseButton(choosePlay: (play: Play) => void, play: Play, description: string) {
+export default class SelectMoveStep extends React.PureComponent<Props> {
+  renderChooseButton(chooseMove: (move: Move) => void, move: Move, description: string) {
     return (
-      <Button onClick={() => choosePlay(play)} color="light" className="w-75 p-3">
+      <Button onClick={() => chooseMove(move)} color="light" className="w-75 p-3">
         <div className="mb-3">
           <h1>{description}</h1>
-          <MoveIcon play={play} />
+          <MoveIcon move={move} />
         </div>
       </Button>
     );
   }
 
   render() {
-    const { afterOpponent, choosePlay, abandonGame, challengeExpirationDate } = this.props;
+    const { afterOpponent, chooseMove, abandonGame, challengeExpirationDate } = this.props;
     const renderChooseButton = this.renderChooseButton;
 
     return (
@@ -39,10 +39,10 @@ export default class SelectPlayStep extends React.PureComponent<Props> {
               : 'Choose your move:'}
           </h1>
           <div className="row w-100">
-            <div className="col-sm-4">{renderChooseButton(choosePlay, Play.Rock, 'Rock')}</div>
-            <div className="col-sm-4">{renderChooseButton(choosePlay, Play.Paper, 'Paper')}</div>
+            <div className="col-sm-4">{renderChooseButton(chooseMove, Move.Rock, 'Rock')}</div>
+            <div className="col-sm-4">{renderChooseButton(chooseMove, Move.Paper, 'Paper')}</div>
             <div className="col-sm-4">
-              {renderChooseButton(choosePlay, Play.Scissors, 'Scissors')}
+              {renderChooseButton(chooseMove, Move.Scissors, 'Scissors')}
             </div>
           </div>
           <div className="mt-5">

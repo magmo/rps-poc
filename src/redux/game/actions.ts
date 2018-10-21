@@ -4,11 +4,10 @@ import { Move, Position, positions } from '../../core';
 export const CREATE_GAME = 'GAME.CREATE_GAME';
 export const INITIAL_POSITION_RECEIVED = 'GAME.INITIAL_POSITION_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
-export const CHOOSE_PLAY = 'GAME.CHOOSE_PLAY';
+export const CHOOSE_MOVE = 'GAME.CHOOSE_MOVE';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
 export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
-export const OPPONENT_RESIGNED = 'GAME.OPPONENT_RESIGNED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
@@ -43,8 +42,8 @@ export const confirmGame = () => ({
   type: CONFIRM_GAME as typeof CONFIRM_GAME,
 });
 
-export const choosePlay = (play: Move) => ({
-  type: CHOOSE_PLAY as typeof CHOOSE_PLAY,
+export const chooseMove = (play: Move) => ({
+  type: CHOOSE_MOVE as typeof CHOOSE_MOVE,
   play,
 });
 
@@ -58,11 +57,6 @@ export const resign = () => ({
 
 export const positionReceived = (position: Position) => ({
   type: POSITION_RECEIVED as typeof POSITION_RECEIVED,
-  position,
-});
-
-export const opponentResigned = (position: positions.Conclude) => ({
-  type: OPPONENT_RESIGNED as typeof OPPONENT_RESIGNED,
   position,
 });
 
@@ -81,25 +75,23 @@ export const withdrawalSuccess = () => ({
 export type InitialPositionReceived = ReturnType<typeof initialPositionReceived>;
 export type CreateGame = ReturnType<typeof createGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
-export type ChoosePlay = ReturnType<typeof choosePlay>;
-export type MoveAgain = ReturnType<typeof playAgain>;
+export type ChooseMove = ReturnType<typeof chooseMove>;
+export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
 export type PositionReceived = ReturnType<typeof positionReceived>;
-export type OpponentResigned = ReturnType<typeof opponentResigned>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 
-export type StartAction = InitialPositionReceived | CreateGame;
-export type LocalAction = (
+export type GameAction = (
   | ConfirmGame
-  | ChoosePlay
-  | MoveAgain
+  | ChooseMove
+  | PlayAgain
   | PositionReceived
   | FundingSuccess
   | WithdrawalSuccess
   | WithdrawalRequest
+  | Resign
+  | InitialPositionReceived
+  | CreateGame
 );
-export type ResignAction = Resign | OpponentResigned;
-
-export type GameAction = (StartAction | LocalAction | ResignAction);

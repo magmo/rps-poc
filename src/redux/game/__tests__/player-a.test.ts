@@ -113,7 +113,7 @@ describe('player A\'s app', () => {
     const gameState = state.pickMove({...aProps, ...postFundSetupB });
 
     describe('when a move is chosen', () => {
-      const action = actions.choosePlay(asMove);
+      const action = actions.chooseMove(asMove);
       // todo: will need to stub out the randomness in the salt somehow
       const updatedState = gameReducer({ messageState, gameState }, action);
 

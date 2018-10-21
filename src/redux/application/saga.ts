@@ -13,8 +13,6 @@ export default function* applicationControllerSaga(userId: string) {
 
   const { address, error } = yield call(setupWallet, userId);
 
- 
-
   if (error) {
     yield put(applicationActions.initializationFailure(error));
     yield take(applicationActions.RELOAD);

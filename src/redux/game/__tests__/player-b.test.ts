@@ -105,7 +105,7 @@ describe('player B\'s app', () => {
     itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when a move is chosen', () => {
-      const action = actions.choosePlay(bsMove);
+      const action = actions.chooseMove(bsMove);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.WaitForOpponentToPickMoveB, updatedState);
@@ -123,7 +123,7 @@ describe('player B\'s app', () => {
       itStoresAction(action, updatedState);
 
       describe('when a move is chosen', () => {
-        const action = actions.choosePlay(bsMove);
+        const action = actions.chooseMove(bsMove);
         const updatedState2 = gameReducer(updatedState, action);
 
         itSends(accept, updatedState2);

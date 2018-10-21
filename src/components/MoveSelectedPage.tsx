@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Play } from '../game-engine/positions';
+import { Move } from '../core';
 import MoveIcon from './MoveIcon';
 import Button from 'reactstrap/lib/Button';
 
 interface Props {
   message: string;
-  yourPlay: Play;
+  yourPlay: Move;
   createBlockchainChallenge: ()=>void;
 }
 
@@ -23,11 +23,11 @@ export default class PlaySelectedPage extends React.PureComponent<Props> {
         <div className="w-100 text-center mb-5">
           <h1 className="mb-5">Move chosen!</h1>
           <p className="lead">
-            You chose <strong>{Play[yourPlay]}</strong>
+            You chose <strong>{Move[yourPlay]}</strong>
           </p>
 
           <div className="mb-5">
-            <MoveIcon play={yourPlay} />`
+            <MoveIcon move={yourPlay} />`
           </div>
           <Button onClick={createBlockchainChallenge}>Challenge</Button>
           <p>{message}</p>
