@@ -4,9 +4,8 @@ import BN from 'bn.js';
 
 import * as actions from './actions';
 import * as states from './state';
-import { Position, Conclude, PostFundSetupA, Propose, Accept, Reveal, Result, Resting, calculateResult, PreFundSetupB, PreFundSetupA, PostFundSetupB } from '../../game-engine/positions';
 import { randomHex } from '../../utils/randomHex';
-import { Player } from '../../game-engine/application-states';
+import { Position, Result, Move, Player, positions } from '../../core';
 
 export interface MessageState {
   opponentOutbox: Position | null;
@@ -86,39 +85,17 @@ function itsMyTurnNext(state: JointState) {
 }
 
 function acceptGameReducer(action: actions.AcceptGame): JointState {
-  const player = Player.PlayerA;
-  const {
-    stake,
-    myName,
-    myAddress,
-    opponentName,
-    opponentAddress,
-    libraryAddress,
-    channelNonce,
-  } = action;
-
-  const balances: [BN, BN] = [(new BN(stake)).muln(5), (new BN(stake)).muln(5)];
+  const { roundBuyIn, myAddress, opponentAddress } = action;
+  const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
   const participants: [string, string] = [myAddress, opponentAddress];
-  const channel = new Channel(libraryAddress, channelNonce, participants);
   const turnNum = 0;
   const stateCount = 0;
-  const preFundSetupA = new PreFundSetupA(channel, turnNum, balances, stateCount, stake);
-  const newGameState: states.WaitForGameConfirmationA = {
-    name: states.StateName.WaitForGameConfirmationA,
-    player,
-    turnNum,
-    roundBuyIn: stake,
-    balances,
-    stateCount,
-    myName,
-    opponentName,
-    latestPosition: preFundSetupA,
-    libraryAddress,
-    channelNonce,
-    participants,
-  };
 
-  const messageState = { ...NULL_MESSAGE_STATE, opponentOutbox: preFundSetupA, };
+  const newGameState = states.waitForGameConfirmationA({
+    ...action, balances, participants, turnNum, stateCount
+  });
+
+  const messageState = { ...NULL_MESSAGE_STATE, opponentOutbox: positions.preFundSetupA(newGameState), };
   return { gameState: newGameState, messageState };
 }
 
@@ -131,51 +108,42 @@ function resignationReducer(state: JointState): JointState {
   let { messageState, gameState } = state;
 
   if (itsMyTurnNext(state)) {
-    let position;
     if (messageState.actionToRetry) {
-      position = messageState.actionToRetry.position;
-    } else {
-      position = gameState.latestPosition;
+      // In this case, we need to force-apply the waiting action.
+      // This will put the gameState into an inconsistent state temporarily.
+      // Todo: probably want to make this a separate application flow.
+      const savedPosition = messageState.actionToRetry.position;
+      gameState.balances = savedPosition.balances;
+      gameState.turnNum = savedPosition.turnNum;
     }
-    const { channel, turnNum, resolution: balances } = position;
-
-    const conclude = new Conclude(channel, turnNum + 1, balances);
-
+    const { turnNum } = gameState;
     // transition to WaitForResignationAcknowledgement
-    gameState = {
-      ...states.base(gameState),
-      name: states.StateName.WaitForResignationAcknowledgement,
-      turnNum: turnNum + 1,
-      latestPosition: conclude,
-    };
+    gameState = states.waitForResignationAcknowledgement({...gameState, turnNum: turnNum + 1});
+
     // and send the latest state to our opponent
-    messageState = { ...messageState, opponentOutbox: conclude };
+    messageState = { ...messageState, opponentOutbox: positions.conclude(gameState) };
   } else {
     // transition to WaitToResign
-    gameState = { ...states.base(gameState), name: states.StateName.WaitToResign };
+    gameState = states.waitForResignationAcknowledgement(gameState);
   }
 
   return { gameState, messageState };
 }
 
-function opponentResignationReducer(state: JointState, position: Conclude) {
-  let { messageState } = state;
-  const { gameState } = state;
+function opponentResignationReducer(state: JointState, position: positions.Conclude) {
+  let { messageState, gameState } = state;
 
-  // for the time being, we're just trusting it was their turn - which the
-  // wallet will enforce
-  const { channel, resolution, turnNum } = position;
-  const newPosition = new Conclude(channel, turnNum + 1, resolution);
+  // in taking the turnNum from their position, we're trusting the wallet to have caught
+  // the case where they resign when it isn't their turn
+  const { turnNum } = position;
 
-  messageState = { ...messageState, opponentOutbox: newPosition };
-  const newGameState: states.OpponentResigned = {
-    ...states.base(gameState),
-    name: states.StateName.OpponentResigned,
-    latestPosition: newPosition,
-    turnNum: turnNum + 1,
-  };
+  // transition to OpponentResigned
+  gameState = states.opponentResigned({...gameState, turnNum: turnNum + 1 });
 
-  return { gameState: newGameState, messageState };
+  // send Conclude to our opponent
+  messageState = { ...messageState, opponentOutbox: positions.conclude(gameState) };
+
+  return { gameState, messageState };
 }
 
 function localActionReducer(state: JointState, action: actions.LocalAction): JointState {
@@ -222,15 +190,15 @@ function localActionReducer(state: JointState, action: actions.LocalAction): Joi
 }
 
 function waitForGameConfirmationAReducer( gameState: states.WaitForGameConfirmationA, messageState: MessageState, action: actions.GameAction): JointState {
-  // only action we need to handle in this state is to receiving a PreFundSetup
+  // only action we need to handle in this state is to receiving a PreFundSetupB
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
-  if (action.position.constructor.name !== 'PreFundSetup') { return { gameState, messageState }; }
+  if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
 
   // request funding
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   // transition to Wait for Funding
-  const newGameState: states.WaitForFunding = { ...states.base(gameState), name: states.StateName.WaitForFunding };
+  const newGameState = states.waitForFunding(gameState);
 
   return { messageState, gameState: newGameState };
 }
@@ -238,15 +206,10 @@ function waitForGameConfirmationAReducer( gameState: states.WaitForGameConfirmat
 function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: MessageState, action: actions.GameAction) : JointState {
   if (action.type !== actions.CONFIRM_GAME) { return { gameState, messageState }; }
 
-  const { channel, turnNum, resolution, stake } = (gameState.latestPosition as PreFundSetupA);
-  const newPosition = new PreFundSetupB(channel, turnNum + 1, resolution, 1, stake);
+  const { turnNum } = gameState;
 
-  const newGameState: states.WaitForFunding = {
-    ...states.base(gameState),
-    name: states.StateName.WaitForFunding,
-    turnNum: turnNum + 1,
-    latestPosition: newPosition,
-  };
+  const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
+  const newPosition = positions.preFundSetupB(gameState);
 
   messageState = { ...messageState, opponentOutbox: newPosition, walletOutbox: 'FUNDING_REQUESTED' };
 
@@ -254,25 +217,14 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
 }
 
 function waitForFundingReducer( gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type !== actions.FUNDING_SUCCESS) {
-    return { gameState, messageState };
-  }
+  if (action.type !== actions.FUNDING_SUCCESS) { return { gameState, messageState }; }
 
-  const { libraryAddress, channelNonce, participants, turnNum, balances, roundBuyIn } = gameState;
-  const postFundSetupA = new PostFundSetupA(
-    new Channel(libraryAddress, channelNonce, participants),
-    turnNum + 1,
-    balances,
-    0,
-    roundBuyIn
-  );
-  const newGameState: states.WaitForPostFundSetup = {
-    ...states.base(gameState),
-    latestPosition: postFundSetupA,
-    name: states.StateName.WaitForPostFundSetup,
-    turnNum: turnNum + 1,
-  };
+  const { turnNum } = gameState;
+  const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum: turnNum + 1, stateCount: 0 });
+
+  const postFundSetupA = positions.postFundSetupA(gameState);
   const newMessageState = { ...NULL_MESSAGE_STATE, opponentOutbox: postFundSetupA };
+
   return { gameState: newGameState, messageState: newMessageState };
 }
 

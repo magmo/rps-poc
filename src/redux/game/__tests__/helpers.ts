@@ -1,8 +1,7 @@
 import { gameReducer, JointState } from '../reducer';
-import { Player } from '../../../game-engine/application-states';
+import { Player, positions } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
-import { Conclude } from '../../../game-engine/positions';
 
 export const itSends = (position, jointState) => {
   it(`sends ${position.constructor.name}`, () => {
@@ -64,21 +63,23 @@ export const itHandlesResignWhenMyTurn = (jointState: JointState) => {
         balances: gameState.balances,
         player: Player.PlayerA,
       });
-      const newConclude = new Conclude(oldPosition.channel, oldPosition.turnNum + 1, oldPosition.resolution);
+      const newConclude = positions.conclude({...oldPosition, turnNum: oldPosition.turnNum + 1});
       expect(position).toEqual(newConclude);
     });
   });
 };
 
 export const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => {
-  const { turnNum, balances, channel } = gameState.latestPosition;
+  const { turnNum } = gameState.latestPosition;
   const isTheirTurn = gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;
   const newTurnNum = isTheirTurn ? turnNum : turnNum + 1;
-  const theirConclude = new Conclude(channel, newTurnNum, balances);
+  const oldPosition = gameState.latestPosition;
+  const theirConclude = positions.conclude({ ...oldPosition, turnNum: newTurnNum });
+  const ourConclude = positions.conclude({ ...oldPosition, turnNum: newTurnNum + 1 });
   const action = actions.opponentResigned(theirConclude);
 
   const updatedState = gameReducer({ gameState, messageState }, action);
 
   itTransitionsTo(state.StateName.OpponentResigned, updatedState);
-  itSends(new Conclude(channel, newTurnNum + 1, balances), updatedState);
+  itSends(ourConclude, updatedState);
 };

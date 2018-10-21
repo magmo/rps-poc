@@ -1,7 +1,7 @@
 import { gameReducer } from '../reducer';
 import * as actions from '../actions';
 import * as state from '../state';
-import * as scenarios from './scenarios';
+import { scenarios } from '../../../core';
 import { itSends, itTransitionsTo, itsPropertiesAreConsistentWithItsPosition } from './helpers';
 
 const nullMessageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };

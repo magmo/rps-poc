@@ -1,6 +1,5 @@
 import BN from 'bn.js';
-import { Position, Result, Play as Move } from '../../game-engine/positions';
-import { Player } from '../../game-engine/application-states';
+import { Position, Result, Move, Player } from '../../core';
 
 // States of the form *A are player A only
 // States of the form *B are player B only
@@ -27,7 +26,7 @@ export enum StateName {
 
 interface TwoChannel {
   libraryAddress: string;
-  channelNonce: string;
+  channelNonce: number;
   participants: [string, string];
 }
 
@@ -38,7 +37,6 @@ interface Base extends TwoChannel {
   roundBuyIn: BN;
   myName: string;
   opponentName: string;
-  latestPosition: Position;
 }
 
 interface IncludesBase extends Base {
@@ -56,7 +54,6 @@ export function base(state: IncludesBase) {
     roundBuyIn,
     myName,
     opponentName,
-    latestPosition,
     player,
   } = state;
 
@@ -70,7 +67,6 @@ export function base(state: IncludesBase) {
     roundBuyIn,
     myName,
     opponentName,
-    latestPosition,
     player,
   };
 }

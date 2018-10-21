@@ -1,9 +1,7 @@
-import BN from "bn.js";
 import { gameReducer } from '../reducer';
-import { Player } from '../../../game-engine/application-states';
+import { Player, scenarios } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
-import * as scenarios from './scenarios';
 
 import {
   itSends,
@@ -19,8 +17,8 @@ const {
   preFundSetupB,
   postFundSetupA,
   postFundSetupB,
-  aPlay,
-  bPlay,
+  asMove,
+  bsMove,
   salt,
   aResult,
   propose,
@@ -48,7 +46,7 @@ describe('player A\'s app', () => {
     ...base,
     player: Player.PlayerA as Player.PlayerA,
     turnNum: 0,
-    balances: preFundSetupA.resolution as [BN, BN],
+    balances: preFundSetupA.balances,
     stateCount: 0,
     latestPosition: preFundSetupA,
   };
@@ -123,7 +121,7 @@ describe('player A\'s app', () => {
     };
 
     describe('when a move is chosen', () => {
-      const action = actions.choosePlay(aPlay);
+      const action = actions.choosePlay(asMove);
       // todo: will need to stub out the randomness in the salt somehow
       const updatedState = gameReducer({ messageState, gameState }, action);
 
@@ -133,7 +131,7 @@ describe('player A\'s app', () => {
 
       it('stores the move and salt', () => {
         const newGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(newGameState.myMove).toEqual(aPlay);
+        expect(newGameState.myMove).toEqual(asMove);
         expect(newGameState.salt).toEqual(salt);
       });
 
@@ -147,7 +145,7 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitForOpponentToPickMoveA,
       latestPosition: propose,
-      myMove: aPlay,
+      myMove: asMove,
       salt,
       turnNum: propose.turnNum,
     };
@@ -163,7 +161,7 @@ describe('player A\'s app', () => {
         itsPropertiesAreConsistentWithItsPosition(updatedState);
         it('sets theirMove and the result', () => {
           const newGameState = updatedState.gameState as state.PlayAgain;
-          expect(newGameState.theirMove).toEqual(bPlay);
+          expect(newGameState.theirMove).toEqual(bsMove);
           expect(newGameState.result).toEqual(aResult);
         });
       });
@@ -172,7 +170,7 @@ describe('player A\'s app', () => {
         const action = actions.positionReceived(acceptInsufficientFunds);
         const gameState2 = {
           ...gameState,
-          balances: proposeInsufficientFunds.resolution as [BN, BN],
+          balances: proposeInsufficientFunds.balances,
           latestPosition: proposeInsufficientFunds
         };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
@@ -191,10 +189,10 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.PlayAgain,
       latestPosition: reveal,
-      myMove: aPlay,
-      theirMove: bPlay,
+      myMove: asMove,
+      theirMove: bsMove,
       result: aResult,
-      balances: reveal.resolution as [BN, BN],
+      balances: reveal.balances,
       turnNum: reveal.turnNum,
     };
 
@@ -244,8 +242,8 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitForRestingA,
       latestPosition: reveal,
-      myMove: aPlay,
-      theirMove: bPlay,
+      myMove: asMove,
+      theirMove: bsMove,
       result: aResult,
       turnNum: reveal.turnNum,
     };
@@ -268,7 +266,7 @@ describe('player A\'s app', () => {
       name: state.StateName.WaitToResign,
       latestPosition: revealInsufficientFunds,
       turnNum: revealInsufficientFunds.turnNum,
-      balances: revealInsufficientFunds.resolution as [BN, BN],
+      balances: revealInsufficientFunds.balances,
     };
 
     describe('when any position arrives', () => {
@@ -287,10 +285,10 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.InsufficientFunds,
       latestPosition: revealInsufficientFunds,
-      myMove: aPlay,
-      theirMove: bPlay,
+      myMove: asMove,
+      theirMove: bsMove,
       result: aResult,
-      balances: revealInsufficientFunds.resolution as [BN, BN],
+      balances: revealInsufficientFunds.balances,
       turnNum: revealInsufficientFunds.turnNum,
     };
 
@@ -309,7 +307,7 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.WaitForResignationAcknowledgement,
       latestPosition: conclude,
-      balances: conclude.resolution as [BN, BN],
+      balances: conclude.balances,
       turnNum: conclude.turnNum,
     };
 
@@ -327,7 +325,7 @@ describe('player A\'s app', () => {
       ...aProps,
       name: state.StateName.GameOver,
       latestPosition: conclude,
-      balances: conclude.resolution as [BN, BN],
+      balances: conclude.balances,
       turnNum: conclude.turnNum,
     };
 

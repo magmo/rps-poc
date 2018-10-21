@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Play, Conclude, Position } from '../../game-engine/positions';
+import { Move, Position, positions } from '../../core';
 
 export const CREATE_GAME = 'GAME.CREATE_GAME';
 export const ACCEPT_GAME = 'GAME.ACCEPT_GAME';
@@ -19,8 +19,8 @@ export const createGame = (
   opponentName: string,
   opponentAddress: string,
   libraryAddress: string,
-  channelNonce: string,
-  stake: BN,
+  channelNonce: number,
+  roundBuyIn: BN,
 ) => ({
   type: CREATE_GAME as typeof ACCEPT_GAME,
   myName,
@@ -29,7 +29,7 @@ export const createGame = (
   opponentAddress,
   libraryAddress,
   channelNonce,
-  stake,
+  roundBuyIn,
 });
 
 export const acceptGame = (
@@ -38,8 +38,8 @@ export const acceptGame = (
   opponentName: string,
   opponentAddress: string,
   libraryAddress: string,
-  channelNonce: string,
-  stake: BN,
+  channelNonce: number,
+  roundBuyIn: BN,
 ) => ({
   type: ACCEPT_GAME as typeof ACCEPT_GAME,
   myName,
@@ -48,14 +48,14 @@ export const acceptGame = (
   opponentAddress,
   libraryAddress,
   channelNonce,
-  stake,
+  roundBuyIn,
 });
 
 export const confirmGame = () => ({
   type: CONFIRM_GAME as typeof CONFIRM_GAME,
 });
 
-export const choosePlay = (play: Play) => ({
+export const choosePlay = (play: Move) => ({
   type: CHOOSE_PLAY as typeof CHOOSE_PLAY,
   play,
 });
@@ -73,7 +73,7 @@ export const positionReceived = (position: Position) => ({
   position,
 });
 
-export const opponentResigned = (position: Conclude) => ({
+export const opponentResigned = (position: positions.Conclude) => ({
   type: OPPONENT_RESIGNED as typeof OPPONENT_RESIGNED,
   position,
 });
@@ -94,7 +94,7 @@ export type AcceptGame = ReturnType<typeof acceptGame>;
 export type CreateGame = ReturnType<typeof createGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
 export type ChoosePlay = ReturnType<typeof choosePlay>;
-export type PlayAgain = ReturnType<typeof playAgain>;
+export type MoveAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
 export type PositionReceived = ReturnType<typeof positionReceived>;
 export type OpponentResigned = ReturnType<typeof opponentResigned>;
@@ -106,7 +106,7 @@ export type StartAction = AcceptGame | CreateGame;
 export type LocalAction = (
   | ConfirmGame
   | ChoosePlay
-  | PlayAgain
+  | MoveAgain
   | PositionReceived
   | FundingSuccess
   | WithdrawalSuccess

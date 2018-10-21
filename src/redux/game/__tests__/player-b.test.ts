@@ -1,9 +1,7 @@
-import BN from "bn.js";
 import { gameReducer } from '../reducer';
-import { Player } from '../../../game-engine/application-states';
+import { Player, scenarios } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
-import * as scenarios from './scenarios';
 
 import {
   itSends,
@@ -18,8 +16,8 @@ const {
   preFundSetupB,
   postFundSetupA,
   postFundSetupB,
-  aPlay,
-  bPlay,
+  asMove,
+  bsMove,
   bResult,
   propose,
   accept,
@@ -33,7 +31,6 @@ const {
 } = scenarios.bResignsAfterOneRound;
 
 const {
-  propose: proposeInsufficientFunds,
   accept: acceptInsufficientFunds,
   reveal: revealInsufficientFunds,
   conclude: concludeInsufficientFunds,
@@ -51,7 +48,7 @@ describe('player B\'s app', () => {
     ...base,
     player: Player.PlayerB as Player.PlayerB,
     turnNum: 0,
-    balances: preFundSetupA.resolution as [BN, BN],
+    balances: preFundSetupA.balances,
     stateCount: 0,
     latestPosition: preFundSetupA,
   };
@@ -128,7 +125,7 @@ describe('player B\'s app', () => {
     itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when a move is chosen', () => {
-      const action = actions.choosePlay(bPlay);
+      const action = actions.choosePlay(bsMove);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itTransitionsTo(state.StateName.WaitForOpponentToPickMoveB, updatedState);
@@ -136,7 +133,7 @@ describe('player B\'s app', () => {
 
       it('stores the move', () => {
         const gameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(gameState.myMove).toEqual(bPlay);
+        expect(gameState.myMove).toEqual(bsMove);
       });
     });
 
@@ -148,7 +145,7 @@ describe('player B\'s app', () => {
       itsPropertiesAreConsistentWithItsPosition(updatedState);
 
       describe('when a move is chosen', () => {
-        const action = actions.choosePlay(bPlay);
+        const action = actions.choosePlay(bsMove);
         const updatedState2 = gameReducer(updatedState, action);
 
         itSends(accept, updatedState2);
@@ -162,7 +159,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.WaitForOpponentToPickMoveB,
       latestPosition: postFundSetupB,
-      myMove: bPlay,
+      myMove: bsMove,
     };
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -182,7 +179,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.WaitForRevealB,
       latestPosition: accept,
-      myMove: bPlay,
+      myMove: bsMove,
     };
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -200,7 +197,7 @@ describe('player B\'s app', () => {
         const action = actions.positionReceived(revealInsufficientFunds);
         const gameState2 = {
           ...gameState,
-          balances: acceptInsufficientFunds.resolution as [BN, BN] };
+          balances: acceptInsufficientFunds.balances };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
 
         itSends(concludeInsufficientFunds, updatedState);
@@ -215,10 +212,10 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.PlayAgain,
       latestPosition: reveal,
-      myMove: bPlay,
-      theirMove: aPlay,
+      myMove: bsMove,
+      theirMove: asMove,
       result: bResult,
-      balances: reveal.resolution as [BN, BN],
+      balances: reveal.balances,
     };
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -247,10 +244,10 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.InsufficientFunds,
       latestPosition: revealInsufficientFunds,
-      myMove: bPlay,
-      theirMove: aPlay,
+      myMove: bsMove,
+      theirMove: asMove,
       result: bResult,
-      balances: revealInsufficientFunds.resolution as [BN, BN],
+      balances: revealInsufficientFunds.balances,
     };
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -269,7 +266,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.WaitForResignationAcknowledgement,
       latestPosition: conclude,
-      balances: conclude.resolution as [BN, BN],
+      balances: conclude.balances,
       turnNum: conclude.turnNum,
     };
 
@@ -290,7 +287,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.GameOver,
       latestPosition: conclude,
-      balances: conclude.resolution as [BN, BN],
+      balances: conclude.balances,
       turnNum: conclude.turnNum,
     };
 
