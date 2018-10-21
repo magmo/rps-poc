@@ -42,9 +42,9 @@ export const confirmGame = () => ({
   type: CONFIRM_GAME as typeof CONFIRM_GAME,
 });
 
-export const chooseMove = (play: Move) => ({
+export const chooseMove = (move: Move) => ({
   type: CHOOSE_MOVE as typeof CHOOSE_MOVE,
-  play,
+  move,
 });
 
 export const playAgain = () => ({

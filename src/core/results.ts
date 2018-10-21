@@ -51,7 +51,7 @@ export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) 
   }
 }
 
-export function convertTorelativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
+export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
   const youArePlayerA = youAre === Player.PlayerA;
 
   switch(absoluteResult) {

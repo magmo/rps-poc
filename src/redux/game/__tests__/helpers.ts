@@ -1,4 +1,4 @@
-import { gameReducer, JointState, MessageState } from '../reducer';
+import { gameReducer, MessageState } from '../reducer';
 import { Player, positions } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
@@ -48,7 +48,7 @@ export const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => 
 
   const theirConclude = positions.conclude({ ...gameState, turnNum: newTurnNum });
   const ourConclude = positions.conclude({ ...gameState, turnNum: newTurnNum + 1 });
-  const action = actions.opponentResigned(theirConclude);
+  const action = actions.positionReceived(theirConclude);
 
   const updatedState = gameReducer({ gameState, messageState }, action);
 

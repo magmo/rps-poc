@@ -110,7 +110,7 @@ const mapStateToProps = (state: SiteState) => ({
 
 const mapDispatchToProps = {
   chooseMove: gameActions.chooseMove,
-  moveAgain: gameActions.playAgain,
+  playAgain: gameActions.playAgain,
   abandonGame: gameActions.resign,
   createBlockchainChallenge: walletActions.createChallenge,
 };

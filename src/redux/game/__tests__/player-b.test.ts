@@ -197,8 +197,6 @@ describe('player B\'s app', () => {
   describe('when in InsufficientFunds', () => {
     const gameState = state.insufficientFunds({ ...bProps, ...revealInsufficientFunds });
 
-    itCanHandleTheOpponentResigning({ gameState, messageState });
-
     describe('when Conclude arrives', () => {
       const action = actions.positionReceived(concludeInsufficientFunds2);
       const updatedState = gameReducer({ messageState, gameState }, action);

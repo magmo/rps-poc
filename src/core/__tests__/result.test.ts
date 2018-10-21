@@ -5,7 +5,7 @@ import {
   calculateResult,
   calculateAbsoluteResult,
   convertToAbsoluteResult,
-  convertTorelativeResult
+  convertToRelativeResult,
 } from '../results';
 
 function testOutcome(yourMove: Move, theirMove: Move, expectedResult: Result) {
