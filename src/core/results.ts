@@ -68,10 +68,10 @@ export function relativeResult(absoluteResult: AbsoluteResult, youAre: Player): 
 export function balancesAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
   switch(absoluteResult) {
     case AbsoluteResult.AWins:
-      return [ balances[0].add(roundBuyIn.muln(2)), balances[0].sub(roundBuyIn.muln(2)) ];
+      return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
     case AbsoluteResult.BWins:
       return balances;
     case AbsoluteResult.Tie:
-      return [ balances[0].add(roundBuyIn.muln(1)), balances[0].sub(roundBuyIn.muln(1)) ];
+      return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
   }
 }

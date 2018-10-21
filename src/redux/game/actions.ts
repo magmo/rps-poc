@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import { Move, Position, positions } from '../../core';
 
 export const CREATE_GAME = 'GAME.CREATE_GAME';
-export const ACCEPT_GAME = 'GAME.ACCEPT_GAME';
+export const INITIAL_POSITION_RECEIVED = 'GAME.INITIAL_POSITION_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
 export const CHOOSE_PLAY = 'GAME.CHOOSE_PLAY';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
@@ -22,7 +22,7 @@ export const createGame = (
   channelNonce: number,
   roundBuyIn: BN,
 ) => ({
-  type: CREATE_GAME as typeof ACCEPT_GAME,
+  type: CREATE_GAME as typeof CREATE_GAME,
   myName,
   myAddress,
   opponentName,
@@ -32,23 +32,11 @@ export const createGame = (
   roundBuyIn,
 });
 
-export const acceptGame = (
-  myName: string,
-  myAddress: string,
-  opponentName: string,
-  opponentAddress: string,
-  libraryAddress: string,
-  channelNonce: number,
-  roundBuyIn: BN,
-) => ({
-  type: ACCEPT_GAME as typeof ACCEPT_GAME,
+export const initialPositionReceived = (position: positions.PreFundSetupA, myName: string, opponentName: string) => ({
+  type: INITIAL_POSITION_RECEIVED as typeof INITIAL_POSITION_RECEIVED,
+  position,
   myName,
-  myAddress,
   opponentName,
-  opponentAddress,
-  libraryAddress,
-  channelNonce,
-  roundBuyIn,
 });
 
 export const confirmGame = () => ({
@@ -90,7 +78,7 @@ export const withdrawalSuccess = () => ({
   type: WITHDRAWAL_SUCCESS as typeof WITHDRAWAL_SUCCESS,
 });
 
-export type AcceptGame = ReturnType<typeof acceptGame>;
+export type InitialPositionReceived = ReturnType<typeof initialPositionReceived>;
 export type CreateGame = ReturnType<typeof createGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
 export type ChoosePlay = ReturnType<typeof choosePlay>;
@@ -102,7 +90,7 @@ export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 
-export type StartAction = AcceptGame | CreateGame;
+export type StartAction = InitialPositionReceived | CreateGame;
 export type LocalAction = (
   | ConfirmGame
   | ChoosePlay

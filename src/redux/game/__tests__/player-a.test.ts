@@ -7,11 +7,14 @@ import {
   itSends,
   itTransitionsTo,
   itStoresAction,
-  itHandlesResignWhenMyTurn,
-  itHandlesResignWhenTheirTurn,
+
+  itHandlesResignLikeItsMyTurn,
+  itHandlesResignLikeItsTheirTurn,
 } from './helpers';
 
 const {
+  asAddress,
+  bsAddress,
   preFundSetupA,
   preFundSetupB,
   postFundSetupA,
@@ -50,6 +53,18 @@ describe('player A\'s app', () => {
     result: aResult,
   };
 
+  describe('when in initial state', () => {
+    describe('when the player creates a game', () => {
+      const action = actions.createGame(
+        'Tom', asAddress, 'Andrew', bsAddress, libraryAddress, channelNonce, roundBuyIn
+      );
+      const updatedState = gameReducer({ messageState }, action);
+
+      itTransitionsTo(state.StateName.WaitForGameConfirmationA, updatedState);
+      itSends(preFundSetupA, updatedState);
+    });
+  });
+
   describe('when in waitForGameConfirmationA', () => {
     const gameState = state.waitForGameConfirmationA({...aProps, ...preFundSetupA });
 
@@ -64,7 +79,7 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     });
 
-    itHandlesResignWhenTheirTurn({ messageState, gameState });
+    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
   describe('when in waitForFunding', () => {
@@ -78,7 +93,7 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.WaitForPostFundSetup, updatedState);
     });
 
-    itHandlesResignWhenMyTurn({ messageState, gameState });
+    itHandlesResignLikeItsMyTurn(gameState, messageState);
   });
 
   describe('when in WaitForPostFundSetup', () => {
@@ -91,7 +106,7 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.PickMove, updatedState);
     });
 
-    itHandlesResignWhenTheirTurn({ messageState, gameState});
+    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
   describe('when in PickMove', () => {
@@ -113,7 +128,7 @@ describe('player A\'s app', () => {
 
     });
 
-    itHandlesResignWhenMyTurn({ messageState, gameState});
+    itHandlesResignLikeItsMyTurn(gameState, messageState);
   });
 
   describe('when in WaitForOpponentToPickMoveA', () => {
@@ -148,7 +163,7 @@ describe('player A\'s app', () => {
       });
     });
 
-    itHandlesResignWhenTheirTurn({ messageState, gameState});
+    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
   describe('when in PlayAgain', () => {
@@ -201,12 +216,12 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.PickMove, updatedState);
     });
 
-    itHandlesResignWhenTheirTurn({ messageState, gameState});
+    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
 
   describe('when in WaitToResign', () => {
-    const gameState = state.waitToResign({...aProps, ...revealInsufficientFunds });
+    const gameState = state.waitToResign({...aProps, ...reveal });
 
     describe('when any position arrives', () => {
       const action = actions.positionReceived(resting);

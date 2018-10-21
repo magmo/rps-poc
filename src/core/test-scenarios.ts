@@ -6,9 +6,9 @@ import { randomHex } from "../utils/randomHex";
 
 const libraryAddress = '0x' + '1'.repeat(40);
 const channelNonce = 4;
-const addrPlayerA = '0x' + 'a'.repeat(40);
-const addrPlayerB = '0x' + 'b'.repeat(40);
-const participants: [string, string] = [addrPlayerA, addrPlayerB];
+const asAddress = '0x' + 'a'.repeat(40);
+const bsAddress = '0x' + 'b'.repeat(40);
+const participants: [string, string] = [asAddress, bsAddress];
 const roundBuyIn = new BN(1);
 const fiveFive: [BN, BN] = [new BN(5), new BN(5)];
 const sixFour: [BN, BN] = [new BN(6), new BN(4)];
@@ -30,15 +30,15 @@ const base = {
 
 const shared = {
   ...base,
-  addrPlayerA,
-  addrPlayerB,
+  asAddress,
+  bsAddress,
   myName: 'Tom',
   opponentName: 'Alex',
 };
 
 export const standard = {
   ...shared,
-  preFundSetupA: positions.preFundSetupB({...base, turnNum: 0, balances: fiveFive, stateCount: 0}),
+  preFundSetupA: positions.preFundSetupA({...base, turnNum: 0, balances: fiveFive, stateCount: 0}),
   preFundSetupB: positions.preFundSetupB({...base, turnNum: 1, balances: fiveFive, stateCount: 1}),
   postFundSetupA: positions.postFundSetupA({...base, turnNum: 2, balances: fiveFive, stateCount: 0}),
   postFundSetupB: positions.postFundSetupB({...base, turnNum: 3, balances: fiveFive, stateCount: 1}),

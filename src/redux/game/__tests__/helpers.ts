@@ -1,10 +1,10 @@
-import { gameReducer, JointState } from '../reducer';
+import { gameReducer, JointState, MessageState } from '../reducer';
 import { Player, positions } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
 
 export const itSends = (position, jointState) => {
-  it(`sends ${position.constructor.name}`, () => {
+  it(`sends ${position.name}`, () => {
     expect(jointState.messageState.opponentOutbox).toEqual(position);
   });
 };
@@ -21,49 +21,33 @@ export const itStoresAction = (action, jointState) => {
   });
 };
 
-export const itHandlesResignWhenTheirTurn = (jointState: JointState) => {
-  describe('when resigning on their turn', () => {
-    it ('transitions to WaitToResign', () => {
-      const { gameState } = jointState;
-      const { turnNum } = gameState;
-      const updatedState = gameReducer(jointState, actions.resign());
+export const itHandlesResignLikeItsTheirTurn = (gameState: state.GameState, messageState: MessageState) => {
+  describe('when the player resigns', () => {
+    const updatedState = gameReducer({ gameState, messageState }, actions.resign());
 
-      expect(updatedState.gameState.name).toEqual(state.StateName.WaitToResign);
-      expect(updatedState.gameState).toMatchObject({
-        name: state.StateName.WaitToResign,
-        turnNum,
-      });
-    });
+    itTransitionsTo(state.StateName.WaitToResign, updatedState);
   });
 };
 
-export const itHandlesResignWhenMyTurn = (jointState: JointState) => {
-  describe('when resigning on my turn', () => {
-    it ('transitions to WaitToResign', () => {
-      const { gameState, messageState } = jointState;
-      const { turnNum } = gameState;
-      const updatedState = gameReducer(jointState, actions.resign());
+export const itHandlesResignLikeItsMyTurn = (gameState: state.GameState, messageState: MessageState) => {
+  describe('when the player resigns', () => {
+    const { turnNum } = gameState;
+    const updatedState = gameReducer({ gameState, messageState }, actions.resign());
 
-      expect(updatedState.gameState.name).toEqual(state.StateName.WaitForResignationAcknowledgement);
-      expect(updatedState.gameState).toMatchObject({
-        name: state.StateName.WaitForResignationAcknowledgement,
-        turnNum: turnNum + 1,
-        balances: gameState.balances,
-        player: Player.PlayerA,
-      });
-      const newConclude = positions.conclude({...gameState, turnNum: turnNum + 1});
-      expect(messageState.opponentOutbox).toEqual(newConclude);
-    });
+    const newConclude = positions.conclude({ ...gameState, turnNum: turnNum + 1 });
+
+    itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState);
+    itSends(newConclude, updatedState);
   });
 };
 
 export const itCanHandleTheOpponentResigning = ({ gameState, messageState }) => {
-  const { turnNum } = gameState.latestPosition;
+  const { turnNum } = gameState;
   const isTheirTurn = gameState.player === Player.PlayerA ? turnNum % 2 === 0 : turnNum % 2 !== 0;
   const newTurnNum = isTheirTurn ? turnNum : turnNum + 1;
-  const oldPosition = gameState.latestPosition;
-  const theirConclude = positions.conclude({ ...oldPosition, turnNum: newTurnNum });
-  const ourConclude = positions.conclude({ ...oldPosition, turnNum: newTurnNum + 1 });
+
+  const theirConclude = positions.conclude({ ...gameState, turnNum: newTurnNum });
+  const ourConclude = positions.conclude({ ...gameState, turnNum: newTurnNum + 1 });
   const action = actions.opponentResigned(theirConclude);
 
   const updatedState = gameReducer({ gameState, messageState }, action);
