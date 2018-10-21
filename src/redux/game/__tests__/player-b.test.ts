@@ -69,7 +69,7 @@ describe('player B\'s app', () => {
         expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
       });
 
-      itTransitionsTo(state.StateName.WaitForFunding, { messageState, gameState });
+      itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     });
   });
 

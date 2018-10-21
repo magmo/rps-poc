@@ -91,8 +91,6 @@ function existingStateReducer(gameState: states.GameState, messageState: Message
   }
 };
 
-
-
 function itsMyTurn(gameState: states.GameState) {
   const nextTurnNum = gameState.turnNum + 1;
   return nextTurnNum % 2 === gameState.player;
@@ -174,12 +172,13 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
 function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (action.type === actions.OPPONENT_RESIGNED) { return opponentResignationReducer(gameState, messageState, action.position); }
+
   if (action.type !== actions.CONFIRM_GAME) { return { gameState, messageState }; }
 
   const { turnNum } = gameState;
 
   const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
-  const newPosition = positions.preFundSetupB(gameState);
+  const newPosition = positions.preFundSetupB(newGameState);
 
   messageState = { ...messageState, opponentOutbox: newPosition, walletOutbox: 'FUNDING_REQUESTED' };
 
@@ -206,8 +205,9 @@ function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, mes
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const { turnNum } = gameState;
-  const newGameState = states.pickMove({ ...gameState, turnNum: turnNum + 1 });
+  let newGameState = states.pickMove({ ...gameState, turnNum: turnNum + 1 });
   if (gameState.player === Player.PlayerB) {
+    newGameState.turnNum += 1;
     messageState = { ...messageState, opponentOutbox: positions.postFundSetupB(newGameState) };
   }
 
@@ -324,7 +324,7 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
       turnNum: turnNum + 1
     });
 
-    const newPosition = positions.conclude(gameState)
+    const newPosition = positions.conclude(newGameState1);
     messageState = { ...messageState, opponentOutbox: newPosition };
 
     return { gameState: newGameState1, messageState };
