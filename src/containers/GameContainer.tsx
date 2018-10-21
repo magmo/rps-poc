@@ -31,17 +31,17 @@ interface GameProps {
 
 function GameContainer(props: GameProps) {
   if (props.showWallet) {
-    return <WalletController/>;
+    return <WalletController />;
   }
-  else if (props.showWalletHeader){
+  else if (props.showWalletHeader) {
     return <WalletHeader>{RenderGame(props)}</WalletHeader>;
   } else {
     return RenderGame(props);
   }
-  
+
 }
 
-function RenderGame(props: GameProps){
+function RenderGame(props: GameProps) {
   const { state, choosePlay, playAgain, abandonGame, createBlockchainChallenge } = props;
   switch (state.name) {
     case StateName.WaitForGameConfirmationA:
@@ -64,13 +64,13 @@ function RenderGame(props: GameProps){
     case StateName.WaitForRestingA:
       return (
         <PlaySelectedPage
-        message="Waiting for resting"
-        yourPlay={state.myMove}
-        createBlockchainChallenge={createBlockchainChallenge}
-      />
+          message="Waiting for resting"
+          yourPlay={state.myMove}
+          createBlockchainChallenge={createBlockchainChallenge}
+        />
       );
 
-case StateName.GameOver:
+    case StateName.GameOver:
       return <WalletController />;
     case StateName.WaitForPostFundSetup:
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
@@ -98,7 +98,7 @@ case StateName.GameOver:
           abandonGame={abandonGame}
         />
       );
-      default:
+    default:
       return <div>View not created for {state.name}</div>;
   }
 }
