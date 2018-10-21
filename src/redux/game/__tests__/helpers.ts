@@ -21,29 +21,18 @@ export const itStoresAction = (action, jointState) => {
   });
 };
 
-export const itsPropertiesAreConsistentWithItsPosition = (jointState) => {
-  it(`updates its properties to be consistent with the latest position`, () => {
-    const gameState = jointState.gameState;
-    const position = gameState.latestPosition;
-    expect(gameState.balances).toEqual(position.resolution);
-    expect(gameState.turnNum).toEqual(position.turnNum);
-  });
-};
-
 export const itHandlesResignWhenTheirTurn = (jointState: JointState) => {
   describe('when resigning on their turn', () => {
     it ('transitions to WaitToResign', () => {
       const { gameState } = jointState;
-      const { latestPosition: oldPosition } = gameState;
+      const { turnNum } = gameState;
       const updatedState = gameReducer(jointState, actions.resign());
-      const { latestPosition: position } = updatedState.gameState as state.GameState;
 
       expect(updatedState.gameState.name).toEqual(state.StateName.WaitToResign);
       expect(updatedState.gameState).toMatchObject({
         name: state.StateName.WaitToResign,
-        turnNum: oldPosition.turnNum,
+        turnNum,
       });
-      expect(position).toEqual(oldPosition);
     });
   });
 };
@@ -51,20 +40,19 @@ export const itHandlesResignWhenTheirTurn = (jointState: JointState) => {
 export const itHandlesResignWhenMyTurn = (jointState: JointState) => {
   describe('when resigning on my turn', () => {
     it ('transitions to WaitToResign', () => {
-      const { gameState } = jointState;
-      const { latestPosition: oldPosition } = gameState;
+      const { gameState, messageState } = jointState;
+      const { turnNum } = gameState;
       const updatedState = gameReducer(jointState, actions.resign());
-      const { latestPosition: position } = updatedState.gameState as state.GameState;
 
       expect(updatedState.gameState.name).toEqual(state.StateName.WaitForResignationAcknowledgement);
       expect(updatedState.gameState).toMatchObject({
         name: state.StateName.WaitForResignationAcknowledgement,
-        turnNum: oldPosition.turnNum + 1,
+        turnNum: turnNum + 1,
         balances: gameState.balances,
         player: Player.PlayerA,
       });
-      const newConclude = positions.conclude({...oldPosition, turnNum: oldPosition.turnNum + 1});
-      expect(position).toEqual(newConclude);
+      const newConclude = positions.conclude({...gameState, turnNum: turnNum + 1});
+      expect(messageState.opponentOutbox).toEqual(newConclude);
     });
   });
 };
