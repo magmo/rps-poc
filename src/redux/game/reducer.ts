@@ -143,7 +143,7 @@ function resignationReducer(state: JointState): JointState {
 
     // transition to WaitForResignationAcknowledgement
     gameState = {
-      ...states.baseProperties(gameState),
+      ...states.base(gameState),
       name: states.StateName.WaitForResignationAcknowledgement,
       turnNum: turnNum + 1,
       latestPosition: conclude,
@@ -152,7 +152,7 @@ function resignationReducer(state: JointState): JointState {
     messageState = { ...messageState, opponentOutbox: conclude };
   } else {
     // transition to WaitToResign
-    gameState = { ...states.baseProperties(gameState), name: states.StateName.WaitToResign };
+    gameState = { ...states.base(gameState), name: states.StateName.WaitToResign };
   }
 
   return { gameState, messageState };
@@ -169,7 +169,7 @@ function opponentResignationReducer(state: JointState, position: Conclude) {
 
   messageState = { ...messageState, opponentOutbox: newPosition };
   const newGameState: states.OpponentResigned = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.OpponentResigned,
     latestPosition: newPosition,
     turnNum: turnNum + 1,
@@ -230,7 +230,7 @@ function waitForGameConfirmationAReducer( gameState: states.WaitForGameConfirmat
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   // transition to Wait for Funding
-  const newGameState: states.WaitForFunding = { ...states.baseProperties(gameState), name: states.StateName.WaitForFunding };
+  const newGameState: states.WaitForFunding = { ...states.base(gameState), name: states.StateName.WaitForFunding };
 
   return { messageState, gameState: newGameState };
 }
@@ -242,7 +242,7 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   const newPosition = new PreFundSetupB(channel, turnNum + 1, resolution, 1, stake);
 
   const newGameState: states.WaitForFunding = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.WaitForFunding,
     turnNum: turnNum + 1,
     latestPosition: newPosition,
@@ -267,7 +267,7 @@ function waitForFundingReducer( gameState: states.WaitForFunding, messageState: 
     roundBuyIn
   );
   const newGameState: states.WaitForPostFundSetup = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     latestPosition: postFundSetupA,
     name: states.StateName.WaitForPostFundSetup,
     turnNum: turnNum + 1,
@@ -291,7 +291,7 @@ function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, mes
   }
 
   const newGameState: states.PickMove = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.PickMove,
     latestPosition,
     turnNum: latestPosition.turnNum,
@@ -310,7 +310,7 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
     const latestPosition = Propose.createWithPlayAndSalt(channel, turnNum + 1, balances, roundBuyIn, action.play, salt);
 
     const newGameStateA: states.WaitForOpponentToPickMoveA = {
-      ...states.baseProperties(gameState),
+      ...states.base(gameState),
       player: gameState.player,
       myMove: action.play,
       salt,
@@ -328,7 +328,7 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
     } else if (action.type === actions.CHOOSE_PLAY) {
 
       const newGameStateB: states.WaitForOpponentToPickMoveB = {
-        ...states.baseProperties(gameState),
+        ...states.base(gameState),
         player: gameState.player,
         myMove: action.play,
         turnNum,
@@ -374,7 +374,7 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
   let newGameState;
   if (insufficientFunds(newBalances, roundBuyIn)) {
     newGameState = {
-      ...states.baseProperties(gameState),
+      ...states.base(gameState),
       name: states.StateName.InsufficientFunds,
       turnNum: turnNum + 2,
       latestPosition: nextPosition,
@@ -386,7 +386,7 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
     } as states.InsufficientFunds;
   } else {
     newGameState = {
-      ...states.baseProperties(gameState),
+      ...states.base(gameState),
       name: states.StateName.PlayAgain,
       turnNum: turnNum + 2,
       latestPosition: nextPosition,
@@ -416,7 +416,7 @@ function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPi
   const newPosition = new Accept(channel, turnNum + 1, newBalances, stake, preCommit, bPlay);
 
   const newGameState: states.WaitForRevealB = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.WaitForRevealB,
     turnNum: turnNum + 1,
     myMove: bPlay,
@@ -449,7 +449,7 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
     messageState = { ...messageState, opponentOutbox: newPosition };
 
     const newGameState1: states.InsufficientFunds = {
-      ...states.baseProperties(gameState),
+      ...states.base(gameState),
       name: states.StateName.InsufficientFunds,
       turnNum: turnNum + 1,
       latestPosition: newPosition,
@@ -463,7 +463,7 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
     return { gameState: newGameState1, messageState };
   } else {
     const newGameState2: states.PlayAgain = {
-      ...states.baseProperties(gameState),
+      ...states.base(gameState),
       name: states.StateName.PlayAgain,
       turnNum: position.turnNum,
       latestPosition: position,
@@ -487,7 +487,7 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
         // transition to WaitForResting
         const { myMove, theirMove, result } = gameState;
         const newGameState: states.WaitForRestingA = {
-          ...states.baseProperties(gameState),
+          ...states.base(gameState),
           name: states.StateName.WaitForRestingA,
           myMove,
           theirMove,
@@ -504,7 +504,7 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
 
         // transition to PickMove
         const newGameState: states.PickMove = {
-          ...states.baseProperties(gameState),
+          ...states.base(gameState),
           name: states.StateName.PickMove,
           turnNum: turnNum + 1,
           latestPosition: resting,
@@ -534,7 +534,7 @@ function waitForRestingAReducer(gameState: states.WaitForRestingA, messageState:
   if (position.constructor.name !== 'Resting') { return { gameState, messageState }; }
 
   const newGameState: states.PickMove = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.PickMove,
     turnNum: position.turnNum,
     balances: position.resolution,
@@ -565,7 +565,7 @@ function insufficientFundsReducer(gameState: states.InsufficientFunds, messageSt
 
   // transition to gameOver
   const newGameState: states.GameOver = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.GameOver,
     turnNum: latestPosition.turnNum,
     latestPosition,
@@ -581,7 +581,7 @@ function waitToResignReducer(gameState: states.WaitToResign, messageState: Messa
   const newPosition = new Conclude(channel, turnNum + 1, balances);
 
   const newGameState: states.WaitForResignationAcknowledgement = {
-    ...states.baseProperties(gameState),
+    ...states.base(gameState),
     name: states.StateName.WaitForResignationAcknowledgement,
     turnNum: turnNum + 1,
     balances,
@@ -601,7 +601,7 @@ function waitForResignationAcknowledgementReducer(gameState: states.WaitForResig
   if (action.position.constructor.name !== 'Conclude') { return { gameState, messageState }; }
 
   const newGameState: states.GameOver = {
-    ...states.baseProperties(gameState), 
+    ...states.base(gameState), 
     name: states.StateName.GameOver,
   };
 
@@ -611,7 +611,7 @@ function waitForResignationAcknowledgementReducer(gameState: states.WaitForResig
 function gameOverReducer(gameState: states.GameOver, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
 
-  const newGameState: states.WaitForWithdrawal = { ...states.baseProperties(gameState), name: states.StateName.WaitForWithdrawal };
+  const newGameState: states.WaitForWithdrawal = { ...states.base(gameState), name: states.StateName.WaitForWithdrawal };
   messageState = { ...messageState, walletOutbox: 'WITHDRAWAL' };
 
   return { gameState: newGameState, messageState };
