@@ -1,8 +1,6 @@
 
-import { State as GameState } from "../../game-engine/application-states";
 import { Challenge } from "./reducer";
 import BN from 'bn.js';
-
 
 export const INITIALIZATION_FAILURE = 'APPLICATION.INITIALIZATION.FAILURE';
 export const RELOAD = 'APPLICATION.RELOAD';
@@ -11,7 +9,6 @@ export const WAITING_ROOM_REQUEST = 'APPLICATION.WAITING_ROOM_REQUEST';
 export const GAME_REQUEST = 'APPLICATION.GAME_REQUEST';
 export const LOBBY_SUCCESS = 'APPLICATION.LOBBY_SUCCESS';
 export const WAITING_ROOM_SUCCESS = 'APPLICATION.WAITING_ROOM_SUCCESS';
-export const GAME_SUCCESS = 'APPLICATION.GAME_SUCCESS';
 
 export const initializationFailure = (error) => ({
   type: INITIALIZATION_FAILURE as typeof INITIALIZATION_FAILURE,
@@ -41,21 +38,12 @@ export const waitingRoomSuccess = (challenge: Challenge) => ({
   challenge,
 });
 
-export const gameSuccess = (state: GameState) => ({
-  type: GAME_SUCCESS as typeof GAME_SUCCESS,
-  state,
-});
-
-
 export type InitializationFailure = ReturnType<typeof initializationFailure>;
-
 export type LobbyRequest = ReturnType<typeof lobbyRequest>;
 export type WaitingRoomRequest = ReturnType<typeof waitingRoomRequest>;
 export type GameRequest = ReturnType<typeof gameRequest>;
-
 export type LobbySuccess = ReturnType<typeof lobbySuccess>;
 export type WaitingRoomSuccess = ReturnType<typeof waitingRoomSuccess>;
-export type GameSuccess = ReturnType<typeof gameSuccess>;
 
 export type AnyAction = 
   | InitializationFailure
@@ -63,5 +51,4 @@ export type AnyAction =
   | WaitingRoomRequest
   | GameRequest
   | LobbySuccess
-  | WaitingRoomSuccess
-  | GameSuccess;
+  | WaitingRoomSuccess;
