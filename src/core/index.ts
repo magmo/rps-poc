@@ -1,5 +1,5 @@
 export { Move } from './moves';
-export { Result, calculateResult } from './results';
+export * from './results';
 export { Player } from './players';
 export { Position } from './positions';
 export { default as encode } from './encode';

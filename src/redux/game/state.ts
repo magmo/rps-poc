@@ -154,13 +154,16 @@ export interface WaitForRevealB extends Base {
   name: StateName.WaitForRevealB;
   myMove: Move;
   player: Player.PlayerB;
+  preCommit: string,
 }
-export function waitForRevealB(state: IncludesMove): WaitForRevealB {
-  return {
-    ...base(state),
-    name: StateName.WaitForRevealB,
-    myMove: state.myMove,
-  };
+interface WaitForRevealBParams extends IncludesBase {
+  myMove: Move;
+  player: Player.PlayerB;
+  preCommit: string,
+}
+export function waitForRevealB(state: WaitForRevealBParams): WaitForRevealB {
+  const { myMove, preCommit } = state;
+  return { ...base(state), name: StateName.WaitForRevealB, myMove, preCommit };
 }
 
 interface IncludesResult extends IncludesBase {
