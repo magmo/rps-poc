@@ -1,6 +1,12 @@
 import { Player } from '../players';
 import { Move } from '../moves';
-import { Result, calculateResult, calculateAbsoluteResult, relativeResult, absoluteResult } from '../results';
+import {
+  Result,
+  calculateResult,
+  calculateAbsoluteResult,
+  convertToAbsoluteResult,
+  convertTorelativeResult
+} from '../results';
 
 function testOutcome(yourMove: Move, theirMove: Move, expectedResult: Result) {
   describe(`When you play ${Move[yourMove]} and they play ${Move[theirMove]}`, () => {
@@ -13,8 +19,8 @@ function testOutcome(yourMove: Move, theirMove: Move, expectedResult: Result) {
     describe('when you are player A', () => {
       const absoluteResultFromMoves = calculateAbsoluteResult(yourMove, theirMove);
 
-      const relativeResultFromAbsolute = relativeResult(absoluteResultFromMoves, Player.PlayerA);
-      const absoluteResultFromRelative = absoluteResult(relativeResultFromMoves, Player.PlayerA);
+      const relativeResultFromAbsolute = convertToRelativeResult(absoluteResultFromMoves, Player.PlayerA);
+      const absoluteResultFromRelative = convertToAbsoluteResult(relativeResultFromMoves, Player.PlayerA);
 
       it('relativeResult is consistent with calculateAbsoluteResult', () => {
         expect(relativeResultFromMoves).toEqual(relativeResultFromAbsolute);
@@ -28,8 +34,8 @@ function testOutcome(yourMove: Move, theirMove: Move, expectedResult: Result) {
     describe('when you are player A', () => {
       const absoluteResultFromMoves = calculateAbsoluteResult(theirMove, yourMove);
 
-      const relativeResultFromAbsolute = relativeResult(absoluteResultFromMoves, Player.PlayerB);
-      const absoluteResultFromRelative = absoluteResult(relativeResultFromMoves, Player.PlayerB);
+      const relativeResultFromAbsolute = convertToRelativeResult(absoluteResultFromMoves, Player.PlayerB);
+      const absoluteResultFromRelative = convertToAbsoluteResult(relativeResultFromMoves, Player.PlayerB);
 
       it('relativeResult is consistent with calculateAbsoluteResult', () => {
         expect(relativeResultFromMoves).toEqual(relativeResultFromAbsolute);

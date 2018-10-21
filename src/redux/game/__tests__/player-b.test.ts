@@ -111,8 +111,8 @@ describe('player B\'s app', () => {
       itTransitionsTo(state.StateName.WaitForOpponentToPickMoveB, updatedState);
 
       it('stores the move', () => {
-        const gameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
-        expect(gameState.myMove).toEqual(bsMove);
+        const updatedGameState = updatedState.gameState as state.WaitForOpponentToPickMoveA;
+        expect(updatedGameState.myMove).toEqual(bsMove);
       });
     });
 
@@ -123,8 +123,8 @@ describe('player B\'s app', () => {
       itStoresAction(action, updatedState);
 
       describe('when a move is chosen', () => {
-        const action = actions.chooseMove(bsMove);
-        const updatedState2 = gameReducer(updatedState, action);
+        const action2 = actions.chooseMove(bsMove);
+        const updatedState2 = gameReducer(updatedState, action2);
 
         itSends(accept, updatedState2);
         itTransitionsTo(state.StateName.WaitForRevealB, updatedState2);

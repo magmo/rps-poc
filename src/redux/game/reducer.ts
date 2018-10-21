@@ -26,7 +26,7 @@ export const gameReducer: Reducer<JointState> = (state: JointState, action: acti
   // if we have saved an action previously, see if that will apply now
   state = attemptRetry(state);
   return state;
-}
+};
 
 function attemptRetry(state: JointState): JointState {
   let { messageState } = state;
@@ -45,7 +45,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
   if (!gameState) {
     return initialStateReducer(messageState, action);
   } else {
-    return existingStateReducer(gameState, messageState, action)
+    return existingStateReducer(gameState, messageState, action);
   }
 }
 
@@ -89,7 +89,7 @@ function existingStateReducer(gameState: states.GameState, messageState: Message
     default:
       throw new Error("Unreachable code");
   }
-};
+}
 
 function itsMyTurn(gameState: states.GameState) {
   const nextTurnNum = gameState.turnNum + 1;
@@ -205,7 +205,7 @@ function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, mes
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const { turnNum } = gameState;
-  let newGameState = states.pickMove({ ...gameState, turnNum: turnNum + 1 });
+  const newGameState = states.pickMove({ ...gameState, turnNum: turnNum + 1 });
   if (gameState.player === Player.PlayerB) {
     newGameState.turnNum += 1;
     messageState = { ...messageState, opponentOutbox: positions.postFundSetupB(newGameState) };
@@ -321,7 +321,7 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
     const newGameState1 = states.insufficientFunds({
       ...gameState,
       ...newProperties,
-      turnNum: turnNum + 1
+      turnNum: turnNum + 1,
     });
 
     const newPosition = positions.conclude(newGameState1);
@@ -401,7 +401,7 @@ function insufficientFundsReducer(gameState: states.InsufficientFunds, messageSt
   const { turnNum } = position;
 
   // transition to gameOver
-  let newGameState = states.gameOver({ ...gameState, turnNum })
+  const newGameState = states.gameOver({ ...gameState, turnNum });
 
   if (gameState.player === Player.PlayerA) {
     newGameState.turnNum = newGameState.turnNum + 1;

@@ -38,7 +38,7 @@ export enum AbsoluteResult {
   BWins,
 }
 
-export function absoluteResult(relativeResult: Result, youAre: Player) {
+export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) {
   const youArePlayerA = youAre === Player.PlayerA;
 
   switch(relativeResult) {
@@ -51,7 +51,7 @@ export function absoluteResult(relativeResult: Result, youAre: Player) {
   }
 }
 
-export function relativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
+export function convertTorelativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
   const youArePlayerA = youAre === Player.PlayerA;
 
   switch(absoluteResult) {

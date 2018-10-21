@@ -154,12 +154,12 @@ export interface WaitForRevealB extends Base {
   name: StateName.WaitForRevealB;
   myMove: Move;
   player: Player.PlayerB;
-  preCommit: string,
+  preCommit: string;
 }
 interface WaitForRevealBParams extends IncludesBase {
   myMove: Move;
   player: Player.PlayerB;
-  preCommit: string,
+  preCommit: string;
 }
 export function waitForRevealB(state: WaitForRevealBParams): WaitForRevealB {
   const { myMove, preCommit } = state;
