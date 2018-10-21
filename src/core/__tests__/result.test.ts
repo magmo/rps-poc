@@ -1,9 +1,44 @@
+import { Player } from '../players';
 import { Move } from '../moves';
-import { Result, calculateResult } from '../results';
+import { Result, calculateResult, calculateAbsoluteResult, relativeResult, absoluteResult } from '../results';
 
 function testOutcome(yourMove: Move, theirMove: Move, expectedResult: Result) {
-  it(`Gives ${Result[expectedResult]} when you play ${Move[yourMove]} and they play ${Move[theirMove]}`, () => {
-    expect(calculateResult(yourMove, theirMove)).toEqual(expectedResult);
+  describe(`When you play ${Move[yourMove]} and they play ${Move[theirMove]}`, () => {
+    const relativeResultFromMoves = calculateResult(yourMove, theirMove);
+
+    it(`result gives ${Result[expectedResult]}`, () => {
+      expect(relativeResultFromMoves).toEqual(expectedResult);
+    });
+
+    describe('when you are player A', () => {
+      const absoluteResultFromMoves = calculateAbsoluteResult(yourMove, theirMove);
+
+      const relativeResultFromAbsolute = relativeResult(absoluteResultFromMoves, Player.PlayerA);
+      const absoluteResultFromRelative = absoluteResult(relativeResultFromMoves, Player.PlayerA);
+
+      it('relativeResult is consistent with calculateAbsoluteResult', () => {
+        expect(relativeResultFromMoves).toEqual(relativeResultFromAbsolute);
+      });
+
+      it('absoluteResult is consistent with calculateResult', () => {
+        expect(absoluteResultFromRelative).toEqual(absoluteResultFromMoves);
+      });
+    });
+
+    describe('when you are player A', () => {
+      const absoluteResultFromMoves = calculateAbsoluteResult(theirMove, yourMove);
+
+      const relativeResultFromAbsolute = relativeResult(absoluteResultFromMoves, Player.PlayerB);
+      const absoluteResultFromRelative = absoluteResult(relativeResultFromMoves, Player.PlayerB);
+
+      it('relativeResult is consistent with calculateAbsoluteResult', () => {
+        expect(relativeResultFromMoves).toEqual(relativeResultFromAbsolute);
+      });
+
+      it('absoluteResult is consistent with calculateResult', () => {
+        expect(absoluteResultFromRelative).toEqual(absoluteResultFromMoves);
+      });
+    });
   });
 }
 
