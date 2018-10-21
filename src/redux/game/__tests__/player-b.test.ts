@@ -1,63 +1,60 @@
 import BN from "bn.js";
-import { PreFundSetupB, PostFundSetupA, PostFundSetupB, Propose, Accept, Reveal, Resting, Conclude, Play, PreFundSetupA, Result } from "../../../game-engine/positions";
-import { Channel } from "fmg-core";
 import { gameReducer } from '../reducer';
 import { Player } from '../../../game-engine/application-states';
 import * as actions from '../actions';
 import * as state from '../state';
+import * as scenarios from './scenarios';
 
-import { randomHex } from "../../../utils/randomHex";
+import {
+  itSends,
+  itTransitionsTo,
+  itStoresAction,
+  itsPropertiesAreConsistentWithItsPosition,
+  itCanHandleTheOpponentResigning,
+} from './helpers';
 
-import { itSends, itTransitionsTo, itStoresAction, itsPropertiesAreConsistentWithItsPosition, itCanHandleTheOpponentResigning } from './game-reducer.test';
+const {
+  preFundSetupA,
+  preFundSetupB,
+  postFundSetupA,
+  postFundSetupB,
+  aPlay,
+  bPlay,
+  bResult,
+  propose,
+  accept,
+  reveal,
+  conclude,
+  resting,
+} = scenarios.aResignsAfterOneRound;
 
-const libraryAddress = '0x123';
-const channelNonce = '4';
-const participants: [string, string] = ['0xa', '0xb'];
-const roundBuyIn = new BN(1);
-const initialBalances: [BN, BN] = [new BN(5), new BN(5)];
-const aWinsBalances: [BN, BN] = [new BN(6), new BN(4)];
-const bWinsBalances: [BN, BN] = [new BN(4), new BN(6)];
-const bLowFundsBalances: [BN, BN] = [new BN(9), new BN(1)];
-const insufficientFundsBalances: [BN, BN] = [new BN(10), new BN(0)];
-const aPlay = Play.Rock;
-const salt = randomHex(64);
-const bPlay = Play.Scissors;
-const bResult = Result.YouLose;
+const {
+  conclude: concludeResign,
+} = scenarios.bResignsAfterOneRound;
 
-const sharedProps = {
-  libraryAddress,
-  channelNonce,
-  participants,
-  turnNum: 0,
-  balances: initialBalances,
-  stateCount: 0,
-  roundBuyIn,
-  myName: 'Tom',
-  opponentName: 'Alex',
-};
+const {
+  propose: proposeInsufficientFunds,
+  accept: acceptInsufficientFunds,
+  reveal: revealInsufficientFunds,
+  conclude: concludeInsufficientFunds,
+  conclude2: concludeInsufficientFunds2,
 
-const channel = new Channel(libraryAddress, channelNonce, participants);
-const preFundSetupA = new PreFundSetupA(channel, 0, initialBalances, 0, roundBuyIn);
-const preFundSetupB = new PreFundSetupB(channel, 1, initialBalances, 1, roundBuyIn);
-const postFundSetupA = new PostFundSetupA(channel, 2, initialBalances, 0, roundBuyIn);
-const postFundSetupB = new PostFundSetupB(channel, 3, initialBalances, 1, roundBuyIn);
-const propose = Propose.createWithPlayAndSalt(channel, 4, initialBalances, roundBuyIn, aPlay, salt);
-const preCommit = propose.preCommit;
-const accept = new Accept(channel, 5, bWinsBalances, roundBuyIn, preCommit, bPlay);
-const reveal = new Reveal(channel, 6, aWinsBalances, roundBuyIn, bPlay, aPlay, salt);
-const resting = new Resting(channel, 7, aWinsBalances, roundBuyIn);
-const concludeResign = new Conclude(channel, 7, aWinsBalances);
-const conclude = new Conclude(channel, 8, aWinsBalances);
-const conclude2 = new Conclude(channel, 9, aWinsBalances);
-const revealInsufficientFunds = new Reveal(channel, 6, insufficientFundsBalances, roundBuyIn, bPlay, aPlay, salt);
-const concludeInsufficientFunds = new Conclude(channel, 7, insufficientFundsBalances);
-const concludeInsufficientFunds2 = new Conclude(channel, 8, insufficientFundsBalances);
+} = scenarios.insufficientFunds;
+
+const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName } = scenarios.standard;
+const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName };
 
 const messageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
 
 describe('player B\'s app', () => {
-  const bProps = { ...sharedProps, player: Player.PlayerB as Player.PlayerB };
-
+  const bProps = {
+    ...base,
+    player: Player.PlayerB as Player.PlayerB,
+    turnNum: 0,
+    balances: preFundSetupA.resolution as [BN, BN],
+    stateCount: 0,
+    latestPosition: preFundSetupA,
+  };
   describe('when in confirmGameB', () => {
     const gameState: state.ConfirmGameB = {
       ...bProps,
@@ -201,7 +198,9 @@ describe('player B\'s app', () => {
 
       describe('if there are not sufficient funds', () => {
         const action = actions.positionReceived(revealInsufficientFunds);
-        const gameState2 = { ...gameState, balances: insufficientFundsBalances };
+        const gameState2 = {
+          ...gameState,
+          balances: acceptInsufficientFunds.resolution as [BN, BN] };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
 
         itSends(concludeInsufficientFunds, updatedState);
@@ -219,7 +218,7 @@ describe('player B\'s app', () => {
       myMove: bPlay,
       theirMove: aPlay,
       result: bResult,
-      balances: aWinsBalances,
+      balances: reveal.resolution as [BN, BN],
     };
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -251,7 +250,7 @@ describe('player B\'s app', () => {
       myMove: bPlay,
       theirMove: aPlay,
       result: bResult,
-      balances: insufficientFundsBalances,
+      balances: revealInsufficientFunds.resolution as [BN, BN],
     };
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -270,7 +269,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.WaitForResignationAcknowledgement,
       latestPosition: conclude,
-      balances: aWinsBalances,
+      balances: conclude.resolution as [BN, BN],
       turnNum: conclude.turnNum,
     };
 
@@ -291,7 +290,7 @@ describe('player B\'s app', () => {
       ...bProps,
       name: state.StateName.GameOver,
       latestPosition: conclude,
-      balances: aWinsBalances,
+      balances: conclude.resolution as [BN, BN],
       turnNum: conclude.turnNum,
     };
 
