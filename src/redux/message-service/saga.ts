@@ -1,17 +1,18 @@
 import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects';
 import { buffers } from 'redux-saga';
-import { reduxSagaFirebase } from '../../gateways/firebase';
+import hash from 'object-hash';
+import { State } from 'fmg-core';
 
+import { reduxSagaFirebase } from '../../gateways/firebase';
 import { actions as walletActions } from '../../wallet';
 import { SignatureSuccess } from '../../wallet/redux/actions/external';
-import hash from 'object-hash';
 import * as challengeActions from '../../wallet/redux/actions/challenge';
-import decode from 'src/game-engine/positions/decode';
-import { State } from 'fmg-core';
+import decode from '../../game-engine/positions/decode';
 import * as gameActions from '../game/actions';
 import { MessageState } from '../game/reducer';
 import { GameState, baseProperties } from '../game/state';
-import { Player } from 'src/game-engine/application-states';
+import { Player } from '../../game-engine/application-states';
+
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
