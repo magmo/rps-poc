@@ -97,6 +97,11 @@ function itsMyTurn(gameState: states.PlayingState) {
 }
 
 function initialStateReducer(messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.ENTER_LOBBY) {
+    const { myName } = action;
+    const gameState = states.lobby({ myName });
+    return { gameState, messageState };
+  }
   if (action.type === actions.CREATE_GAME) {
     const { roundBuyIn, myAddress, opponentAddress } = action;
     const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];

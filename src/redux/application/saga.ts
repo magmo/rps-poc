@@ -4,10 +4,10 @@ import { delay } from 'redux-saga';
 import * as applicationActions from './actions';
 
 import { walletSaga, actions as walletActions } from '../../wallet';
-
-import waitingRoomSaga from '../waiting-room/saga';
-import lobbySaga from '../lobby/saga';
+import * as gameActions from '../game/actions';
 import messageServiceSaga from '../message-service/saga';
+import lobbySaga from '../lobby/saga';
+import waitingRoomSaga from '../waiting-room/saga';
 
 export default function* applicationControllerSaga(userId: string) {
 
@@ -17,33 +17,12 @@ export default function* applicationControllerSaga(userId: string) {
     yield put(applicationActions.initializationFailure(error));
     yield take(applicationActions.RELOAD);
   }
+  const name = 'My name';
 
   yield fork(messageServiceSaga, address);
-
-  const channel = yield actionChannel([
-    applicationActions.LOBBY_REQUEST,
-    applicationActions.WAITING_ROOM_REQUEST,
-    applicationActions.GAME_REQUEST,
-    applicationActions.INITIALIZATION_FAILURE,
-  ]);
-  let currentRoom = yield fork(lobbySaga, address);
-
-  while (true) {
-    const action: applicationActions.AnyAction = yield take(channel);
-    yield cancel(currentRoom); // todo: maybe we should do some checks first
-
-    switch (action.type) {
-      case applicationActions.LOBBY_REQUEST:
-        currentRoom = yield fork(lobbySaga, address);
-        break;
-      case applicationActions.WAITING_ROOM_REQUEST:
-        const isPublic = true;
-        currentRoom = yield fork(waitingRoomSaga, address, action.name, action.stake, isPublic);
-        break;
-      default:
-        // todo: check for unreachability
-    }
-  }
+  yield fork(lobbySaga,address);
+  yield fork(waitingRoomSaga,address,name,true);
+  yield put(gameActions.enterLobby('myName'));
 }
 
 function* setupWallet(uid) {
