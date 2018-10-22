@@ -16,8 +16,8 @@ import { SiteState } from '../redux/reducer';
 
 
 import { Move } from '../core';
-import WalletHeader from 'src/wallet/containers/WalletHeader';
-import { GameState, StateName } from 'src/redux/game/state';
+import WalletHeader from '../wallet/containers/WalletHeader';
+import { GameState, StateName } from '../redux/game/state';
 
 interface GameProps {
   state: GameState;
