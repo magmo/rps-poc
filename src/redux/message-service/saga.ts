@@ -11,6 +11,7 @@ import * as gameActions from '../game/actions';
 import { MessageState } from './state';
 import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
+import { getMessageState, getGameState } from '../store';
 
 export enum Queue {
   WALLET = 'WALLET',
@@ -41,20 +42,20 @@ export function* sendMessagesSaga(opponentAddress: string) {
       yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
     } else {
       // TODO: Select the actual state once it's wired up.
-      const getMessageState = state => ({});
       const messageState: MessageState = yield select(getMessageState);
       if (messageState.opponentOutbox != null) {
         const queue = Queue.GAME_ENGINE;
-        const data = encode(messageState.opponentOutbox);
+        const data = encode(messageState.opponentOutbox.position);
         const signature = yield signMessage(data);
         const message = { data, queue, signature };
         yield put(walletActions.messageSent(data, signature));
         yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
       }
       if (messageState.walletOutbox != null) {
-        const getGameState = state => ({});
         const gameState: gameStates.GameState = yield select(getGameState);
-        handleWalletMessage(messageState.walletOutbox, gameState);
+        if (gameState.name !== gameStates.StateName.Lobby && gameState.name !== gameStates.StateName.WaitingRoom) {
+          handleWalletMessage(messageState.walletOutbox, gameState);
+        }
       }
     }
   }
@@ -95,7 +96,7 @@ function* receiveFromFirebaseSaga(address: string) {
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
 }
-function* handleWalletMessage(type, state: gameStates.GameState) {
+function* handleWalletMessage(type, state: gameStates.PlayingState) {
   const { libraryAddress, channelNonce, player, balances, participants } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
   const channelId = channel.id;

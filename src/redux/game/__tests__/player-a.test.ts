@@ -13,8 +13,6 @@ import {
 } from './helpers';
 
 const {
-  asAddress,
-  bsAddress,
   preFundSetupA,
   preFundSetupB,
   postFundSetupA,

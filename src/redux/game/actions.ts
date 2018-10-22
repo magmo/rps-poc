@@ -11,6 +11,8 @@ export const POSITION_RECEIVED = 'GAME.POSITION_RECEIVED';
 export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
+export const ENTER_WAITING_ROOM = 'GAME.ENTER_WAITING_ROOM';
+export const RETURN_TO_LOBBY = 'Game.RETURN_TO_LOBBY';
 
 export const createGame = (
   myName: string,
@@ -72,6 +74,16 @@ export const withdrawalSuccess = () => ({
   type: WITHDRAWAL_SUCCESS as typeof WITHDRAWAL_SUCCESS,
 });
 
+export const enterWaitingRoom = (myName: string, roundBuyIn: BN) => ({
+  type: ENTER_WAITING_ROOM as typeof ENTER_WAITING_ROOM,
+  myName,
+  roundBuyIn,
+});
+
+export const returnToLobby = () => ({
+  type: RETURN_TO_LOBBY as typeof RETURN_TO_LOBBY,
+});
+
 export type InitialPositionReceived = ReturnType<typeof initialPositionReceived>;
 export type CreateGame = ReturnType<typeof createGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
@@ -82,6 +94,8 @@ export type PositionReceived = ReturnType<typeof positionReceived>;
 export type FundingSuccess = ReturnType<typeof fundingSuccess>;
 export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
+export type EnterWaitingRoom = ReturnType<typeof enterWaitingRoom>;
+export type ReturnToLobby = ReturnType<typeof returnToLobby>;
 
 export type GameAction = (
   | ConfirmGame
@@ -94,4 +108,6 @@ export type GameAction = (
   | Resign
   | InitialPositionReceived
   | CreateGame
+  | EnterWaitingRoom
+  | ReturnToLobby
 );

@@ -5,7 +5,7 @@ import { reduxSagaFirebase } from '../../gateways/firebase';
 import * as lobbyActions from './actions';
 import * as applicationActions from '../application/actions';
 
-import { createGame } from '../../redux/game/actions';
+import { createGame, enterWaitingRoom } from '../../redux/game/actions';
 import BN from 'bn.js';
 
 // @ts-ignore
@@ -40,7 +40,7 @@ export default function* lobbySaga(address: string) {
         break;
 
       case lobbyActions.CREATE_CHALLENGE:
-        yield put(applicationActions.waitingRoomRequest(action.name, action.stake));
+        yield put(enterWaitingRoom(action.name, action.stake));
         break;
 
       case lobbyActions.SYNC_CHALLENGES:

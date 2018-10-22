@@ -5,28 +5,30 @@ import { SiteState } from '../redux/reducer';
 import GameContainer from './GameContainer';
 import WaitingRoomContainer from './WaitingRoomContainer';
 import LobbyContainer from './LobbyContainer';
+import * as gameStates from '../redux/game/state';
 import ErrorContainer from './ErrorContainer';
-import { Room } from '../redux/application/reducer';
 
 interface ApplicationProps {
-  currentRoom: Room;
+  gameState?: gameStates.GameState;
 }
 
 function Application(props: ApplicationProps) {
-  switch (props.currentRoom) {
-    case Room.waitingRoom:
+  if (props.gameState==null){
+    return <ErrorContainer/>;
+  }
+
+  switch (props.gameState.name) {
+    case gameStates.StateName.WaitingRoom:
       return <WaitingRoomContainer />;
-    case Room.game:
-      return <GameContainer />;
-    case Room.error:
-      return <ErrorContainer />;
-    default:
+    case gameStates.StateName.Lobby:
       return <LobbyContainer />;
+    default:
+      return <GameContainer />;
   }
 }
 
 const mapStateToProps = (state: SiteState): ApplicationProps => ({
-  currentRoom: state.app.currentRoom,
+  gameState: state.game.gameState ,
 });
 
 export default connect(mapStateToProps)(Application);

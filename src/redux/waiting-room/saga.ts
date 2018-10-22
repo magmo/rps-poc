@@ -46,13 +46,12 @@ export default function* waitingRoomSaga(
     switch (action.type) {
       case waitingRoomActions.CANCEL_CHALLENGE:
         yield call(reduxSagaFirebase.database.delete, challengeKey);
-        yield put(applicationActions.lobbyRequest());
+        yield put(gameActions.returnToLobby());
         break;
 
       case gameActions.POSITION_RECEIVED:
         // todo: handle error if it isn't a propose state with the right properties
         yield call(reduxSagaFirebase.database.delete, challengeKey);
-        yield put(applicationActions.gameRequest());
         break;
     }
   }

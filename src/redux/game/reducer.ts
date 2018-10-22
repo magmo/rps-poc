@@ -82,6 +82,10 @@ function existingStateReducer(gameState: states.GameState, messageState: Message
       return gameOverReducer(gameState, messageState, action);
     // case states.StateName.WaitForWithdrawal:
     //   return waitForWithdrawalReducer(gameState, messageState, action);
+    case states.StateName.WaitingRoom:
+      return waitingRoomReducer(gameState, messageState, action);
+    case states.StateName.Lobby:
+      return lobbyReducer(gameState, messageState, action);
     default:
       throw new Error("Unreachable code");
   }
@@ -141,10 +145,10 @@ function resignationReducer(gameState: states.PlayingState, messageState: Messag
 }
 
 function opponentResignationReducer(gameState: states.PlayingState, messageState: MessageState, action: actions.GameAction) {
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState}; }
+  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const position = action.position;
-  if (position.name !== positions.CONCLUDE) { return { gameState, messageState}; }
+  if (position.name !== positions.CONCLUDE) { return { gameState, messageState }; }
   // in taking the turnNum from their position, we're trusting the wallet to have caught
   // the case where they resign when it isn't their turn
   const { turnNum } = position;
@@ -242,7 +246,7 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
     const newGameStateA = states.waitForOpponentToPickMoveA({ ...gameState, ...propose, salt, myMove: asMove });
 
     const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(positions.postFundSetupB(propose), opponentAddress, messageState);
+    messageState = sendMessage(positions.propose(propose), opponentAddress, messageState);
 
     return { gameState: newGameStateA, messageState };
   } else {
@@ -299,7 +303,7 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
 function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-  
+
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const position = action.position;
@@ -322,7 +326,7 @@ function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPi
 function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-  
+
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   if (action.position.name !== positions.REVEAL) { return { gameState, messageState }; }
@@ -400,7 +404,7 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
 function waitForRestingAReducer(gameState: states.WaitForRestingA, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-  
+
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
   const position = action.position;
@@ -470,6 +474,43 @@ function gameOverReducer(gameState: states.GameOver, messageState: MessageState,
 
   return { gameState: newGameState, messageState };
 }
+function waitingRoomReducer(gameState: states.WaitingRoom, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type !== actions.INITIAL_POSITION_RECEIVED) {
+    return { gameState, messageState };
+  }
+  const { position, myName, opponentName } = action;
+  if (position.name !== positions.PRE_FUND_SETUP_A) { return { messageState }; }
 
+  const newGameState = states.confirmGameB({ ...position, myName, opponentName });
+
+  return { gameState: newGameState, messageState };
+}
+function lobbyReducer(gameState: states.Lobby, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.ENTER_WAITING_ROOM:
+      const newGameState = states.waitingRoom({ myName: action.myName, roundBuyIn: action.roundBuyIn });
+      return { gameState: newGameState, messageState };
+      break;
+    case actions.CREATE_GAME:
+      const { roundBuyIn, myAddress, opponentAddress } = action;
+      const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
+      const participants: [string, string] = [myAddress, opponentAddress];
+      const turnNum = 0;
+      const stateCount = 1;
+
+      const waitForConfirmationState = states.waitForGameConfirmationA({
+        ...action, balances, participants, turnNum, stateCount,
+      });
+      messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
+      return { gameState: waitForConfirmationState, messageState };
+      break;
+    default:
+      return { gameState, messageState };
+      break;
+  }
+
+
+
+}
 // function waitForWithdrawalReducer(gameState: states.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
 // }
