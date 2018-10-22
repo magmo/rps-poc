@@ -38,44 +38,84 @@ const shared = {
 
 export const standard = {
   ...shared,
-  preFundSetupA: positions.preFundSetupA({...base, turnNum: 0, balances: fiveFive, stateCount: 0}),
-  preFundSetupB: positions.preFundSetupB({...base, turnNum: 1, balances: fiveFive, stateCount: 1}),
-  postFundSetupA: positions.postFundSetupA({...base, turnNum: 2, balances: fiveFive, stateCount: 0}),
-  postFundSetupB: positions.postFundSetupB({...base, turnNum: 3, balances: fiveFive, stateCount: 1}),
+  preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, stateCount: 0 }),
+  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, stateCount: 1 }),
+  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, stateCount: 0 }),
+  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, stateCount: 1 }),
   asMove,
   salt,
   preCommit,
   bsMove,
   aResult: Result.YouWin,
   bResult: Result.YouLose,
-  propose: positions.proposeFromSalt({...base, turnNum: 4, balances: fiveFive, asMove, salt}),
-  accept:  positions.accept({...base, turnNum: 5, balances: fourSix, preCommit, bsMove}),
-  reveal:  positions.reveal({...base, turnNum: 6, balances: sixFour, bsMove, asMove, salt}),
+  propose: positions.proposeFromSalt({ ...base, turnNum: 4, balances: fiveFive, asMove, salt }),
+  accept: positions.accept({ ...base, turnNum: 5, balances: fourSix, preCommit, bsMove }),
+  reveal: positions.reveal({ ...base, turnNum: 6, balances: sixFour, bsMove, asMove, salt }),
+
+
+
+
 };
 
 export const aResignsAfterOneRound = {
   ...standard,
-  resting: positions.resting({...base, turnNum: 7, balances: sixFour }),
-  conclude: positions.conclude({...base, turnNum: 8, balances: sixFour }),
-  conclude2: positions.conclude({...base, turnNum: 9, balances: sixFour }),
+  resting: positions.resting({ ...base, turnNum: 7, balances: sixFour }),
+  conclude: positions.conclude({ ...base, turnNum: 8, balances: sixFour }),
+  conclude2: positions.conclude({ ...base, turnNum: 9, balances: sixFour }),
 };
 
 export const bResignsAfterOneRound = {
   ...standard,
-  conclude: positions.conclude({...base, turnNum: 7, balances: sixFour }),
-  conclude2: positions.conclude({...base, turnNum: 8, balances: sixFour }),
+  conclude: positions.conclude({ ...base, turnNum: 7, balances: sixFour }),
+  conclude2: positions.conclude({ ...base, turnNum: 8, balances: sixFour }),
 };
 
 export const insufficientFunds = {
-  preFundSetupA: positions.preFundSetupB({...base, turnNum: 0, balances: nineOne, stateCount: 0}),
-  preFundSetupB: positions.preFundSetupB({...base, turnNum: 1, balances: nineOne, stateCount: 1}),
-  postFundSetupA: positions.postFundSetupA({...base, turnNum: 2, balances: nineOne, stateCount: 0}),
-  postFundSetupB: positions.postFundSetupB({...base, turnNum: 3, balances: nineOne, stateCount: 1}),
+  preFundSetupA: positions.preFundSetupB({ ...base, turnNum: 0, balances: nineOne, stateCount: 0 }),
+  preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: nineOne, stateCount: 1 }),
+  postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: nineOne, stateCount: 0 }),
+  postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: nineOne, stateCount: 1 }),
   asMove,
   bsMove,
-  propose: positions.proposeFromSalt({...base, turnNum: 4, balances: nineOne, asMove, salt}),
-  accept:  positions.accept({...base, turnNum: 5, balances: eightTwo, preCommit, bsMove}),
-  reveal:  positions.reveal({...base, turnNum: 6, balances: tenZero, bsMove, asMove, salt}),
-  conclude: positions.conclude({...base, turnNum: 7, balances: tenZero }),
-  conclude2: positions.conclude({...base, turnNum: 8, balances: tenZero }),
+  propose: positions.proposeFromSalt({ ...base, turnNum: 4, balances: nineOne, asMove, salt }),
+  accept: positions.accept({ ...base, turnNum: 5, balances: eightTwo, preCommit, bsMove }),
+  reveal: positions.reveal({ ...base, turnNum: 6, balances: tenZero, bsMove, asMove, salt }),
+  conclude: positions.conclude({ ...base, turnNum: 7, balances: tenZero }),
+  conclude2: positions.conclude({ ...base, turnNum: 8, balances: tenZero }),
 };
+
+export function build(customLibraryAddress: string, customAsAddress: string, customBsAddress: string) {
+  const customParticipants : [string, string] = [customAsAddress, customBsAddress];
+  const customBase = {
+    libraryAddress: customLibraryAddress,
+    channelNonce,
+    participants: customParticipants,
+    roundBuyIn,
+  };
+
+  const customShared = {
+    ...customBase,
+    asAddress: customAsAddress,
+    bsAddress: customBsAddress,
+    myName: 'Tom',
+    opponentName: 'Alex',
+  };
+
+  return {
+    ...customShared,
+    preFundSetupA: positions.preFundSetupA({ ...base, turnNum: 0, balances: fiveFive, stateCount: 0 }),
+    preFundSetupB: positions.preFundSetupB({ ...base, turnNum: 1, balances: fiveFive, stateCount: 1 }),
+    postFundSetupA: positions.postFundSetupA({ ...base, turnNum: 2, balances: fiveFive, stateCount: 0 }),
+    postFundSetupB: positions.postFundSetupB({ ...base, turnNum: 3, balances: fiveFive, stateCount: 1 }),
+    asMove,
+    salt,
+    preCommit,
+    bsMove,
+    aResult: Result.YouWin,
+    bResult: Result.YouLose,
+    propose: positions.proposeFromSalt({ ...base, turnNum: 4, balances: fiveFive, asMove, salt }),
+    accept: positions.accept({ ...base, turnNum: 5, balances: fourSix, preCommit, bsMove }),
+    reveal: positions.reveal({ ...base, turnNum: 6, balances: sixFour, bsMove, asMove, salt }),
+    resting: positions.resting({ ...base, turnNum: 7, balances: sixFour }),
+  };
+}
