@@ -58,10 +58,10 @@ function encodeGameAttributes(position: positions.Position) {
 }
 
 export enum GamePositionType {
-  Propose = 0,
-  Accept = 1,
-  Reveal = 2,
-  Resting = 3,
+  Resting = 0,
+  Propose = 1,
+  Accept = 2,
+  Reveal = 3,
 }
 
 export function packRestingAttributes(stake: BN) {
