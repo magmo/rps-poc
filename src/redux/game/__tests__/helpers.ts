@@ -1,11 +1,12 @@
-import { gameReducer, MessageState } from '../reducer';
+import { gameReducer } from '../reducer';
+import { MessageState } from '../../message-service/state';
 import { Player, positions } from '../../../core';
 import * as actions from '../actions';
 import * as state from '../state';
 
 export const itSends = (position, jointState) => {
   it(`sends ${position.name}`, () => {
-    expect(jointState.messageState.opponentOutbox).toEqual(position);
+    expect(jointState.messageState.opponentOutbox.position).toEqual(position);
   });
 };
 
@@ -29,7 +30,7 @@ export const itHandlesResignLikeItsTheirTurn = (gameState: state.GameState, mess
   });
 };
 
-export const itHandlesResignLikeItsMyTurn = (gameState: state.GameState, messageState: MessageState) => {
+export const itHandlesResignLikeItsMyTurn = (gameState: state.PlayingState, messageState: MessageState) => {
   describe('when the player resigns', () => {
     const { turnNum } = gameState;
     const updatedState = gameReducer({ gameState, messageState }, actions.resign());

@@ -8,7 +8,7 @@ import { SignatureSuccess } from '../../wallet/redux/actions/external';
 import * as challengeActions from '../../wallet/redux/actions/challenge';
 import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
-import { MessageState } from '../game/reducer';
+import { MessageState } from './state';
 import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 
@@ -25,9 +25,14 @@ export default function* messageSaga(address: string) {
 export function* sendMessagesSaga(opponentAddress: string) {
   const channel = yield actionChannel('*');
 
+  // tslint:disable-next-line:no-console
+  console.log('send message Saga is running');
   while (true) {
     // We take any action that might trigger the outbox to be updated
     const action = yield take(channel);
+
+    // tslint:disable-next-line:no-console
+    console.log('message Saga received ', action.type);
 
     if (action.type === walletActions.SEND_MESSAGE) {
       const queue = Queue.WALLET;

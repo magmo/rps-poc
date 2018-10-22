@@ -5,7 +5,8 @@ import { Result, Move, Player } from '../../core';
 // States of the form *B are player B only
 // All other states are both players
 export enum StateName {
-  NotStarted = 'NotStarted',
+  Lobby = 'Lobby',
+  WaitingRoom = 'WaitingRoom',
   WaitForGameConfirmationA = 'WAIT_FOR_GAME_CONFIRMATION_A',
   ConfirmGameB = 'CONFIRM_GAME_B',
   WaitForFunding = 'WAIT_FOR_FUNDING',
@@ -22,6 +23,35 @@ export enum StateName {
   WaitForResignationAcknowledgement = 'WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT',
   GameOver = 'GAME_OVER',
   WaitForWithdrawal = 'WAIT_FOR_WITHDRAWAL',
+}
+
+export interface Lobby {
+  name: StateName.Lobby;
+  myName: string;
+}
+interface LobbyParams {
+  myName: string;
+  [x: string]: any;
+}
+
+export function lobby(obj: LobbyParams): Lobby {
+  return { name: StateName.Lobby, myName: obj.myName };
+}
+
+export interface WaitingRoom {
+  name: StateName.WaitingRoom;
+  myName: string;
+  roundBuyIn: BN;
+}
+
+interface WaitingRoomParams {
+  myName: string;
+  roundBuyIn: BN;
+  [x: string]: any;
+}
+export function waitingRoom(obj: WaitingRoomParams): WaitingRoom {
+  const { myName, roundBuyIn } = obj;
+  return { name: StateName.WaitingRoom, myName, roundBuyIn };
 }
 
 interface TwoChannel {
@@ -71,8 +101,8 @@ export function base(state: IncludesBase) {
   };
 }
 
-export interface NotStarted {
-  name: StateName.NotStarted;
+export function getOpponentAddress(state: IncludesBase) {
+  return state.participants[state.player];
 }
 
 export interface WaitForGameConfirmationA extends Base {
@@ -248,7 +278,7 @@ export function waitForWithdrawal(state: IncludesBase): WaitForWithdrawal {
   return { ...base(state), name: StateName.WaitForWithdrawal };
 }
 
-export type GameState = (
+export type PlayingState = (
   | WaitForGameConfirmationA
   | ConfirmGameB
   | WaitForFunding
@@ -265,4 +295,10 @@ export type GameState = (
   | WaitForResignationAcknowledgement
   | GameOver
   | WaitForWithdrawal
+);
+
+export type GameState = (
+  | Lobby
+  | WaitingRoom
+  | PlayingState
 );

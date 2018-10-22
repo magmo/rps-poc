@@ -41,7 +41,7 @@ const {
 const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName } = scenarios.standard;
 const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName };
 
-const messageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
+const messageState = { };
 
 describe('player A\'s app', () => {
   const aProps = {
@@ -52,18 +52,6 @@ describe('player A\'s app', () => {
     theirMove: bsMove,
     result: aResult,
   };
-
-  describe('when in initial state', () => {
-    describe('when the player creates a game', () => {
-      const action = actions.createGame(
-        'Tom', asAddress, 'Andrew', bsAddress, libraryAddress, channelNonce, roundBuyIn
-      );
-      const updatedState = gameReducer({ messageState }, action);
-
-      itTransitionsTo(state.StateName.WaitForGameConfirmationA, updatedState);
-      itSends(preFundSetupA, updatedState);
-    });
-  });
 
   describe('when in waitForGameConfirmationA', () => {
     const gameState = state.waitForGameConfirmationA({...aProps, ...preFundSetupA });

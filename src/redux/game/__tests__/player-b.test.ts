@@ -40,7 +40,7 @@ const {
 const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName } = scenarios.standard;
 const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName };
 
-const messageState = { walletOutbox: null, opponentOutbox: null, actionToRetry: null };
+const messageState = { };
 
 describe('player B\'s app', () => {
   const bProps = {

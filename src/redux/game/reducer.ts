@@ -4,13 +4,9 @@ import BN from 'bn.js';
 import * as actions from './actions';
 import * as states from './state';
 import { randomHex } from '../../utils/randomHex';
-import { Position, calculateResult, balancesAfterResult, calculateAbsoluteResult, Player, positions } from '../../core';
+import { calculateResult, balancesAfterResult, calculateAbsoluteResult, Player, positions } from '../../core';
+import { MessageState, sendMessage } from '../message-service/state';
 
-export interface MessageState {
-  opponentOutbox: Position | null;
-  walletOutbox: string | null;
-  actionToRetry: actions.PositionReceived | null;
-}
 
 export interface JointState {
   gameState?: states.GameState;
@@ -33,7 +29,7 @@ function attemptRetry(state: JointState): JointState {
 
   const actionToRetry = messageState.actionToRetry;
   if (actionToRetry) {
-    messageState = { ...messageState, actionToRetry: null };
+    messageState = { ...messageState, actionToRetry: undefined };
     state = singleActionReducer(state, actionToRetry);
   }
   return state;
@@ -91,7 +87,7 @@ function existingStateReducer(gameState: states.GameState, messageState: Message
   }
 }
 
-function itsMyTurn(gameState: states.GameState) {
+function itsMyTurn(gameState: states.PlayingState) {
   const nextTurnNum = gameState.turnNum + 1;
   return nextTurnNum % 2 === gameState.player;
 }
@@ -108,7 +104,7 @@ function initialStateReducer(messageState: MessageState, action: actions.GameAct
       ...action, balances, participants, turnNum, stateCount,
     });
 
-    messageState = { ...messageState, opponentOutbox: positions.preFundSetupA(gameState) };
+    messageState = sendMessage(positions.preFundSetupA(gameState), opponentAddress, messageState);
     return { gameState, messageState };
 
   } else if (action.type === actions.INITIAL_POSITION_RECEIVED) {
@@ -127,14 +123,15 @@ function receivedConclude(action: actions.GameAction) {
   return action.type === actions.POSITION_RECEIVED && action.position.name === positions.CONCLUDE;
 }
 
-function resignationReducer(gameState: states.GameState, messageState: MessageState): JointState {
+function resignationReducer(gameState: states.PlayingState, messageState: MessageState): JointState {
   if (itsMyTurn(gameState)) {
     const { turnNum } = gameState;
     // transition to WaitForResignationAcknowledgement
     gameState = states.waitForResignationAcknowledgement({ ...gameState, turnNum: turnNum + 1 });
 
     // and send the latest state to our opponent
-    messageState = { ...messageState, opponentOutbox: positions.conclude(gameState) };
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
   } else {
     // transition to WaitToResign
     gameState = states.waitToResign(gameState);
@@ -143,7 +140,7 @@ function resignationReducer(gameState: states.GameState, messageState: MessageSt
   return { gameState, messageState };
 }
 
-function opponentResignationReducer(gameState: states.GameState, messageState: MessageState, action: actions.GameAction) {
+function opponentResignationReducer(gameState: states.PlayingState, messageState: MessageState, action: actions.GameAction) {
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState}; }
 
   const position = action.position;
@@ -156,7 +153,8 @@ function opponentResignationReducer(gameState: states.GameState, messageState: M
   gameState = states.opponentResigned({ ...gameState, turnNum: turnNum + 1 });
 
   // send Conclude to our opponent
-  messageState = { ...messageState, opponentOutbox: positions.conclude(gameState) };
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
 
   return { gameState, messageState };
 }
@@ -188,7 +186,9 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
   const newPosition = positions.preFundSetupB(newGameState);
 
-  messageState = { ...messageState, opponentOutbox: newPosition, walletOutbox: 'FUNDING_REQUESTED' };
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(newPosition, opponentAddress, messageState);
+  messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   return { gameState: newGameState, messageState };
 }
@@ -203,7 +203,9 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
   const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum: turnNum + 1, stateCount: 0 });
 
   const postFundSetupA = positions.postFundSetupA(newGameState);
-  messageState = { ...messageState, opponentOutbox: postFundSetupA };
+
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
 
   return { gameState: newGameState, messageState };
 }
@@ -218,7 +220,8 @@ function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, mes
   const newGameState = states.pickMove({ ...gameState, turnNum: turnNum + 1 });
   if (gameState.player === Player.PlayerB) {
     newGameState.turnNum += 1;
-    messageState = { ...messageState, opponentOutbox: positions.postFundSetupB(newGameState) };
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(positions.postFundSetupB(newGameState), opponentAddress, messageState);
   }
 
   return { gameState: newGameState, messageState };
@@ -238,7 +241,8 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
     const propose = positions.proposeFromSalt({ ...gameState, asMove, salt, turnNum: turnNum + 1 });
     const newGameStateA = states.waitForOpponentToPickMoveA({ ...gameState, ...propose, salt, myMove: asMove });
 
-    messageState = { ...messageState, opponentOutbox: propose };
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(positions.postFundSetupB(propose), opponentAddress, messageState);
 
     return { gameState: newGameStateA, messageState };
   } else {
@@ -286,7 +290,8 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
   }
 
   const reveal = positions.reveal({ ...newGameState, asMove: myMove, bsMove: theirMove, salt });
-  messageState = { ...messageState, opponentOutbox: reveal };
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(reveal, opponentAddress, messageState);
 
   return { gameState: newGameState, messageState };
 }
@@ -308,7 +313,8 @@ function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPi
 
   const newPosition = positions.accept({ ...newGameState, bsMove: newGameState.myMove });
 
-  messageState = { ...messageState, opponentOutbox: newPosition };
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(newPosition, opponentAddress, messageState);
 
   return { gameState: newGameState, messageState };
 }
@@ -339,7 +345,8 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
     });
 
     const newPosition = positions.conclude(newGameState1);
-    messageState = { ...messageState, opponentOutbox: newPosition };
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(newPosition, opponentAddress, messageState);
 
     return { gameState: newGameState1, messageState };
   } else {
@@ -370,7 +377,8 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
         const resting = positions.resting(newGameState1);
 
         // send Resting
-        messageState = { ...messageState, opponentOutbox: resting };
+        const opponentAddress = states.getOpponentAddress(gameState);
+        messageState = sendMessage(resting, opponentAddress, messageState);
 
         return { gameState: newGameState1, messageState };
       }
@@ -421,7 +429,8 @@ function insufficientFundsReducer(gameState: states.InsufficientFunds, messageSt
     // send conclude if player A
     const conclude = positions.conclude(newGameState);
 
-    messageState = { ...messageState, opponentOutbox: conclude };
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(conclude, opponentAddress, messageState);
   }
 
   return { gameState: newGameState, messageState };
@@ -436,7 +445,8 @@ function waitToResignReducer(gameState: states.WaitToResign, messageState: Messa
   const newGameState = states.waitForResignationAcknowledgement({ ...gameState, turnNum });
 
   const newPosition = positions.conclude(newGameState);
-  messageState = { ...messageState, opponentOutbox: newPosition };
+  const opponentAddress = states.getOpponentAddress(gameState);
+  messageState = sendMessage(newPosition, opponentAddress, messageState);
 
   return { gameState: newGameState, messageState };
 }
