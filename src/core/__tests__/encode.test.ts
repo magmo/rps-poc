@@ -26,4 +26,7 @@ describe('decode', () => {
   it('encodes Resting', () => {
     expect(encode(scenarios.aResignsAfterOneRound.resting)).toEqual(scenarios.aResignsAfterOneRound.restingHex);
   });
+  it('encodes Conclude', () => {
+    expect(encode(scenarios.aResignsAfterOneRound.conclude)).toEqual(scenarios.aResignsAfterOneRound.concludeHex);
+  });
 });
