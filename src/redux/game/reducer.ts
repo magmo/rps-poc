@@ -17,9 +17,9 @@ const emptyMessageState = { opponentOutbox: null, walletOutbox: null, actionToRe
 const emptyJointState = { messageState: emptyMessageState };
 
 export const gameReducer: Reducer<JointState> = (state: JointState, action: actions.GameAction) => {
-  if (action.type === actions.MESSAGE_SENT){
-    const {actionToRetry} = state.messageState;
-      return {gameState:state.gameState, messageState:{opponentOutbox:undefined, walletOutbox:undefined, actionToRetry}};
+  if (action.type === actions.MESSAGE_SENT) {
+    const { actionToRetry } = state.messageState;
+    return { gameState: state.gameState, messageState: { opponentOutbox: undefined, walletOutbox: undefined, actionToRetry } };
   }
   // apply the current action to the state
   state = singleActionReducer(state, action);
@@ -211,16 +211,20 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.FUNDING_SUCCESS) { return { gameState, messageState }; }
+  if (gameState.player === Player.PlayerA) {
+    const { turnNum } = gameState;
+    const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
 
-  const { turnNum } = gameState;
-  const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum: turnNum + 1, stateCount: 0 });
+    const postFundSetupA = positions.postFundSetupA(newGameState);
+    const opponentAddress = states.getOpponentAddress(gameState);
+    messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
 
-  const postFundSetupA = positions.postFundSetupA(newGameState);
-
-  const opponentAddress = states.getOpponentAddress(gameState);
-  messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
-
-  return { gameState: newGameState, messageState };
+    return { gameState: newGameState, messageState };
+  }else{
+    const { turnNum } = gameState;
+    const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
+    return { gameState: newGameState, messageState };
+  }
 }
 
 function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {

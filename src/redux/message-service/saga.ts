@@ -43,6 +43,8 @@ export function* sendMessagesSaga() {
     gameActions.INITIAL_POSITION_RECEIVED,
     gameActions.PLAY_AGAIN,
     gameActions.POSITION_RECEIVED,
+    gameActions.FUNDING_SUCCESS,
+    gameActions.WITHDRAWAL_SUCCESS,
   ]);
 
   // tslint:disable-next-line:no-console
@@ -54,8 +56,6 @@ export function* sendMessagesSaga() {
     // tslint:disable-next-line:no-console
     console.log('message Saga received ', action.type);
 
-    let messageSent = false;
-    // TODO: Select the actual state once it's wired up.
     const messageState: MessageState = yield select(getMessageState);
     if (messageState.opponentOutbox != null) {
       const queue = Queue.GAME_ENGINE;
@@ -64,19 +64,16 @@ export function* sendMessagesSaga() {
       const message = { data, queue, signature };
       const { opponentAddress } = messageState.opponentOutbox;
       yield put(walletActions.messageSent(data, signature));
-      messageSent = true;
+      yield put(gameActions.messageSent());
       yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
     }
     if (messageState.walletOutbox != null) {
       const gameState: gameStates.GameState = yield select(getGameState);
       if (gameState.name !== gameStates.StateName.Lobby && gameState.name !== gameStates.StateName.WaitingRoom) {
         yield handleWalletMessage(messageState.walletOutbox, gameState);
-        messageSent = true;
       }
     }
-    if (messageSent) {
-      yield put(gameActions.messageSent());
-    }
+   
   }
 }
 
@@ -134,6 +131,9 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
 
       yield put(walletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
       yield take(walletActions.FUNDING_SUCCESS);
+      yield put(gameActions.messageSent());
+      yield put(gameActions.fundingSuccess());
+
       break;
     case "WITHDRAWAL_REQUESTED":
       const { turnNum } = positions.conclude(state);
@@ -146,6 +146,8 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       });
       yield put(walletActions.withdrawalRequest(channelState));
       yield take(walletActions.WITHDRAWAL_SUCCESS);
+      yield put(gameActions.messageSent());
+      yield put(gameActions.withdrawalSuccess());
 
   }
 }
