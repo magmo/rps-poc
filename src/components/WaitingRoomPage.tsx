@@ -7,21 +7,21 @@ import web3Utils from 'web3-utils';
 import BN from 'bn.js';
 
 interface Props {
-  cancelChallenge: () => void;
-  stake: BN;
+  cancelOpenGame: () => void;
+  roundBuyIn: BN;
 }
 
 export default class WaitingRoomPage extends React.PureComponent<Props> {
   render() {
-    const { cancelChallenge, stake } = this.props;
+    const { cancelOpenGame, roundBuyIn } = this.props;
     return (
       <div className="container centered-container">
         <h2 className="w-100">
           Waiting for someone to accept your challenge for{' '}
-          {web3Utils.fromWei(stake.toString(), 'finney')} finney
+          {web3Utils.fromWei(roundBuyIn.toString(), 'finney')} finney
         </h2>
 
-        <Button block={true} onClick={cancelChallenge}>
+        <Button block={true} onClick={cancelOpenGame}>
           Cancel
         </Button>
         <FooterBar>Waiting ...</FooterBar>

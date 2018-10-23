@@ -3,23 +3,16 @@ import { connect } from 'react-redux';
 
 import { SiteState } from '../redux/reducer';
 import GameContainer from './GameContainer';
-import WaitingRoomContainer from './WaitingRoomContainer';
 import LobbyContainer from './LobbyContainer';
 import * as gameStates from '../redux/game/state';
-import ErrorContainer from './ErrorContainer';
 
 interface ApplicationProps {
-  gameState?: gameStates.GameState;
+  gameState: gameStates.GameState;
 }
 
 function Application(props: ApplicationProps) {
-  if (props.gameState==null){
-    return <ErrorContainer/>;
-  }
-
   switch (props.gameState.name) {
-    case gameStates.StateName.WaitingRoom:
-      return <WaitingRoomContainer />;
+    // lobby is special as we need access to the list of open challenges
     case gameStates.StateName.Lobby:
       return <LobbyContainer />;
     default:
@@ -28,7 +21,7 @@ function Application(props: ApplicationProps) {
 }
 
 const mapStateToProps = (state: SiteState): ApplicationProps => ({
-  gameState: state.game.gameState ,
+  gameState: state.game.gameState,
 });
 
 export default connect(mapStateToProps)(Application);

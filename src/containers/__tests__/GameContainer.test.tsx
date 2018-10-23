@@ -12,23 +12,22 @@ const mockStore = configureStore();
 
 
 describe('GameContainer', () => {
-    it('should render GameProposed for state WaitForGameConfirmationA', () => {
-        const { preFundSetupA } = scenarios.standard;
+  it('should render GameProposed for state WaitForGameConfirmationA', () => {
+    const { preFundSetupA } = scenarios.standard;
 
-        const gameState = waitForGameConfirmationA({ ...base, ...preFundSetupA });
+    const gameState = waitForGameConfirmationA({ ...base, ...preFundSetupA });
 
-        const initialState = {
-            game: { gameState },
-            wallet: {
-                display: {
-                    showWallet: false,
-                    showWalletHeader: false,
-                },
-            },
-        };
-        const store = mockStore(initialState);
-        const component = mount(<GameContainer />, { context: { store } });
-        expect(component.find(GameProposed)).toHaveLength(1);
-    });
-
+    const initialState = {
+      game: { gameState },
+      wallet: {
+        display: {
+          showWallet: false,
+          showWalletHeader: false,
+        },
+      },
+    };
+    const store = mockStore(initialState);
+    const component = mount(<GameContainer />, { context: { store } });
+    expect(component.find(GameProposed)).toHaveLength(1);
+  });
 });

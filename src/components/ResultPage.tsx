@@ -11,7 +11,7 @@ interface Props {
   theirMove: Move;
   result: Result;
   message: string;
-  abandonGame: () => void;
+  resign: () => void;
   playAgain: () => void;
 }
 
@@ -32,7 +32,7 @@ export default class ResultPage extends React.PureComponent<Props> {
   }
 
   render() {
-    const { yourMove, theirMove, message, playAgain, abandonGame } = this.props;
+    const { yourMove, theirMove, message, playAgain, resign } = this.props;
 
     return (
       <div className="container centered-container">
@@ -57,7 +57,7 @@ export default class ResultPage extends React.PureComponent<Props> {
             </div>
           </div>
 
-          <Button color="default" onClick={abandonGame}>
+          <Button color="default" onClick={resign}>
             Abandon game
           </Button>
           <Button color="primary" onClick={playAgain}>

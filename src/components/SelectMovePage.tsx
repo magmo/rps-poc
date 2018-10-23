@@ -7,7 +7,7 @@ import MoveIcon from './MoveIcon';
 
 interface Props {
   chooseMove: (move: Move) => void;
-  abandonGame: () => void;
+  resign: () => void;
   afterOpponent?: any;
   challengeExpirationDate?:number;
 
@@ -26,7 +26,7 @@ export default class SelectMoveStep extends React.PureComponent<Props> {
   }
 
   render() {
-    const { afterOpponent, chooseMove, abandonGame, challengeExpirationDate } = this.props;
+    const { afterOpponent, chooseMove, resign, challengeExpirationDate } = this.props;
     const renderChooseButton = this.renderChooseButton;
 
     return (
@@ -46,7 +46,7 @@ export default class SelectMoveStep extends React.PureComponent<Props> {
             </div>
           </div>
           <div className="mt-5">
-            <Button onClick={() => abandonGame()} color="dark" className="w-75 p-3">
+            <Button onClick={() => resign()} color="dark" className="w-75 p-3">
               <h1>Abandon game</h1>
             </Button>
           </div>
