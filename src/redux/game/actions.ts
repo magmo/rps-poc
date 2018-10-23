@@ -12,7 +12,8 @@ export const FUNDING_SUCCESS = 'GAME.FUNDING_SUCCESS';
 export const WITHDRAWAL_REQUEST = 'GAME.WITHDRAWAL_REQUEST';
 export const WITHDRAWAL_SUCCESS = 'GAME.WITHDRAWAL_SUCCESS';
 export const ENTER_WAITING_ROOM = 'GAME.ENTER_WAITING_ROOM';
-export const ENTER_LOBBY = 'Game.ENTER_LOBBY';
+export const ENTER_LOBBY = 'GAME.ENTER_LOBBY';
+export const MESSAGE_SENT = 'GAME.MESSAGE_SENT';
 
 export const createGame = (
   myName: string,
@@ -85,6 +86,11 @@ export const enterLobby = (myName: string) => ({
   myName,
 });
 
+// TODO: Should this be moved?
+export const messageSent = ()=>({
+  type: MESSAGE_SENT as typeof MESSAGE_SENT,
+});
+
 export type InitialPositionReceived = ReturnType<typeof initialPositionReceived>;
 export type CreateGame = ReturnType<typeof createGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
@@ -97,6 +103,7 @@ export type WithdrawalSuccess = ReturnType<typeof withdrawalSuccess>;
 export type WithdrawalRequest = ReturnType<typeof withdrawalRequest>;
 export type EnterWaitingRoom = ReturnType<typeof enterWaitingRoom>;
 export type EnterLobby = ReturnType<typeof enterLobby>;
+export type MessageSent = ReturnType<typeof messageSent>;
 
 export type GameAction = (
   | ConfirmGame
@@ -111,4 +118,5 @@ export type GameAction = (
   | CreateGame
   | EnterWaitingRoom
   | EnterLobby
+  | MessageSent
 );

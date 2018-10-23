@@ -26,12 +26,12 @@ export default function* lobbySaga(address: string) {
     switch (action.type) {
       case lobbyActions.ACCEPT_CHALLENGE:
         const libraryAddress = yield getLibraryAddress();
-        const { stake, opponentName, opponentAddress } = action;
+        const { stake, address:opponentAddress } = action;
         const channelNonce = 0; // TODO: make random?
         yield put(createGame(
           'myName',
-          '0x123',
-          opponentName,
+          address,
+          'theirName',
           opponentAddress,
           libraryAddress,
           channelNonce,

@@ -4,9 +4,8 @@ import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase'
 import * as waitingRoomActions from '../waiting-room/actions';
 
 import * as gameActions from '../game/actions';
-
 type ActionType = waitingRoomActions.CancelChallenge | gameActions.PositionReceived | gameActions.EnterWaitingRoom;
-
+   
 export default function* waitingRoomSaga(
   address: string,
   name: string,

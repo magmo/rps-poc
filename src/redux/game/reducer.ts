@@ -17,6 +17,10 @@ const emptyMessageState = { opponentOutbox: null, walletOutbox: null, actionToRe
 const emptyJointState = { messageState: emptyMessageState };
 
 export const gameReducer: Reducer<JointState> = (state: JointState, action: actions.GameAction) => {
+  if (action.type === actions.MESSAGE_SENT){
+    const {actionToRetry} = state.messageState;
+      return {gameState:state.gameState, messageState:{opponentOutbox:undefined, walletOutbox:undefined, actionToRetry}};
+  }
   // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now

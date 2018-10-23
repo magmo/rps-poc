@@ -21,10 +21,29 @@ export enum Queue {
 export default function* messageSaga(address: string) {
   yield fork(receiveFromFirebaseSaga, address);
   yield fork(receiveFromWalletSaga);
+  yield fork(sendMessagesSaga);
+  yield fork(sendWalletMessageSaga);
 }
 
-export function* sendMessagesSaga(opponentAddress: string) {
-  const channel = yield actionChannel('*');
+export function* sendWalletMessageSaga() {
+  while (true) {
+    const action = yield take(walletActions.SEND_MESSAGE);
+    const queue = Queue.WALLET;
+    const { data, to } = action;
+    const message = { data, queue };
+    yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
+  }
+}
+
+export function* sendMessagesSaga() {
+  const channel = yield actionChannel([
+    gameActions.CHOOSE_MOVE,
+    gameActions.CONFIRM_GAME,
+    gameActions.CREATE_GAME,
+    gameActions.INITIAL_POSITION_RECEIVED,
+    gameActions.PLAY_AGAIN,
+    gameActions.POSITION_RECEIVED,
+  ]);
 
   // tslint:disable-next-line:no-console
   console.log('send message Saga is running');
@@ -35,31 +54,32 @@ export function* sendMessagesSaga(opponentAddress: string) {
     // tslint:disable-next-line:no-console
     console.log('message Saga received ', action.type);
 
-    if (action.type === walletActions.SEND_MESSAGE) {
-      const queue = Queue.WALLET;
-      const { data } = action;
-      const message = { data, queue };
+    let messageSent = false;
+    // TODO: Select the actual state once it's wired up.
+    const messageState: MessageState = yield select(getMessageState);
+    if (messageState.opponentOutbox != null) {
+      const queue = Queue.GAME_ENGINE;
+      const data = encode(messageState.opponentOutbox.position);
+      const signature = yield signMessage(data);
+      const message = { data, queue, signature };
+      const { opponentAddress } = messageState.opponentOutbox;
+      yield put(walletActions.messageSent(data, signature));
+      messageSent = true;
       yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
-    } else {
-      // TODO: Select the actual state once it's wired up.
-      const messageState: MessageState = yield select(getMessageState);
-      if (messageState.opponentOutbox != null) {
-        const queue = Queue.GAME_ENGINE;
-        const data = encode(messageState.opponentOutbox.position);
-        const signature = yield signMessage(data);
-        const message = { data, queue, signature };
-        yield put(walletActions.messageSent(data, signature));
-        yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
+    }
+    if (messageState.walletOutbox != null) {
+      const gameState: gameStates.GameState = yield select(getGameState);
+      if (gameState.name !== gameStates.StateName.Lobby && gameState.name !== gameStates.StateName.WaitingRoom) {
+        yield handleWalletMessage(messageState.walletOutbox, gameState);
+        messageSent = true;
       }
-      if (messageState.walletOutbox != null) {
-        const gameState: gameStates.GameState = yield select(getGameState);
-        if (gameState.name !== gameStates.StateName.Lobby && gameState.name !== gameStates.StateName.WaitingRoom) {
-          handleWalletMessage(messageState.walletOutbox, gameState);
-        }
-      }
+    }
+    if (messageSent) {
+      yield put(gameActions.messageSent());
     }
   }
 }
+
 
 function* receiveFromFirebaseSaga(address: string) {
   address = address.toLowerCase();
@@ -102,8 +122,9 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
   const channelId = channel.id;
 
   switch (type) {
-    case "FUNDING_REQUEST":
-
+    case "FUNDING_REQUESTED":
+      // TODO: We need to close the channel at some point
+      yield put(walletActions.openChannelRequest(channel));
       const myIndex = player === Player.PlayerA ? 0 : 1;
 
       const opponentAddress = participants[1 - myIndex];
@@ -114,7 +135,7 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       yield put(walletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
       yield take(walletActions.FUNDING_SUCCESS);
       break;
-    case "WITHDRAWAL_REQUEST":
+    case "WITHDRAWAL_REQUESTED":
       const { turnNum } = positions.conclude(state);
       const channelState = new State({
         channel,

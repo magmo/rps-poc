@@ -18,6 +18,7 @@ import { SiteState } from '../redux/reducer';
 import { Move } from '../core';
 import WalletHeader from '../wallet/containers/WalletHeader';
 import { GameState, StateName } from '../redux/game/state';
+import ConfirmGamePage from 'src/components/ConfirmGamePage';
 
 interface GameProps {
   state: GameState;
@@ -27,6 +28,7 @@ interface GameProps {
   abandonGame: () => void;
   playAgain: () => void;
   createBlockchainChallenge: () => void;
+  confirmGame:()=>void;
 }
 
 function GameContainer(props: GameProps) {
@@ -42,12 +44,12 @@ function GameContainer(props: GameProps) {
 }
 
 function RenderGame(props: GameProps) {
-  const { state, chooseMove, playAgain, abandonGame, createBlockchainChallenge } = props;
+  const { state, chooseMove, playAgain, abandonGame, createBlockchainChallenge, confirmGame} = props;
   switch (state.name) {
     case StateName.WaitForGameConfirmationA:
       return <GameProposedPage message="Waiting for your opponent to accept game" />;
     case StateName.ConfirmGameB:
-      return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
+      return <ConfirmGamePage  confirmGame={confirmGame} cancelGame={()=>{return;}}  stake={state.roundBuyIn} opponentName={state.opponentName}/>;
 
     case StateName.PickMove:
       return <SelectMovePage chooseMove={chooseMove} abandonGame={abandonGame} />;
@@ -113,6 +115,7 @@ const mapDispatchToProps = {
   playAgain: gameActions.playAgain,
   abandonGame: gameActions.resign,
   createBlockchainChallenge: walletActions.createChallenge,
+  confirmGame: gameActions.confirmGame,
 };
 
 export default connect(

@@ -23,6 +23,7 @@ export default function* applicationControllerSaga(userId: string) {
   yield fork(lobbySaga,address);
   yield fork(waitingRoomSaga,address,name,true);
   yield put(gameActions.enterLobby('myName'));
+
 }
 
 function* setupWallet(uid) {

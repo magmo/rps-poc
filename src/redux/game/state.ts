@@ -102,7 +102,7 @@ export function base(state: IncludesBase) {
 }
 
 export function getOpponentAddress(state: IncludesBase) {
-  return state.participants[state.player];
+  return state.participants[1 - state.player];
 }
 
 export interface WaitForGameConfirmationA extends Base {
