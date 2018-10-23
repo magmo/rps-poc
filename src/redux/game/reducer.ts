@@ -183,7 +183,7 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   // transition to Wait for Funding
-  const newGameState = states.waitForFunding(gameState);
+  const newGameState = states.waitForFunding({...gameState, turnNum:gameState.turnNum+1});
 
   return { messageState, gameState: newGameState };
 }
@@ -211,20 +211,16 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.FUNDING_SUCCESS) { return { gameState, messageState }; }
-  if (gameState.player === Player.PlayerA) {
-    const { turnNum } = gameState;
+    const turnNum = gameState.player === Player.PlayerA ? gameState.turnNum+1:gameState.turnNum+2;
     const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
 
-    const postFundSetupA = positions.postFundSetupA(newGameState);
-    const opponentAddress = states.getOpponentAddress(gameState);
+    if (gameState.player === Player.PlayerA){
+      const postFundSetupA = positions.postFundSetupA(newGameState);
+      const opponentAddress = states.getOpponentAddress(gameState);
     messageState = sendMessage(postFundSetupA, opponentAddress, messageState);
-
+    }
     return { gameState: newGameState, messageState };
-  }else{
-    const { turnNum } = gameState;
-    const newGameState = states.waitForPostFundSetup({ ...gameState, turnNum, stateCount: 0 });
-    return { gameState: newGameState, messageState };
-  }
+  
 }
 
 function waitForPostFundSetupReducer(gameState: states.WaitForPostFundSetup, messageState: MessageState, action: actions.GameAction): JointState {
