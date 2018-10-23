@@ -7,6 +7,7 @@ const sagaMiddleware = createSagaMiddleware();
 
 import loginSaga from './login/saga';
 import openGameSaga from './open-games/saga';
+import messageSaga from './message-service/saga';
 
 const composeEnhancers = (window as  any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancers = composeEnhancers(
@@ -18,6 +19,7 @@ const store = createStore(reducer, enhancers);
 function * rootSaga() {
   yield fork(loginSaga);
   yield fork(openGameSaga);
+  yield fork(messageSaga);
 }
 
 sagaMiddleware.run(rootSaga);

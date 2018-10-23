@@ -35,14 +35,8 @@ export default function* openGameSaga() {
     }
 
     if (gameState.name === StateName.WaitingRoom) {
-      // tslint:disable:no-console
-      console.log('[OPEN GAME SAGA] in waiting room');
       // need to make sure our open game is on firebase when we're in the waiting room
-
       const address: string = yield select(getWalletAddress);
-
-      // tslint:disable:no-console
-      console.log('[OPEN GAME SAGA] wallet address', address);
 
       // if we don't have a wallet address, something's gone very wrong
       if (address) {

@@ -20,7 +20,7 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
   if (action.type === actions.MESSAGE_SENT) {
     const { messageState, gameState } = state;
     const { actionToRetry } = messageState;
-    return { gameState, messageState: { ...messageState, actionToRetry } };
+    return { gameState, messageState: { actionToRetry } };
   }
   // apply the current action to the state
   state = singleActionReducer(state, action);

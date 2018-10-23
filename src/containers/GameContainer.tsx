@@ -11,7 +11,7 @@ import WaitingRoomPage from '../components/WaitingRoomPage';
 import WaitingStep from '../components/WaitingStep';
 import SelectMovePage from '../components/SelectMovePage';
 import FundingConfirmedPage from '../components/FundingConfirmedPage';
-// import GameProposedPage from '../components/GameProposedPage';
+import GameProposedPage from '../components/GameProposedPage';
 import MoveSelectedPage from '../components/MoveSelectedPage';
 import ResultPage from '../components/ResultPage';
 import { WalletController } from '../wallet';
@@ -68,6 +68,9 @@ function RenderGame(props: GameProps) {
           roundBuyIn={state.roundBuyIn}
         />
       );
+
+    case StateName.WaitForGameConfirmationA:
+      return <GameProposedPage message='Waiting for opponent to confirm' />;
     case StateName.ConfirmGameB:
       return <ConfirmGamePage confirmGame={confirmGame} cancelGame={() => { return; }} stake={state.roundBuyIn} opponentName={state.opponentName} />;
 

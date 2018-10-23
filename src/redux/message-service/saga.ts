@@ -1,4 +1,4 @@
-import { fork, take, call, put, actionChannel, select } from 'redux-saga/effects';
+import { fork, take, call, put, select } from 'redux-saga/effects';
 import { buffers } from 'redux-saga';
 import hash from 'object-hash';
 
@@ -18,8 +18,10 @@ export enum Queue {
   GAME_ENGINE = 'GAME_ENGINE',
 }
 
-export default function* messageSaga(address: string) {
-  yield fork(receiveFromFirebaseSaga, address);
+export const getWalletAddress = (storeObj:any) => storeObj.wallet.address;
+
+export default function* messageSaga() {
+  yield fork(waitForWalletThenReceiveFromFirebaseSaga);
   yield fork(receiveFromWalletSaga);
   yield fork(sendMessagesSaga);
   yield fork(sendWalletMessageSaga);
@@ -36,38 +38,26 @@ export function* sendWalletMessageSaga() {
 }
 
 export function* sendMessagesSaga() {
-  const channel = yield actionChannel([
-    gameActions.CHOOSE_MOVE,
-    gameActions.CONFIRM_GAME,
-    gameActions.CREATE_OPEN_GAME,
-    gameActions.INITIAL_POSITION_RECEIVED,
-    gameActions.PLAY_AGAIN,
-    gameActions.POSITION_RECEIVED,
-    gameActions.FUNDING_SUCCESS,
-    gameActions.WITHDRAWAL_SUCCESS,
-  ]);
-
-  // tslint:disable-next-line:no-console
-  console.log('send message Saga is running');
   while (true) {
     // We take any action that might trigger the outbox to be updated
-    const action = yield take(channel);
-
-    // tslint:disable-next-line:no-console
-    console.log('message Saga received ', action.type);
+    yield take('*');
 
     const messageState: MessageState = yield select(getMessageState);
-    if (messageState.opponentOutbox != null) {
+    if (messageState.opponentOutbox) {
       const queue = Queue.GAME_ENGINE;
       const data = encode(messageState.opponentOutbox.position);
       const signature = yield signMessage(data);
       const message = { data, queue, signature };
       const { opponentAddress } = messageState.opponentOutbox;
       yield put(walletActions.messageSent(data, signature));
-      yield put(gameActions.messageSent());
+      // tslint:disable-next-line:no-console
+      console.log('[MESSAGE_SERVICE] sending to firebase', opponentAddress, message);
       yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
+      // tslint:disable-next-line:no-console
+      console.log('[MESSAGE_SERVICE] sent to firebase');
+      yield put(gameActions.messageSent());
     }
-    if (messageState.walletOutbox != null) {
+    if (messageState.walletOutbox) {
       const gameState: gameStates.GameState = yield select(getGameState);
       if (
         gameState.name !== gameStates.StateName.Lobby &&
@@ -81,9 +71,25 @@ export function* sendMessagesSaga() {
   }
 }
 
+function * waitForWalletThenReceiveFromFirebaseSaga() {
+  while(true) {
+    yield take('*');
 
-function* receiveFromFirebaseSaga(address: string) {
+    const address = yield select(getWalletAddress);
+
+    if (address) {
+      // this will never return
+      yield receiveFromFirebaseSaga(address);
+    }
+  }
+}
+
+function* receiveFromFirebaseSaga(address) {
   address = address.toLowerCase();
+
+  // tslint:disable-next-line:no-console
+  console.log('[MESSAGE SAGA] monitoring firebase');
+
   const channel = yield call(
     reduxSagaFirebase.database.channel,
     `/messages/${address}`,
@@ -93,6 +99,8 @@ function* receiveFromFirebaseSaga(address: string) {
 
   while (true) {
     const message = yield take(channel);
+    // tslint:disable-next-line:no-console
+    console.log('[MESSAGE SAGA] message received');
     const key = message.snapshot.key;
 
     const { data, queue } = message.value;
