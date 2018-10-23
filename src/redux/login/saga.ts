@@ -37,7 +37,7 @@ function* loginStatusWatcherSaga() {
     const { user } = yield take(channel);
 
     if (user) {
-      applicationThread = yield fork(applicationSaga, user.uid);
+      applicationThread = yield fork(applicationSaga, user.uid, user.displayName);
 
       yield put(loginActions.loginSuccess(user));
 

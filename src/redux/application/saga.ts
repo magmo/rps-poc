@@ -9,20 +9,19 @@ import messageServiceSaga from '../message-service/saga';
 import lobbySaga from '../lobby/saga';
 import waitingRoomSaga from '../waiting-room/saga';
 
-export default function* applicationControllerSaga(userId: string) {
-
+export default function* applicationControllerSaga(userId: string, userName:string) {
+  yield put(gameActions.enterLobby(userName));
   const { address, error } = yield call(setupWallet, userId);
 
   if (error) {
     yield put(applicationActions.initializationFailure(error));
     yield take(applicationActions.RELOAD);
   }
-  const name = 'My name';
 
   yield fork(messageServiceSaga, address);
   yield fork(lobbySaga,address);
-  yield fork(waitingRoomSaga,address,name,true);
-  yield put(gameActions.enterLobby('myName'));
+  yield fork(waitingRoomSaga,address,userName,true);
+
 
 }
 
