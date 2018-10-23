@@ -6,6 +6,7 @@ import { Result, Move, Player } from '../../core';
 // All other states are both players
 export enum StateName {
   Lobby = 'Lobby',
+  CreatingOpenGame = 'CREATING_OPEN_GAME',
   WaitingRoom = 'WaitingRoom',
   WaitForGameConfirmationA = 'WAIT_FOR_GAME_CONFIRMATION_A',
   ConfirmGameB = 'CONFIRM_GAME_B',
@@ -36,6 +37,15 @@ interface LobbyParams {
 
 export function lobby(obj: LobbyParams): Lobby {
   return { name: StateName.Lobby, myName: obj.myName };
+}
+
+export interface CreatingOpenGame {
+  name: StateName.CreatingOpenGame;
+  myName: string;
+}
+
+export function creatingOpenGame(obj: LobbyParams): CreatingOpenGame {
+  return { name: StateName.CreatingOpenGame, myName: obj.myName };
 }
 
 export interface WaitingRoom {
@@ -299,6 +309,7 @@ export type PlayingState = (
 
 export type GameState = (
   | Lobby
+  | CreatingOpenGame
   | WaitingRoom
   | PlayingState
 );

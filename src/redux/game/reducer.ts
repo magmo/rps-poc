@@ -7,19 +7,20 @@ import { randomHex } from '../../utils/randomHex';
 import { calculateResult, balancesAfterResult, calculateAbsoluteResult, Player, positions } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 
-
 export interface JointState {
-  gameState?: states.GameState;
+  gameState: states.GameState;
   messageState: MessageState;
 }
 
-const emptyMessageState = { opponentOutbox: null, walletOutbox: null, actionToRetry: null };
-const emptyJointState = { messageState: emptyMessageState };
+// todo: allow an empty name, redirect to choose name page if empty
+const emptyJointState: JointState = { messageState: {}, gameState: states.lobby({ myName: 'Me' }) };
 
-export const gameReducer: Reducer<JointState> = (state: JointState, action: actions.GameAction) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction) => {
+
   if (action.type === actions.MESSAGE_SENT) {
-    const { actionToRetry } = state.messageState;
-    return { gameState: state.gameState, messageState: { opponentOutbox: undefined, walletOutbox: undefined, actionToRetry } };
+    const { messageState, gameState } = state;
+    const { actionToRetry } = messageState;
+    return { gameState, messageState: { ...messageState, actionToRetry } };
   }
   // apply the current action to the state
   state = singleActionReducer(state, action);
@@ -40,18 +41,15 @@ function attemptRetry(state: JointState): JointState {
 }
 
 function singleActionReducer(state: JointState, action: actions.GameAction) {
-  const { messageState, gameState } = state || emptyJointState;
+  const { messageState, gameState } = state;
 
-  if (!gameState) {
-    return initialStateReducer(messageState, action);
-  } else {
-    return existingStateReducer(gameState, messageState, action);
-  }
-}
-
-
-function existingStateReducer(gameState: states.GameState, messageState: MessageState, action: actions.GameAction) {
   switch (gameState.name) {
+    case states.StateName.Lobby:
+      return lobbyReducer(gameState, messageState, action);
+    case states.StateName.CreatingOpenGame:
+      return creatingOpenGameReducer(gameState, messageState, action);
+    case states.StateName.WaitingRoom:
+      return waitingRoomReducer(gameState, messageState, action);
     case states.StateName.WaitForGameConfirmationA:
       return waitForGameConfirmationAReducer(gameState, messageState, action);
     case states.StateName.WaitForGameConfirmationA:
@@ -86,50 +84,65 @@ function existingStateReducer(gameState: states.GameState, messageState: Message
       return gameOverReducer(gameState, messageState, action);
     // case states.StateName.WaitForWithdrawal:
     //   return waitForWithdrawalReducer(gameState, messageState, action);
-    case states.StateName.WaitingRoom:
-      return waitingRoomReducer(gameState, messageState, action);
-    case states.StateName.Lobby:
-      return lobbyReducer(gameState, messageState, action);
     default:
       throw new Error("Unreachable code");
+  }
+}
+
+function lobbyReducer(gameState: states.Lobby, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.NEW_OPEN_GAME:
+      const newGameState = states.creatingOpenGame(gameState);
+      return { gameState: newGameState, messageState };
+    case actions.JOIN_OPEN_GAME:
+      const { roundBuyIn, myAddress, opponentAddress } = action;
+      const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
+      const participants: [string, string] = [myAddress, opponentAddress];
+      const turnNum = 0;
+      const stateCount = 1;
+
+      const waitForConfirmationState = states.waitForGameConfirmationA({
+        ...action, balances, participants, turnNum, stateCount,
+      });
+      messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
+      return { gameState: waitForConfirmationState, messageState };
+    default:
+      return { gameState, messageState };
+  }
+}
+
+function creatingOpenGameReducer(gameState: states.CreatingOpenGame, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.CREATE_OPEN_GAME:
+      const newGameState = states.waitingRoom({...gameState, roundBuyIn: action.roundBuyIn });
+      return { gameState: newGameState, messageState };
+    case actions.CANCEL_OPEN_GAME:
+      const newGameState1 = states.lobby(gameState);
+      return { gameState: newGameState1, messageState };
+    default:
+      return { gameState, messageState };
+  }
+}
+
+function waitingRoomReducer(gameState: states.WaitingRoom, messageState: MessageState, action: actions.GameAction): JointState {
+  switch (action.type) {
+    case actions.INITIAL_POSITION_RECEIVED:
+      const { position, myName, opponentName } = action;
+      if (position.name !== positions.PRE_FUND_SETUP_A) { return { gameState, messageState }; }
+
+      const newGameState = states.confirmGameB({ ...position, myName, opponentName });
+      return { gameState: newGameState, messageState };
+    case actions.CANCEL_OPEN_GAME:
+      const newGameState1 = states.lobby(gameState);
+      return { gameState: newGameState1, messageState };
+    default:
+      return { gameState, messageState };
   }
 }
 
 function itsMyTurn(gameState: states.PlayingState) {
   const nextTurnNum = gameState.turnNum + 1;
   return nextTurnNum % 2 === gameState.player;
-}
-
-function initialStateReducer(messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type === actions.ENTER_LOBBY) {
-    const { myName } = action;
-    const gameState = states.lobby({ myName });
-    return { gameState, messageState };
-  }
-  if (action.type === actions.CREATE_GAME) {
-    const { roundBuyIn, myAddress, opponentAddress } = action;
-    const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
-    const participants: [string, string] = [myAddress, opponentAddress];
-    const turnNum = 0;
-    const stateCount = 1;
-
-    const gameState = states.waitForGameConfirmationA({
-      ...action, balances, participants, turnNum, stateCount,
-    });
-
-    messageState = sendMessage(positions.preFundSetupA(gameState), opponentAddress, messageState);
-    return { gameState, messageState };
-
-  } else if (action.type === actions.INITIAL_POSITION_RECEIVED) {
-    const { position, myName, opponentName } = action;
-    if (position.name !== positions.PRE_FUND_SETUP_A) { return { messageState }; }
-
-    const gameState1 = states.confirmGameB({ ...position, myName, opponentName });
-
-    return { gameState: gameState1, messageState };
-  } else {
-    return { messageState };
-  }
 }
 
 function receivedConclude(action: actions.GameAction) {
@@ -482,44 +495,6 @@ function gameOverReducer(gameState: states.GameOver, messageState: MessageState,
   messageState = { ...messageState, walletOutbox: 'WITHDRAWAL' };
 
   return { gameState: newGameState, messageState };
-}
-function waitingRoomReducer(gameState: states.WaitingRoom, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type !== actions.INITIAL_POSITION_RECEIVED) {
-    return { gameState, messageState };
-  }
-  const { position, myName, opponentName } = action;
-  if (position.name !== positions.PRE_FUND_SETUP_A) { return { messageState }; }
-
-  const newGameState = states.confirmGameB({ ...position, myName, opponentName });
-
-  return { gameState: newGameState, messageState };
-}
-function lobbyReducer(gameState: states.Lobby, messageState: MessageState, action: actions.GameAction): JointState {
-  switch (action.type) {
-    case actions.ENTER_WAITING_ROOM:
-      const newGameState = states.waitingRoom({ myName: action.myName, roundBuyIn: action.roundBuyIn });
-      return { gameState: newGameState, messageState };
-      break;
-    case actions.CREATE_GAME:
-      const { roundBuyIn, myAddress, opponentAddress } = action;
-      const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
-      const participants: [string, string] = [myAddress, opponentAddress];
-      const turnNum = 0;
-      const stateCount = 1;
-
-      const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, balances, participants, turnNum, stateCount,
-      });
-      messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
-      return { gameState: waitForConfirmationState, messageState };
-      break;
-    default:
-      return { gameState, messageState };
-      break;
-  }
-
-
-
 }
 // function waitForWithdrawalReducer(gameState: states.WaitForWithdrawal, messageState: MessageState, action: actions.GameAction) {
 // }

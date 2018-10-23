@@ -18,8 +18,8 @@ const messageState = {};
 describe('when in lobby', () => {
   const gameState = state.lobby(params);
 
-  describe('when the player creates a game', () => {
-    const action = actions.createGame(
+  describe('when the player joins a open game', () => {
+    const action = actions.joinOpenGame(
       'Tom', asAddress, 'Andrew', bsAddress, libraryAddress, channelNonce, roundBuyIn
     );
     const updatedState = gameReducer({ gameState, messageState }, action);
@@ -27,6 +27,32 @@ describe('when in lobby', () => {
     itTransitionsTo(state.StateName.WaitForGameConfirmationA, updatedState);
     itSends(preFundSetupA, updatedState);
   });
+
+  describe('when the player wants to create their own game', () => {
+    const action = actions.newOpenGame();
+    const updatedState = gameReducer({ gameState, messageState }, action);
+
+    itTransitionsTo(state.StateName.CreatingOpenGame, updatedState);
+  });
+});
+
+describe('when in creating open game', () => {
+  const gameState = state.creatingOpenGame(params);
+
+  describe('when the player finalizes the creation', () => {
+    const action = actions.createOpenGame(roundBuyIn);
+    const updatedState = gameReducer({ gameState, messageState }, action);
+
+    itTransitionsTo(state.StateName.WaitingRoom, updatedState);
+  });
+
+  describe('when the player cancels', () => {
+    const action = actions.cancelOpenGame();
+    const updatedState = gameReducer({ gameState, messageState }, action);
+
+    itTransitionsTo(state.StateName.Lobby, updatedState);
+  });
+
 });
 
 describe('when in waiting room', () => {
@@ -37,5 +63,12 @@ describe('when in waiting room', () => {
     const updatedState = gameReducer({ gameState, messageState }, action);
 
     itTransitionsTo(state.StateName.ConfirmGameB, updatedState);
+  });
+
+  describe('when the player cancels', () => {
+    const action = actions.cancelOpenGame();
+    const updatedState = gameReducer({ gameState, messageState }, action);
+
+    itTransitionsTo(state.StateName.Lobby, updatedState);
   });
 });

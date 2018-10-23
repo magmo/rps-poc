@@ -39,7 +39,7 @@ export function* sendMessagesSaga() {
   const channel = yield actionChannel([
     gameActions.CHOOSE_MOVE,
     gameActions.CONFIRM_GAME,
-    gameActions.CREATE_GAME,
+    gameActions.CREATE_OPEN_GAME,
     gameActions.INITIAL_POSITION_RECEIVED,
     gameActions.PLAY_AGAIN,
     gameActions.POSITION_RECEIVED,
@@ -69,7 +69,11 @@ export function* sendMessagesSaga() {
     }
     if (messageState.walletOutbox != null) {
       const gameState: gameStates.GameState = yield select(getGameState);
-      if (gameState.name !== gameStates.StateName.Lobby && gameState.name !== gameStates.StateName.WaitingRoom) {
+      if (
+        gameState.name !== gameStates.StateName.Lobby &&
+        gameState.name !== gameStates.StateName.WaitingRoom &&
+        gameState.name !== gameStates.StateName.CreatingOpenGame
+      ) {
         yield handleWalletMessage(messageState.walletOutbox, gameState);
       }
     }
