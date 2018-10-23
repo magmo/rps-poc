@@ -18,7 +18,7 @@ import { SiteState } from '../redux/reducer';
 import { Move } from '../core';
 import WalletHeader from '../wallet/containers/WalletHeader';
 import { GameState, StateName } from '../redux/game/state';
-import ConfirmGamePage from 'src/components/ConfirmGamePage';
+import ConfirmGamePage from '../components/ConfirmGamePage';
 
 interface GameProps {
   state: GameState;
