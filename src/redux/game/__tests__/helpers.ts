@@ -19,7 +19,7 @@ export const itIncreasesTurnNumBy = (increase: number, oldState: JointState, new
     expect(newState.gameState.turnNum).toEqual(oldState.gameState.turnNum + increase);
 
   });
-}
+};
 
 export const itTransitionsTo = (stateName, jointState) => {
   it(`transitions to ${stateName}`, () => {
