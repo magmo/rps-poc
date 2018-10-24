@@ -30,18 +30,18 @@ interface Props {
   selectWithdrawalAddress: (address: string) => void;
   respondWithMove: () => void;
   respondWithAlternativeMove: (alternativePosition: string, alternativeSignature: Signature, response: string, responseSignature: Signature) => void;
-  refute: (newerPosition: string, signature: Signature)=>void;
-  conclude: (proof: ConclusionProof)=>void;
+  refute: (newerPosition: string, signature: Signature) => void;
+  conclude: (proof: ConclusionProof) => void;
 }
 
 export default class WalletController extends PureComponent<Props> {
   renderWallet() {
     const { walletState, challengeState } = this.props;
     if (walletState === null) {
-      return <div/>;
+      return <div />;
     }
 
-    if (challengeState !== null) {
+    if (challengeState != null) {
       switch (challengeState.status) {
         case ChallengeStatus.WaitingForUserSelection:
           return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} respondWithAlternativeMove={this.props.respondWithAlternativeMove} refute={this.props.refute} conclude={this.props.conclude} />);
@@ -90,9 +90,12 @@ export default class WalletController extends PureComponent<Props> {
         return <FundingInProgress message="waiting for deposit confirmation" />;
       case WaitForApproval:
       case playerB.WaitForApprovalWithAdjudicator:
-  
-        return <FundingWelcome approve={this.props.approveFunding} decline={this.props.declineFunding}/>;
+
+        return <FundingWelcome approve={this.props.approveFunding} decline={this.props.declineFunding} />;
       default:
+        if (!walletState) {
+          return <div />;
+        }
         return (
           <FundingInProgress message={`[view not implemented: ${walletState.constructor.name}`} />
         );
