@@ -1,0 +1,21 @@
+@import "./_colors";
+@import "./fonts";
+
+.navbar {
+    background-color: $navbar-color;
+    height: 70px;
+}
+
+.navbar-item {
+    display: flex;
+}
+
+.navbar-link {
+    align-items: center;
+    font-size: 15px;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: rgba(255, 255, 255, 0.3);
+}

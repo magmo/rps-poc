@@ -8,6 +8,7 @@ import { SiteState } from '../redux/reducer';
 import { OpenGame } from '../redux/open-games/state';
 
 const mapStateToProps = (state: SiteState) => ({
+  loginState: state.login,
   openGames: state.openGames as OpenGame[],
 });
 
