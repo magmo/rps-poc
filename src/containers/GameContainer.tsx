@@ -3,27 +3,26 @@ import { connect } from 'react-redux';
 
 import BN from 'bn.js';
 
+import { Move } from '../core';
+import { SiteState } from '../redux/reducer';
 import * as gameActions from '../redux/game/actions';
+
+import { WalletController } from '../wallet';
 import * as walletActions from '../wallet/redux/actions/external';
+import WalletHeader from '../wallet/containers/WalletHeader';
 
 import CreatingOpenGamePage from '../components/CreatingOpenGamePage';
 import WaitingRoomPage from '../components/WaitingRoomPage';
-import WaitingStep from '../components/WaitingStep';
 import SelectMovePage from '../components/SelectMovePage';
 import FundingConfirmedPage from '../components/FundingConfirmedPage';
 import GameProposedPage from '../components/GameProposedPage';
 import MoveSelectedPage from '../components/MoveSelectedPage';
 import ResultPage from '../components/ResultPage';
-import { WalletController } from '../wallet';
 
-import { SiteState } from '../redux/reducer';
-
-
-import { Move } from '../core';
-import WalletHeader from '../wallet/containers/WalletHeader';
 import { GameState, StateName } from '../redux/game/state';
 import ConfirmGamePage from '../components/ConfirmGamePage';
 import GameOverPage from '../components/GameOverPage';
+import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
 
 interface GameProps {
   state: GameState;
@@ -105,7 +104,7 @@ function RenderGame(props: GameProps) {
       return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
 
     case StateName.WaitForOpponentToPickMoveB:
-      return <WaitingStep createBlockchainChallenge={createBlockchainChallenge} message="Waiting for your opponent to choose their move" />;
+      return <WaitForOpponentToPickMove />;
 
     case StateName.WaitForRevealB:
       return (
