@@ -10,19 +10,22 @@ import * as gameActions from '../redux/game/actions';
 import { WalletController } from '../wallet';
 import * as walletActions from '../wallet/redux/actions/external';
 import WalletHeader from '../wallet/containers/WalletHeader';
-
 import CreatingOpenGamePage from '../components/CreatingOpenGamePage';
 import WaitingRoomPage from '../components/WaitingRoomPage';
+import ConfirmGamePage from '../components/ConfirmGamePage';
+import WaitForFunding from '../components/WaitForFunding';
+import FundingConfirmedPage from '../components/FundingConfirmedPage'; // WaitForPostFundSetup
 import SelectMovePage from '../components/SelectMovePage';
-import FundingConfirmedPage from '../components/FundingConfirmedPage';
+import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
+import MoveSelectedPage from '../components/MoveSelectedPage'; // WaitForReveal, WaitForResting
+import ResultPage from '../components/ResultPage'; // PlayAgain
+import InsufficientFunds from '../components/InsufficientFunds';
+import WaitToResign from '../components/WaitToResign';
+import GameOverPage from '../components/GameOverPage'; // GameOver, OpponentResigned
+import WaitForWithdrawal from '../components/WaitForWithdrawal';
 import GameProposedPage from '../components/GameProposedPage';
-import MoveSelectedPage from '../components/MoveSelectedPage';
-import ResultPage from '../components/ResultPage';
 
 import { GameState, StateName } from '../redux/game/state';
-import ConfirmGamePage from '../components/ConfirmGamePage';
-import GameOverPage from '../components/GameOverPage';
-import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
 
 interface GameProps {
   state: GameState;
