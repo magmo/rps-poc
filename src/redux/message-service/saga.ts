@@ -1,5 +1,5 @@
 import { fork, take, call, put, select, actionChannel } from 'redux-saga/effects';
-import { buffers } from 'redux-saga';
+import { buffers, delay } from 'redux-saga';
 import hash from 'object-hash';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
@@ -116,6 +116,9 @@ function* receiveFromFirebaseSaga(address) {
     const message = yield take(channel);
     // tslint:disable-next-line:no-console
     console.log('[MESSAGE SAGA] message received');
+
+    yield delay(500);
+
     const key = message.snapshot.key;
 
     const { data, queue } = message.value;
@@ -138,8 +141,11 @@ function* receiveFromFirebaseSaga(address) {
       yield put(walletActions.receiveMessage(data));
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
+
+    yield call(delay, 2000);
   }
 }
+
 function* handleWalletMessage(type, state: gameStates.PlayingState) {
   const { libraryAddress, channelNonce, player, balances, participants } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
