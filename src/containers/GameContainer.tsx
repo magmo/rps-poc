@@ -13,7 +13,6 @@ import WalletHeader from '../wallet/containers/WalletHeader';
 import CreatingOpenGamePage from '../components/CreatingOpenGamePage';
 import WaitingRoomPage from '../components/WaitingRoomPage';
 import ConfirmGamePage from '../components/ConfirmGamePage';
-import WaitForFunding from '../components/WaitForFunding';
 import FundingConfirmedPage from '../components/FundingConfirmedPage'; // WaitForPostFundSetup
 import SelectMovePage from '../components/SelectMovePage';
 import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
@@ -21,9 +20,11 @@ import MoveSelectedPage from '../components/MoveSelectedPage'; // WaitForReveal,
 import ResultPage from '../components/ResultPage'; // PlayAgain
 import InsufficientFunds from '../components/InsufficientFunds';
 import WaitToResign from '../components/WaitToResign';
+import WaitForResignationAcknowledgement from '../components/WaitForResignationAcknowledgement';
 import GameOverPage from '../components/GameOverPage'; // GameOver, OpponentResigned
-import WaitForWithdrawal from '../components/WaitForWithdrawal';
 import GameProposedPage from '../components/GameProposedPage';
+
+import WaitForWallet from '../components/WaitForWallet'; // WaitForFunding, maybe others?
 
 import { GameState, StateName } from '../redux/game/state';
 
@@ -77,7 +78,6 @@ function RenderGame(props: GameProps) {
       return <GameProposedPage message='Waiting for opponent to confirm' />;
     case StateName.ConfirmGameB:
       return <ConfirmGamePage confirmGame={confirmGame} cancelGame={() => { return; }} stake={state.roundBuyIn} opponentName={state.opponentName} />;
-
     case StateName.PickMove:
       return <SelectMovePage chooseMove={chooseMove} resign={resign} />;
 
@@ -129,9 +129,18 @@ function RenderGame(props: GameProps) {
           resign={resign}
         />
       );
+    case StateName.InsufficientFunds:
+      return <InsufficientFunds />;
+    case StateName.WaitToResign:
+      return <WaitToResign />;
+    case StateName.WaitForResignationAcknowledgement:
+      return <WaitForResignationAcknowledgement />;
+    case StateName.WaitForFunding:
+      return <WaitForWallet reason={"Waiting for funding confirmation."} />;
+    case StateName.WaitForWithdrawal:
+      return <WaitForWallet reason={"Waiting for funds withdrawal."} />;
     default:
       throw new Error(`View not created for ${state.name}`);
-      // return <div>View not created for {state.name}</div>;
   }
 }
 
