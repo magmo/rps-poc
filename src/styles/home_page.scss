@@ -1,4 +1,5 @@
 $loginButton-height: 44px;
+$background-image-size: 800px;
 
 .homePage {
 	background-color: #151b44;
@@ -39,16 +40,27 @@ $loginButton-height: 44px;
 }
 
 .homePage-loginButton-icon-container {
-	height: $loginButton-height;
-	width: $loginButton-height;
+	align-items: center;
 	background-color: white;
 	display: flex;
-	align-items: center;
-	justify-content: center;
 	flex-direction: row;
+	height: $loginButton-height;
+	justify-content: center;
+	width: $loginButton-height;
 }
 
 .homePage-loginButton-icon {
 	height: 25px;
 	width: 25px;
+}
+
+.homePage-image {
+  background-image: url(images/homepage_image.png);
+  background-repeat: no-repeat;
+  background-size: $background-image-size;
+  height: $background-image-size;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: $background-image-size;
 }
