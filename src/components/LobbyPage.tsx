@@ -85,7 +85,6 @@ export default class LobbyPage extends React.PureComponent<Props, State> {
                 </tbody>
               </Table>
             </div>
-            <Button onClick={logoutRequest}>Logout</Button>
           </div>
         </div>
       </div>
