@@ -21,4 +21,12 @@
     height: 40px;
     border-radius: 20px;
     background: $rps-red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-user {
+    font-size: 15px;
+    color: $rps-white;
 }

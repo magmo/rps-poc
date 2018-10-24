@@ -16,7 +16,9 @@ export default class NavigationBar extends React.PureComponent<Props, State> {
         <Button color="link" className="navbar-button mr-auto">
           Rules
         </Button>
-        <div className="circle"/>
+        <div className="circle">
+          <div className="navbar-user">TC</div>
+        </div>
         <Button color="link" className="navbar-button ml-auto" onClick={this.props.logoutRequest}>
           Sign Out
         </Button>
