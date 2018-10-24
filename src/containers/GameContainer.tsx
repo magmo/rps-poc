@@ -130,7 +130,8 @@ function RenderGame(props: GameProps) {
         />
       );
     default:
-      return <div>View not created for {state.name}</div>;
+      throw new Error(`View not created for ${state.name}`);
+      // return <div>View not created for {state.name}</div>;
   }
 }
 
