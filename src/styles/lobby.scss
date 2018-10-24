@@ -2,7 +2,7 @@
 @import "./fonts";
 
 .navbar {
-    background-color: $navbar-color;
+    background-color: $rps-dark-blue;
     height: 70px;
 }
 
@@ -13,5 +13,12 @@
     font-stretch: normal;
     line-height: normal;
     letter-spacing: normal;
-    color: rgba(255, 255, 255, 0.3);
+    color :$rps-light-grey;
+}
+
+.circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: $rps-red;
 }
