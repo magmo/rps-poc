@@ -1,0 +1,9 @@
+@import "./_colors";
+
+.oge-container {
+  width: 230px;
+  height: 241px;
+  border-radius: 10px;
+  border: solid 1px $rps-oge-off-white;
+  background-color: $rps-white;
+}
