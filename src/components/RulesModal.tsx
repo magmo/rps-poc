@@ -8,11 +8,20 @@ interface Props {
 
 export const RulesModal = (props: Props) => {
   return (
-    <Modal isOpen={props.visible} toggle={props.rulesRequest}>
-      <ModalHeader toggle={props.rulesRequest}>Here's the rules:</ModalHeader>
+    <Modal isOpen={props.visible} toggle={props.rulesRequest} centered={true}>
+      <ModalHeader className="rules-header" toggle={props.rulesRequest}>
+        Here are the rules:
+      </ModalHeader>
       <ModalBody>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </ModalBody>
+        <ul>
+          <li>Each player must contribute their buy-in amount to enter a game.</li>
+          <li>Each player must have enough funds to cover the wager for each round.</li>
+          <li>Each player takes turns picking a selection.</li>
+          <li>At the end of each round a winner is determined.</li>
+          <li>The winner of each round collects their wager + their opponents wager.</li>
+          <li>The game ends when one player is out of wager funds or leaves the game.</li>
+        </ul>
+      </ModalBody>
     </Modal>
   );
 };
