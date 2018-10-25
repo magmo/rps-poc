@@ -9,9 +9,11 @@ import { Button, ButtonGroup, Table } from 'reactstrap';
 import BN from 'bn.js';
 import NavigationBar from './NavigationBar';
 import { LoginState } from 'src/redux/login/reducer';
+import { RulesState } from 'src/redux/global/state';
 
 interface Props {
   loginState: LoginState;
+  rulesState: RulesState;
   openGames: OpenGame[];
   joinOpenGame: (
     myName: string,
@@ -24,6 +26,7 @@ interface Props {
   ) => void;
   newOpenGame: () => void;
   logoutRequest: () => void;
+  rulesRequest: () => void;
 }
 
 const initialState = { showChallenges: true };
@@ -33,12 +36,12 @@ export default class LobbyPage extends React.PureComponent<Props, State> {
   readonly state: State = initialState;
 
   render() {
-    const { loginState, newOpenGame, joinOpenGame, logoutRequest } = this.props;
+    const { loginState, rulesState, newOpenGame, joinOpenGame, logoutRequest, rulesRequest } = this.props;
     const openGames = this.props.openGames || [];
 
     return (
       <div className="w-100">
-        <NavigationBar login={loginState} logoutRequest={logoutRequest}/>
+        <NavigationBar login={loginState} rules={rulesState} logoutRequest={logoutRequest} rulesRequest={rulesRequest}/>
         <div className="container centered-container w-100">
           <div className="w-100">
             <ButtonGroup className="d-flex w-100 mb-3">
