@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import ethIcon from '../../images/ethereum_icon.png';
+import ethIcon from '../../images/ethereum_icon.svg';
 
 export interface Props {
     approve: () => void;

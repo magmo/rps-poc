@@ -17,10 +17,19 @@ export class InvalidStateError extends Error {
   }
 }
 
+export class FundingUnderway {
+  myBalance:BN;
+  constructor(myBalance:BN){
+    this.myBalance = myBalance;
+  }
+}
+
 export class FundingFailed {
   message: string;
-  constructor(message) {
+  myBalance:BN;
+  constructor(message,myBalance) {
     this.message = message;
+    this.myBalance = myBalance;
   }
 }
 export class WaitForApproval {
@@ -38,15 +47,19 @@ export class WaitForApproval {
 
 export class AdjudicatorReceived {
   adjudicatorAddress: string;
-  constructor(adjudicatorAddress) {
+  myBalance:BN;
+  constructor(adjudicatorAddress, myBalance:BN) {
     this.adjudicatorAddress = adjudicatorAddress;
+    this.myBalance = myBalance;
   }
 }
 
 export class Funded {
   adjudicatorAddress: string;
-  constructor(adjudicatorAddress: string) {
+  myBalance:BN;
+  constructor(adjudicatorAddress: string, myBalance:BN) {
     this.adjudicatorAddress = adjudicatorAddress;
+    this.myBalance = myBalance;
   }
 }
 
