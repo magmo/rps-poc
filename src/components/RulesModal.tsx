@@ -9,7 +9,7 @@ interface Props {
 export const RulesModal = (props: Props) => {
   return (
     <Modal isOpen={props.visible} toggle={props.rulesRequest} centered={true}>
-      <ModalHeader className="rules-header" toggle={props.rulesRequest}>
+      <ModalHeader className="rules-header">
         Here are the rules:
       </ModalHeader>
       <ModalBody>
