@@ -42,7 +42,7 @@ export default class LobbyPage extends React.PureComponent<Props, State> {
             </Button>
           </div>
           <div className="mb-5">
-            <div className="lobby-oge-container">
+            <div className="lobby-ogc-container">
               {openGames.map(openGame => (
                   <OpenGameEntry key={openGame.address} openGame={openGame} joinOpenGame={joinOpenGame}/>
               ))}
