@@ -6,5 +6,5 @@ steps:
 - name: gcr.io/cloud-builders/gsutil
   args: ["-m", "rsync", "-r", "-c", "-d", "./build", "gs://demo.magmo.com"]
 options:
- machineType: 'n1-highmem-2'
+ machineType: 'N1_HIGHCPU_8'
   
