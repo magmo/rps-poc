@@ -72,7 +72,7 @@ function RenderGame(props: GameProps) {
     case StateName.WaitForGameConfirmationA:
       return <GameProposedPage message='Waiting for opponent to confirm' />;
     case StateName.ConfirmGameB:
-      return <ConfirmGamePage confirmGame={confirmGame} cancelGame={() => { return; }} stake={state.roundBuyIn} opponentName={state.opponentName} />;
+      return <ConfirmGamePage confirmGame={confirmGame} cancelGame={resign} stake={state.roundBuyIn} opponentName={state.opponentName} />;
     case StateName.PickMove:
       return <SelectMovePage chooseMove={chooseMove} resign={resign} />;
 

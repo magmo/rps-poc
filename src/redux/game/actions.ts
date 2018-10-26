@@ -7,6 +7,7 @@ export const CREATE_OPEN_GAME = 'GAME.CREATE_OPEN_GAME';
 export const CANCEL_OPEN_GAME = 'GAME.CANCEL_OPEN_GAME';
 export const INITIAL_POSITION_RECEIVED = 'GAME.INITIAL_POSITION_RECEIVED';
 export const CONFIRM_GAME = 'GAME.CONFIRM_GAME';
+export const DECLINE_GAME = 'GAME.DECLINE_GAME';
 export const CHOOSE_MOVE = 'GAME.CHOOSE_MOVE';
 export const PLAY_AGAIN = 'GAME.PLAY_AGAIN';
 export const RESIGN = 'GAME.RESIGN';
@@ -26,20 +27,14 @@ export const cancelOpenGame = () => ({
 });
 
 export const joinOpenGame = (
-  myName: string,
-  myAddress: string,
   opponentName: string,
   opponentAddress: string,
-  libraryAddress: string,
-  channelNonce: number,
+  channelNonce:number,
   roundBuyIn: BN,
 ) => ({
   type: JOIN_OPEN_GAME as typeof JOIN_OPEN_GAME,
-  myName,
-  myAddress,
   opponentName,
   opponentAddress,
-  libraryAddress,
   channelNonce,
   roundBuyIn,
 });
@@ -52,6 +47,9 @@ opponentName,
 
 export const confirmGame = () => ({
   type: CONFIRM_GAME as typeof CONFIRM_GAME,
+});
+export const declineGame  = () => ({
+  type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
 export const chooseMove = (move: Move) => ({

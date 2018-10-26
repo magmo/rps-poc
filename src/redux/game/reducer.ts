@@ -69,7 +69,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return waitForGameConfirmationAReducer(gameState, messageState, action);
     case states.StateName.ConfirmGameB:
       return confirmGameBReducer(gameState, messageState, action);
-    case states.StateName.WaitForFunding:
+   case states.StateName.WaitForFunding:
       return waitForFundingReducer(gameState, messageState, action);
     case states.StateName.WaitForPostFundSetup:
       return waitForPostFundSetupReducer(gameState, messageState, action);
@@ -109,14 +109,14 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       return { gameState: newGameState, messageState };
     case actions.JOIN_OPEN_GAME:
       const { roundBuyIn, opponentAddress } = action;
-      const { myAddress, libraryAddress } = gameState;
+      const { myName,myAddress, libraryAddress,} = gameState;
       const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
       const participants: [string, string] = [myAddress, opponentAddress];
       const turnNum = 0;
       const stateCount = 1;
 
       const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, balances, participants, turnNum, stateCount, libraryAddress,
+        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress,
       });
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
       return { gameState: waitForConfirmationState, messageState };
