@@ -1,0 +1,40 @@
+@import "./_colors";
+@import "./_fonts";
+
+.oge-container {
+  width: 230px;
+  height: 241px;
+  border-radius: 10px;
+  border: solid 1px $rps-oge-off-white;
+  background-color: $rps-white;
+}
+
+.oge-header {
+  display: flex;
+  justify-content: center;
+}
+
+.oge-card-title, .oge-opponent-name, .oge-vs {
+  font-family: $rps-font-family;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.oge-vs {
+  @extend .oge-card-title;
+  color: $rps-red;
+  margin-right: 10px;
+}
+
+.oge-join {
+  width: 190px;
+  height: 36px;
+  border-radius: 40px;
+  background-color: $rps-red;
+  border-color: $rps-red;
+
+  font-family: $rps-font-family;
+  font-size: 18px;
+  font-weight: bold;
+  color: $rps-white;
+}

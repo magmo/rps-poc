@@ -32,10 +32,14 @@ export class OpenGameEntry extends React.PureComponent<Props, State> {
       openGame.stake);
 
     return (
-      <div className="oge-container">
-        <p>{openGame.name}</p>
-        <p>Buy in {web3Utils.fromWei(openGame.stake.toString(), 'finney')}</p>
-        <Button onClick={joinThisGame}>Join</Button>
+      <div className="oge-container card text-center">
+        <div className="card-body">
+          <div className="oge-header">
+            <div className="oge-vs">vs</div> <div className="oge-opponent-name">{openGame.name}</div>
+          </div>
+          <p>Buy in {web3Utils.fromWei(openGame.stake.toString(), 'finney')}</p>
+          <Button className="oge-join" onClick={joinThisGame}>Join</Button>
+        </div>
       </div>
 
     );

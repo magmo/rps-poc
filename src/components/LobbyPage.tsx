@@ -6,7 +6,7 @@ import { OpenGame } from '../redux/open-games/state';
 import { Button } from 'reactstrap';
 import BN from 'bn.js';
 import { ApplicationLayout } from './ApplicationLayout';
-import { OpenGameEntry } from './OpenGameEntry';
+import { OpenGameEntry } from './OpenGameCard';
 
 interface Props {
   openGames: OpenGame[];
