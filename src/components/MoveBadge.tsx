@@ -36,7 +36,7 @@ export class MoveBadge extends React.Component<Props, State> {
     const { move, action } = this.props;
     switch (move) {
       case Move.Rock:
-        return <img className={`move-badge`} src={ROCK_BADGE} onClick={action} onMouseEnter={this.hoverOn} onMouseLeave={this.hoverOff} />;
+        return <img className='move-badge' src={ROCK_BADGE} onClick={action} onMouseEnter={this.hoverOn} onMouseLeave={this.hoverOff} />;
       case Move.Paper:
         return <img className='move-badge' src={PAPER_BADGE} onClick={action} />;
       default: // Move.Scissors:
