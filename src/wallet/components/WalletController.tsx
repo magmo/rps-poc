@@ -189,8 +189,7 @@ export default class WalletController extends PureComponent<Props> {
           <p>We’ll guide you through a few simple steps to get it setup and your ETH transferred.</p></div>;
         return <WalletWelcome title="Transfer Funds with this State Stash Wallet"
           content={fundingContent}
-          approve={this.props.approveFunding}
-          decline={this.props.declineFunding} />;
+          approve={this.props.approveFunding} />;
       default:
         return <div />;
     }
