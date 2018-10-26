@@ -45,7 +45,7 @@ export default class ChallengeResponse extends React.PureComponent<Props> {
           <img src={ethIcon} className="challenge-issued-icon"/>
           <div className="challenge-issued-title">A challenge has been issued</div>
           <p>A challenge has been detected! You need to respond by {parsedExpiryDate} or the game will conclude.</p>
-           <p>You can respond by:</p>
+           <p>You can:</p>
           <div className="challenge-issued-button-container" > 
           {responseOptions.map(option => {
             if (option instanceof RespondWithMove) {
