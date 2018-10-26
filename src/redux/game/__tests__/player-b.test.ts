@@ -102,7 +102,7 @@ describe('player B\'s app', () => {
         itTransitionsTo(state.StateName.PickMove, updatedState2);
         itSends(postFundSetupB, updatedState2);
       });
-    })
+    });
   });
 
   describe('when in WaitForPostFundSetup', () => {
@@ -188,7 +188,7 @@ describe('player B\'s app', () => {
         const action = actions.positionReceived(revealInsufficientFunds);
         const gameState2 = {
           ...gameState,
-          balances: acceptInsufficientFunds.balances
+          balances: acceptInsufficientFunds.balances,
         };
         const updatedState = gameReducer({ messageState, gameState: gameState2 }, action);
 
