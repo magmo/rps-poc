@@ -2,11 +2,12 @@ import { connect } from 'react-redux';
 
 import CreatingOpenGameModal from '../components/CreatingOpenGameModal';
 import * as gameActions from '../redux/game/actions';
+import * as gameStates from '../redux/game/state';
 
 import { SiteState } from '../redux/reducer';
 
 const mapStateToProps = (state: SiteState) => ({
-  gameState: state.game.gameState,
+  visible: state.game.gameState.name === gameStates.StateName.CreatingOpenGame,
 });
 
 const mapDispatchToProps = {
