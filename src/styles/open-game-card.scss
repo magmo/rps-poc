@@ -34,6 +34,7 @@
 .ogc-stakes {
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
 }
 
 .ogc-buyin, .ogc-wager {
@@ -57,6 +58,13 @@
   font-family: $rps-font-family;
   font-size: 10px;
 }
+
+.ogc-divider {
+  width: 1px;
+  height: 14px;
+  stroke: $rps-ogc-divider-grey;
+}
+
 .ogc-join {
   width: 190px;
   height: 36px;
