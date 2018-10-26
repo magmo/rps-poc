@@ -1,5 +1,4 @@
 import { State } from 'fmg-core';
-import BN from 'bn.js';
 import decodeState from '../wallet/domain/decode';
 
 import * as positions from './positions';

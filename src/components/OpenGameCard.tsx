@@ -12,7 +12,7 @@ interface Props {
     opponentName: string,
     opponentAddress: string,
     channelNonce: number,
-    roundBuyIn: BN,
+    roundBuyIn: string,
   ) => void;
 }
 
