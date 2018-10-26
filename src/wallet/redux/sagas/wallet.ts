@@ -167,13 +167,15 @@ export function* handleWithdrawalRequest(
   yield put(displayActions.showWallet());
   // TODO: There's probably enough logic here to pull it out into it's own saga
   const { address: playerAddress, channelId } = wallet;
+  walletEngine.requestWithdrawal();
+  yield put(stateActions.stateChanged(walletEngine.state));
+  yield take (playerActions.APPROVE_WITHDRAWAL);
 
-  walletEngine.requestWithdrawalAddress();
+  walletEngine.confirmWithdrawal(position.resolution[walletEngine.playerIndex]);
   yield put(stateActions.stateChanged(walletEngine.state));
 
-  const action = yield take(playerActions.SELECT_WITHDRAWAL_ADDRESS);
-  const destination = action.address;
-  walletEngine.selectWithdrawalAddress(action.address);
+  const destination = web3.eth.defaultAccount;
+  walletEngine.selectWithdrawalAddress(destination,position.resolution[walletEngine.playerIndex]);
   yield put(stateActions.stateChanged(walletEngine.state));
 
   const data = [

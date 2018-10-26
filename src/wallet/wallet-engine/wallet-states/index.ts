@@ -66,12 +66,20 @@ export class Funded {
 export class FundingDeclined {
 }
 
-export class SelectWithdrawalAddress { }
+export class ConfirmWithdrawal{}
+export class SelectWithdrawalAddress { 
+  withdrawalAmount:BN;
+  constructor(withdrawalAmount){
+    this.withdrawalAmount = withdrawalAmount;
+  }
+}
 
 export class WaitForWithdrawal {
   depositAddress: string;
-  constructor(depositAddress: string) {
+  withdrawalAmount: BN;
+  constructor(depositAddress: string, withdrawalAmount:BN) {
     this.depositAddress = depositAddress;
+    this.withdrawalAmount = withdrawalAmount;
   }
 }
 
