@@ -31,6 +31,9 @@ export class OpenGameEntry extends React.PureComponent<Props, State> {
       5,
       openGame.stake);
 
+    const stake = openGame.stake;
+    // TODO: should not hardcode the number of rounds
+    const buyin = stake.mul(new BN(5));
     return (
       <div className="ogc-container card text-center">
         <div className="card-body">
@@ -40,12 +43,12 @@ export class OpenGameEntry extends React.PureComponent<Props, State> {
           <div className="ogc-stakes">
             <div className="ogc-buyin">
               <div className="ogc-stake-header">Buy In:</div>
-              <div className="ogc-stake-amount">{web3Utils.fromWei(openGame.stake.toString(), 'finney')}</div>
+              <div className="ogc-stake-amount">{web3Utils.fromWei(buyin.toString(), 'ether')}</div>
               <div className="ogc-stake-currency">ETH</div>
             </div>
             <div className="ogc-wager">
               <div className="ogc-stake-header">Wager:</div>
-              <div className="ogc-stake-amount">{web3Utils.fromWei(openGame.stake.toString(), 'finney')}</div>
+              <div className="ogc-stake-amount">{web3Utils.fromWei(stake.toString(), 'ether')}</div>
               <div className="ogc-stake-currency">ETH</div>
             </div>
           </div>
