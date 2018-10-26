@@ -7,7 +7,7 @@ import { Button } from 'reactstrap';
 import BN from 'bn.js';
 import { ApplicationLayout } from './ApplicationLayout';
 import { OpenGameEntry } from './OpenGameCard';
-import CreatingOpenGameModal from './CreatingOpenGameModal';
+import CreatingOpenGameContainer from 'src/containers/CreatingOpenGameContainer';
 
 interface Props {
   openGames: OpenGame[];
@@ -50,7 +50,7 @@ export default class LobbyPage extends React.PureComponent<Props, State> {
             </div>
           </div>
         </div>
-        <CreatingOpenGameModal fake=""/>
+        <CreatingOpenGameContainer/>
       </ApplicationLayout >
     );
   }
