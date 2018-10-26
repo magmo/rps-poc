@@ -6,6 +6,7 @@ import * as gameActions from '../redux/game/actions';
 import { SiteState } from '../redux/reducer';
 
 const mapStateToProps = (state: SiteState) => ({
+  gameState: state.game.gameState,
 });
 
 const mapDispatchToProps = {

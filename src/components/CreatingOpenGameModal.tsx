@@ -5,8 +5,10 @@ import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 
 import BN from 'bn.js';
 import web3Utils from 'web3-utils';
+import * as gameStates from '../redux/game/state';
 
 interface Props {
+  gameState: gameStates.GameState;
   createOpenGame: (roundBuyIn: BN) => void;
   cancelOpenGame: () => void;
 }
@@ -18,10 +20,6 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
     super(props);
     this.buyinInput = React.createRef();
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
-  }
-
-  componentDidMount() {
-    this.buyinInput.current.focus();
   }
 
   createOpenGameHandler(e) {
@@ -38,8 +36,10 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
   }
 
   render() {
+    const visible = (this.props.gameState.name === gameStates.StateName.CreatingOpenGame);
+
     return (
-      <Modal className="cog-container" toggle={this.props.cancelOpenGame} isOpen={true} centered={true}>
+      <Modal className="cog-container" toggle={this.props.cancelOpenGame} isOpen={visible} centered={true}>
       <ModalHeader className="rules-header">
         Create A Game
       </ModalHeader>
