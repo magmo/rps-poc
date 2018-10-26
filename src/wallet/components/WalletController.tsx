@@ -73,11 +73,20 @@ export default class WalletController extends PureComponent<Props> {
           );
         }
         break;
+        case CommonState.WithdrawalComplete:
+        return <WithdrawInProgress
+        loginDisplayName={loginDisplayName}
+        withdrawStatus={BlockchainStatus.Completed}
+        amount={(walletState as CommonState.WithdrawalComplete).withdrawalAmount}
+        exitGame={closeWallet}
+      />;
+      break;
+        break;
       case WaitForWithdrawal:
         return <WithdrawInProgress
           loginDisplayName={loginDisplayName}
-          withdrawStatus={BlockchainStatus.NotStarted}
-          amount={(walletState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
+          withdrawStatus={BlockchainStatus.InProgress}
+          amount={(walletState as CommonState.WaitForWithdrawal).withdrawalAmount}
         />;
         break;
       case SelectWithdrawalAddress:

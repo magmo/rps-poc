@@ -114,6 +114,13 @@ export default class WalletEngine {
     return this.state;
   }
 
+  withdrawalComplete(){
+    if (this.state instanceof CommonState.WaitForWithdrawal){
+      return this.transitionTo(new CommonState.WithdrawalComplete(this.state.withdrawalAmount));
+    }
+    return this.state;
+  }
+
   transitionTo(state: State): State {
     this.state = state;
     return state;

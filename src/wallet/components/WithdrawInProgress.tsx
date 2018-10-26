@@ -34,7 +34,6 @@ export default class WithdrawInProgress extends React.PureComponent<Props> {
   }
 
 
-    const withdrawStyling =  withdrawStatus !== BlockchainStatus.NotStarted ? "withdraw-off withdraw-container" : 'withdraw-container';
     return (
       <div className="withdraw-container" >
       <div className="withdraw-header">
@@ -44,7 +43,7 @@ export default class WithdrawInProgress extends React.PureComponent<Props> {
         </div>
       </div>
       <div className="withdraw-transfer-container">
-        <div className={withdrawStyling}>
+        <div className="withdraw-container">
           <img className="withdraw-icon" src={this.getIcon(withdrawStatus)} />
           <div className="withdraw-title">{title}</div>
           <div className="withdraw-amount">Amount {web3Utils.fromWei(amount, 'ether')} ETH</div>
