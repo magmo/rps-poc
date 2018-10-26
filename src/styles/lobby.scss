@@ -1,4 +1,3 @@
-@import "./fonts";
 @import "./colors";
 
 .lobby-header {
@@ -9,12 +8,10 @@
 
 .lobby-header-title {
   font-size: 50px;
-  font-family: $rps-font-family;
   font-weight: bold;
 }
 
 .lobby-new-game {
-  font-family: $rps-font-family;
   font-size: 18px;
   font-weight: bold;
   color: $rps-red;

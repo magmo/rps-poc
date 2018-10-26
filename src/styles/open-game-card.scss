@@ -1,5 +1,4 @@
 @import "./_colors";
-@import "./_fonts";
 
 .ogc-container {
   width: 230px;
@@ -20,7 +19,6 @@
 }
 
 .ogc-card-title, .ogc-opponent-name, .ogc-vs {
-  font-family: $rps-font-family;
   font-size: 25px;
   font-weight: bold;
 }
@@ -44,18 +42,15 @@
 }
 
 .ogc-stake-header {
-  font-family: $rps-font-family;
   font-size: 12px;
   color: $rps-ogc-grey;
 }
 
 .ogc-stake-amount {
-  font-family: $rps-font-family;
   font-size: 18px;
 }
 
 .ogc-stake-currency {
-  font-family: $rps-font-family;
   font-size: 10px;
 }
 
@@ -72,7 +67,6 @@
   background-color: $rps-red;
   border-color: $rps-red;
 
-  font-family: $rps-font-family;
   font-size: 18px;
   font-weight: bold;
   color: $rps-white;
