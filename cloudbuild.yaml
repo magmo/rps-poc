@@ -3,8 +3,8 @@ steps:
   args: ['install']
 - name: 'gcr.io/cloud-builders/yarn'
   args: [ 'build']
+    options:
+    machineType:'N1-HIGHMEM-2'
 - name: gcr.io/cloud-builders/gsutil
   args: ["-m", "rsync", "-r", "-c", "-d", "./build", "gs://demo.magmo.com"]
   
-  options:
-    machineType:'N1-HIGHMEM-2'
