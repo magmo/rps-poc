@@ -401,7 +401,6 @@ module.exports = {
       async: false,
       tsconfig: paths.appTsProdConfig,
       tslint: paths.appTsLint,
-      memoryLimit:512
     }),
     // Instead of using the truffle loader we'll look for the already built truffle artifacts
     new webpack.NormalModuleReplacementPlugin(
