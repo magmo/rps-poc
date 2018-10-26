@@ -1,6 +1,6 @@
 import React from 'react';
-import NavigationBarContainer from "src/containers/NavigationBarContainer";
-import GameBarContainer from "src/containers/GameBarContainer";
+import NavigationBarContainer from "../containers/NavigationBarContainer";
+import GameBarContainer from "../containers/GameBarContainer";
 
 export const GameLayout = (props) => {
   return (

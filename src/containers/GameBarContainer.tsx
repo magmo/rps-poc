@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 
 import GameBar from '../components/GameBar';
 import { SiteState } from '../redux/reducer';
-import { PlayingState } from 'src/redux/game/state';
+import { PlayingState } from '../redux/game/state';
 
 function mapStateToProps(state: SiteState) {
   const gameState = state.game.gameState as PlayingState;
