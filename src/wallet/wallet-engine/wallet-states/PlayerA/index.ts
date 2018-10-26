@@ -2,7 +2,7 @@ import * as CommonState from '../';
 
 export class ReadyToDeploy extends CommonState.FundingUnderway { }
 export class WaitForBlockchainDeploy extends CommonState.FundingUnderway { }
-export class WaitForBToDeposit extends CommonState.AdjudicatorReceived{}
+export class WaitForBToDeposit extends CommonState.AdjudicatorReceived { }
 
 export const FundingFailed = CommonState.FundingFailed;
 export const WaitForApproval = CommonState.WaitForApproval;

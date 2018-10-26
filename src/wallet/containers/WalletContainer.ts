@@ -9,7 +9,7 @@ const mapStateToProps = (state: SiteState) => {
     walletState: state.wallet.walletState,
     challengeState: state.wallet.challenge,
     showWallet: state.wallet.display.showWallet,
-    // TODO: We should store this in the wallet state and gert it from there
+    // TODO: We should store this in the wallet state and get it from there
     loginDisplayName: state.game.gameState ? state.game.gameState.myName : "",
   };
 };

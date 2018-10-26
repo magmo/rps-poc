@@ -6,8 +6,8 @@ import { PlayerAState } from './PlayerA';
 import { PlayerBState } from './PlayerB';
 
 export enum PlayerIndex {
-  'A'=0,
-  'B'=1,
+  'A' = 0,
+  'B' = 1,
 }
 
 export type State = PlayerAState | PlayerBState;
@@ -18,16 +18,16 @@ export class InvalidStateError extends Error {
 }
 
 export class FundingUnderway {
-  myBalance:BN;
-  constructor(myBalance:BN){
+  myBalance: BN;
+  constructor(myBalance: BN) {
     this.myBalance = myBalance;
   }
 }
 
 export class FundingFailed {
   message: string;
-  myBalance:BN;
-  constructor(message,myBalance) {
+  myBalance: BN;
+  constructor(message, myBalance) {
     this.message = message;
     this.myBalance = myBalance;
   }
@@ -47,8 +47,8 @@ export class WaitForApproval {
 
 export class AdjudicatorReceived {
   adjudicatorAddress: string;
-  myBalance:BN;
-  constructor(adjudicatorAddress, myBalance:BN) {
+  myBalance: BN;
+  constructor(adjudicatorAddress, myBalance: BN) {
     this.adjudicatorAddress = adjudicatorAddress;
     this.myBalance = myBalance;
   }
@@ -56,14 +56,14 @@ export class AdjudicatorReceived {
 
 export class Funded {
   adjudicatorAddress: string;
-  myBalance:BN;
-  constructor(adjudicatorAddress: string, myBalance:BN) {
+  myBalance: BN;
+  constructor(adjudicatorAddress: string, myBalance: BN) {
     this.adjudicatorAddress = adjudicatorAddress;
     this.myBalance = myBalance;
   }
 }
 
-export class FundingDeclined{
+export class FundingDeclined {
 }
 
 export class SelectWithdrawalAddress { }
@@ -95,5 +95,5 @@ export class WaitForChallengeConcludeOrExpire {
   }
 }
 
-export class ChallengeResponse{}
-export class ChallengeTimeout{}
+export class ChallengeResponse { }
+export class ChallengeTimeout { }

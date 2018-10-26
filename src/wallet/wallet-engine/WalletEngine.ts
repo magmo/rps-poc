@@ -60,14 +60,14 @@ export default class WalletEngine {
       this.state instanceof PlayerA.WaitForBlockchainDeploy ||
       this.state instanceof PlayerA.FundingFailed
     ) {
-      return this.transitionTo(new PlayerA.WaitForBToDeposit(adjudicator,this.state.myBalance));
+      return this.transitionTo(new PlayerA.WaitForBToDeposit(adjudicator, this.state.myBalance));
     }
     if (this.state instanceof PlayerB.WaitForAToDeploy) {
-      return this.transitionTo(new PlayerB.ReadyToDeposit(adjudicator,this.state.myBalance));
+      return this.transitionTo(new PlayerB.ReadyToDeposit(adjudicator, this.state.myBalance));
     }
     if (this.state instanceof PlayerB.WaitForApproval) {
-      const { myAddress, opponentAddress, myBalance, opponentBalance} = this.state;
-      return this.transitionTo(new PlayerB.WaitForApprovalWithAdjudicator({ myAddress, opponentAddress, myBalance, opponentBalance,adjudicatorAddress: adjudicator}));
+      const { myAddress, opponentAddress, myBalance, opponentBalance } = this.state;
+      return this.transitionTo(new PlayerB.WaitForApprovalWithAdjudicator({ myAddress, opponentAddress, myBalance, opponentBalance, adjudicatorAddress: adjudicator }));
     }
 
     return this.state;
@@ -83,7 +83,7 @@ export default class WalletEngine {
     return this.state;
   }
 
-  receiveFundingEvent(): State{
+  receiveFundingEvent(): State {
     if (this.state instanceof PlayerA.WaitForBToDeposit) {
       return this.transitionTo(new PlayerA.Funded(this.state.adjudicatorAddress, this.state.myBalance));
     }
@@ -92,15 +92,15 @@ export default class WalletEngine {
   }
 
   requestWithdrawalAddress(): State {
-    if (this.state instanceof CommonState.Funded){
+    if (this.state instanceof CommonState.Funded) {
       return this.transitionTo(new CommonState.SelectWithdrawalAddress());
     }
 
     return this.state;
   }
 
-  selectWithdrawalAddress(depositAddress:string): State {
-    if (this.state instanceof CommonState.SelectWithdrawalAddress){
+  selectWithdrawalAddress(depositAddress: string): State {
+    if (this.state instanceof CommonState.SelectWithdrawalAddress) {
       return this.transitionTo(new CommonState.WaitForWithdrawal(depositAddress));
     }
 
@@ -112,7 +112,7 @@ export default class WalletEngine {
     return state;
   }
 
-  fundingDeclined():State{
+  fundingDeclined(): State {
     return this.transitionTo(new CommonState.FundingDeclined());
   }
 

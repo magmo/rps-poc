@@ -60,15 +60,15 @@ export default class WalletController extends PureComponent<Props> {
 
     switch (walletState && walletState.constructor) {
       case FundingFailed:
-      // TODO: Figure out why we have to do this
-      if (walletState instanceof FundingFailed){
-        return (
-          <FundingError
-            message={(walletState as FundingFailed).message}
-            tryAgain={this.props.tryFundingAgain}
-          />
-        );
-      }
+        // TODO: Figure out why we have to do this
+        if (walletState instanceof FundingFailed) {
+          return (
+            <FundingError
+              message={(walletState as FundingFailed).message}
+              tryAgain={this.props.tryFundingAgain}
+            />
+          );
+        }
         break;
       case WaitForWithdrawal:
         return <div>Waiting for withdrawal process to complete.</div>;
@@ -80,87 +80,87 @@ export default class WalletController extends PureComponent<Props> {
         return <div>Waiting for challenge</div>;
       case WaitForChallengeConcludeOrExpire:
         return <div>Waiting for opponent to respond to challenge</div>;
-        case playerA.ReadyToDeploy:
-        return <FundingInProgress 
-        loginDisplayName={loginDisplayName}
-        deployStatus={BlockchainStatus.NotStarted}
-        depositStatus={BlockchainStatus.NotStarted}
-        player={0}
-        amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+      case playerA.ReadyToDeploy:
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.NotStarted}
+          depositStatus={BlockchainStatus.NotStarted}
+          player={0}
+          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
         break;
       case playerA.Funded:
-      return <FundingInProgress 
-      loginDisplayName={loginDisplayName}
-      deployStatus={BlockchainStatus.Completed}
-      depositStatus={BlockchainStatus.Completed}
-      player={0}
-      amount={(walletState as Funded).myBalance}
-      returnToGame={closeWallet}
-      />;
-      break;
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.Completed}
+          depositStatus={BlockchainStatus.Completed}
+          player={0}
+          amount={(walletState as Funded).myBalance}
+          returnToGame={closeWallet}
+        />;
+        break;
       case playerB.Funded:
-      return <FundingInProgress 
-      loginDisplayName={loginDisplayName}
-      deployStatus={BlockchainStatus.Completed}
-      depositStatus={BlockchainStatus.Completed}
-      player={1}
-      amount={(walletState as Funded).myBalance}
-      returnToGame={closeWallet}
-      
-      />;
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.Completed}
+          depositStatus={BlockchainStatus.Completed}
+          player={1}
+          amount={(walletState as Funded).myBalance}
+          returnToGame={closeWallet}
+
+        />;
       case playerA.WaitForBlockchainDeploy:
-        return <FundingInProgress 
-        loginDisplayName={loginDisplayName}
-        deployStatus={BlockchainStatus.InProgress}
-        depositStatus={BlockchainStatus.NotStarted}
-        player={0}
-        amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.InProgress}
+          depositStatus={BlockchainStatus.NotStarted}
+          player={0}
+          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
 
       case playerA.WaitForBToDeposit:
-      return <FundingInProgress 
-      loginDisplayName={loginDisplayName}
-      deployStatus={BlockchainStatus.Completed}
-      depositStatus={BlockchainStatus.NotStarted}
-      player={0}
-      amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
-      />;
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.Completed}
+          depositStatus={BlockchainStatus.NotStarted}
+          player={0}
+          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+        />;
 
       case playerB.WaitForAToDeploy:
-      return <FundingInProgress
-      loginDisplayName={loginDisplayName} 
-      deployStatus={BlockchainStatus.NotStarted}
-      depositStatus={BlockchainStatus.NotStarted}
-      player={1}
-      amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
-      />;
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.NotStarted}
+          depositStatus={BlockchainStatus.NotStarted}
+          player={1}
+          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+        />;
 
       case playerB.ReadyToDeposit:
-      return <FundingInProgress 
-      loginDisplayName={loginDisplayName}
-      deployStatus={BlockchainStatus.Completed}
-      depositStatus={BlockchainStatus.NotStarted}
-      player={1}
-      amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
-      />;
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.Completed}
+          depositStatus={BlockchainStatus.NotStarted}
+          player={1}
+          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+        />;
 
       case playerB.WaitForBlockchainDeposit:
-      return <FundingInProgress 
-      loginDisplayName={loginDisplayName}
-      deployStatus={BlockchainStatus.Completed}
-      depositStatus={BlockchainStatus.InProgress}
-      player={1}
-      amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
-      />;
+        return <FundingInProgress
+          loginDisplayName={loginDisplayName}
+          deployStatus={BlockchainStatus.Completed}
+          depositStatus={BlockchainStatus.InProgress}
+          player={1}
+          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+        />;
       case WaitForApproval:
       case playerB.WaitForApprovalWithAdjudicator:
 
         return <FundingWelcome approve={this.props.approveFunding} decline={this.props.declineFunding} />;
       default:
-          return <div/>;
+        return <div />;
     }
-    return <div/>;
+    return <div />;
   }
 
   render() {

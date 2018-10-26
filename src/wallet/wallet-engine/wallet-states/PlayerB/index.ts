@@ -8,11 +8,11 @@ export class WaitForApprovalWithAdjudicator extends CommonState.WaitForApproval 
   }
 }
 export class WaitForAToDeploy extends CommonState.FundingUnderway { }
-export class WaitForBlockchainDeposit  extends CommonState.FundingUnderway { }
+export class WaitForBlockchainDeposit extends CommonState.FundingUnderway { }
 export const FundingFailed = CommonState.FundingFailed;
 export const WaitForApproval = CommonState.WaitForApproval;
 export const Funded = CommonState.Funded;
-export class ReadyToDeposit extends CommonState.AdjudicatorReceived{}
+export class ReadyToDeposit extends CommonState.AdjudicatorReceived { }
 export const WaitForWithdrawal = CommonState.WaitForWithdrawal;
 export const SelectWithdrawalAddress = CommonState.SelectWithdrawalAddress;
 export const ChallengeRequested = CommonState.ChallengeRequested;
@@ -26,7 +26,7 @@ export type PlayerBState =
   | typeof FundingFailed
   | ReadyToDeposit
   | typeof Funded
-  |  CommonState.SelectWithdrawalAddress
+  | CommonState.SelectWithdrawalAddress
   | typeof WaitForWithdrawal
   | typeof ChallengeRequested
   | typeof ChallengeResponse
