@@ -5,20 +5,22 @@ import { ChallengeStatus, Signature, ConclusionProof } from '../domain';
 
 import * as playerA from '../wallet-engine/wallet-states/PlayerA';
 import * as playerB from '../wallet-engine/wallet-states/PlayerB';
-import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire, Funded, } from '../wallet-engine/wallet-states';
+import * as CommonState from '../wallet-engine/wallet-states';
+import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire, Funded, ConfirmWithdrawal, } from '../wallet-engine/wallet-states';
 
 import { WalletState } from '../redux/reducers/wallet-state';
 import { ChallengeState } from '../redux/reducers/challenge';
 
 import FundingInProgress, { BlockchainStatus } from './FundingInProgress';
 import FundingError from './FundingError';
-import WithdrawFunds from './WithdrawFunds';
+
 import ChallengeIssued from './ChallengeIssued';
 import ChallengeResponse from './ChallengeResponse';
 import WaitingForCreateChallenge from './WaitingForCreateChallenge';
 import WaitingForConcludeChallenge from './WaitingForConcludeChallenge';
 import Sidebar from 'react-sidebar';
-import FundingWelcome from './FundingWelcome';
+import WalletWelcome from './WalletWelcome';
+import WithdrawInProgress from './WithdrawInProgress';
 
 interface Props {
   showWallet: boolean;
@@ -28,6 +30,7 @@ interface Props {
   closeWallet: () => void;
   tryFundingAgain: () => void;
   approveFunding: () => void;
+  approveWithdrawal: () => void;
   declineFunding: () => void;
   selectWithdrawalAddress: (address: string) => void;
   respondWithMove: () => void;
@@ -38,7 +41,7 @@ interface Props {
 
 export default class WalletController extends PureComponent<Props> {
   renderWallet() {
-    const { walletState, challengeState, loginDisplayName, closeWallet } = this.props;
+    const { walletState, challengeState, loginDisplayName, closeWallet, approveWithdrawal } = this.props;
     if (walletState === null) {
       return <div />;
     }
@@ -71,10 +74,27 @@ export default class WalletController extends PureComponent<Props> {
         }
         break;
       case WaitForWithdrawal:
-        return <div>Waiting for withdrawal process to complete.</div>;
+        return <WithdrawInProgress
+          loginDisplayName={loginDisplayName}
+          withdrawStatus={BlockchainStatus.NotStarted}
+          amount={(walletState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
+        />;
         break;
       case SelectWithdrawalAddress:
-        return <WithdrawFunds selectAddress={this.props.selectWithdrawalAddress} />;
+        return <WithdrawInProgress
+          loginDisplayName={loginDisplayName}
+          withdrawStatus={BlockchainStatus.NotStarted}
+          amount={(walletState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
+        />;
+        break;
+      case ConfirmWithdrawal:
+        const withdrawalContent = <div><p>This State Stash wallet enables you to quickly withdraw your funds.</p>
+          <p>We’ll guide you through a few simple steps to get it setup and your ETH transferred.</p></div>;
+        return <WalletWelcome
+          title="Withdraw with the State Stash Wallet"
+          content={withdrawalContent}
+          approve={approveWithdrawal}
+        />;
         break;
       case ChallengeRequested:
         return <div>Waiting for challenge</div>;
@@ -155,8 +175,12 @@ export default class WalletController extends PureComponent<Props> {
         />;
       case WaitForApproval:
       case playerB.WaitForApprovalWithAdjudicator:
-
-        return <FundingWelcome approve={this.props.approveFunding} decline={this.props.declineFunding} />;
+        const fundingContent = <div><p>This wallet enables you to quickly transfer to funds to buy in and withdraw from games.</p>
+          <p>We’ll guide you through a few simple steps to get it setup and your ETH transferred.</p></div>;
+        return <WalletWelcome title="Transfer Funds with this State Stash Wallet"
+          content={fundingContent}
+          approve={this.props.approveFunding}
+          decline={this.props.declineFunding} />;
       default:
         return <div />;
     }
