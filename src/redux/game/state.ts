@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import { Result, Move, Player } from '../../core';
 
 // States of the form *A are player A only
@@ -10,6 +9,7 @@ export enum StateName {
   WaitingRoom = 'WaitingRoom',
   WaitForGameConfirmationA = 'WAIT_FOR_GAME_CONFIRMATION_A',
   ConfirmGameB = 'CONFIRM_GAME_B',
+  DeclineGame = 'DECLINE_GAME_B',
   WaitForFunding = 'WAIT_FOR_FUNDING',
   WaitForPostFundSetup = 'WAIT_FOR_POST_FUND_SETUP',
   PickMove = 'PICK_MOVE',
@@ -61,12 +61,12 @@ export interface WaitingRoom {
   myName: string;
   myAddress:string;
   libraryAddress:string;
-  roundBuyIn: BN;
+  roundBuyIn: string;
 }
 
 interface WaitingRoomParams {
   myName: string;
-  roundBuyIn: BN;
+  roundBuyIn: string;
   myAddress:string;
   libraryAddress:string;
   [x: string]: any;
@@ -84,9 +84,9 @@ interface TwoChannel {
 
 interface Base extends TwoChannel {
   turnNum: number;
-  balances: [BN, BN];
+  balances: [string, string];
   stateCount: number;
-  roundBuyIn: BN;
+  roundBuyIn: string;
   myName: string;
   opponentName: string;
 }
@@ -142,6 +142,15 @@ export interface ConfirmGameB extends Base {
 export function confirmGameB(state: IncludesBase): ConfirmGameB {
   return { ...base(state), name: StateName.ConfirmGameB, player: Player.PlayerB };
 }
+
+export interface DeclineGameB extends Base{
+  name: StateName.DeclineGame;
+  player: Player.PlayerB;
+}
+export function declineGameB(state: IncludesBase): DeclineGameB {
+  return { ...base(state), name: StateName.DeclineGame, player: Player.PlayerB };
+}
+
 
 export interface WaitForFunding extends Base {
   name: StateName.WaitForFunding;
@@ -303,6 +312,7 @@ export function waitForWithdrawal(state: IncludesBase): WaitForWithdrawal {
 export type PlayingState = (
   | WaitForGameConfirmationA
   | ConfirmGameB
+  | DeclineGameB
   | WaitForFunding
   | WaitForPostFundSetup
   | PickMove

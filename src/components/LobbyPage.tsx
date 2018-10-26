@@ -4,7 +4,6 @@ import React from 'react';
 import { OpenGame } from '../redux/open-games/state';
 
 import { Button } from 'reactstrap';
-import BN from 'bn.js';
 import { ApplicationLayout } from './ApplicationLayout';
 import { OpenGameEntry } from './OpenGameCard';
 import CreatingOpenGameContainer from 'src/containers/CreatingOpenGameContainer';
@@ -12,13 +11,10 @@ import CreatingOpenGameContainer from 'src/containers/CreatingOpenGameContainer'
 interface Props {
   openGames: OpenGame[];
   joinOpenGame: (
-    myName: string,
-    myAddress: string,
     opponentName: string,
     opponentAddress: string,
-    libraryAddress: string,
     channelNonce: number,
-    roundBuyIn: BN,
+    roundBuyIn: string,
   ) => void;
   newOpenGame: () => void;
 }

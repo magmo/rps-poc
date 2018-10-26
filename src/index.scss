@@ -4,15 +4,21 @@
 
 @import "~bootstrap/scss/bootstrap";
 
-@import "./styles/game-bar";
+@import "./styles/move-badge";
 @import "./styles/home-page";
 @import "./styles/navbar";
 @import "./styles/rules";
-@import "./styles/wallet/funding-welcome";
+@import "./styles/wallet/wallet-welcome";
+@import "./styles/wallet/wallet-message";
+@import "./styles/wallet/challenge-issued";
+@import "./styles/wallet/withdraw-in-progress";
 @import "./styles/wallet/funding-in-progress";
+@import "./styles/wallet/challenge-footer";
 @import "./styles/_fonts";
 @import "./styles/lobby";
 @import "./styles/open-game-card";
+@import "./styles/game-bar";
+@import './styles/confirm-game';
 @import "./styles/creating-open-game-modal";
 
 

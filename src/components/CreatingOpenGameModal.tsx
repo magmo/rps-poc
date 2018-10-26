@@ -3,13 +3,12 @@ import React from 'react';
 
 import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 
-import BN from 'bn.js';
 import web3Utils from 'web3-utils';
 import * as gameStates from '../redux/game/state';
 
 interface Props {
   gameState: gameStates.GameState;
-  createOpenGame: (roundBuyIn: BN) => void;
+  createOpenGame: (roundBuyIn: string) => void;
   cancelOpenGame: () => void;
 }
 
@@ -31,7 +30,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
       return;
     }
 
-    this.props.createOpenGame(new BN(web3Utils.toWei(buyin.toString(), 'ether')));
+    this.props.createOpenGame(web3Utils.toWei(buyin.toString(), 'ether'));
     this.buyinInput.current.value = '';
   }
 

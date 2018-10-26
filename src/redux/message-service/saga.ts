@@ -13,6 +13,8 @@ import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
 
+import hexToBN from '../../utils/hexToBN';
+
 export enum Queue {
   WALLET = 'WALLET',
   GAME_ENGINE = 'GAME_ENGINE',
@@ -58,11 +60,13 @@ export function* sendMessagesSaga() {
     yield take(channel);
 
     const messageState: MessageState = yield select(getMessageState);
+    const gameState: gameStates.GameState = yield select(getGameState);
     if (messageState.opponentOutbox) {
       const queue = Queue.GAME_ENGINE;
       const data = encode(messageState.opponentOutbox.position);
       const signature = yield signMessage(data);
-      const message = { data, queue, signature };
+      const userName = gameState.myName;
+      const message = { data, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
       yield put(walletActions.messageSent(data, signature));
       // tslint:disable-next-line:no-console
@@ -73,7 +77,6 @@ export function* sendMessagesSaga() {
       yield put(gameActions.messageSent());
     }
     if (messageState.walletOutbox) {
-      const gameState: gameStates.GameState = yield select(getGameState);
       if (
         gameState.name !== gameStates.StateName.Lobby &&
         gameState.name !== gameStates.StateName.WaitingRoom &&
@@ -118,7 +121,7 @@ function* receiveFromFirebaseSaga(address) {
     console.log('[MESSAGE SAGA] message received');
     const key = message.snapshot.key;
 
-    const { data, queue } = message.value;
+    const { data, queue, userName } = message.value;
 
     if (queue === Queue.GAME_ENGINE) {
       const { signature } = message.value;
@@ -129,8 +132,7 @@ function* receiveFromFirebaseSaga(address) {
       yield put(walletActions.messageReceived(data, signature));
       const position = decode(data);
       if (position.name === positions.PRE_FUND_SETUP_A) {
-        // todo: how do we get actual names in here - will need to look up from firebase
-        yield put(gameActions.initialPositionReceived(position,'Opponent'));
+        yield put(gameActions.initialPositionReceived(position, userName? userName:'Opponent'));
       } else {
         yield put(gameActions.positionReceived(position));
       }
@@ -153,8 +155,8 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
 
       const opponentAddress = participants[1 - myIndex];
       const myAddress = participants[myIndex];
-      const myBalance = balances[myIndex];
-      const opponentBalance = balances[1 - myIndex];
+      const myBalance = hexToBN(balances[myIndex]);
+      const opponentBalance = hexToBN(balances[1 - myIndex]);
 
       yield put(walletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
       yield take(walletActions.FUNDING_SUCCESS);
@@ -168,7 +170,7 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
         channel,
         stateType: State.StateType.Conclude,
         turnNum,
-        resolution: balances,
+        resolution: balances.map(hexToBN),
         stateCount: 0,
       });
       yield put(walletActions.withdrawalRequest(channelState));

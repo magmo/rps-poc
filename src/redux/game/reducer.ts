@@ -9,6 +9,8 @@ import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/external';
 
+import hexToBN from '../../utils/hexToBN';
+import bnToHex from '../../utils/bnToHex';
 
 export interface JointState {
   gameState: states.GameState;
@@ -69,7 +71,7 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return waitForGameConfirmationAReducer(gameState, messageState, action);
     case states.StateName.ConfirmGameB:
       return confirmGameBReducer(gameState, messageState, action);
-    case states.StateName.WaitForFunding:
+   case states.StateName.WaitForFunding:
       return waitForFundingReducer(gameState, messageState, action);
     case states.StateName.WaitForPostFundSetup:
       return waitForPostFundSetupReducer(gameState, messageState, action);
@@ -109,14 +111,14 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       return { gameState: newGameState, messageState };
     case actions.JOIN_OPEN_GAME:
       const { roundBuyIn, opponentAddress } = action;
-      const { myAddress, libraryAddress } = gameState;
-      const balances: [BN, BN] = [(new BN(roundBuyIn)).muln(5), (new BN(roundBuyIn)).muln(5)];
+      const { myName,myAddress, libraryAddress,} = gameState;
+      const balances = [hexToBN(roundBuyIn).muln(5), hexToBN(roundBuyIn).muln(5)].map(bnToHex) as [string, string];
       const participants: [string, string] = [myAddress, opponentAddress];
       const turnNum = 0;
       const stateCount = 1;
 
       const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, balances, participants, turnNum, stateCount, libraryAddress,
+        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress,
       });
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
       return { gameState: waitForConfirmationState, messageState };
@@ -220,8 +222,9 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
-  if (action.type !== actions.CONFIRM_GAME) { return { gameState, messageState }; }
+  if (action.type !== actions.CONFIRM_GAME && action.type !== actions.DECLINE_GAME)  { return { gameState, messageState }; }
 
+  if (action.type === actions.CONFIRM_GAME){
   const { turnNum } = gameState;
 
   const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
@@ -232,6 +235,14 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   return { gameState: newGameState, messageState };
+  } else {
+
+    const {myName,participants,libraryAddress, player} = gameState;
+    // TODO: Probably should return to the waiting room instead of getting kicked back to the lobby
+    const newGameState = states.lobby({myName,myAddress:participants[player],libraryAddress});
+    // TODO: Send a message to the other player that the game has been declined
+    return {gameState:newGameState,messageState};
+  }
 }
 
 function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
@@ -311,8 +322,12 @@ function pickMoveReducer(gameState: states.PickMove, messageState: MessageState,
   return { gameState, messageState };
 }
 
-function insufficientFunds(balances: [BN, BN], roundBuyIn: BN): boolean {
-  return balances[0].lt(roundBuyIn) || balances[1].lt(roundBuyIn);
+function insufficientFunds(balances: [string, string], roundBuyIn: string): boolean {
+  const aBal = hexToBN(balances[0]);
+  const bBal = hexToBN(balances[1]);
+  const buyIn = hexToBN(roundBuyIn);
+
+  return aBal.lt(buyIn) || bBal.lt(buyIn);
 }
 
 function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction): JointState {
@@ -329,7 +344,9 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
   const { bsMove: theirMove, balances, turnNum } = theirPosition;
   const result = calculateResult(myMove, theirMove);
   const absoluteResult = calculateAbsoluteResult(myMove, theirMove);
-  const newBalances = balancesAfterResult(absoluteResult, roundBuyIn, balances);
+  const bnRoundBuyIn = hexToBN(roundBuyIn);
+  const bnBalances = balances.map(hexToBN) as [BN, BN];
+  const newBalances = balancesAfterResult(absoluteResult, bnRoundBuyIn, bnBalances).map(bnToHex) as [string, string];
 
   const newProperties = { myMove, theirMove, result, balances: newBalances, turnNum: turnNum + 1 };
 
@@ -358,7 +375,9 @@ function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPi
 
   const preCommit = position.preCommit;
   const { balances, turnNum, roundBuyIn } = gameState;
-  const newBalances: [BN, BN] = [balances[0].sub(roundBuyIn), balances[1].add(roundBuyIn)];
+  const aBal = bnToHex(hexToBN(balances[0]).sub(hexToBN(roundBuyIn)));
+  const bBal = bnToHex(hexToBN(balances[1]).add(hexToBN(roundBuyIn)));
+  const newBalances = [aBal, bBal] as [string, string];
 
   const newGameState = states.waitForRevealB({ ...gameState, balances: newBalances, preCommit, turnNum: turnNum + 2 });
 
