@@ -102,6 +102,7 @@ export type NewOpenGame = ReturnType<typeof newOpenGame>;
 export type CancelOpenGame = ReturnType<typeof cancelOpenGame>;
 export type JoinOpenGame = ReturnType<typeof joinOpenGame>;
 export type ConfirmGame = ReturnType<typeof confirmGame>;
+export type DeclineGame = ReturnType<typeof declineGame>;
 export type ChooseMove = ReturnType<typeof chooseMove>;
 export type PlayAgain = ReturnType<typeof playAgain>;
 export type Resign = ReturnType<typeof resign>;
@@ -118,6 +119,7 @@ export type GameAction = (
   | CancelOpenGame
   | CreateOpenGame
   | ConfirmGame
+  | DeclineGame
   | JoinOpenGame
   | ChooseMove
   | PlayAgain

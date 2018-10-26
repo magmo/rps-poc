@@ -220,8 +220,9 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
-  if (action.type !== actions.CONFIRM_GAME) { return { gameState, messageState }; }
+  if (action.type !== actions.CONFIRM_GAME && action.type !== actions.DECLINE_GAME)  { return { gameState, messageState }; }
 
+  if (action.type === actions.CONFIRM_GAME){
   const { turnNum } = gameState;
 
   const newGameState = states.waitForFunding({ ...gameState, turnNum: turnNum + 1 });
@@ -232,6 +233,14 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
   messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
 
   return { gameState: newGameState, messageState };
+  } else {
+
+    const {myName,participants,libraryAddress, player} = gameState;
+    // TODO: Probably should return to the waiting room instead of getting kicked back to the lobby
+    const newGameState = states.lobby({myName,myAddress:participants[player],libraryAddress});
+    // TODO: Send a message to the other player that the game has been declined
+    return {gameState:newGameState,messageState};
+  }
 }
 
 function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
