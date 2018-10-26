@@ -74,6 +74,13 @@ export class SelectWithdrawalAddress {
   }
 }
 
+export class WithdrawalComplete{
+  withdrawalAmount:BN;
+  constructor(withdrawalAmount:BN){
+    this.withdrawalAmount = withdrawalAmount;
+  }
+}
+
 export class WaitForWithdrawal {
   depositAddress: string;
   withdrawalAmount: BN;

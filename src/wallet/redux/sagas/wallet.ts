@@ -197,7 +197,12 @@ export function* handleWithdrawalRequest(
 
   if (transaction) {
     // TODO: broadcast the channelId
+    const newState = walletEngine.withdrawalComplete();
+    yield put(stateActions.stateChanged(newState));
+    yield take(playerActions.CLOSE_WALLET);
     yield put(actions.withdrawalSuccess(transaction));
+   
+
   } else {
     yield put(actions.withdrawalFailure(failureReason));
   }
