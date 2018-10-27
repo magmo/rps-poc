@@ -143,7 +143,7 @@ export default class WalletController extends PureComponent<Props> {
         return <FundingInProgress
           loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.Completed}
-          depositStatus={BlockchainStatus.NotStarted}
+          depositStatus={BlockchainStatus.InProgress}
           player={0}
           amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
         />;

@@ -27,7 +27,7 @@ export default class FundingInProgress extends React.PureComponent<Props> {
   render() {
     const { player, deployStatus, depositStatus, amount, returnToGame } = this.props;
     const deployTitle = player === 0 ? "Your Transfer" : "Opponent Transfer";
-    const depositTitle = player === 0 ? "Opponent Transfer" : "Your Transfer";
+    const depositTitle = player === 1 ? "Your Transfer" : "Opponent Transfer";
     const playerAIsFunding = deployStatus !== BlockchainStatus.Completed;
     const playerBIsFunding = depositStatus === BlockchainStatus.InProgress;
     const deployStyling = !playerAIsFunding ? "funding-off deploy-container" : 'deploy-container';
@@ -44,7 +44,7 @@ export default class FundingInProgress extends React.PureComponent<Props> {
         </div>
         <div className="transfer-container">
           <div className={deployStyling}>
-            <img className="deploy-icon" src={this.getIcon(deployStatus, !playerAIsFunding)} />
+            <img className="deploy-icon" src={this.getIcon(deployStatus,!playerAIsFunding)} />
             <div className="deploy-title">{deployTitle}</div>
             <div className="deploy-amount">Amount {web3Utils.fromWei(amount, 'ether')} ETH</div>
             {player === 0 && playerAIsFunding && <div >Check your wallet to the right to confirm the deposit amount is correct.</div>}
