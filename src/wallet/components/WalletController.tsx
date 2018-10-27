@@ -47,7 +47,7 @@ export default class WalletController extends PureComponent<Props> {
     if (challengeState != null) {
       switch (challengeState.status) {
         case ChallengeStatus.WaitingForUserSelection:
-          return (<ChallengeResponse expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} respondWithAlternativeMove={this.props.respondWithAlternativeMove} refute={this.props.refute} conclude={this.props.conclude} />);
+          return (<ChallengeResponse loginDisplayName={loginDisplayName} expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} respondWithAlternativeMove={this.props.respondWithAlternativeMove} refute={this.props.refute} conclude={this.props.conclude} />);
         case ChallengeStatus.WaitingOnOtherPlayer:
         const parsedExpiryDate = new Date(challengeState.expirationTime * 1000).toLocaleDateString();
         const waitForPlayerContent = <div><p>Your challenge has been issued.</p>
