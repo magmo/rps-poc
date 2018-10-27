@@ -200,7 +200,7 @@ export default class WalletController extends PureComponent<Props> {
     return <Sidebar
       sidebar={this.renderWallet()}
       open={this.props.showWallet}
-      styles={{ sidebar: { width: "30%", background: "#f3f3f3" } }}
+      styles={{ sidebar: { width: "25%", background: "#f3f3f3" } }}
     >
       {this.props.children}
     </Sidebar>;
