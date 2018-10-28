@@ -35,41 +35,42 @@ export default function* openGameSaga() {
       }
     }
 
+    const address: string = yield select(getWalletAddress);
+    const myOpenGameKey = `/challenges/${address}`;
+
     if (gameState.name === StateName.WaitingRoom) {
+      if (!address) {
+        // if we don't have a wallet address, something's gone very wrong
+        break;
+      }
+
       // need to make sure our open game is on firebase when we're in the waiting room
-      const address: string = yield select(getWalletAddress);
 
-      // if we don't have a wallet address, something's gone very wrong
-      if (address) {
-        const myOpenGameKey = `/challenges/${address}`;
+      if (!myGameIsOnFirebase) {
+        // my game isn't on firebase (as far as the app knows)
+        // attempt to put the game on firebase - will be a no-op if already there
 
-        if (!myGameIsOnFirebase) {
-          // my game isn't on firebase (as far as the app knows)
-          // attempt to put the game on firebase - will be a no-op if already there
+        const myOpenGame = {
+          address,
+          name: gameState.myName,
+          stake: gameState.roundBuyIn.toString(),
+          createdAt: new Date().getTime(),
+          isPublic: true,
+        };
 
-          const myOpenGame = {
-            address,
-            name: gameState.myName,
-            stake: gameState.roundBuyIn.toString(),
-            createdAt: new Date().getTime(),
-            isPublic: true,
-          };
+        const disconnect = firebase.database().ref(myOpenGameKey).onDisconnect();
+        yield apply(disconnect, disconnect.remove);
+        // use update to allow us to pick our own key
+        yield call(reduxSagaFirebase.database.update, myOpenGameKey, myOpenGame);
+        myGameIsOnFirebase = true;
+      }
+    } else if (gameState.name === StateName.Lobby) {
+      if (myGameIsOnFirebase) {
+        // my game is on firebase (as far as the app remember)
+        // attempt to delete the game - will be a no-op if not there
 
-          const disconnect = firebase.database().ref(myOpenGameKey).onDisconnect();
-          yield apply(disconnect, disconnect.remove);
-          // use update to allow us to pick our own key
-          yield call(reduxSagaFirebase.database.update, myOpenGameKey, myOpenGame);
-          myGameIsOnFirebase = true;
-        } else {
-          if (myGameIsOnFirebase) {
-            // my game is on firebase (as far as the app remember)
-            // attempt to delete the game - will be a no-op if not there
-
-            yield call(reduxSagaFirebase.database.delete, myOpenGameKey);
-            myGameIsOnFirebase = false;
-          }
-        }
-
+        yield call(reduxSagaFirebase.database.delete, myOpenGameKey);
+        myGameIsOnFirebase = false;
       }
     }
   }
