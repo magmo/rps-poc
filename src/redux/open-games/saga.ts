@@ -1,7 +1,7 @@
 import { fork, take, select, cancel, call, apply } from 'redux-saga/effects';
 
-export const getGameState = (storeObj:any) => storeObj.game.gameState;
-export const getWalletAddress = (storeObj:any) => storeObj.wallet.address;
+export const getGameState = (storeObj: any) => storeObj.game.gameState;
+export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
 
 import { default as firebase, reduxSagaFirebase } from '../../gateways/firebase';
 
@@ -10,16 +10,17 @@ import bnToHex from '../../utils/bnToHex';
 
 import BN from 'bn.js';
 import { StateName, GameState } from '../game/state';
+import * as gameActions from '../game/actions';
 
 
 export default function* openGameSaga() {
   // could be more efficient by only watching actions that could change the state
   // this is more robust though, so stick to watching all actions for the time being
-  let openGameSyncerProcess:any = null;
+  let openGameSyncerProcess: any = null;
   let myGameIsOnFirebase = false;
 
   while (true) {
-    yield take('*');
+    const action = yield take('*');
 
     const gameState: GameState = yield select(getGameState);
 
@@ -34,11 +35,17 @@ export default function* openGameSaga() {
         yield cancel(openGameSyncerProcess);
       }
     }
+    // If the user just deleted a game and came back to the lobby
+    // we need to remove it from the list of open challenges
+    if (action.type === gameActions.CANCEL_OPEN_GAME) {
+      const address: string = yield select(getWalletAddress);
+      const myOpenGameKey = `/challenges/${address}`;
+      yield call(reduxSagaFirebase.database.delete, myOpenGameKey);
+    }
 
     if (gameState.name === StateName.WaitingRoom) {
       // need to make sure our open game is on firebase when we're in the waiting room
       const address: string = yield select(getWalletAddress);
-
       // if we don't have a wallet address, something's gone very wrong
       if (address) {
         const myOpenGameKey = `/challenges/${address}`;
