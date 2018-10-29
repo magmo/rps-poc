@@ -32,7 +32,7 @@ export default class ProfilePage extends React.PureComponent<Props, State> {
     if (name === "") {
       nameErrorMessage = "Please enter a name";
     }
-    if (!/^[a-zA-Z0-9]*$/.test(name)) {
+    if (!/^[a-zA-Z0-9 ]*$/.test(name)) {
       nameErrorMessage = "Please use only alphanumeric characters for your name";
     }
     if (name.length>20){
