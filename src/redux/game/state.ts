@@ -28,7 +28,7 @@ export enum StateName {
 }
 
 export interface NoName {
-  name: StateName.NoName,
+  name: StateName.NoName;
   libraryAddress: string;
   myAddress: string;
 }

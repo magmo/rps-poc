@@ -8,11 +8,10 @@ import { SiteState } from '../redux/reducer';
 
 const mapStateToProps = (state: SiteState) => {
   const name = ('myName' in state.game.gameState) ? state.game.gameState.myName : "";
-
   return {
     showRules: state.rules.visible,
     loginDisplayName: name,
-  }
+  };
 };
 
 const mapDispatchToProps = {

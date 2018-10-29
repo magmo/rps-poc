@@ -112,7 +112,7 @@ function noNameReducer(gameState: states.NoName, messageState: MessageState, act
       const { myAddress, libraryAddress } = gameState;
 
       const lobby = states.lobby({
-        ...action, myName: name, myAddress, libraryAddress, twitterHandle
+        ...action, myName: name, myAddress, libraryAddress, twitterHandle,
       });
       return { gameState: lobby, messageState };
     default:
@@ -134,7 +134,7 @@ function lobbyReducer(gameState: states.Lobby, messageState: MessageState, actio
       const stateCount = 1;
 
       const waitForConfirmationState = states.waitForGameConfirmationA({
-        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle
+        ...action, myName, balances, participants, turnNum, stateCount, libraryAddress, twitterHandle,
       });
       messageState = sendMessage(positions.preFundSetupA(waitForConfirmationState), opponentAddress, messageState);
       return { gameState: waitForConfirmationState, messageState };
