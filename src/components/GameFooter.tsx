@@ -12,7 +12,7 @@ export default class GameFooter extends React.PureComponent<Props> {
   render() {
     const { resign, createBlockchainChallenge } = this.props;
     return (
-      <footer className="footer">
+      <nav className="navbar fixed-bottom navbar-light footer-bar">
         <div className="container">
             <Button className="footer-resign" outline={true} onClick={resign}>
               Resign
@@ -20,11 +20,11 @@ export default class GameFooter extends React.PureComponent<Props> {
             <Button className="footer-challenge" outline={true} onClick={createBlockchainChallenge}>
               Challenge on-chain
             </Button>
-          <div className="float-right">
+          <div className="ml-auto">
             <img src={MAGMO_LOGO} />
           </div>
         </div>
-      </footer>
+      </nav>
     );
   }
 }

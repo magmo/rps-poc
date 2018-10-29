@@ -13,13 +13,14 @@ export const ApplicationLayout = (props) => {
       </div>
 
 
-      <footer className="footer">
+      <nav className="navbar fixed-bottom navbar-light footer-bar">
+
         <div className="container">
-          <div className="float-right">
+          <div className="ml-auto">
             <img src={MAGMO_LOGO} />
           </div>
         </div>
-      </footer>
+      </nav>
     </div>
   );
 };
