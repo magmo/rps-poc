@@ -44,7 +44,8 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
 };
 
 function attemptRetry(state: JointState): JointState {
-  let { messageState, gameState } = state;
+  const { gameState } = state;
+  let { messageState } = state;
 
   const actionToRetry = messageState.actionToRetry;
   if (actionToRetry) {
