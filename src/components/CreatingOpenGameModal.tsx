@@ -24,7 +24,9 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
     this.state = { validBuyIn: false, buyIn: "", buyInChanged: false };
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
     this.handleBuyInChange = this.handleBuyInChange.bind(this);
+    this.modalClosed = this.modalClosed.bind(this);
   }
+
   handleBuyInChange(e) {
     const buyIn = Number(e.target.value);
     let validBuyIn = true;
@@ -43,9 +45,14 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
     }
   }
 
+  modalClosed() {
+    this.setState({ validBuyIn: false, buyIn: "", buyInChanged: false });
+    this.props.cancelOpenGame();
+  }
+
   render() {
     return (
-      <Modal className="cog-container" toggle={this.props.cancelOpenGame} isOpen={this.props.visible} centered={true}>
+      <Modal className="cog-container" toggle={this.modalClosed} isOpen={this.props.visible} centered={true}>
         <ModalHeader className="rules-header">
           Create A Game
       </ModalHeader>
@@ -71,7 +78,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                 <small className="form-text text-danger">
                   {
                     this.state.buyIn === "" ? "Please enter a buy-in amount" :
-                    `Invalid buy in amount ${this.state.buyIn}. Please enter an amount between ${MIN_BUYIN} and ${MAX_BUYIN}`
+                      `Invalid buy in amount ${this.state.buyIn}. Please enter an amount between ${MIN_BUYIN} and ${MAX_BUYIN}`
                   }
                 </small>
               }
