@@ -13,7 +13,7 @@ interface Props {
 interface State {
   validBuyIn: boolean;
   buyIn: string;
-  showError: boolean;
+  buyInChanged: boolean;
 }
 const MIN_BUYIN = 0.001;
 const MAX_BUYIN = 1;
@@ -21,7 +21,7 @@ const MAX_BUYIN = 1;
 export default class CreatingOpenGameModal extends React.PureComponent<Props, State> {
   constructor(props) {
     super(props);
-    this.state = { validBuyIn: false, buyIn: "", showError: false };
+    this.state = { validBuyIn: false, buyIn: "", buyInChanged: false };
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
     this.handleBuyInChange = this.handleBuyInChange.bind(this);
   }
@@ -31,7 +31,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
     if (buyIn < MIN_BUYIN || buyIn > MAX_BUYIN) {
       validBuyIn = false;
     }
-    this.setState({ validBuyIn, buyIn: e.target.value, showError: false });
+    this.setState({ validBuyIn, buyIn: e.target.value, buyInChanged: true });
   }
 
   createOpenGameHandler(e) {
@@ -39,7 +39,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
     if (this.state.validBuyIn) {
       this.props.createOpenGame(web3Utils.toWei(this.state.buyIn, 'ether'));
     } else {
-      this.setState({ showError: true });
+      this.setState({ buyInChanged: true });
     }
   }
 
@@ -67,7 +67,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                   `Please enter an amount between ${MIN_BUYIN} and ${MAX_BUYIN}`
                 }
               </small>
-              {!this.state.validBuyIn && this.state.showError &&
+              {!this.state.validBuyIn && this.state.buyInChanged &&
                 <small className="form-text text-danger">
                   {
                     this.state.buyIn === "" ? "Please enter a buy-in amount" :
@@ -80,7 +80,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                 This will be 20% of the total buy in amount.
             </small>
             </div>
-            <Button className="cog-button" type="submit" block={true}>
+            <Button className="cog-button" type="submit" disabled={!this.state.validBuyIn} block={true}>
               Create Game
           </Button>
           </form>
