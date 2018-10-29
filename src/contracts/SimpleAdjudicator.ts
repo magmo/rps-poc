@@ -54,7 +54,7 @@ async function verifyContractDeployed(address){
   let code = await connectWeb3().eth.getCode(address);
   let delayAmount = 100;
   while ((code === '' || code === '0x') && delayAmount < 5000) {
-    delay(delayAmount);
+    await delay(delayAmount);
     delayAmount *= 2;
     code = await web3.eth.getCode(address);
   }
