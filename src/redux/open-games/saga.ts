@@ -64,7 +64,7 @@ export default function* openGameSaga() {
         yield call(reduxSagaFirebase.database.update, myOpenGameKey, myOpenGame);
         myGameIsOnFirebase = true;
       }
-    } else if (gameState.name === StateName.Lobby) {
+    } else {
       if (myGameIsOnFirebase) {
         // my game is on firebase (as far as the app remember)
         // attempt to delete the game - will be a no-op if not there
