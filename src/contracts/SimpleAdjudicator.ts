@@ -40,7 +40,7 @@ export async function deploySimpleAdjudicator({ channelId, amount }: { channelId
 
   const tx = web3Contract.deploy({
     data: contractBytecode,
-    arguments: [channelId],
+    arguments: [channelId, CHALLENGE_DURATION_MINUTES],
   });
 
   const deployedContract = await tx.send({ from: connectedWeb3.eth.defaultAccount, value: amount.toString() });
@@ -52,6 +52,8 @@ export async function simpleAdjudicatorAt({ address, amount } : { address: strin
   const truffleContract = await setupContract(connectWeb3());
   return await truffleContract.at(address, { value: amount.toString() });
 }
+
+const CHALLENGE_DURATION_MINUTES = 2;
 
 async function setupContract(connectedWeb3) {
   const simpleAdjudicatorContract = contract(simpleAdjudicatorArtifact);
