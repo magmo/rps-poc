@@ -25,6 +25,12 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
   }
 
+  componentDidUpdate() {
+    if (this.buyinInput.current) {
+      this.buyinInput.current.focus();
+    }
+  }
+
   createOpenGameHandler(e) {
     e.preventDefault();
     const buyin = Number(this.buyinInput.current.value);
@@ -47,7 +53,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
 
   render() {
     return (
-      <Modal className="cog-container" toggle={this.props.cancelOpenGame} isOpen={this.props.visible} centered={true}>
+    <Modal className="cog-container" toggle={this.props.cancelOpenGame} isOpen={this.props.visible} centered={true}>
       <ModalHeader className="rules-header">
         Create A Game
       </ModalHeader>
@@ -55,14 +61,17 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
       <ModalBody>
         <form className="cog-form" onSubmit={e => this.createOpenGameHandler(e)}>
           <div className="form-group">
-            <label htmlFor="buyin">Enter Buy In Amount</label>
-            <input
-              className="form-control"
-              name="buyin"
-              id="buyin"
-              placeholder="ETH"
-              ref={this.buyinInput}
-            />
+            <label htmlFor="buyin">Enter Game Buy In Amount</label>
+            <div className="cog-input-group">
+              <input
+                className="cog-input form-control"
+                name="buyin"
+                id="buyin"
+                ref={this.buyinInput}
+                autoFocus={true}
+              />
+              <div>ETH</div>
+            </div>
             <small className="form-text text-muted">
             {
               this.invalidBuyin
@@ -70,7 +79,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props> {
               : `Please enter an amount between ${MIN_BUYIN} and ${MAX_BUYIN}`
             }
             </small>
-            <div className="mt-2">Wage Per Round:</div>
+            <div className="mt-2">Round Buy In:</div>
             <small className="form-text text-muted">
               This will be 20% of the total buy in amount.
             </small>
