@@ -19,8 +19,11 @@ const MIN_BUYIN = 0.001;
 const MAX_BUYIN = 1;
 
 export default class CreatingOpenGameModal extends React.PureComponent<Props, State> {
+  buyInInput: any;
+
   constructor(props) {
     super(props);
+    this.buyInInput = React.createRef();
     this.state = { validBuyIn: false, buyIn: "", buyInChanged: false };
     this.createOpenGameHandler = this.createOpenGameHandler.bind(this);
     this.handleBuyInChange = this.handleBuyInChange.bind(this);
@@ -36,11 +39,11 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
     this.setState({ validBuyIn, buyIn: e.target.value, buyInChanged: true });
   }
 
-  /*componentDidUpdate() {
-    if (this.buyinInput.current) {
-      this.buyinInput.current.focus();
+  componentDidUpdate() {
+    if (this.buyInInput.current) {
+      this.buyInInput.current.focus();
     }
-  }*/
+  }
 
   createOpenGameHandler(e) {
     e.preventDefault();
@@ -73,6 +76,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                   name="buyin"
                   id="buyin"
                   value={this.state.buyIn}
+                  ref={this.buyInInput}
                   onChange={e => this.handleBuyInChange(e)}
                 />
                 <div>ETH</div>
