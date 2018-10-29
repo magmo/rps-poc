@@ -98,18 +98,18 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                 <small className="form-text text-danger">
                   {
                     this.state.buyIn === "" ? "Please enter a buy-in amount" :
-                      `Invalid buy in amount ${this.state.buyIn}. Please enter an amount between ${MIN_BUYIN} and ${MAX_BUYIN}`
+                      `Invalid game buy in amount ${this.state.buyIn}. Please enter an amount between ${MIN_BUYIN} and ${MAX_BUYIN}`
                   }
                 </small>
               }
               <div className="mt-2">Round Buy In: {this.calculateRoundBuyIn()}</div>
               <small className="form-text text-muted">
-                This is 20% of the total buy in amount.
+                This is 20% of the game buy in amount.
               </small>
             </div>
             <Button className="cog-button" type="submit" disabled={!this.state.validBuyIn} block={true}>
               Create Game
-          </Button>
+            </Button>
           </form>
         </ModalBody>
       </Modal>
