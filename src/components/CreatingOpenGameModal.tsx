@@ -105,7 +105,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                 {this.state.errorMessage}
               </small>
 
-             <div className="mt-2">Round Buy In: {this.calculateRoundBuyIn()}</div>
+              <div className="mt-2">Round Buy In:</div>
               <small className="form-text text-muted">
                 This is 20% of the total buy in amount.
               </small>
