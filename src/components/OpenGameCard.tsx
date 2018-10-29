@@ -27,8 +27,8 @@ export class OpenGameEntry extends React.PureComponent<Props, State> {
       5,
       openGame.stake);
 
-    const stake = openGame.stake;
-    const buyin = bnToHex(hexToBN(openGame.stake).mul(new BN(5)));
+    const stake = bnToHex(hexToBN(openGame.stake).div(new BN(5)));
+    const buyin = openGame.stake;
     return (
       <div className="ogc-container m-1">
         <div className="ogc-header">
