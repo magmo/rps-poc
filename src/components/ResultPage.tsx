@@ -59,6 +59,7 @@ export default class ResultPage extends React.PureComponent<Props> {
           <Button className="cog-button" onClick={playAgain}>
             Play again
           </Button>
+          <div> {this.props.message} </div>
         </div>
       </GameLayout>
     );
