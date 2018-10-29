@@ -72,7 +72,7 @@ export async function simpleAdjudicatorAt({ address, amount }: { address: string
   return await truffleContract.at(address, { value: amount.toString() });
 }
 
-const CHALLENGE_DURATION_MINUTES = 2;
+const CHALLENGE_DURATION_MINUTES = 1;
 
 async function setupContract(connectedWeb3) {
   const simpleAdjudicatorContract = contract(simpleAdjudicatorArtifact);
