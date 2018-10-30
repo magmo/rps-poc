@@ -7,7 +7,7 @@ import { ConclusionProof } from '../../domain/ConclusionProof';
 import * as blockchainActions from '../actions/blockchain';
 import { deploySimpleAdjudicator, simpleAdjudicatorAt } from '../../../contracts/SimpleAdjudicator';
 import * as externalActions from '../actions/external';
-import { Signature } from 'src/wallet/domain';
+import { Signature } from '../../../wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
