@@ -10,7 +10,7 @@ import * as externalActions from '../actions/external';
 import { Signature } from 'src/wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
-import ChannelWallet from 'src/wallet/domain/ChannelWallet';
+import ChannelWallet from '../../../wallet/domain/ChannelWallet';
 
 
 export function* blockchainSaga(wallet) {
