@@ -12,7 +12,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   padding-top: 40px;
-  padding-bottom: $navbar-height;
+  margin-bottom: $navbar-height;
 }
 
 .game-container {
