@@ -1,9 +1,8 @@
 @import "./_colors";
-@import "./dimensions";
 
 .navbar {
     background-color: $rps-dark-blue;
-    height: $navbar-height;
+    height: 70px;
 }
 
 .navbar-button {
