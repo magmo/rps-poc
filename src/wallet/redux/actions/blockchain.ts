@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import { State } from 'fmg-core';
 import { ChallengeProof } from '../../domain/ChallengeProof';
-import { Signature } from 'src/wallet/domain/Signature';
+import { Signature } from '../../../wallet/domain/Signature';
 
 
 export type DeploymentRequest = ReturnType<typeof deploymentRequest>;
