@@ -79,7 +79,7 @@ function* challengeExpirer(expirationTime){
   // TODO: This is hack and needs to be replaced properly
   yield take(blockchainActions.WITHDRAW_SUCCESS);
   yield put(displayActions.hideWallet());
-  yield put(gameActions.resign());
+  yield put(gameActions.exitToLobby());
 }
 
 
