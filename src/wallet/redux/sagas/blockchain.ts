@@ -1,17 +1,17 @@
 import { take, put, actionChannel, call, fork, cancel, spawn } from 'redux-saga/effects';
-// @ts-ignore
-import simpleAdjudicatorArtifact from 'fmg-simple-adjudicator/contracts/SimpleAdjudicator.sol';
+import { utils, ethers } from 'ethers';
+
 import { eventChannel } from 'redux-saga';
 
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import * as blockchainActions from '../actions/blockchain';
-import { deploySimpleAdjudicator, simpleAdjudicatorAt } from '../../../contracts/SimpleAdjudicator';
+import { simpleAdjudicatorAt } from '../../../contracts/SimpleAdjudicator';
 import * as externalActions from '../actions/external';
 import { Signature } from '../../../wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
-
+import { deployableFactory } from 'src/contracts/SA_ethers';
 
 export function* blockchainSaga(wallet) {
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
@@ -38,7 +38,11 @@ function* contractSetup() {
       case blockchainActions.DEPLOY_REQUEST: // Player A
         try {
           const { channelId, amount } = action;
-          const deployedContract = yield call(deploySimpleAdjudicator, { channelId, amount });
+          // const deployedContract = yield call(deploySimpleAdjudicator, { channelId, amount });
+          const factory = yield call(deployableFactory);
+          console.log(amount, ethers, factory);
+          const value = utils.parseEther(utils.formatEther(amount.toString()));
+          const deployedContract = yield factory.deploy(channelId, 2, { value });
 
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
           // TODO: This should probably move out of this scope
