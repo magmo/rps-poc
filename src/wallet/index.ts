@@ -10,4 +10,4 @@ export interface Wallet {
 export { actions, WalletController };
 
 export { walletSaga } from './redux/sagas/wallet';
-export { walletReducer, Wallet as WalletState } from './redux/reducers/wallet';
+export { walletReducer, WalletState } from './redux/reducers';

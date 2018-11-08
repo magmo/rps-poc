@@ -7,7 +7,7 @@ import * as blockchainActions from '../redux/actions/blockchain';
 
 const mapStateToProps = (state: SiteState) => {
   return {
-    walletState: state.wallet.walletState,
+    channelState: state.wallet.channelState,
     challengeState: state.wallet.challenge,
     showWallet: state.wallet.display.showWallet,
     loginDisplayName: ('myName' in state.game.gameState) ? state.game.gameState.myName : "",

@@ -8,7 +8,7 @@ import * as playerB from '../wallet-engine/wallet-states/PlayerB';
 import * as CommonState from '../wallet-engine/wallet-states';
 import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire, Funded, ConfirmWithdrawal, } from '../wallet-engine/wallet-states';
 
-import { WalletState } from '../redux/reducers/wallet-state';
+import { ChannelState } from '../redux/reducers/channel';
 import { ChallengeState } from '../redux/reducers/challenge';
 
 import FundingInProgress, { BlockchainStatus } from './FundingInProgress';
@@ -24,7 +24,7 @@ import ChallengeExpired from './ChallengeExpired';
 
 interface Props {
   showWallet: boolean;
-  walletState: WalletState;
+  channelState: ChannelState;
   challengeState: ChallengeState;
   loginDisplayName: string;
   userAddress:string;
@@ -42,8 +42,8 @@ interface Props {
 }
 export default class WalletController extends PureComponent<Props> {
   renderWallet() {
-    const { walletState, challengeState, loginDisplayName, closeWallet, approveWithdrawal } = this.props;
-    if (walletState === null) {
+    const { channelState, challengeState, loginDisplayName, closeWallet, approveWithdrawal } = this.props;
+    if (channelState === null) {
       return <div />;
     }
 
@@ -69,13 +69,13 @@ export default class WalletController extends PureComponent<Props> {
       }
     }
 
-    switch (walletState && walletState.constructor) {
+    switch (channelState && channelState.constructor) {
       case FundingFailed:
         // TODO: Figure out why we have to do this
-        if (walletState instanceof FundingFailed) {
+        if (channelState instanceof FundingFailed) {
           return (
             <FundingError
-              message={(walletState as FundingFailed).message}
+              message={(channelState as FundingFailed).message}
               tryAgain={this.props.tryFundingAgain}
             />
           );
@@ -84,20 +84,20 @@ export default class WalletController extends PureComponent<Props> {
         return <WithdrawInProgress
           loginDisplayName={loginDisplayName}
           withdrawStatus={BlockchainStatus.Completed}
-          amount={(walletState as CommonState.WithdrawalComplete).withdrawalAmount}
+          amount={(channelState as CommonState.WithdrawalComplete).withdrawalAmount}
           exitGame={closeWallet}
         />;
       case WaitForWithdrawal:
         return <WithdrawInProgress
           loginDisplayName={loginDisplayName}
           withdrawStatus={BlockchainStatus.InProgress}
-          amount={(walletState as CommonState.WaitForWithdrawal).withdrawalAmount}
+          amount={(channelState as CommonState.WaitForWithdrawal).withdrawalAmount}
         />;
       case SelectWithdrawalAddress:
         return <WithdrawInProgress
           loginDisplayName={loginDisplayName}
           withdrawStatus={BlockchainStatus.NotStarted}
-          amount={(walletState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
+          amount={(channelState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
         />;
       case ConfirmWithdrawal:
         const withdrawalContent = <div><p>This State Stash wallet enables you to quickly withdraw your funds.</p>
@@ -117,7 +117,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.NotStarted}
           depositStatus={BlockchainStatus.NotStarted}
           player={0}
-          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+          amount={(channelState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
       case playerA.Funded:
         return <FundingInProgress
@@ -125,7 +125,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.Completed}
           player={0}
-          amount={(walletState as Funded).myBalance}
+          amount={(channelState as Funded).myBalance}
           returnToGame={closeWallet}
         />;
       case playerB.Funded:
@@ -134,7 +134,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.Completed}
           player={1}
-          amount={(walletState as Funded).myBalance}
+          amount={(channelState as Funded).myBalance}
           returnToGame={closeWallet}
 
         />;
@@ -144,7 +144,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.InProgress}
           depositStatus={BlockchainStatus.NotStarted}
           player={0}
-          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+          amount={(channelState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
       case playerA.WaitForBToDeposit:
         return <FundingInProgress
@@ -152,7 +152,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.InProgress}
           player={0}
-          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+          amount={(channelState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
       case playerB.WaitForAToDeploy:
         return <FundingInProgress
@@ -160,7 +160,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.NotStarted}
           depositStatus={BlockchainStatus.NotStarted}
           player={1}
-          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+          amount={(channelState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
       case playerB.ReadyToDeposit:
         return <FundingInProgress
@@ -168,7 +168,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.NotStarted}
           player={1}
-          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+          amount={(channelState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
       case playerB.WaitForBlockchainDeposit:
         return <FundingInProgress
@@ -176,7 +176,7 @@ export default class WalletController extends PureComponent<Props> {
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.InProgress}
           player={1}
-          amount={(walletState as playerA.WaitForBlockchainDeploy).myBalance}
+          amount={(channelState as playerA.WaitForBlockchainDeploy).myBalance}
         />;
       case WaitForApproval:
       case playerB.WaitForApprovalWithAdjudicator:
