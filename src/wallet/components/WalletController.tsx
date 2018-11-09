@@ -21,6 +21,7 @@ import WalletWithdrawalWelcome from './WalletWithdrawalWelcome';
 import WithdrawInProgress from './WithdrawInProgress';
 import WalletMessage from './WalletMessage';
 import ChallengeExpired from './ChallengeExpired';
+import ChallengeIssued from './ChallengeIssued';
 
 interface Props {
   showWallet: boolean;
@@ -65,10 +66,7 @@ export default class WalletController extends PureComponent<Props> {
               />
             );
           case ChallengeStatus.WaitingOnOtherPlayer:
-            const parsedExpiryDateTime = new Date(challengeState.expirationTime * 1000).toLocaleTimeString();
-            const waitForPlayerContent = <div><p>Your challenge has been issued.</p>
-              <p>The game will automatically conclude by {parsedExpiryDateTime} if no action is taken.</p></div>;
-            return (<WalletMessage loginDisplayName={loginDisplayName} content={waitForPlayerContent} title="Challenge Issued" />);
+            return <ChallengeIssued expirationTime={challengeState.expirationTime} loginDisplayName={loginDisplayName} />;
           case ChallengeStatus.WaitingForCreateChallenge:
             const waitForCreateContent = <div>Waiting for the challenge transaction to be recorded.</div>;
             return <WalletMessage loginDisplayName={loginDisplayName} title="Waiting for challenge creation" content={waitForCreateContent} />;
