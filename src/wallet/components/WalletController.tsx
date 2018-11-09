@@ -53,7 +53,17 @@ export default class WalletController extends PureComponent<Props> {
       } else {
         switch (challengeState.status) {
           case ChallengeStatus.WaitingForUserSelection:
-            return (<ChallengeResponse loginDisplayName={loginDisplayName} expiryTime={challengeState.expirationTime} responseOptions={challengeState.responseOptions} respondWithMove={this.props.respondWithMove} respondWithAlternativeMove={this.props.respondWithAlternativeMove} refute={this.props.refute} conclude={this.props.conclude} />);
+            return (
+              <ChallengeResponse
+                loginDisplayName={loginDisplayName}
+                expiryTime={challengeState.expirationTime}
+                responseOptions={challengeState.responseOptions}
+                respondWithMove={this.props.respondWithMove}
+                respondWithAlternativeMove={this.props.respondWithAlternativeMove}
+                refute={this.props.refute}
+                conclude={this.props.conclude}
+              />
+            );
           case ChallengeStatus.WaitingOnOtherPlayer:
             const parsedExpiryDateTime = new Date(challengeState.expirationTime * 1000).toLocaleTimeString();
             const waitForPlayerContent = <div><p>Your challenge has been issued.</p>
@@ -100,13 +110,7 @@ export default class WalletController extends PureComponent<Props> {
           amount={(channelState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
         />;
       case ConfirmWithdrawal:
-        const withdrawalContent = <div><p>This State Stash wallet enables you to quickly withdraw your funds.</p>
-          <p>We’ll guide you through a few simple steps to get it setup and your ETH transferred.</p></div>;
-        return <WalletWithdrawalWelcome
-          title="Withdraw with the State Stash Wallet"
-          content={withdrawalContent}
-          approve={approveWithdrawal}
-        />;
+        return <WalletWithdrawalWelcome approve={approveWithdrawal} />;
       case ChallengeRequested:
         return <div>Waiting for challenge</div>;
       case WaitForChallengeConcludeOrExpire:
