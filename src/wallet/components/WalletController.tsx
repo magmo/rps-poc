@@ -19,9 +19,10 @@ import Sidebar from 'react-sidebar';
 import WalletWelcome from './WalletWelcome';
 import WalletWithdrawalWelcome from './WalletWithdrawalWelcome';
 import WithdrawInProgress from './WithdrawInProgress';
-import WalletMessage from './WalletMessage';
 import ChallengeExpired from './ChallengeExpired';
 import ChallengeIssued from './ChallengeIssued';
+import WaitForChallengeConfirmation from './WaitForChallengeConfirmation';
+import WaitForResponseConfirmation from './WaitForResponseConfirmation';
 
 interface Props {
   showWallet: boolean;
@@ -68,11 +69,9 @@ export default class WalletController extends PureComponent<Props> {
           case ChallengeStatus.WaitingOnOtherPlayer:
             return <ChallengeIssued expirationTime={challengeState.expirationTime} loginDisplayName={loginDisplayName} />;
           case ChallengeStatus.WaitingForCreateChallenge:
-            const waitForCreateContent = <div>Waiting for the challenge transaction to be recorded.</div>;
-            return <WalletMessage loginDisplayName={loginDisplayName} title="Waiting for challenge creation" content={waitForCreateContent} />;
+            return <WaitForChallengeConfirmation />;
           case ChallengeStatus.WaitingForConcludeChallenge:
-            const waitForConcludeContent = <div>Waiting for the challenge to conclude</div>;
-            return <WalletMessage loginDisplayName={loginDisplayName} title="Waiting for challenge to conclude" content={waitForConcludeContent} />;
+            return <WaitForResponseConfirmation />;
         }
       }
     }
