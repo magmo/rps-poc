@@ -1,35 +1,36 @@
 import React from 'react';
-import { PureComponent } from 'react';
 
-import { ChallengeStatus, Signature, ConclusionProof } from '../domain';
+import { SiteState } from '../../redux/reducer';
+import { connect } from 'react-redux';
+import * as playerActions from '../redux/actions/player';
+import * as challengeActions from '../redux/actions/challenge';
+import * as blockchainActions from '../redux/actions/blockchain';
+import { WalletState } from '../redux/reducers';
+
 
 import * as playerA from '../wallet-engine/wallet-states/PlayerA';
 import * as playerB from '../wallet-engine/wallet-states/PlayerB';
 import * as CommonState from '../wallet-engine/wallet-states';
 import { FundingFailed, WaitForApproval, SelectWithdrawalAddress, WaitForWithdrawal, ChallengeRequested, WaitForChallengeConcludeOrExpire, Funded, ConfirmWithdrawal, } from '../wallet-engine/wallet-states';
 
-import { ChannelState } from '../redux/reducers/channel';
-import { ChallengeState } from '../redux/reducers/challenge';
+import FundingInProgress, { BlockchainStatus } from '../components/FundingInProgress';
+import FundingError from '../components/FundingError';
 
-import FundingInProgress, { BlockchainStatus } from './FundingInProgress';
-import FundingError from './FundingError';
+import ChallengeResponse from '../components/ChallengeResponse';
+import WalletWelcome from '../components/WalletWelcome';
+import WalletWithdrawalWelcome from '../components/WalletWithdrawalWelcome';
+import WithdrawInProgress from '../components/WithdrawInProgress';
+import ChallengeExpired from '../components/ChallengeExpired';
+import ChallengeIssued from '../components/ChallengeIssued';
+import WaitForChallengeConfirmation from '../components/WaitForChallengeConfirmation';
+import WaitForResponseConfirmation from '../components/WaitForResponseConfirmation';
 
-import ChallengeResponse from './ChallengeResponse';
-import Sidebar from 'react-sidebar';
-import WalletWelcome from './WalletWelcome';
-import WalletWithdrawalWelcome from './WalletWithdrawalWelcome';
-import WithdrawInProgress from './WithdrawInProgress';
-import ChallengeExpired from './ChallengeExpired';
-import ChallengeIssued from './ChallengeIssued';
-import WaitForChallengeConfirmation from './WaitForChallengeConfirmation';
-import WaitForResponseConfirmation from './WaitForResponseConfirmation';
+import { ChallengeStatus, Signature, ConclusionProof } from '../domain';
 
 interface Props {
-  showWallet: boolean;
-  channelState: ChannelState;
-  challengeState: ChallengeState;
+  state: WalletState;
   loginDisplayName: string;
-  userAddress:string;
+  userAddress: string;
   closeWallet: () => void;
   tryFundingAgain: () => void;
   approveFunding: () => void;
@@ -42,16 +43,19 @@ interface Props {
   conclude: (proof: ConclusionProof) => void;
   withdraw: (address:string) => void;
 }
-export default class WalletController extends PureComponent<Props> {
-  renderWallet() {
-    const { channelState, challengeState, loginDisplayName, closeWallet, approveWithdrawal } = this.props;
+
+
+function WalletContainer(props: Props) {
+    const { state, loginDisplayName, closeWallet, approveWithdrawal } = props;
+    const { channelState, challenge: challengeState } = state;
+
     if (channelState === null) {
       return <div />;
     }
 
     if (challengeState != null) {
       if (challengeState.status === ChallengeStatus.Expired) {
-        return <ChallengeExpired withdraw={()=>this.props.withdraw(this.props.userAddress)} loginDisplayName={loginDisplayName} expiryTime={challengeState.expirationTime} />;
+        return <ChallengeExpired withdraw={()=>props.withdraw(props.userAddress)} loginDisplayName={loginDisplayName} expiryTime={challengeState.expirationTime} />;
       } else {
         switch (challengeState.status) {
           case ChallengeStatus.WaitingForUserSelection:
@@ -60,10 +64,10 @@ export default class WalletController extends PureComponent<Props> {
                 loginDisplayName={loginDisplayName}
                 expiryTime={challengeState.expirationTime}
                 responseOptions={challengeState.responseOptions}
-                respondWithMove={this.props.respondWithMove}
-                respondWithAlternativeMove={this.props.respondWithAlternativeMove}
-                refute={this.props.refute}
-                conclude={this.props.conclude}
+                respondWithMove={props.respondWithMove}
+                respondWithAlternativeMove={props.respondWithAlternativeMove}
+                refute={props.refute}
+                conclude={props.conclude}
               />
             );
           case ChallengeStatus.WaitingOnOtherPlayer:
@@ -83,7 +87,7 @@ export default class WalletController extends PureComponent<Props> {
           return (
             <FundingError
               message={(channelState as FundingFailed).message}
-              tryAgain={this.props.tryFundingAgain}
+              tryAgain={props.tryFundingAgain}
             />
           );
         }
@@ -182,21 +186,37 @@ export default class WalletController extends PureComponent<Props> {
       case WaitForApproval:
       case playerB.WaitForApprovalWithAdjudicator:
         return <WalletWelcome
-          approve={this.props.approveFunding} />;
+          approve={props.approveFunding} />;
       default:
         return <div />;
     }
     return <div />;
-  }
-
-  render() {
-    return <Sidebar
-      sidebar={this.renderWallet()}
-      open={this.props.showWallet}
-      styles={{ sidebar: { width: "450px", zIndex: "1040", background: "#f3f3f3" } }}
-      overlayClassName="wallet-overlay"
-    >
-      {this.props.children}
-    </Sidebar>;
-  }
 }
+
+const mapStateToProps = (state: SiteState) => {
+  return {
+    state: state.wallet,
+    loginDisplayName: ('myName' in state.game.gameState) ? state.game.gameState.myName : "",
+    userAddress: state.wallet.address || "",
+    // TODO: We should store this in the wallet state and get it from there
+  };
+};
+
+const mapDispatchToProps = {
+  tryFundingAgain: playerActions.tryFundingAgain,
+  approveFunding: playerActions.approveFunding,
+  declineFunding: playerActions.declineFunding,
+  approveWithdrawal: playerActions.approveWithdrawal,
+  closeWallet: playerActions.closeWallet,
+  selectWithdrawalAddress: playerActions.selectWithdrawalAddress,
+  respondWithMove: challengeActions.respondWithMove,
+  respondWithAlternativeMove: challengeActions.respondWithAlternativeMove,
+  refute: challengeActions.refute,
+  conclude: challengeActions.conclude,
+  withdraw: blockchainActions.withdrawRequest,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WalletContainer);

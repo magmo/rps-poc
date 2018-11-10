@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { WalletState } from '../redux/reducers';
 import { SiteState } from '../../redux/reducer';
-import WalletContainer from './WalletContainer';
+import WalletContents from './WalletContents';
 import SidebarLayout from '../components/SidebarLayout';
 import FooterLayout from './WalletFooter';
 
@@ -19,16 +19,16 @@ class Wallet extends PureComponent<WalletProps> {
 
     if (showWallet) {
       return (
-        <SidebarLayout contents={<WalletContainer />}>
+        <SidebarLayout contents={<WalletContents />}>
           {this.props.children}
         </SidebarLayout>
-      )
+      );
     } else if (showFooter) {
       return (
         <FooterLayout>
           {this.props.children}
         </FooterLayout>
-      )
+      );
     } else {
       return this.props.children;
     }
