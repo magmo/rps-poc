@@ -29,7 +29,6 @@ import { ChallengeStatus, Signature, ConclusionProof } from '../domain';
 
 interface Props {
   state: WalletState;
-  loginDisplayName: string;
   userAddress: string;
   closeWallet: () => void;
   tryFundingAgain: () => void;
@@ -46,7 +45,7 @@ interface Props {
 
 
 function WalletContainer(props: Props) {
-    const { state, loginDisplayName, closeWallet, approveWithdrawal } = props;
+    const { state, closeWallet, approveWithdrawal } = props;
     const { channelState, challenge: challengeState } = state;
 
     if (channelState === null) {
@@ -55,13 +54,12 @@ function WalletContainer(props: Props) {
 
     if (challengeState != null) {
       if (challengeState.status === ChallengeStatus.Expired) {
-        return <ChallengeExpired withdraw={()=>props.withdraw(props.userAddress)} loginDisplayName={loginDisplayName} expiryTime={challengeState.expirationTime} />;
+        return <ChallengeExpired withdraw={()=>props.withdraw(props.userAddress)} expiryTime={challengeState.expirationTime} />;
       } else {
         switch (challengeState.status) {
           case ChallengeStatus.WaitingForUserSelection:
             return (
               <ChallengeResponse
-                loginDisplayName={loginDisplayName}
                 expiryTime={challengeState.expirationTime}
                 responseOptions={challengeState.responseOptions}
                 respondWithMove={props.respondWithMove}
@@ -71,7 +69,7 @@ function WalletContainer(props: Props) {
               />
             );
           case ChallengeStatus.WaitingOnOtherPlayer:
-            return <ChallengeIssued expirationTime={challengeState.expirationTime} loginDisplayName={loginDisplayName} />;
+            return <ChallengeIssued expirationTime={challengeState.expirationTime} />;
           case ChallengeStatus.WaitingForCreateChallenge:
             return <WaitForChallengeConfirmation />;
           case ChallengeStatus.WaitingForConcludeChallenge:
@@ -93,20 +91,17 @@ function WalletContainer(props: Props) {
         }
       case CommonState.WithdrawalComplete:
         return <WithdrawInProgress
-          loginDisplayName={loginDisplayName}
           withdrawStatus={BlockchainStatus.Completed}
           amount={(channelState as CommonState.WithdrawalComplete).withdrawalAmount}
           exitGame={closeWallet}
         />;
       case WaitForWithdrawal:
         return <WithdrawInProgress
-          loginDisplayName={loginDisplayName}
           withdrawStatus={BlockchainStatus.InProgress}
           amount={(channelState as CommonState.WaitForWithdrawal).withdrawalAmount}
         />;
       case SelectWithdrawalAddress:
         return <WithdrawInProgress
-          loginDisplayName={loginDisplayName}
           withdrawStatus={BlockchainStatus.NotStarted}
           amount={(channelState as CommonState.SelectWithdrawalAddress).withdrawalAmount}
         />;
@@ -118,7 +113,6 @@ function WalletContainer(props: Props) {
         return <div>Waiting for opponent to respond to challenge</div>;
       case playerA.ReadyToDeploy:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.NotStarted}
           depositStatus={BlockchainStatus.NotStarted}
           player={0}
@@ -126,7 +120,6 @@ function WalletContainer(props: Props) {
         />;
       case playerA.Funded:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.Completed}
           player={0}
@@ -135,7 +128,6 @@ function WalletContainer(props: Props) {
         />;
       case playerB.Funded:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.Completed}
           player={1}
@@ -145,7 +137,6 @@ function WalletContainer(props: Props) {
         />;
       case playerA.WaitForBlockchainDeploy:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.InProgress}
           depositStatus={BlockchainStatus.NotStarted}
           player={0}
@@ -153,7 +144,6 @@ function WalletContainer(props: Props) {
         />;
       case playerA.WaitForBToDeposit:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.InProgress}
           player={0}
@@ -161,7 +151,6 @@ function WalletContainer(props: Props) {
         />;
       case playerB.WaitForAToDeploy:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.NotStarted}
           depositStatus={BlockchainStatus.NotStarted}
           player={1}
@@ -169,7 +158,6 @@ function WalletContainer(props: Props) {
         />;
       case playerB.ReadyToDeposit:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.NotStarted}
           player={1}
@@ -177,7 +165,6 @@ function WalletContainer(props: Props) {
         />;
       case playerB.WaitForBlockchainDeposit:
         return <FundingInProgress
-          loginDisplayName={loginDisplayName}
           deployStatus={BlockchainStatus.Completed}
           depositStatus={BlockchainStatus.InProgress}
           player={1}
@@ -196,7 +183,6 @@ function WalletContainer(props: Props) {
 const mapStateToProps = (state: SiteState) => {
   return {
     state: state.wallet,
-    loginDisplayName: ('myName' in state.game.gameState) ? state.game.gameState.myName : "",
     userAddress: state.wallet.address || "",
     // TODO: We should store this in the wallet state and get it from there
   };
