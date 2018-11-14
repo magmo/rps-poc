@@ -1,10 +1,8 @@
 import {
   TwoPositions,
   twoPositions,
-  TwoPositionsParams,
   AdjudicatorExists,
   adjudicatorExists,
-  AdjudicatorExistsParams,
 } from './shared';
 
 // stage
@@ -36,16 +34,16 @@ interface ClosedOnChain extends AdjudicatorExists {
   stage: typeof CLOSING;
 }
 
-export function concluding(params: AdjudicatorExistsParams): Concluding {
+export function concluding<T extends AdjudicatorExists>(params: T): Concluding {
   return { type: CONCLUDING, stage: CLOSING, ...adjudicatorExists(params) };
 }
-export function concluded(params: AdjudicatorExistsParams): Concluded {
+export function concluded<T extends AdjudicatorExists>(params: T): Concluded {
   return { type: CONCLUDED, stage: CLOSING, ...adjudicatorExists(params) };
 }
-export function closed(params: TwoPositionsParams): Closed {
+export function closed<T extends TwoPositions>(params: T): Closed {
   return { type: CLOSED, stage: CLOSING, ...twoPositions(params) };
 }
-export function closedOnChain(params: AdjudicatorExistsParams): ClosedOnChain {
+export function closedOnChain<T extends AdjudicatorExists>(params: T): ClosedOnChain {
   return { type: CLOSED_ON_CHAIN, stage: CLOSING, ...adjudicatorExists(params) };
 }
 

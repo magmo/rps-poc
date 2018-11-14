@@ -1,10 +1,8 @@
 import {
   OnePosition,
   onePosition,
-  OnePositionParams,
   TwoPositions,
   twoPositions,
-  TwoPositionsParams,
 } from './shared';
 
 // stage
@@ -31,10 +29,10 @@ interface ReadyToFund extends TwoPositions {
 }
 
 
-export function preFundSetup(params: OnePositionParams): PreFundSetup {
+export function preFundSetup<T extends OnePosition>(params: T): PreFundSetup {
   return { type: PRE_FUND_SETUP, stage: INITIALIZING, ...onePosition(params) };
 }
-export function readyToFund(params: TwoPositionsParams): ReadyToFund {
+export function readyToFund<T extends TwoPositions>(params: T): ReadyToFund {
   return { type: READY_TO_FUND, stage: INITIALIZING, ...twoPositions(params) };
 }
 

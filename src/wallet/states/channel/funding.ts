@@ -1,6 +1,5 @@
 import {
   TwoPositions,
-  TwoPositionsParams,
   twoPositions,
   AdjudicatorExists,
 } from './shared';
@@ -71,7 +70,7 @@ interface AcknowledgeFundingSuccess extends AdjudicatorExists {
 }
 
 
-export function approveFunding(params: TwoPositionsParams): ApproveFunding {
+export function approveFunding<T extends TwoPositions>(params: T): ApproveFunding {
   return { type: APPROVE_FUNDING, stage: FUNDING, ...twoPositions(params) };
 }
 
