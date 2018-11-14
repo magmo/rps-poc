@@ -5,11 +5,7 @@ export interface Base {
   channelNonce: number;
 }
 
-export interface BaseParams extends Base {
-  [x: string]: any;
-}
-
-export function base(params: BaseParams): Base {
+export function base<T extends Base>(params: T): Base {
   const { channelId, ourIndex, participants, channelNonce } = params;
   return { channelId, ourIndex, participants, channelNonce };
 }
@@ -18,11 +14,7 @@ export interface OnePosition extends Base {
   turnNum: number;
   position0: string;
 }
-export interface OnePositionParams extends BaseParams {
-  turnNum: number;
-  position0: string;
-}
-export function onePosition(params: OnePositionParams): OnePosition {
+export function onePosition<T extends OnePosition>(params: T): OnePosition {
   const { turnNum, position0 } = params;
   return { ...base(params), turnNum, position0 };
 }
@@ -30,20 +22,14 @@ export function onePosition(params: OnePositionParams): OnePosition {
 export interface TwoPositions extends OnePosition {
   position1: string;
 }
-export interface TwoPositionsParams extends OnePositionParams {
-  position1: string;
-}
-export function twoPositions(params: TwoPositionsParams): TwoPositions {
+export function twoPositions<T extends TwoPositions>(params: T): TwoPositions {
   return { ...onePosition(params), position1: params.position1 };
 }
 
 export interface AdjudicatorExists extends TwoPositions {
   adjudicator: string;
 }
-export interface AdjudicatorExistsParams extends TwoPositionsParams {
-  adjudicator: string;
-}
-export function adjudicatorExists(params: AdjudicatorExistsParams): AdjudicatorExists {
-  return { ...twoPositions(params), adjudicator: params.adjudcator };
+export function adjudicatorExists<T extends AdjudicatorExists>(params: T): AdjudicatorExists {
+  return { ...twoPositions(params), adjudicator: params.adjudicator };
 }
 

@@ -1,7 +1,6 @@
 import {
   AdjudicatorExists,
   adjudicatorExists,
-  AdjudicatorExistsParams,
 } from './shared';
 
 // both the stage and the state type. 
@@ -14,8 +13,7 @@ interface Running extends AdjudicatorExists {
 
 }
 
-
-export function running(params: AdjudicatorExistsParams): Running {
+export function running<T extends AdjudicatorExists>(params: T): Running {
   return { type: RUNNING, stage: RUNNING, ...adjudicatorExists(params) };
 }
 
