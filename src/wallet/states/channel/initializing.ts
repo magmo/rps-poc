@@ -7,6 +7,10 @@ import {
   TwoPositionsParams,
 } from './shared';
 
+// stage
+export const INITIALIZING = 'INITIALIZING';
+
+// state type
 export const READY_TO_FUND = 'READY_TO_FUND';
 export const PRE_FUND_SETUP = 'PRE_FUND_SETUP';
 
@@ -16,15 +20,22 @@ export const lifecycleNames = [
 ];
 
 
-interface PreFundSetup extends OnePosition { name: typeof PRE_FUND_SETUP; }
-interface ReadyToFund extends TwoPositions { name: typeof READY_TO_FUND; }
+interface PreFundSetup extends OnePosition {
+  type: typeof PRE_FUND_SETUP;
+  stage: typeof INITIALIZING;
+}
+
+interface ReadyToFund extends TwoPositions {
+  type: typeof READY_TO_FUND;
+  stage: typeof INITIALIZING;
+}
 
 
 export function preFundSetup(params: OnePositionParams): PreFundSetup {
-  return { name: PRE_FUND_SETUP, ...onePosition(params) };
+  return { type: PRE_FUND_SETUP, stage: INITIALIZING, ...onePosition(params) };
 }
 export function readyToFund(params: TwoPositionsParams): ReadyToFund {
-  return { name: READY_TO_FUND, ...twoPositions(params) };
+  return { type: READY_TO_FUND, stage: INITIALIZING, ...twoPositions(params) };
 }
 
 export type InitializingState = (

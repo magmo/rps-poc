@@ -1,19 +1,19 @@
-import { combineReducers } from 'redux';
-import { ChannelState, channelStateReducer } from './channel';
-import { ChallengeState, challengeReducer } from './challenge';
-import { displayReducer, DisplayState } from './display';
-import { AddressState, addressReducer } from './address';
+import { Reducer } from 'redux';
+import { WalletState, initial, INITIALIZING, IDLE, RUNNING } from '../../states/wallet';
+import { channelReducer } from './channel';
 
-export interface WalletState {
-  channelState: ChannelState;
-  challenge: ChallengeState;
-  display: DisplayState;
-  address: AddressState;
-}
+const initialState = initial();
 
-export const walletReducer = combineReducers<WalletState>({
-  channelState: channelStateReducer,
-  challenge: challengeReducer,
-  display: displayReducer,
-  address: addressReducer,
-});
+export const walletReducer: Reducer<WalletState> = (state = initialState, action: any) => {
+  switch (state.type) {
+    case INITIALIZING:
+      return state;
+    case IDLE:
+      return state;
+    case RUNNING:
+      return { ...state, channel: channelReducer(state.channel, action) }
+    default:
+      return state;
+  }
+};
+
