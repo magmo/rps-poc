@@ -1,8 +1,9 @@
+import { AdjudicatorExists } from './shared';
 
-import {
-  AdjudicatorExists
-} from './shared';
+// stage
+export const RESPONDING = 'RESPONDING';
 
+// state types
 export const ACKNOWLEDGE_CHALLENGE = 'ACKNOWLEDGE_CHALLENGE';
 export const CHOOSE_RESPONSE = 'CHOOSE_RESPONSE';
 export const ACKNOWLEDGE_MUST_TAKE_MOVE = 'ACKNOWELDGE_MUST_TAKE_MOVE';
@@ -11,30 +12,36 @@ export const INTIATE_RESPONSE = 'INITIATE_RESPONSE';
 export const WAIT_FOR_RESPONSE_CONFIRMATION = 'WAIT_FOR_RESPONSE_CONFIRMATION';
 
 interface AcknowledgeChallenge extends AdjudicatorExists {
-  name: typeof ACKNOWLEDGE_CHALLENGE;
+  type: typeof ACKNOWLEDGE_CHALLENGE;
+  stage: typeof RESPONDING;
 }
 
 interface ChooseResponse extends AdjudicatorExists {
-  name: typeof CHOOSE_RESPONSE;
+  type: typeof CHOOSE_RESPONSE;
+  stage: typeof RESPONDING;
 }
 
 interface AcknowledgeMustTakeMove extends AdjudicatorExists {
-  name: typeof ACKNOWLEDGE_MUST_TAKE_MOVE;
+  type: typeof ACKNOWLEDGE_MUST_TAKE_MOVE;
+  stage: typeof RESPONDING;
 }
 
 interface TakeMoveInApp extends AdjudicatorExists {
-  name: typeof TAKE_MOVE_IN_APP;
+  type: typeof TAKE_MOVE_IN_APP;
+  stage: typeof RESPONDING;
 }
 
 interface InitiateResponse extends AdjudicatorExists {
-  name: typeof INTIATE_RESPONSE;
+  type: typeof INTIATE_RESPONSE;
+  stage: typeof RESPONDING;
 }
 
 interface WaitForResponseConfirmation extends AdjudicatorExists {
-  name: typeof WAIT_FOR_RESPONSE_CONFIRMATION;
+  type: typeof WAIT_FOR_RESPONSE_CONFIRMATION;
+  stage: typeof RESPONDING;
 }
 
-export type ResponderState = (
+export type RespondingState = (
   | AcknowledgeChallenge 
   | ChooseResponse 
   | AcknowledgeMustTakeMove 

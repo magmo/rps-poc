@@ -1,21 +1,25 @@
 import { InitializingState } from './initializing';
 import { RunningState } from './running';
 import { FundingState } from './funding';
-import { ChallengerState } from './challenging';
-import { ResponderState } from './responding';
-import { WithdrawalState } from './withdrawing';
+import { ChallengingState } from './challenging';
+import { RespondingState } from './responding';
+import { WithdrawingState } from './withdrawing';
 import { ClosingState } from './closing';
 
 export type ChannelState = (
   | InitializingState
   | FundingState
   | RunningState
-  | ChallengerState
-  | ResponderState
-  | WithdrawalState
+  | ChallengingState
+  | RespondingState
+  | WithdrawingState
   | ClosingState
 );
 
-export function isFundingState(state: ChannelState): state is FundingState {
-  return [1].indexOf(1) > 0;
-}
+export * from './initializing';
+export * from './running';
+export * from './funding';
+export * from './challenging';
+export * from './responding';
+export * from './withdrawing';
+export * from './closing';
