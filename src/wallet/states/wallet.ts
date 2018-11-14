@@ -1,6 +1,8 @@
 import { ChannelState } from './channel';
 
-export const INITIAL_STATE = 'INITIAL_STATE';
+export const INITIALIZING = 'INITIAL';
+export const IDLE = 'IDLE';
+export const RUNNING = 'RUNNING';
 
 export enum DisplayMode {
   None,
@@ -8,26 +10,29 @@ export enum DisplayMode {
   Full,
 }
 
-interface Initial {
-  name: 'INITIAL_STATE';
+export interface Initializing {
+  type: typeof INITIALIZING;
   display: DisplayMode;
 }
+export function initial(display=DisplayMode.None): Initializing {
+  return { type: INITIALIZING, display };
+}
 
-interface Idle {
-  name: 'READY_STATE';
+export interface Idle {
+  type: typeof IDLE;
   display: DisplayMode;
   address: string;
 }
 
-interface Running {
-  name: 'RUNNING';
+export interface Running {
+  type: typeof RUNNING;
   display: DisplayMode;
   address: string;
   channel: ChannelState;
 }
 
 export type WalletState = (
-  | Initial
+  | Initializing
   | Idle
   | Running
 );

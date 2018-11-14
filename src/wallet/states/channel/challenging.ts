@@ -2,6 +2,8 @@ import {
   AdjudicatorExists
 } from './shared';
 
+export const CHALLENGING = 'CHALLENGING';
+
 export const APPROVE_CHALLENGE = 'APPROVE_CHALLENGE';
 export const INITIATE_CHALLENGE = 'INITIATE_CHALLENGE';
 export const WAIT_FOR_CHALLENGE_CONFIRMATION = 'WAIT_FOR_CHALLENGE_CONFIRMATION';
@@ -10,30 +12,36 @@ export const ACKNOWLEDGE_CHALLENGE_RESPONSE = 'ACKNOWLEDGE_CHALLENGE_RESPONSE';
 export const ACKNOWLEDGE_CHALLENGE_TIMEOUT = 'ACKNOWLEDGE_CHALLENGE_TIMEOUT';
 
 interface ApproveChallenge extends AdjudicatorExists {
-  name: typeof APPROVE_CHALLENGE;
+  type: typeof APPROVE_CHALLENGE;
+  stage: typeof CHALLENGING;
 }
 
 interface InitiateChallenge extends AdjudicatorExists {
-  name: typeof INITIATE_CHALLENGE;
+  type: typeof INITIATE_CHALLENGE;
+  stage: typeof CHALLENGING;
 }
 
 interface WaitForChallengeConfirmation extends AdjudicatorExists {
-  name: typeof WAIT_FOR_CHALLENGE_CONFIRMATION;
+  type: typeof WAIT_FOR_CHALLENGE_CONFIRMATION;
+  stage: typeof CHALLENGING;
 }
 
 interface WaitForResponseOrTimeout extends AdjudicatorExists {
-  name: typeof WAIT_FOR_RESPONSE_OR_TIMEOUT;
+  type: typeof WAIT_FOR_RESPONSE_OR_TIMEOUT;
+  stage: typeof CHALLENGING;
 }
 
 interface AcknowledgeChallengeResponse extends AdjudicatorExists {
-  name: typeof ACKNOWLEDGE_CHALLENGE_RESPONSE;
+  type: typeof ACKNOWLEDGE_CHALLENGE_RESPONSE;
+  stage: typeof CHALLENGING;
 }
 
 interface AcknowledgeChallengeTimeout extends AdjudicatorExists {
-  name: typeof ACKNOWLEDGE_CHALLENGE_TIMEOUT;
+  type: typeof ACKNOWLEDGE_CHALLENGE_TIMEOUT;
+  stage: typeof CHALLENGING;
 }
 
-export type ChallengerState = (
+export type ChallengingState = (
   | ApproveChallenge 
   | InitiateChallenge 
   | WaitForChallengeConfirmation 
