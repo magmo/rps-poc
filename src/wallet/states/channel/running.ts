@@ -3,20 +3,22 @@ import {
   adjudicatorExists,
 } from './shared';
 
-// both the stage and the state type. 
-// TODO: this is potentially confusing - should fix
+// stage
 export const RUNNING = 'RUNNING';
 
-interface Running extends AdjudicatorExists {
-  type: typeof RUNNING;
+
+export const WAIT_FOR_UPDATE = 'WAIT_FOR_UPDATE';
+
+interface WaitForUpdate extends AdjudicatorExists {
+  type: typeof WAIT_FOR_UPDATE;
   stage: typeof RUNNING;
 
 }
 
-export function running<T extends AdjudicatorExists>(params: T): Running {
-  return { type: RUNNING, stage: RUNNING, ...adjudicatorExists(params) };
+export function waitForUpdate<T extends AdjudicatorExists>(params: T): WaitForUpdate {
+  return { type: WAIT_FOR_UPDATE, stage: RUNNING, ...adjudicatorExists(params) };
 }
 
 export type RunningState = (
-  | Running
+  | WaitForUpdate
 );
