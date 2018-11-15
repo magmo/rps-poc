@@ -1,6 +1,6 @@
 import {
   ChannelState,
-  INITIALIZING,
+  OPENING,
   FUNDING,
   RUNNING,
   CHALLENGING,
@@ -9,7 +9,7 @@ import {
   CLOSING,
 } from '../../../states/channel';
 
-import { initializingReducer } from './initializing';
+import { openingReducer } from './opening';
 import { fundingReducer } from './funding';
 import { runningReducer } from './running';
 import { challengingReducer } from './challenging';
@@ -19,8 +19,8 @@ import { closingReducer } from './closing';
 
 export const channelReducer = (state: ChannelState, action: any): ChannelState => {
   switch (state.stage) {
-    case INITIALIZING:
-      return initializingReducer(state, action);
+    case OPENING:
+      return openingReducer(state, action);
     case FUNDING:
       return fundingReducer(state, action);
     case RUNNING:
