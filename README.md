@@ -1,4 +1,10 @@
-## Rock Paper Scissors: A Force-Move Games POC
+## Rock Paper Scissors: an example ForceMove game
+
+This app is an example of a game built on our [ForceMove](https://magmo.com/force-move-games.pdf) protocol. You can play against a friend or against our bots on the ropsten testnet.
+
+![splash](./screens.png 'screens')
+
+To run the app on your machine, clone down the code and follow the instructions below. 
 
 ### Setup
 
@@ -41,7 +47,7 @@
 
 #### To deploy smart contracts
 
-1. Add test eth to your account for the deployment using an eth faucet: https://faucet.ropsten.be/
+1. Add test eth to your account for the deployment using an eth faucet: https://faucet.ropsten.be/ or https://faucet.metamask.io.
 2. Deploy the contracts to the network:
     ```
     # deploy smart contracts to a network
@@ -82,7 +88,7 @@ Please use the Sublime/VS Code package _JsPrettier_ for formatting. Add the foll
   "trailingComma": "all",
 ```
 
-### Current state:
+## Problems?
 
-![screenshot](https://user-images.githubusercontent.com/12832034/40526428-44e37118-5f9b-11e8-8e63-c5fbaf9cae59.png 'screenshot')
+Please check [issues](https://github.com/magmo/rps-poc/issues), someone else may have had the same experience. You may find a solution -- if not, please add to or create an issue.
 
