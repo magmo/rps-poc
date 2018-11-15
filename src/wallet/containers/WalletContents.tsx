@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import * as playerActions from '../redux/actions/player';
 import * as challengeActions from '../redux/actions/challenge';
 import * as blockchainActions from '../redux/actions/blockchain';
-import { WalletState } from '../redux/reducers';
+import { WalletState, INITIALIZING, IDLE, RUNNING } from '../states/wallet';
 
 
 import * as playerA from '../wallet-engine/wallet-states/PlayerA';
@@ -46,10 +46,18 @@ interface Props {
 
 function WalletContainer(props: Props) {
     const { state, closeWallet, approveWithdrawal } = props;
-    const { channelState, challenge: challengeState } = state;
+
+    switch(state.type) {
+      case INITIALIZING:
+        return <div />;
+      case IDLE:
+        return <div />;
+      case RUNNING:
+
+    }
+
 
     if (channelState === null) {
-      return <div />;
     }
 
     if (challengeState != null) {
