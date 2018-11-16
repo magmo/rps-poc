@@ -2,9 +2,9 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import { WalletState, DisplayMode } from '../states/wallet';
+import { WalletState, DisplayMode } from '../states';
 import { SiteState } from '../../redux/reducer';
-import WalletContents from './WalletContents';
+import FullContainer from './Full';
 import SidebarLayout from '../components/SidebarLayout';
 import FooterLayout from './WalletFooter';
 
@@ -15,12 +15,12 @@ interface WalletProps {
 class Wallet extends PureComponent<WalletProps> {
 
   render() {
-    const display = this.props.state.display;
+    const displayMode = this.props.state.displayMode;
 
-    switch (display) {
+    switch (displayMode) {
       case DisplayMode.Full:
         return (
-          <SidebarLayout contents={<WalletContents />}>
+          <SidebarLayout contents={<FullContainer state={this.props.state} />}>
             {this.props.children}
           </SidebarLayout>
         );

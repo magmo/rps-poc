@@ -4,7 +4,7 @@ import ChallengeFooter from '../components/ChallengeFooter';
 
 const mapStateToProps = (state: SiteState) => {
   return {
-    expiryTime: state.wallet.challenge.expirationTime,
+    expiryTime: 100, // todo
   };
 };
 

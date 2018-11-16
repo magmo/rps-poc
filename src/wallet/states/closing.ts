@@ -1,9 +1,4 @@
-import {
-  TwoPositions,
-  twoPositions,
-  AdjudicatorExists,
-  adjudicatorExists,
-} from './shared';
+import { AdjudicatorExists, adjudicatorExists, ChannelOpen, channelOpen, } from './shared';
 
 // stage
 export const CLOSING = 'CLOSING';
@@ -24,7 +19,7 @@ interface Concluded extends AdjudicatorExists {
   stage: typeof CLOSING;
 }
 
-interface Closed extends TwoPositions {
+interface Closed extends ChannelOpen {
   type: typeof CLOSED;
   stage: typeof CLOSING;
 }
@@ -40,8 +35,8 @@ export function concluding<T extends AdjudicatorExists>(params: T): Concluding {
 export function concluded<T extends AdjudicatorExists>(params: T): Concluded {
   return { type: CONCLUDED, stage: CLOSING, ...adjudicatorExists(params) };
 }
-export function closed<T extends TwoPositions>(params: T): Closed {
-  return { type: CLOSED, stage: CLOSING, ...twoPositions(params) };
+export function closed<T extends ChannelOpen>(params: T): Closed {
+  return { type: CLOSED, stage: CLOSING, ...channelOpen(params) };
 }
 export function closedOnChain<T extends AdjudicatorExists>(params: T): ClosedOnChain {
   return { type: CLOSED_ON_CHAIN, stage: CLOSING, ...adjudicatorExists(params) };

@@ -1,6 +1,4 @@
-import {
-  AdjudicatorExists
-} from './shared';
+import { AdjudicatorExists } from './shared'; 
 
 // stage
 export const WITHDRAWING = 'STAGE.WITHDRAWING';
@@ -36,4 +34,4 @@ export type WithdrawingState = (
   | InitiateWithdrawal
   | WaitForWithdrawalConfirmation
   | AcknowledgeWithdrawalSuccess
-)
+);
