@@ -4,7 +4,7 @@ This app is an example of a game built on our [ForceMove](https://magmo.com/forc
 
 ![splash](./screens.png 'screens')
 
-To run the app on your machine, clone down the code and follow the instructions below. 
+To run the app on your machine, clone the code and follow the instructions below. 
 
 ### Setup
 
