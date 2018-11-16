@@ -1,19 +1,49 @@
-import { Reducer } from 'redux';
-import { WalletState, initial, INITIALIZING, IDLE, RUNNING } from '../../states/wallet';
-import { channelReducer } from './channel';
+import { unreachable } from '../../utils';
 
-const initialState = initial();
+import {
+  WalletState,
+  waitForAddress,
+  INITIALIZING,
+  OPENING,
+  FUNDING,
+  RUNNING,
+  CHALLENGING,
+  RESPONDING,
+  WITHDRAWING,
+  CLOSING,
+} from '../../states';
 
-export const walletReducer: Reducer<WalletState> = (state = initialState, action: any) => {
-  switch (state.type) {
+import { initializingReducer } from './initializing';
+import { openingReducer } from './opening';
+import { fundingReducer } from './funding';
+import { runningReducer } from './running';
+import { challengingReducer } from './challenging';
+import { respondingReducer } from './responding';
+import { withdrawingReducer } from './withdrawing';
+import { closingReducer } from './closing';
+
+const initialState = waitForAddress();
+
+export const walletReducer = (state: WalletState = initialState, action: any): WalletState => {
+  switch (state.stage) {
     case INITIALIZING:
-      return state;
-    case IDLE:
-      return state;
+      return initializingReducer(state, action);
+    case OPENING:
+      return openingReducer(state, action);
+    case FUNDING:
+      return fundingReducer(state, action);
     case RUNNING:
-      return { ...state, channel: channelReducer(state.channel, action) }
+      return runningReducer(state, action);
+    case CHALLENGING:
+      return challengingReducer(state, action);
+    case RESPONDING:
+      return respondingReducer(state, action);
+    case WITHDRAWING:
+      return withdrawingReducer(state, action);
+    case CLOSING:
+      return closingReducer(state, action);
     default:
-      return state;
+      return unreachable(state);
   }
 };
 

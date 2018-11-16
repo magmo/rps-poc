@@ -27,8 +27,6 @@ import { GameState, StateName } from '../redux/game/state';
 
 interface GameProps {
   state: GameState;
-  showWallet: boolean;
-  showWalletHeader: boolean;
   chooseMove: (move: Move) => void;
   playAgain: () => void;
   createBlockchainChallenge: () => void;
@@ -129,8 +127,6 @@ function RenderGame(props: GameProps) {
 
 const mapStateToProps = (state: SiteState) => ({
   state: state.game.gameState,
-  showWallet: state.wallet.display.showWallet,
-  showWalletHeader: state.wallet.display.showFooter,
 });
 
 const mapDispatchToProps = {
