@@ -1,8 +1,4 @@
-import {
-  TwoPositions,
-  twoPositions,
-  AdjudicatorExists,
-} from './shared';
+import { AdjudicatorExists, ChannelOpen, channelOpen, } from './shared';
 
 // stage
 export const FUNDING = 'FUNDING';
@@ -19,17 +15,17 @@ export const B_WAIT_FOR_POST_FUND_SETUP = 'B_WAIT_FOR_POST_FUND_SETUP';
 export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
 export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
 
-interface ApproveFunding extends TwoPositions {
+interface ApproveFunding extends ChannelOpen {
   type: typeof APPROVE_FUNDING;
   stage: typeof FUNDING;
 }
 
-interface AInitiateDeploy extends TwoPositions {
+interface AInitiateDeploy extends ChannelOpen {
   type: typeof A_INITIATE_DEPLOY;
   stage: typeof FUNDING;
 }
 
-interface BWaitForDeployInitiation extends TwoPositions {
+interface BWaitForDeployInitiation extends ChannelOpen {
   type: typeof B_WAIT_FOR_DEPLOY_INITIATION;
   stage: typeof FUNDING;
 }
@@ -70,8 +66,8 @@ interface AcknowledgeFundingSuccess extends AdjudicatorExists {
 }
 
 
-export function approveFunding<T extends TwoPositions>(params: T): ApproveFunding {
-  return { type: APPROVE_FUNDING, stage: FUNDING, ...twoPositions(params) };
+export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding {
+  return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
 }
 
 export type FundingState = (

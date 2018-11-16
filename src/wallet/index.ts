@@ -4,4 +4,5 @@ import Wallet from './containers/Wallet';
 export { actions, Wallet };
 
 export { walletSaga } from './redux/sagas/wallet';
-export { walletReducer, WalletState } from './redux/reducers';
+export { walletReducer } from './redux/reducers';
+export { WalletState } from './states';
