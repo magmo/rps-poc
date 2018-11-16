@@ -22,7 +22,7 @@ To run the app on your machine, clone down the code and follow the instructions 
 
 #### To run a dev server:
 
-1. Start ganache byy running
+1. Start ganache by running
     ```
     ganache-cli
     ```
