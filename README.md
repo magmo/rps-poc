@@ -22,10 +22,15 @@ To run the app on your machine, clone down the code and follow the instructions 
 
 #### To run a dev server:
 
-1. Start ganache
-    * Either using the app
-    * Or by running `ganache-cli` in a different tab
-2. Run the server:
+1. Start ganache byy running
+    ```
+    ganache-cli
+    ```
+2. **In a new tab** Run the server
+    ```
+    yarn start
+    ```
+    After seeing the message "compiled successfully!", kill the server <kbd>cmd</kbd>+<kbd>C</kbd> and run it again
     ```
     yarn start
     ```
