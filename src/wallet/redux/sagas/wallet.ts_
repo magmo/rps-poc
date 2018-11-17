@@ -16,7 +16,7 @@ import * as playerActions from '../actions/player';
 import * as displayActions from '../actions/display';
 import * as challengeActions from '../actions/challenge';
 
-import { initializeWallet } from './initialization';
+import { initializeWallet } from './initialization.ts_';
 import { fundingSaga } from './funding';
 import { blockchainSaga } from './blockchain';
 import { ChallengeProof } from '../../domain/ChallengeProof';
