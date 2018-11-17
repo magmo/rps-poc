@@ -1,3 +1,13 @@
+
+export const KEYS_LOADED = 'KEYS_LOADED';
+
+export const keysLoaded = (address: string, privateKey: string) => ({
+  type: KEYS_LOADED as typeof KEYS_LOADED,
+  address,
+  privateKey,
+});
+export type KeysLoaded = ReturnType<typeof keysLoaded>;
+
 export const CREATE_CHANNEL_REQUEST = ''; // send over opponent addresses, gameLibrary
                                           // return nonce etc.
 export const JOIN_CHANNEL_REQUEST = '';
@@ -39,3 +49,6 @@ export const WITHDRAWAL_SUBMITTED = '.';
 export const WITHDRAWAL_CONFIRMED = '.';
 export const WITHDRAWAL_FINALISED = '.';
 
+export type WalletAction = (
+  | KeysLoaded
+);

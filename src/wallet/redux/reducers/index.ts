@@ -2,7 +2,6 @@ import { unreachable } from '../../utils';
 
 import {
   WalletState,
-  waitForAddress,
   INITIALIZING,
   OPENING,
   FUNDING,
@@ -11,6 +10,7 @@ import {
   RESPONDING,
   WITHDRAWING,
   CLOSING,
+  waitForLogin,
 } from '../../states';
 
 import { initializingReducer } from './initializing';
@@ -21,10 +21,11 @@ import { challengingReducer } from './challenging';
 import { respondingReducer } from './responding';
 import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
+import { WalletAction } from '../actions';
 
-const initialState = waitForAddress();
+const initialState = waitForLogin();
 
-export const walletReducer = (state: WalletState = initialState, action: any): WalletState => {
+export const walletReducer = (state: WalletState = initialState, action: WalletAction): WalletState => {
   switch (state.stage) {
     case INITIALIZING:
       return initializingReducer(state, action);
