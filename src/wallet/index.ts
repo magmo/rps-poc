@@ -3,6 +3,6 @@ import Wallet from './containers/Wallet';
 
 export { actions, Wallet };
 
-export { walletSaga } from './redux/sagas/wallet';
+export { sagaManager as walletSaga } from './redux/sagas/saga-manager';
 export { walletReducer } from './redux/reducers';
 export { WalletState } from './states';
