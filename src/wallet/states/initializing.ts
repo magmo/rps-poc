@@ -1,17 +1,27 @@
-import { DisplayMode, Base, AddressExists, addressExists } from "./shared";
+import { DisplayMode, Base, AddressExists, addressExists, LoggedIn, loggedIn } from "./shared";
 
 export const INITIALIZING = 'INITIALIZING';
 
+export const WAIT_FOR_LOGIN = 'WAIT_FOR_LOGIN';
 export const WAIT_FOR_ADDRESS = 'WAIT_FOR_ADDRESS';
 export const WAIT_FOR_CHANNEL = 'WAIT_FOR_CHANNEL';
 
-export interface WaitForAddress extends Base {
+export interface WaitForLogin extends Base {
+  type: typeof WAIT_FOR_LOGIN;
+  stage: typeof INITIALIZING;
+}
+export function waitForLogin<T extends Partial<Base>>(params = {} as T): WaitForLogin {
+  const displayMode = params.displayMode || DisplayMode.None;
+  return { type: WAIT_FOR_LOGIN, stage: INITIALIZING, displayMode };
+}
+
+export interface WaitForAddress extends LoggedIn {
   type: typeof WAIT_FOR_ADDRESS;
   stage: typeof INITIALIZING;
 }
-export function waitForAddress<T extends Partial<Base>>(params = {} as T): WaitForAddress {
-  const displayMode = params.displayMode || DisplayMode.None;
-  return { type: WAIT_FOR_ADDRESS, stage: INITIALIZING, displayMode };
+
+export function waitForAddress<T extends WaitForAddress>(params: T): WaitForAddress {
+  return { ...loggedIn(params), type: WAIT_FOR_ADDRESS, stage: INITIALIZING };
 }
 
 export interface WaitForChannel extends AddressExists {
@@ -23,6 +33,7 @@ export function waitForChannel<T extends AddressExists>(params: T): WaitForChann
 }
 
 export type InitializingState = (
+  | WaitForLogin
   | WaitForAddress
   | WaitForChannel
 );

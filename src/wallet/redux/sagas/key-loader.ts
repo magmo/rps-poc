@@ -1,7 +1,9 @@
-import { call } from 'redux-saga/effects';
+import { call, select, put } from 'redux-saga/effects';
 
 import { default as firebase, reduxSagaFirebase } from '../../../gateways/firebase';
 import ChannelWallet from '../../domain/ChannelWallet';
+import { SiteState } from '../../../redux/reducer';
+import { keysLoaded } from '../actions';
 
 interface WalletParams {
   uid: string;
@@ -9,7 +11,9 @@ interface WalletParams {
   address: string;
 }
 
-export function* initializeWallet(uid: string) {
+export function* keyLoader() {
+  const uid = yield select((state: SiteState) => state.login.user.uid);
+
   let wallet = yield* fetchWallet(uid);
 
   if (!wallet) {
@@ -18,7 +22,7 @@ export function* initializeWallet(uid: string) {
     wallet = yield* fetchWallet(uid);
   }
 
-  return wallet;
+  yield put(keysLoaded(wallet.address, wallet.privateKey));
 }
 
 const walletTransformer = (data: any) =>
