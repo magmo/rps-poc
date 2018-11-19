@@ -4,9 +4,10 @@ import { keyLoader } from './key-loader';
 import { messageListener } from './message-listener';
 import { messageSender } from './message-sender';
 import { transactionSender } from './transaction-sender';
+import { adjudicatorWatcher } from './adjudicator-watcher';
 
 import { SiteState } from '../../../redux/reducer';
-import { WalletState } from '../../states';
+import { WalletState, WAIT_FOR_ADDRESS } from '../../states';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -24,14 +25,14 @@ export function* sagaManager(): IterableIterator<any> {
 
     // if we don't have an address, make sure that the keyLoader runs once
     // todo: can we be sure that this won't be called more than once if successful?
-    if (!('address' in state)) {
+    if (state.type === WAIT_FOR_ADDRESS) {
       yield keyLoader();
     }
 
     // if have adjudicator, make sure that the adjudicator watcher is running
     if ('adjudicator' in state) {
       if (!adjudicatorWatcherProcess) {
-        // adjudicatorWatcherProcess = yield fork(adjudicatorWatcher);
+        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.adjudicator);
       }
     } else {
       if (adjudicatorWatcherProcess) {

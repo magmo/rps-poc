@@ -20,7 +20,7 @@ export interface WaitForAddress extends LoggedIn {
   stage: typeof INITIALIZING;
 }
 
-export function waitForAddress<T extends WaitForAddress>(params: T): WaitForAddress {
+export function waitForAddress<T extends LoggedIn>(params: T): WaitForAddress {
   return { ...loggedIn(params), type: WAIT_FOR_ADDRESS, stage: INITIALIZING };
 }
 
