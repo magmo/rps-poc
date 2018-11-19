@@ -1,6 +1,11 @@
+export const LOGGED_IN = 'WALLET.LOGGED_IN';
+export const loggedIn = (uid: string) => ({
+  type: LOGGED_IN as typeof LOGGED_IN,
+  uid,
+});
+export type LoggedIn = ReturnType<typeof loggedIn>;
 
-export const KEYS_LOADED = 'KEYS_LOADED';
-
+export const KEYS_LOADED = 'WALLET.KEYS_LOADED';
 export const keysLoaded = (address: string, privateKey: string) => ({
   type: KEYS_LOADED as typeof KEYS_LOADED,
   address,
@@ -50,5 +55,6 @@ export const WITHDRAWAL_CONFIRMED = '.';
 export const WITHDRAWAL_FINALISED = '.';
 
 export type WalletAction = (
+  | LoggedIn
   | KeysLoaded
 );
