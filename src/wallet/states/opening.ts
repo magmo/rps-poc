@@ -4,27 +4,27 @@ import { ChannelPartiallyOpen, ChannelOpen, channelPartiallyOpen, channelOpen } 
 export const OPENING = 'OPENING';
 
 // state type
-export const READY_TO_FUND = 'READY_TO_FUND';
-export const PRE_FUND_SETUP = 'PRE_FUND_SETUP';
+export const WAIT_FOR_PRE_FUND_SETUP = 'WAIT_FOR_PRE_FUND_SETUP';
+export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 
-interface PreFundSetup extends ChannelPartiallyOpen {
-  type: typeof PRE_FUND_SETUP;
+interface WaitForPreFundSetup extends ChannelPartiallyOpen {
+  type: typeof WAIT_FOR_PRE_FUND_SETUP;
   stage: typeof OPENING;
 }
 
-interface ReadyToFund extends ChannelOpen {
-  type: typeof READY_TO_FUND;
+interface WaitForFundingRequest extends ChannelOpen {
+  type: typeof WAIT_FOR_FUNDING_REQUEST;
   stage: typeof OPENING;
 }
 
-export function preFundSetup<T extends ChannelPartiallyOpen>(params: T): PreFundSetup {
-  return { type: PRE_FUND_SETUP, stage: OPENING, ...channelPartiallyOpen(params) };
+export function waitForPreFundSetup<T extends ChannelPartiallyOpen>(params: T): WaitForPreFundSetup {
+  return { type: WAIT_FOR_PRE_FUND_SETUP, stage: OPENING, ...channelPartiallyOpen(params) };
 }
-export function readyToFund<T extends ChannelOpen>(params: T): ReadyToFund {
-  return { type: READY_TO_FUND, stage: OPENING, ...channelOpen(params) };
+export function waitForFundingRequest<T extends ChannelOpen>(params: T): WaitForFundingRequest {
+  return { type: WAIT_FOR_FUNDING_REQUEST, stage: OPENING, ...channelOpen(params) };
 }
 
 export type OpeningState = (
-  | PreFundSetup
-  | ReadyToFund
+  | WaitForPreFundSetup
+  | WaitForFundingRequest
 );
