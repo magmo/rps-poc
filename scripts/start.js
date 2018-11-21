@@ -86,41 +86,16 @@ choosePort(HOST, DEFAULT_PORT)
       urls.lanUrlForConfig
     );
 
-    //Default accounts to seed so we can have accounts with 1M ether for testing
-    var accounts =
-      [
-        {
-          secretKey: '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
-          balance: '0xD3C21BCECCEDA1000000'
-        },
-        {
-          secretKey: '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72',
-          balance: '0xD3C21BCECCEDA1000000'
-        },
-        {
-          secretKey: '0xdf02719c4df8b9b8ac7f551fcb5d9ef48fa27eef7a66453879f4d8fdc6e78fb1',
-          balance: '0xD3C21BCECCEDA1000000'
-        }
-      ];
-    var ganache = require("ganache-cli");
-    console.log(`Starting ganache on port ${process.env.DEV_GANACHE_PORT}`);
-    var ganacheServer = ganache.server({ port: process.env.DEV_GANACHE_PORT, network_id: 0, accounts });
-    var ganachePortInUse = false;
-    ganacheServer.on('error', function (err) {
-      if (err.code && err.code === 'EADDRINUSE') {
-        console.log(`Port ${process.env.DEV_GANACHE_PORT} in use. Assuming a ganache instance on that port.`);
-        ganachePortInUse = true;
-      } else {
-        throw err;
-      }
-    });
-    if (!ganachePortInUse) {
-      ganacheServer.listen(process.env.DEV_GANACHE_PORT, process.env.DEV_GANACHE_HOST, function (err, blockchain) {
-        if (err) {
-          return console.log(err);
-        }
-      });
+    // TODO: We should start up ganache if it's not running
+    // This has been disabled since it was not working with deployContracts
+   
+    // We only deploy the contracts to development network
+    // Otherwise we rely on the prebuilt artifacts
+    if (process.env.TARGET_NETWORK==='development'){
+      const {deployContracts} = require('./deploy_contracts');
+      deployContracts();
     }
+
     const devServer = new WebpackDevServer(compiler, serverConfig);
     // Launch WebpackDevServer.
     devServer.listen(port, HOST, err => {
