@@ -15,7 +15,7 @@ process.on('unhandledRejection', err => {
 require('../config/env');
 
 process.env.DEV_GANACHE_HOST = process.env.DEV_GANACHE_HOST || 'localhost';
-process.env.DEV_GANACHE_PORT = process.env.DEV_GANACHE_PORT || 7546;
+process.env.DEV_GANACHE_PORT = process.env.DEV_GANACHE_PORT || 8545;
 process.env.DEFAULT_GAS = process.env.DEFAULT_GAS || 6721975;
 process.env.DEFAULT_GAS_PRICE = process.env.DEFAULT_GAS_PRICE || 20000000000;
 // Default to the development network
@@ -86,40 +86,38 @@ choosePort(HOST, DEFAULT_PORT)
       urls.lanUrlForConfig
     );
 
-    // TODO: We should start up ganache if it's not running
-    // This has been disabled since it was not working with deployContracts
-   
-    // We only deploy the contracts to development network
-    // Otherwise we rely on the prebuilt artifacts
-    if (process.env.TARGET_NETWORK==='development'){
-      const {deployContracts} = require('./deploy_contracts');
-      deployContracts();
-    }
+    const {
+      deployContracts,
+      startGanache
+    } = require('./helperFunctions');
 
-    const devServer = new WebpackDevServer(compiler, serverConfig);
-    // Launch WebpackDevServer.
-    devServer.listen(port, HOST, err => {
-      if (err) {
-        return console.log(err);
-      }
-      if (isInteractive) {
-        clearConsole();
-      }
-      console.log(chalk.cyan('Starting the development server...\n'));
-      openBrowser(urls.localUrlForBrowser);
-    });
+    startGanache().then(() => {
 
-    ['SIGINT', 'SIGTERM'].forEach(function(sig) {
-      process.on(sig, function() {
-        devServer.close();
-        ganacheServer.close();
-        process.exit();
-      });
-    });
-  })
-  .catch(err => {
-    if (err && err.message) {
-      console.log(err.message);
-    }
-    process.exit(1);
+      deployContracts().then(value => {
+          
+          const devServer = new WebpackDevServer(compiler, serverConfig);
+          // Launch WebpackDevServer.
+          devServer.listen(port, HOST, err => {
+            console.log('he');
+            if (err) {
+              return console.log(err);
+            }
+            if (isInteractive) {
+              clearConsole();
+            }
+            console.log(chalk.cyan('Starting the development server...\n'));
+            openBrowser(urls.localUrlForBrowser);
+          });
+
+          ['SIGINT', 'SIGTERM'].forEach(function (sig) {
+            process.on(sig, function () {
+              devServer.close();
+              process.exit();
+            });
+          });
+        })
+        .catch(err =>
+          console.log(err)
+        );
+    })
   });
