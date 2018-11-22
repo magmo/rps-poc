@@ -8,9 +8,9 @@ import { Signature } from '../../../wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
-import { createFactory, getProvider } from 'src/contracts/contractUtils';
+import { createFactory, getProvider } from '../../../contracts/contractUtils';
 import { eventChannel } from 'redux-saga';
-import bigNumberToBN from 'src/utils/bigNumberToBN';
+import bigNumberToBN from '../../../utils/bigNumberToBN';
 
 export function* blockchainSaga(wallet) {
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
