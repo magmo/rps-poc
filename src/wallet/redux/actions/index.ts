@@ -18,8 +18,19 @@ export const CREATE_CHANNEL_REQUEST = ''; // send over opponent addresses, gameL
 export const JOIN_CHANNEL_REQUEST = '';
 export const ADDRESS_REQUEST = ''; // provide me with an address
 
-export const OWN_POSITION_RECEIVED = '';
-export const OPPONENT_POSITION_RECEIVED = '';
+export const OWN_POSITION_RECEIVED = 'WALLET.OWN_POSITION_RECEIVED';
+export const ownPositionReceived = (data: string) => ({
+  type: OWN_POSITION_RECEIVED as typeof OWN_POSITION_RECEIVED,
+  data
+});
+export type OwnPositionReceived = ReturnType<typeof ownPositionReceived>;
+
+export const OPPONENT_POSITION_RECEIVED = 'WALLET.OPPONENT_POSITION_RECEIVED';
+export const opponentPositionReceived = (data: string, signature: string) => ({
+  type: OPPONENT_POSITION_RECEIVED as typeof OPPONENT_POSITION_RECEIVED,
+  data
+});
+export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
 export const FUNDING_REQUESTED = '.';
 export const FUNDING_APPROVED = '.';
