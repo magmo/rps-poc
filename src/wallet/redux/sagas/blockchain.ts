@@ -1,15 +1,15 @@
 import { take, put, actionChannel, call, fork, cancel, spawn } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
+import { utils } from 'ethers';
 
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import * as blockchainActions from '../actions/blockchain';
-import { deploySimpleAdjudicator, simpleAdjudicatorAt } from '../../../contracts/SimpleAdjudicator';
 import * as externalActions from '../actions/external';
 import { Signature } from '../../../wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
-
+import { contractFactory } from 'src/contracts/SA_ethers';
 
 export function* blockchainSaga(wallet) {
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
@@ -36,7 +36,11 @@ function* contractSetup() {
       case blockchainActions.DEPLOY_REQUEST: // Player A
         try {
           const { channelId, amount } = action;
-          const deployedContract = yield call(deploySimpleAdjudicator, { channelId, amount });
+          const factory = yield call(contractFactory);
+          const value = utils.parseEther(utils.formatEther(amount.toString()));
+          const deployedContract = yield factory.deploy(channelId, 2, { value });
+          // wait for the contract deployment transaction to be mined
+          yield deployedContract.deployed();
 
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
           // TODO: This should probably move out of this scope
@@ -52,7 +56,8 @@ function* contractSetup() {
       case blockchainActions.DEPOSIT_REQUEST: // Player B
         try {
           const { address, amount } = action;
-          const existingContract = yield call(simpleAdjudicatorAt, { address, amount });
+          const factory = yield call(contractFactory);
+          const existingContract = factory.attach(address);
           const transaction = yield call(existingContract.send, action.amount.toString());
           yield put(blockchainActions.depositSuccess(transaction));
           const eventListener = yield spawn(watchAdjudicator, existingContract);
@@ -177,17 +182,8 @@ function* watchAdjudicator(deployedContract) {
 }
 
 function createEventChannel(deployedContract) {
-  const filter = deployedContract.allEvents();
-  const channel = eventChannel(emitter => {
-    filter.watch((error, results) => {
-      if (error) {
-        throw error;
-      }
-      emitter(results);
-    });
-    return () => {
-      filter.stopWatching();
-    };
+  const channel = deployedContract.on('FundsReceived', (event, listener) => {
+    console.log(event, listener);
   });
   return channel;
 }
