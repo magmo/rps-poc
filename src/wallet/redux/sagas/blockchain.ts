@@ -12,7 +12,6 @@ import { createFactory, getProvider } from 'src/contracts/contractUtils';
 import { eventChannel } from 'redux-saga';
 import bigNumberToBN from 'src/utils/bigNumberToBN';
 
-
 export function* blockchainSaga(wallet) {
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
 
@@ -56,13 +55,13 @@ function* contractSetup() {
         break;
       case blockchainActions.DEPOSIT_REQUEST: // Player B
         try {
-          const { address } = action;
+          const { address, amount} = action;
           const factory = yield call(createFactory);
 
           const existingContract: ethers.Contract = factory.attach(address);
           const depositTransaction = {
             to: address,
-            value: ethers.utils.parseEther("1.0"),
+            value:utils.bigNumberify(amount.toString()),
           };
           const provider = yield call(getProvider);
           const signer = provider.getSigner();
@@ -169,28 +168,36 @@ function handleError(action, err) {
   return put(action(message));
 }
 
+function convertBigNumberArgsToBN(argumentObject): any {
+  const convertedObject = {};
+  Object.keys(argumentObject).forEach(key => {
+    if (argumentObject[key].constructor.name === 'BigNumber') {
+      convertedObject[key] = bigNumberToBN(argumentObject[key]);
+    } else {
+      convertedObject[key] = argumentObject[key];
+    }
+  });
+  return convertedObject;
+}
+
 function* watchAdjudicator(deployedContract: ethers.Contract) {
   const watchChannel = createEventChannel(deployedContract);
   while (true) {
     const result = yield take(watchChannel);
-
+    const convertedArgs = convertBigNumberArgsToBN(result.args);
     if (result.event === "FundsReceived") {
-      const fundsReceivedArgs = {
-        amountReceived: bigNumberToBN(result.args.amountReceived),
-        adjudicatorBalance: bigNumberToBN(result.args.adjudicatorBalance),
-        sender: result.args.sender,
-      };
-      yield put(blockchainActions.fundsReceivedEvent(fundsReceivedArgs));
+
+      yield put(blockchainActions.fundsReceivedEvent({ ...convertedArgs }));
     } else if (result.event === "GameConcluded") {
-      yield put(blockchainActions.gameConcluded({ ...result.args }));
+      yield put(blockchainActions.gameConcluded({ ...convertedArgs }));
     } else if (result.event === "ChallengeCreated") {
-      yield put(blockchainActions.challengeCreatedEvent({ ...result.args }));
+      yield put(blockchainActions.challengeCreatedEvent({ ...convertedArgs }));
     } else if (
       result.event === "RespondedWithMove" ||
       result.event === "Refuted" ||
       result.event === "RespondedWithAlternativeMove"
     ) {
-      yield put(blockchainActions.challengeConcludedEvent({ ...result.args }));
+      yield put(blockchainActions.challengeConcludedEvent({ ...convertedArgs }));
     }
   }
 }
