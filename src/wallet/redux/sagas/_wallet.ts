@@ -9,19 +9,19 @@ import { ConclusionProof } from '../../domain/ConclusionProof';
 import decode from '../../domain/decode';
 import WalletEngine from '../../wallet-engine/WalletEngine';
 
-import * as actions from '../actions/external';
-import * as blockchainActions from '../actions/blockchain';
-import * as stateActions from '../actions/state';
-import * as playerActions from '../actions/player';
-import * as displayActions from '../actions/display';
-import * as challengeActions from '../actions/challenge';
+import * as actions from '../actions/_external';
+import * as blockchainActions from '../actions/_blockchain';
+import * as stateActions from '../actions/_state';
+import * as playerActions from '../actions/_player';
+import * as displayActions from '../actions/_display';
+import * as challengeActions from '../actions/_challenge';
 
-import { initializeWallet } from './initialization.ts_';
-import { fundingSaga } from './funding';
-import { blockchainSaga } from './blockchain';
+import { initializeWallet } from './_initialization';
+import { fundingSaga } from './_funding';
+import { blockchainSaga } from './_blockchain';
 import { ChallengeProof } from '../../domain/ChallengeProof';
-import challengeSaga from './challenge';
-import { messageListenerSaga } from './messaging';
+import challengeSaga from './_challenge';
+import { messageListenerSaga } from './_messaging';
 import { ChallengeStatus } from '../../domain/ChallengeStatus';
 
 export function* walletSaga(uid: string): IterableIterator<any> {
