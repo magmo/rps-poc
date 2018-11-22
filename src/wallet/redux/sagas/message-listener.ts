@@ -1,7 +1,10 @@
 import { actionChannel, take, put } from "redux-saga/effects";
 
 import { LOGIN_SUCCESS } from "../../../redux/login/actions";
-import { loggedIn } from "../actions";
+
+import * as incoming from '../../interface/incoming';
+
+import * as actions from "../actions";
 
 
 // this is the only thing in the wallet which is allowed to listen for app actions
@@ -13,11 +16,19 @@ export function* messageListener() {
   const channel = yield actionChannel('*');
 
   while (true) {
+    // todo: figure out what types action can be
     const action = yield take(channel);
 
     switch (action.type) {
       case LOGIN_SUCCESS:
-        yield put(loggedIn(action.user.uid));
+        yield put(actions.loggedIn(action.user.uid));
+        break;
+      case incoming.SIGNATURE_REQUEST:
+        yield put(actions.ownPositionReceived(action.data));
+        break;
+      case incoming.VALIDATION_REQUEST:
+        yield put(actions.opponentPositionReceived(action.data, action.signature));
+        break;
       default:
         // do nothing
     }
