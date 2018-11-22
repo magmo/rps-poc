@@ -1,16 +1,27 @@
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import simpleAdjudicatorArtifact from '../../contracts/artifacts/SimpleAdjudicator.json';
 import detectNetwork from 'web3-detect-network';
+import BN from 'bn.js';
 
-/*
-As of November 2, 2018, metamask will introduce a breaking change where it will
-no longer inject a connected web3 instance to the browser.
+export async function deployContract(channelId, amount: BN) {
+  const factory = await createFactory();
+  const value = utils.bigNumberify(amount.toString());
+  const deployedContract = await factory.deploy(channelId, 2, { value });
+  // wait for the contract deployment transaction to be mined
+  return await deployedContract.deployed();
+}
+export async function depositFunds(address: string, amount: BN) {
+  const depositTransaction = {
+    to: address,
+    value: utils.bigNumberify(amount.toString()),
+  };
+  const provider = await getProvider();
+  const signer = provider.getSigner();
 
-Instead, it will inject an ethereum provider, under the variable `ethereum`.
-See: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
-*/
+  return await signer.sendTransaction(depositTransaction);
+}
 
-export async function getProvider(): Promise<ethers.providers.Web3Provider>{
+export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
 }
 

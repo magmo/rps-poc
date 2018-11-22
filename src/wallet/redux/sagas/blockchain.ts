@@ -1,5 +1,5 @@
 import { take, put, actionChannel, call, fork, cancel, spawn } from 'redux-saga/effects';
-import { utils, ethers } from 'ethers';
+import { ethers } from 'ethers';
 
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import * as blockchainActions from '../actions/blockchain';
@@ -8,7 +8,7 @@ import { Signature } from '../../../wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
-import { createFactory, getProvider } from '../../../contracts/contractUtils';
+import { createFactory, depositFunds, deployContract } from '../../../contracts/simpleAdjudicatorUtils';
 import { eventChannel } from 'redux-saga';
 import bigNumberToBN from '../../../utils/bigNumberToBN';
 
@@ -36,11 +36,7 @@ function* contractSetup() {
       case blockchainActions.DEPLOY_REQUEST: // Player A
         try {
           const { channelId, amount } = action;
-          const factory = yield call(createFactory);
-          const value = utils.parseEther(utils.formatEther(amount.toString()));
-          const deployedContract = yield factory.deploy(channelId, 2, { value });
-          // wait for the contract deployment transaction to be mined
-          yield deployedContract.deployed();
+          const deployedContract = yield call(deployContract, channelId, amount);
 
           yield put(blockchainActions.deploymentSuccess(deployedContract.address));
           // TODO: This should probably move out of this scope
@@ -57,16 +53,8 @@ function* contractSetup() {
         try {
           const { address, amount} = action;
           const factory = yield call(createFactory);
-
           const existingContract: ethers.Contract = factory.attach(address);
-          const depositTransaction = {
-            to: address,
-            value:utils.bigNumberify(amount.toString()),
-          };
-          const provider = yield call(getProvider);
-          const signer = provider.getSigner();
-
-          const transaction = yield signer.sendTransaction(depositTransaction);
+          const transaction =yield call(depositFunds,address,amount);
           yield put(blockchainActions.depositSuccess(transaction));
           const eventListener = yield spawn(watchAdjudicator, existingContract);
 
@@ -186,7 +174,6 @@ function* watchAdjudicator(deployedContract: ethers.Contract) {
     const result = yield take(watchChannel);
     const convertedArgs = convertBigNumberArgsToBN(result.args);
     if (result.event === "FundsReceived") {
-
       yield put(blockchainActions.fundsReceivedEvent({ ...convertedArgs }));
     } else if (result.event === "GameConcluded") {
       yield put(blockchainActions.gameConcluded({ ...convertedArgs }));
