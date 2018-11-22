@@ -1,4 +1,4 @@
-import * as actions from './redux/actions/external';
+import * as actions from './redux/actions/_external';
 import Wallet from './containers/Wallet';
 
 export { actions, Wallet };

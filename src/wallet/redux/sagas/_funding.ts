@@ -1,10 +1,10 @@
 import { put, take } from 'redux-saga/effects';
 import BN from 'bn.js';
 
-import * as blockchainActions from '../actions/blockchain';
-import * as stateActions from '../actions/state';
-import * as externalActions from '../actions/external';
-import * as playerActions from '../actions/player';
+import * as blockchainActions from '../actions/_blockchain';
+import * as stateActions from '../actions/_state';
+import * as externalActions from '../actions/_external';
+import * as playerActions from '../actions/_player';
 
 import WalletEngine from '../../wallet-engine/WalletEngine';
 import * as PlayerA from '../../wallet-engine/wallet-states/PlayerA';

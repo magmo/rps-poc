@@ -1,9 +1,9 @@
 import { put, take, fork } from "redux-saga/effects";
 
-import * as challengeActions from '../actions/challenge';
-import * as displayActions from '../actions/display';
-import * as externalActions from '../actions/external';
-import * as blockchainActions from '../actions/blockchain';
+import * as challengeActions from '../actions/_challenge';
+import * as displayActions from '../actions/_display';
+import * as externalActions from '../actions/_external';
+import * as blockchainActions from '../actions/_blockchain';
 
 import decode from "../../domain/decode";
 import { Refute, ChallengeResponse, RespondWithMove, RespondWithExistingMove } from "../../domain/ChallengeResponse";

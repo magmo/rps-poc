@@ -4,8 +4,8 @@ import hash from 'object-hash';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
 import { actions as walletActions } from '../../wallet';
-import { SignatureSuccess } from '../../wallet/redux/actions/external';
-import * as challengeActions from '../../wallet/redux/actions/challenge';
+import { SignatureSuccess } from '../../wallet/redux/actions/_external';
+import * as challengeActions from '../../wallet/redux/actions/_challenge';
 import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
 import { MessageState } from './state';
