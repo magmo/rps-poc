@@ -1,6 +1,5 @@
 import { take, put, actionChannel, call, fork, cancel, spawn } from 'redux-saga/effects';
-import { eventChannel } from 'redux-saga';
-import { utils } from 'ethers';
+import { utils, ethers } from 'ethers';
 
 import { ConclusionProof } from '../../domain/ConclusionProof';
 import * as blockchainActions from '../actions/blockchain';
@@ -9,7 +8,10 @@ import { Signature } from '../../../wallet/domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
-import { contractFactory } from 'src/contracts/SA_ethers';
+import { createFactory, getProvider } from 'src/contracts/ContractFactory';
+import { eventChannel } from 'redux-saga';
+import bigNumberToBN from 'src/utils/bigNumberToBN';
+
 
 export function* blockchainSaga(wallet) {
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
@@ -22,7 +24,6 @@ export function* blockchainSaga(wallet) {
 
   return true;
 }
-
 function* contractSetup() {
   const channel = yield actionChannel([
     blockchainActions.DEPLOY_REQUEST,
@@ -36,7 +37,7 @@ function* contractSetup() {
       case blockchainActions.DEPLOY_REQUEST: // Player A
         try {
           const { channelId, amount } = action;
-          const factory = yield call(contractFactory);
+          const factory = yield call(createFactory);
           const value = utils.parseEther(utils.formatEther(amount.toString()));
           const deployedContract = yield factory.deploy(channelId, 2, { value });
           // wait for the contract deployment transaction to be mined
@@ -55,10 +56,18 @@ function* contractSetup() {
         break;
       case blockchainActions.DEPOSIT_REQUEST: // Player B
         try {
-          const { address, amount } = action;
-          const factory = yield call(contractFactory);
-          const existingContract = factory.attach(address);
-          const transaction = yield call(existingContract.send, action.amount.toString());
+          const { address } = action;
+          const factory = yield call(createFactory);
+
+          const existingContract: ethers.Contract = factory.attach(address);
+          const depositTransaction = {
+            to: address,
+            value: ethers.utils.parseEther("1.0"),
+          };
+          const provider = yield call(getProvider);
+          const signer = provider.getSigner();
+
+          const transaction = yield signer.sendTransaction(depositTransaction);
           yield put(blockchainActions.depositSuccess(transaction));
           const eventListener = yield spawn(watchAdjudicator, existingContract);
 
@@ -160,13 +169,18 @@ function handleError(action, err) {
   return put(action(message));
 }
 
-function* watchAdjudicator(deployedContract) {
+function* watchAdjudicator(deployedContract: ethers.Contract) {
   const watchChannel = createEventChannel(deployedContract);
   while (true) {
     const result = yield take(watchChannel);
 
     if (result.event === "FundsReceived") {
-      yield put(blockchainActions.fundsReceivedEvent({ ...result.args }));
+      const fundsReceivedArgs = {
+        amountReceived: bigNumberToBN(result.args.amountReceived),
+        adjudicatorBalance: bigNumberToBN(result.args.adjudicatorBalance),
+        sender: result.args.sender,
+      };
+      yield put(blockchainActions.fundsReceivedEvent(fundsReceivedArgs));
     } else if (result.event === "GameConcluded") {
       yield put(blockchainActions.gameConcluded({ ...result.args }));
     } else if (result.event === "ChallengeCreated") {
@@ -181,9 +195,15 @@ function* watchAdjudicator(deployedContract) {
   }
 }
 
-function createEventChannel(deployedContract) {
-  const channel = deployedContract.on('FundsReceived', (event, listener) => {
-    console.log(event, listener);
+function createEventChannel(deployedContract: ethers.Contract) {
+
+  const channel = eventChannel(emitter => {
+    deployedContract.on('*', (event) => {
+      emitter(event);
+    });
+    return () => {
+      deployedContract.stopWatching();
+    };
   });
   return channel;
 }
