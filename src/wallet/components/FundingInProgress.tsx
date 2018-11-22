@@ -40,7 +40,7 @@ export default class FundingInProgress extends React.PureComponent<Props> {
         </div>
         <div className="transfer-container">
           <div className={deployStyling}>
-            <img className="deploy-icon" src={this.getIcon(deployStatus,!playerAIsFunding)} />
+            <img className="deploy-icon" src={this.getIcon(deployStatus, !playerAIsFunding)} />
             <div className="deploy-title">{deployTitle}</div>
             <div className="deploy-amount">Amount {web3Utils.fromWei(amount, 'ether')} ETH</div>
             {player === 0 && playerAIsFunding && <div >Check your wallet to see the status of the transaction.</div>}

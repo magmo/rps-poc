@@ -1,7 +1,7 @@
 @import "../_colors";
 @import "../_fonts";
 
-.welcome-title{
+.welcome-title {
     font-family: $rps-font-family;
     font-size: 30px;
     font-weight: bold;
@@ -11,27 +11,30 @@
     letter-spacing: normal;
 }
 
-.welcome-text{
+.welcome-text {
     font-family: $rps-font-family;
 }
-.welcome-button-container{
+
+.welcome-button-container {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.welcome-container{
-    padding:28px;
-    display:flex;
+
+.welcome-container {
+    padding: 28px;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     height: 100%;
 }
+
 .welcome-button {
     font-family: $rps-font-family;
     background-color: $rps-wallet-orange;
     border-color: $rps-wallet-orange;
-    color:#fff;
-    width:90%;
+    color: #fff;
+    width: 90%;
     border-radius: 10px;
     margin: 0 auto;
 }
@@ -43,13 +46,15 @@
     color: $rps-wallet-grey;
     align-self: flex-start;
     margin: auto 0 0 0;
-    
+
 }
-.welcome-spacer{
+
+.welcome-spacer {
     margin: auto 0 0 0;
 }
+
 .welcome-icon {
-    height:50px;
-    width:50px;
+    height: 50px;
+    width: 50px;
     margin: 150px auto 0 auto;
 }

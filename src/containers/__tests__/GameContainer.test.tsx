@@ -7,7 +7,7 @@ import configureStore from 'redux-mock-store';
 import GameProposed from '../../components/GameProposedPage';
 
 const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, twitterHandle } = scenarios.standard;
-const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, twitterHandle};
+const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName, twitterHandle };
 const mockStore = configureStore();
 
 

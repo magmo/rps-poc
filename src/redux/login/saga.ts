@@ -51,9 +51,9 @@ function* loginStatusWatcherSaga() {
 
 export default function* loginRootSaga() {
   const metaMask = yield metamaskSaga();
-  
+
   // If metamask is not properly set up we can halt processing and wait for the reload
-  if (!metaMask){
+  if (!metaMask) {
     return;
   }
 

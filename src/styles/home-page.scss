@@ -25,22 +25,22 @@ $background-image-max-width: 400px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
-	max-width: 70%; 
+	max-width: 70%;
 }
 
 .homePage-loginButton {
-  margin-top: $loginButton-height;
-  font-size: 20px;
+	margin-top: $loginButton-height;
+	font-size: 20px;
 }
 
 .homePage-image {
-  background-image: url(images/homepage_image.png);
-  background-repeat: no-repeat;
-  background-size: $background-image-size;
+	background-image: url(images/homepage_image.png);
+	background-repeat: no-repeat;
+	background-size: $background-image-size;
 	height: 100%;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: $background-image-width;
-  max-width: $background-image-max-width;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: $background-image-width;
+	max-width: $background-image-max-width;
 }

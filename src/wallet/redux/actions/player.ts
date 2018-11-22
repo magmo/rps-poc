@@ -18,8 +18,8 @@ export const closeWallet = () => ({
   type: CLOSE_WALLET,
 });
 
-export const approveWithdrawal= ()=>({
-type:APPROVE_WITHDRAWAL,
+export const approveWithdrawal = () => ({
+  type: APPROVE_WITHDRAWAL,
 });
 
 export const selectWithdrawalAddress = (address: string) => ({

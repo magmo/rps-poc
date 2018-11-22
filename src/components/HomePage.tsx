@@ -21,7 +21,7 @@ const HomePage: React.SFC<IProps> = ({ login }) => {
           </Button>
         </div>
       </div>
-    <div className="homePage-image" />
+      <div className="homePage-image" />
     </div >
   );
 };

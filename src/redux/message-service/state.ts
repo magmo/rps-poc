@@ -12,6 +12,6 @@ export interface MessageState {
   actionToRetry?: actions.PositionReceived;
 }
 
-export function sendMessage(position: Position, opponentAddress: string,  state: MessageState): MessageState {
-  return { ...state, opponentOutbox: { opponentAddress, position }};
+export function sendMessage(position: Position, opponentAddress: string, state: MessageState): MessageState {
+  return { ...state, opponentOutbox: { opponentAddress, position } };
 }

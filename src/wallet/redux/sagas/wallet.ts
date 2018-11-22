@@ -170,13 +170,13 @@ export function* handleWithdrawalRequest(
   const { address: playerAddress, channelId } = wallet;
   walletEngine.requestWithdrawal();
   yield put(stateActions.stateChanged(walletEngine.state));
-  yield take (playerActions.APPROVE_WITHDRAWAL);
+  yield take(playerActions.APPROVE_WITHDRAWAL);
 
   walletEngine.confirmWithdrawal(position.resolution[walletEngine.playerIndex]);
   yield put(stateActions.stateChanged(walletEngine.state));
 
   const destination = web3.eth.defaultAccount;
-  walletEngine.selectWithdrawalAddress(destination,position.resolution[walletEngine.playerIndex]);
+  walletEngine.selectWithdrawalAddress(destination, position.resolution[walletEngine.playerIndex]);
   yield put(stateActions.stateChanged(walletEngine.state));
 
   const data = [
@@ -201,7 +201,7 @@ export function* handleWithdrawalRequest(
     yield put(stateActions.stateChanged(newState));
     yield take(playerActions.CLOSE_WALLET);
     yield put(actions.withdrawalSuccess(transaction));
-   
+
 
   } else {
     yield put(actions.withdrawalFailure(failureReason));

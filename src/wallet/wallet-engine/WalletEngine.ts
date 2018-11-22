@@ -92,30 +92,30 @@ export default class WalletEngine {
   }
 
   requestWithdrawal(): State {
-    if (this.state instanceof CommonState.Funded){
+    if (this.state instanceof CommonState.Funded) {
       return this.transitionTo(new CommonState.ConfirmWithdrawal());
     }
 
     return this.state;
   }
 
-  confirmWithdrawal(withdrawalAmount:BN):State{
-    if (this.state instanceof CommonState.ConfirmWithdrawal){
+  confirmWithdrawal(withdrawalAmount: BN): State {
+    if (this.state instanceof CommonState.ConfirmWithdrawal) {
       return this.transitionTo(new CommonState.SelectWithdrawalAddress(withdrawalAmount));
     }
     return this.state;
   }
 
-  selectWithdrawalAddress(depositAddress:string, withdrawalAmount: BN): State {
-    if (this.state instanceof CommonState.SelectWithdrawalAddress){
-      return this.transitionTo(new CommonState.WaitForWithdrawal(depositAddress,withdrawalAmount));
+  selectWithdrawalAddress(depositAddress: string, withdrawalAmount: BN): State {
+    if (this.state instanceof CommonState.SelectWithdrawalAddress) {
+      return this.transitionTo(new CommonState.WaitForWithdrawal(depositAddress, withdrawalAmount));
     }
 
     return this.state;
   }
 
-  withdrawalComplete(){
-    if (this.state instanceof CommonState.WaitForWithdrawal){
+  withdrawalComplete() {
+    if (this.state instanceof CommonState.WaitForWithdrawal) {
       return this.transitionTo(new CommonState.WithdrawalComplete(this.state.withdrawalAmount));
     }
     return this.state;

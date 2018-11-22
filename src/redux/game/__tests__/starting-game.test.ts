@@ -9,10 +9,10 @@ import {
 } from './helpers';
 
 const {
-  asAddress, bsAddress,channelNonce, libraryAddress, roundBuyIn, preFundSetupA,
+  asAddress, bsAddress, channelNonce, libraryAddress, roundBuyIn, preFundSetupA,
 } = scenarios.standard;
 
-const params = { myName: 'Tom', roundBuyIn, myAddress:asAddress, libraryAddress, twitterHandle:"Tweet" };
+const params = { myName: 'Tom', roundBuyIn, myAddress: asAddress, libraryAddress, twitterHandle: "Tweet" };
 const messageState = {};
 
 describe('when in lobby', () => {
@@ -20,7 +20,7 @@ describe('when in lobby', () => {
 
   describe('when the player joins a open game', () => {
     const action = actions.joinOpenGame(
-   'Andrew', bsAddress,channelNonce, roundBuyIn
+      'Andrew', bsAddress, channelNonce, roundBuyIn
     );
     const updatedState = gameReducer({ gameState, messageState }, action);
 
@@ -59,7 +59,7 @@ describe('when in waiting room', () => {
   const gameState = state.waitingRoom(params);
 
   describe('when PreFundSetupA arrives', () => {
-    const action = actions.initialPositionReceived(preFundSetupA,'Tom');
+    const action = actions.initialPositionReceived(preFundSetupA, 'Tom');
     const updatedState = gameReducer({ gameState, messageState }, action);
 
     itTransitionsTo(state.StateName.ConfirmGameB, updatedState);

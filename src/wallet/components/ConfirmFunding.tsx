@@ -19,7 +19,7 @@ export interface ConfirmFundingDispatchProps {
 
 export default class ConfirmFunding extends React.Component<
   ConfirmFundingProps & ConfirmFundingDispatchProps
-> {
+  > {
   render() {
     const {
       rulesAddress,

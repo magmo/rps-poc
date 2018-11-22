@@ -8,35 +8,41 @@
     margin: -80px 35px 35px 35px;
     justify-content: center;
 }
-.funding-container{
-    height:87%;
-}
-.deploy-title, .deposit-title{
-    font-size:40px;
-    font-weight:bold;
+
+.funding-container {
+    height: 87%;
 }
 
-.deploy-icon, .deposit-icon {
+.deploy-title,
+.deposit-title {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.deploy-icon,
+.deposit-icon {
     margin-bottom: 10px;
 }
 
 
-.funding-divider{
+.funding-divider {
     height: 1px;
-    width:100%;
+    width: 100%;
     color: $rps-wallet-light-grey;
     border-width: 1px;
     border-style: dashed;
     margin: 30px 0;
 }
 
-.deploy-amount, .deposit-amount {
+.deploy-amount,
+.deposit-amount {
     font-size: 14px;
 }
 
-.funding-off{
+.funding-off {
     color: $rps-wallet-light-grey;
 }
+
 .funding-circle {
     width: 40px;
     height: 40px;
@@ -52,22 +58,22 @@
     color: $rps-white;
 }
 
-.funding-header{
+.funding-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin:25px;
+    margin: 25px;
 }
 
-.funding-header-icon{
-    width:50px;
-    height:50px;
+.funding-header-icon {
+    width: 50px;
+    height: 50px;
 }
 
-.return-button{
+.return-button {
     display: flex;
     background-color: $rps-wallet-orange;
     border-color: $rps-wallet-orange;
-    color:#fff;
+    color: #fff;
     margin: 0 auto;
 }

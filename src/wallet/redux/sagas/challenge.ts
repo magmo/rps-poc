@@ -45,7 +45,7 @@ export default function* challengeSaga(challenge, theirPositionString: string, t
 
   yield put(challengeActions.setChallenge(expirationTime, responseOptions, userIsChallenger ? ChallengeStatus.WaitingOnOtherPlayer : ChallengeStatus.WaitingForUserSelection));
   yield put(displayActions.showWallet());
-  yield fork(challengeExpirer,expirationTime);
+  yield fork(challengeExpirer, expirationTime);
   if (!userIsChallenger) {
     const action: challengeActions.ResponseAction = yield take(challengeActions.RESPONSE_ACTIONS);
     switch (action.type) {
@@ -68,13 +68,13 @@ export default function* challengeSaga(challenge, theirPositionString: string, t
         break;
     }
   }
- 
+
   return true;
 }
 
-function* challengeExpirer(expirationTime){
+function* challengeExpirer(expirationTime) {
   yield delay((expirationTime * 1000) - Date.now());
-  yield put (challengeActions.setChallengeStatus(ChallengeStatus.Expired));
+  yield put(challengeActions.setChallengeStatus(ChallengeStatus.Expired));
 
   // TODO: This is hack and needs to be replaced properly
   yield take(blockchainActions.WITHDRAW_SUCCESS);

@@ -10,7 +10,7 @@ import { GameLayout } from './GameLayout';
 interface Props {
   chooseMove: (move: Move) => void;
   afterOpponent?: any;
-  challengeExpirationDate?:number;
+  challengeExpirationDate?: number;
 
 }
 
@@ -29,7 +29,7 @@ export default class SelectMoveStep extends React.PureComponent<Props> {
       <GameLayout>
         <div className="w-100 text-center mb-5">
           <h1 className="mb-5">
-          {challengeExpirationDate && `Challenge detected, respond by ${new Date(challengeExpirationDate).toString()}` }
+            {challengeExpirationDate && `Challenge detected, respond by ${new Date(challengeExpirationDate).toString()}`}
             {afterOpponent
               ? 'Your opponent has chosen a move, now choose yours:'
               : 'Choose your move:'}

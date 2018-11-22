@@ -65,7 +65,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
   }
 
   calculateRoundBuyIn() {
-    const roundBuyIn = parseFloat(this.state.buyIn)/5;
+    const roundBuyIn = parseFloat(this.state.buyIn) / 5;
     if (roundBuyIn) {
       return roundBuyIn;
     }
@@ -109,7 +109,7 @@ export default class CreatingOpenGameModal extends React.PureComponent<Props, St
                 This is 20% of the game buy in amount.
               </small>
             </div>
-            <Button className="cog-button" type="submit" disabled={this.state.errorMessage !== "" || !this.state.buyInChanged } block={true}>
+            <Button className="cog-button" type="submit" disabled={this.state.errorMessage !== "" || !this.state.buyInChanged} block={true}>
               Create Game
             </Button>
           </form>

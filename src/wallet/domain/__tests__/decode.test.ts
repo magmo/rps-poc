@@ -25,8 +25,8 @@ const testEncodeDecode = (pledge) => {
 };
 
 describe('decode', () => {
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.Conclude}));
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.Game}));
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.PostFundSetup}));
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.PreFundSetup}));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.Conclude }));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.Game }));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.PostFundSetup }));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.PreFundSetup }));
 });

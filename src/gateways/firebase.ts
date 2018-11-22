@@ -15,4 +15,4 @@ export const reduxSagaFirebase = new ReduxSagaFirebase(fire);
 export const authProvider = new firebase.auth.GoogleAuthProvider();
 export default fire;
 
-export const  serverTimestamp = firebase.database.ServerValue.TIMESTAMP;
+export const serverTimestamp = firebase.database.ServerValue.TIMESTAMP;

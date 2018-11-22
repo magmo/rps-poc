@@ -49,7 +49,7 @@ export async function deploySimpleAdjudicator({ channelId, amount }: { channelId
   return await truffleContract.at(deployedContract.options.address);
 }
 
-async function verifyContractDeployed(address){
+async function verifyContractDeployed(address) {
   // Check if we can access the code at the address if not delay and try again
   let code = await connectWeb3().eth.getCode(address);
   let delayAmount = 100;
@@ -58,16 +58,16 @@ async function verifyContractDeployed(address){
     delayAmount *= 2;
     code = await connectWeb3().eth.getCode(address);
   }
-  if (code === '' || code === '0x'){
+  if (code === '' || code === '0x') {
     return false;
-  }else{
+  } else {
     return true;
   }
 }
 
 export async function simpleAdjudicatorAt({ address, amount }: { address: string, amount: BN }) {
   await verifyContractDeployed(address);
-  
+
   const truffleContract = await setupContract(connectWeb3());
   return await truffleContract.at(address, { value: amount.toString() });
 }
@@ -80,7 +80,7 @@ async function setupContract(connectedWeb3) {
 
   const network = await detectNetwork(web3.currentProvider);
   simpleAdjudicatorContract.setNetwork(network.id);
-  
+
   await simpleAdjudicatorContract.defaults({ from: connectedWeb3.eth.defaultAccount });
   return simpleAdjudicatorContract;
 }

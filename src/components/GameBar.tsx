@@ -37,7 +37,7 @@ export default class GameBar extends React.PureComponent<Props> {
   )
 
   render() {
-    const { myName, opponentName, roundBuyIn, myBalance, opponentBalance} = this.props;
+    const { myName, opponentName, roundBuyIn, myBalance, opponentBalance } = this.props;
 
     const myGameCount = Math.round(hexToBN(myBalance).div(hexToBN(roundBuyIn)).toNumber());
     const opponentGameCount = Math.round(hexToBN(opponentBalance).div(hexToBN(roundBuyIn)).toNumber());

@@ -10,7 +10,7 @@ export const loginRequest = () => ({
   type: LOGIN_REQUEST as typeof LOGIN_REQUEST,
 });
 
-export const loginSuccess = (user: any, libraryAddress:string) => ({
+export const loginSuccess = (user: any, libraryAddress: string) => ({
   type: LOGIN_SUCCESS as typeof LOGIN_SUCCESS,
   user,
   libraryAddress,

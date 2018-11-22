@@ -41,7 +41,7 @@ export class OpenGameEntry extends React.PureComponent<Props, State> {
             <div className="ogc-stake-currency">ETH</div>
           </div>
           <svg className="ogc-divider">
-            <line x1="0" y1="0" x2="0" y2="14"/>
+            <line x1="0" y1="0" x2="0" y2="14" />
           </svg>
           <div className="ogc-round-buyin pl-3">
             <div className="ogc-stake-header">Round Buy In:</div>

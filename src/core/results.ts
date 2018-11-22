@@ -41,7 +41,7 @@ export enum AbsoluteResult {
 export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) {
   const youArePlayerA = youAre === Player.PlayerA;
 
-  switch(relativeResult) {
+  switch (relativeResult) {
     case Result.Tie:
       return AbsoluteResult.Tie;
     case Result.YouWin:
@@ -54,7 +54,7 @@ export function convertToAbsoluteResult(relativeResult: Result, youAre: Player) 
 export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: Player): Result {
   const youArePlayerA = youAre === Player.PlayerA;
 
-  switch(absoluteResult) {
+  switch (absoluteResult) {
     case AbsoluteResult.Tie:
       return Result.Tie;
     case AbsoluteResult.AWins:
@@ -66,12 +66,12 @@ export function convertToRelativeResult(absoluteResult: AbsoluteResult, youAre: 
 }
 
 export function balancesAfterResult(absoluteResult: AbsoluteResult, roundBuyIn: BN, balances: [BN, BN]): [BN, BN] {
-  switch(absoluteResult) {
+  switch (absoluteResult) {
     case AbsoluteResult.AWins:
-      return [ balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2)) ];
+      return [balances[0].add(roundBuyIn.muln(2)), balances[1].sub(roundBuyIn.muln(2))];
     case AbsoluteResult.BWins:
       return balances;
     case AbsoluteResult.Tie:
-      return [ balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1)) ];
+      return [balances[0].add(roundBuyIn.muln(1)), balances[1].sub(roundBuyIn.muln(1))];
   }
 }

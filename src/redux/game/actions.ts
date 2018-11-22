@@ -45,16 +45,16 @@ export const joinOpenGame = (
   roundBuyIn,
 });
 
-export const initialPositionReceived = (position: positions.PreFundSetupA, opponentName:string) => ({
+export const initialPositionReceived = (position: positions.PreFundSetupA, opponentName: string) => ({
   type: INITIAL_POSITION_RECEIVED as typeof INITIAL_POSITION_RECEIVED,
   position,
-opponentName,
+  opponentName,
 });
 
 export const confirmGame = () => ({
   type: CONFIRM_GAME as typeof CONFIRM_GAME,
 });
-export const declineGame  = () => ({
+export const declineGame = () => ({
   type: DECLINE_GAME as typeof DECLINE_GAME,
 });
 
@@ -98,7 +98,7 @@ export const exitToLobby = () => ({
 });
 
 // TODO: Should this be moved?
-export const messageSent = ()=>({
+export const messageSent = () => ({
   type: MESSAGE_SENT as typeof MESSAGE_SENT,
 });
 

@@ -29,7 +29,7 @@ export default class NavigationBar extends React.PureComponent<Props, State> {
         <Button color="link" className="navbar-button ml-auto" onClick={this.props.logoutRequest}>
           Sign Out
         </Button>
-        <RulesModal visible={this.props.showRules} rulesRequest={this.props.rulesRequest}/>
+        <RulesModal visible={this.props.showRules} rulesRequest={this.props.rulesRequest} />
       </Navbar>
     );
   }

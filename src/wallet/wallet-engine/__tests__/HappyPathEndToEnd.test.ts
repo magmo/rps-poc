@@ -44,7 +44,7 @@ describe('Happy path runthrough', () => {
   });
 
   it('should have the wait for A to deploy state', () => {
-    const waitForAToDeploy =  walletEngineB.approve();
+    const waitForAToDeploy = walletEngineB.approve();
     expect(waitForAToDeploy).toBeInstanceOf(WalletStatesB.WaitForAToDeploy);
   });
 
