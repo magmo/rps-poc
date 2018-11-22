@@ -7,7 +7,7 @@ import { randomHex } from '../../utils/randomHex';
 import { calculateResult, balancesAfterResult, calculateAbsoluteResult, Player, positions } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
-import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/external';
+import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/_external';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';

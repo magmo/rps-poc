@@ -2,13 +2,13 @@ import { take, put, actionChannel, call, fork, cancel, spawn } from 'redux-saga/
 import { eventChannel } from 'redux-saga';
 
 import { ConclusionProof } from '../../domain/ConclusionProof';
-import * as blockchainActions from '../actions/blockchain';
+import * as blockchainActions from '../actions/_blockchain';
 import { deploySimpleAdjudicator, simpleAdjudicatorAt } from '../../../contracts/SimpleAdjudicator';
-import * as externalActions from '../actions/external';
-import { Signature } from '../../../wallet/domain';
+import * as externalActions from '../actions/_external';
+import { Signature } from '../../domain';
 import hash from 'object-hash';
 import { SolidityType } from 'fmg-core';
-import ChannelWallet from '../../../wallet/domain/ChannelWallet';
+import ChannelWallet from '../../domain/ChannelWallet';
 
 
 export function* blockchainSaga(wallet) {

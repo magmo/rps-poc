@@ -31,19 +31,21 @@ export type FundingRequest = ReturnType<typeof fundingRequest>;
 // CHANNELS
 // ========
 
-export const OPEN_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.OPEN';
-export const CLOSE_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.CLOSE';
 
+// Currently triggered in the app's messaging-service, immediately before funding is requested
+// j
+export const OPEN_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.OPEN';
 export const openChannelRequest = (channel: Channel) => ({
   type: OPEN_CHANNEL_REQUEST as typeof OPEN_CHANNEL_REQUEST,
   channel,
 });
+export type OpenChannelRequest = ReturnType<typeof openChannelRequest>;
 
+export const CLOSE_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.CLOSE';
 export const closeChannelRequest = () => ({
   type: CLOSE_CHANNEL_REQUEST as typeof CLOSE_CHANNEL_REQUEST,
 });
 
-export type OpenChannelRequest = ReturnType<typeof openChannelRequest>;
 export type CloseChannelRequest = ReturnType<typeof closeChannelRequest>;
 
 

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 
 import GameFooter from '../components/GameFooter';
 import * as gameActions from '../redux/game/actions';
-import * as walletActions from '../wallet/redux/actions/external';
+import * as walletActions from '../wallet/redux/actions/_external';
 
 function mapStateToProps() {
   return {};

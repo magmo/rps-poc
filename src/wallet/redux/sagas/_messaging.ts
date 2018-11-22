@@ -1,4 +1,4 @@
-import { MESSAGE_RECEIVED, MESSAGE_SENT } from "../actions/external";
+import { MESSAGE_RECEIVED, MESSAGE_SENT } from "../actions/_external";
 import { actionChannel, take, call } from "redux-saga/effects";
 import ChannelWallet from "../../domain/ChannelWallet";
 import { reduxSagaFirebase, serverTimestamp } from "../../../gateways/firebase";
