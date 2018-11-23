@@ -31,7 +31,7 @@ function testOutcome(yourMove: Move, theirMove: Move, expectedResult: Result) {
       });
     });
 
-    describe('when you are player A', () => {
+    describe('when you are player B', () => {
       const absoluteResultFromMoves = calculateAbsoluteResult(theirMove, yourMove);
 
       const relativeResultFromAbsolute = convertToRelativeResult(absoluteResultFromMoves, Player.PlayerB);
