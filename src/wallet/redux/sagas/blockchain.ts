@@ -10,7 +10,6 @@ import { SolidityType } from 'fmg-core';
 import ChannelWallet from '../../../wallet/domain/ChannelWallet';
 import { createFactory, depositFunds, deployContract } from '../../../contracts/simpleAdjudicatorUtils';
 import { eventChannel } from 'redux-saga';
-import bigNumberToBN from '../../../utils/bigNumberToBN';
 
 export function* blockchainSaga(wallet) {
   const { simpleAdjudicator, eventListener } = yield call(contractSetup);
@@ -51,10 +50,10 @@ function* contractSetup() {
         break;
       case blockchainActions.DEPOSIT_REQUEST: // Player B
         try {
-          const { address, amount} = action;
+          const { address, amount } = action;
           const factory = yield call(createFactory);
           const existingContract: ethers.Contract = factory.attach(address);
-          const transaction =yield call(depositFunds,address,amount);
+          const transaction = yield call(depositFunds, address, amount);
           yield put(blockchainActions.depositSuccess(transaction));
           const eventListener = yield spawn(watchAdjudicator, existingContract);
 
@@ -160,7 +159,7 @@ function convertBigNumberArgsToBN(argumentObject): any {
   const convertedObject = {};
   Object.keys(argumentObject).forEach(key => {
     if (argumentObject[key].constructor.name === 'BigNumber') {
-      convertedObject[key] = bigNumberToBN(argumentObject[key]);
+      convertedObject[key] = argumentObject[key].toBn();
     } else {
       convertedObject[key] = argumentObject[key];
     }
