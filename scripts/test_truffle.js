@@ -13,6 +13,12 @@ process.env.PUBLIC_URL = '';
 if (!process.env.DEV_GANACHE_PORT) {
   process.env.DEV_GANACHE_PORT = 5732;
 }
+
+process.on('unhandledRejection', err => {
+  throw err;
+});
+
+
 console.log(`Using port ${process.env.DEV_GANACHE_PORT} for Ganache.`);
 require('magmo-devtools').startGanache().then(() => {
   const trufflePath = path.resolve(__dirname, '../node_modules/.bin/truffle');
@@ -27,5 +33,7 @@ require('magmo-devtools').startGanache().then(() => {
       console.log(err);
       process.exit(1);
     }
+    process.exit(0);
   });
+
 });
