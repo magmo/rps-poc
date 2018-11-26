@@ -4,6 +4,7 @@ import { AdjudicatorExists, ChannelOpen, channelOpen, } from './shared';
 export const FUNDING = 'FUNDING';
 
 // state types
+export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 export const APPROVE_FUNDING = 'APPROVE_FUNDING';
 export const A_INITIATE_DEPLOY = 'A_INITIATE_DEPLOY';
 export const B_WAIT_FOR_DEPLOY_INITIATION = 'B_WAIT_FOR_DEPLOY_INITIATION';
@@ -14,6 +15,11 @@ export const WAIT_FOR_DEPOSIT_CONFIRMATION = 'WAIT_FOR_DEPOSIT_CONFIRMATION';
 export const B_WAIT_FOR_POST_FUND_SETUP = 'B_WAIT_FOR_POST_FUND_SETUP';
 export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
 export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
+
+export interface WaitForFundingRequest extends ChannelOpen {
+  type: typeof WAIT_FOR_FUNDING_REQUEST;
+  stage: typeof FUNDING;
+}
 
 interface ApproveFunding extends ChannelOpen {
   type: typeof APPROVE_FUNDING;
@@ -65,12 +71,16 @@ interface AcknowledgeFundingSuccess extends AdjudicatorExists {
   stage: typeof FUNDING;
 }
 
+export function waitForFundingRequest<T extends ChannelOpen>(params: T): WaitForFundingRequest {
+  return { type: WAIT_FOR_FUNDING_REQUEST, stage: FUNDING, ...channelOpen(params) };
+}
 
 export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding {
   return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
 }
 
 export type FundingState = (
+  | WaitForFundingRequest
   | ApproveFunding
   | AInitiateDeploy
   | BWaitForDeployInitiation
