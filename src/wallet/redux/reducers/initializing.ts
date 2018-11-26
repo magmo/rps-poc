@@ -6,8 +6,6 @@ import {
   WaitForAddress,
   WAIT_FOR_LOGIN,
   WAIT_FOR_ADDRESS,
-  WAIT_FOR_CHANNEL,
-  WaitForChannel,
   waitForAddress
 } from '../../states';
 
@@ -20,8 +18,6 @@ export const initializingReducer = (state: InitializingState, action: WalletActi
       return waitForLoginReducer(state, action);
     case WAIT_FOR_ADDRESS:
       return waitForAddressReducer(state, action);
-    case WAIT_FOR_CHANNEL:
-      return waitForChannelReducer(state, action);
     default:
       return unreachable(state);
   }
@@ -45,8 +41,4 @@ const waitForAddressReducer = (state: WaitForAddress, action: any) => {
     default:
       return state;
   }
-};
-
-const waitForChannelReducer = (state: WaitForChannel, action: any) => {
-  return state;
 };

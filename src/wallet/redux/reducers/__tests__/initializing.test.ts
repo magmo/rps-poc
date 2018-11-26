@@ -28,12 +28,3 @@ describe('when in WaitForAddress', () => {
     itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
   });
 });
-
-describe('when in WaitForChannel', () => {
-  const state = states.waitForChannel(defaults);
-
-  describe('when our user requests a channel', () => {});
-
-  describe('when the PreFundSetup arrives from another player', () => {});
-
-});

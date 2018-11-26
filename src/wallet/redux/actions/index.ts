@@ -21,14 +21,15 @@ export const ADDRESS_REQUEST = ''; // provide me with an address
 export const OWN_POSITION_RECEIVED = 'WALLET.OWN_POSITION_RECEIVED';
 export const ownPositionReceived = (data: string) => ({
   type: OWN_POSITION_RECEIVED as typeof OWN_POSITION_RECEIVED,
-  data
+  data,
 });
 export type OwnPositionReceived = ReturnType<typeof ownPositionReceived>;
 
 export const OPPONENT_POSITION_RECEIVED = 'WALLET.OPPONENT_POSITION_RECEIVED';
 export const opponentPositionReceived = (data: string, signature: string) => ({
   type: OPPONENT_POSITION_RECEIVED as typeof OPPONENT_POSITION_RECEIVED,
-  data
+  data,
+  signature,
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 

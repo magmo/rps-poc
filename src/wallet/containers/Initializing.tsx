@@ -4,7 +4,7 @@ import { unreachable } from '../utils';
 
 import { PureComponent } from 'react';
 
-import { InitializingState, WAIT_FOR_ADDRESS, WAIT_FOR_CHANNEL, WAIT_FOR_LOGIN } from '../states';
+import { InitializingState, WAIT_FOR_ADDRESS, WAIT_FOR_LOGIN } from '../states';
 
 import Todo from '../components/Todo';
 
@@ -20,8 +20,6 @@ export default class InitializingContainer extends PureComponent<Props> {
       case WAIT_FOR_LOGIN:
         return <Todo stateType={state.type} />;
       case WAIT_FOR_ADDRESS:
-        return <Todo stateType={state.type} />;
-      case WAIT_FOR_CHANNEL:
         return <Todo stateType={state.type} />;
       default:
         return unreachable(state);
