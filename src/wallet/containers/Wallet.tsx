@@ -30,7 +30,7 @@ class Wallet extends PureComponent<WalletProps> {
             {this.props.children}
           </FooterLayout>
         );
-      case DisplayMode.None:
+      default:
         return this.props.children;
     }
   }
