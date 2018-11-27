@@ -134,7 +134,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
   });
 
   describe('when the wallet detects an opponent challenge', () => {
-    const action = actions.opponentChallengeDetected();
+    const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
