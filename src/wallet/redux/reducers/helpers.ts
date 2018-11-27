@@ -14,19 +14,19 @@ export const validTransition = (fromState: WalletState, toState: State) => {
     (toState.channel.participants[1] === fromState.participants[1]) &&
     (toState.channel.channelType === fromState.libraryAddress) &&
     (toState.channel.id === fromState.channelId);
-}
+};
 
 export const validSignature = (data: string, signature: string, address: string) => {
   try {
     const signerAddress = recoverAddress(hashMessage(data), signature);
-    return signerAddress == getAddress(address);
+    return signerAddress === getAddress(address);
   } catch {
     return false;
   }
-}
+};
 
 export const ourTurn = (state: WalletState) => {
   if (!('turnNum' in state)) { return false; }
 
   return state.turnNum % 2 !== state.ourIndex;
-}
+};

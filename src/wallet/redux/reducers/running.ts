@@ -77,6 +77,6 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
     default:
       return state;
   }
-}
+};
 
 
