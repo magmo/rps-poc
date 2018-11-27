@@ -22,7 +22,6 @@ const {
 
 const defaults = {
   uid: 'uid',
-  displayMode: states.DisplayMode.None,
   participants,
   libraryAddress,
   channelId,

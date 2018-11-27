@@ -26,4 +26,3 @@ export * from './challenging';
 export * from './responding';
 export * from './withdrawing';
 export * from './closing';
-export { DisplayMode } from './shared';
