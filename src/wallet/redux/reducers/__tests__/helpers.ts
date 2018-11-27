@@ -11,3 +11,9 @@ export const itTransitionsToStateType = (type, state: WalletState) => {
     expect(state.type).toEqual(type);
   });
 };
+
+export const itDoesntTransition = (oldState: WalletState, newState: WalletState) => {
+  it(`doesn't transition`, () => {
+    expect(newState).toEqual(oldState);
+  });
+};

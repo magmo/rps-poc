@@ -69,4 +69,6 @@ export const WITHDRAWAL_FINALISED = '.';
 export type WalletAction = (
   | LoggedIn
   | KeysLoaded
+  | OwnPositionReceived
+  | OpponentPositionReceived
 );
