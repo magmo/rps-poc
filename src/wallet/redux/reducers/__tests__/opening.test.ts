@@ -51,7 +51,7 @@ describe('when in WaitForChannel', () => {
 
   describe('when we send in a a non-PreFundSetupA', () => {
     const state = states.waitForChannel(defaults);
-    const action = actions.ownPositionReceived(preFundSetupBHex)
+    const action = actions.ownPositionReceived(preFundSetupBHex);
     const updatedState = walletReducer(state, action);
 
     itDoesntTransition(state, updatedState);
@@ -96,7 +96,7 @@ describe('when in WaitForPreFundSetup', () => {
 
   describe('when we send in a a non-PreFundSetupB', () => {
     const state = states.waitForPreFundSetup({ ...defaults2, ourIndex: 1 });
-    const action = actions.ownPositionReceived(preFundSetupAHex)
+    const action = actions.ownPositionReceived(preFundSetupAHex);
     const updatedState = walletReducer(state, action);
 
     itDoesntTransition(state, updatedState);
