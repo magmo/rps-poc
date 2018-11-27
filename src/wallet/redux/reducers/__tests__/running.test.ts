@@ -3,7 +3,7 @@ import { walletReducer } from '..';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itDoesntTransition, itIncreasesTurnNumBy} from './helpers';
+import { itTransitionsToStateType, itDoesntTransition, itIncreasesTurnNumBy } from './helpers';
 import { scenarios } from '../../../../core';
 
 const {
@@ -30,6 +30,7 @@ const defaults = {
   penultimatePosition: acceptHex,
   turnNum: 6,
   adjudicator: 'adj-address',
+  challengeExpiry: new Date(),
 };
 
 const bParams = { address: bsAddress, ourIndex: 1, privateKey: bsPrivateKey };
@@ -74,7 +75,7 @@ describe('when in WaitForUpdate on our turn', () => {
   });
 
   describe('when the wallet detects an opponent challenge', () => {
-    const action = actions.opponentChallengeDetected();
+    const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
