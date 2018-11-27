@@ -18,9 +18,16 @@ const {
   channelId,
   participants,
   channelNonce,
+  libraryAddress,
 } = scenarios.standard;
 
-const defaults = { uid: 'uid', displayMode: states.DisplayMode.None, address: asAddress, privateKey: asPrivateKey };
+const defaults = {
+  uid: 'uid',
+  displayMode: states.DisplayMode.None,
+  address: asAddress,
+  privateKey: asPrivateKey,
+  libraryAddress,
+};
 
 describe('when in WaitForChannel', () => {
   describe('when we send in a PreFundSetupA', () => { // preFundSetupA is A's move, so in this case we need to be player A
@@ -65,7 +72,7 @@ describe('when in WaitForPreFundSetup', () => {
     participants,
     channelNonce,
     turnNum: 0,
-    position0: preFundSetupAHex,
+    lastPosition: preFundSetupAHex,
   };
 
   describe('when we send a PreFundSetupB', () => {

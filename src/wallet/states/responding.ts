@@ -1,4 +1,4 @@
-import { AdjudicatorExists } from './shared';
+import { AdjudicatorExists, adjudicatorExists } from './shared';
 
 // stage
 export const RESPONDING = 'RESPONDING';
@@ -14,6 +14,9 @@ export const WAIT_FOR_RESPONSE_CONFIRMATION = 'WAIT_FOR_RESPONSE_CONFIRMATION';
 interface AcknowledgeChallenge extends AdjudicatorExists {
   type: typeof ACKNOWLEDGE_CHALLENGE;
   stage: typeof RESPONDING;
+}
+export function acknowledgeChallenge<T extends AdjudicatorExists>(params: T): AcknowledgeChallenge {
+  return { type: ACKNOWLEDGE_CHALLENGE, stage: RESPONDING, ...adjudicatorExists(params) };
 }
 
 interface ChooseResponse extends AdjudicatorExists {

@@ -1,11 +1,11 @@
 import { State } from 'fmg-core';
+import { validSignature } from './helpers';
 
 import * as states from '../../states';
 import * as actions from '../actions';
 import { unreachable } from '../../utils';
 
 import decode from '../../domain/decode';
-import { recoverAddress, getAddress, hashMessage } from 'ethers/utils';
 
 export const openingReducer = (state: states.OpeningState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {
@@ -36,12 +36,13 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
+        libraryAddress: ownPosition.channel.gameLibrary,
         channelId: ownPosition.channel.channelId,
         ourIndex: 0,
         participants: [ourAddress, opponentAddress],
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
-        position0: action.data,
+        lastPosition: action.data,
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -56,27 +57,21 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       const ourAddress2 = opponentPosition.channel.participants[1] as string;
       const opponentAddress2 = opponentPosition.channel.participants[0] as string;
 
-      // todo: check the signature matches
-      try {
-        const signerAddress = recoverAddress(hashMessage(action.data), action.signature);
+      if (!validSignature(action.data, action.signature, opponentAddress2)) { return state; }
 
-        if (signerAddress !== getAddress(opponentAddress2)) { return state; }
+      if (ourAddress2 !== state.address) { return state; }
 
-        if (ourAddress2 !== state.address) { return state; }
-
-        // if so, unpack its contents into the state
-        return states.waitForPreFundSetup({
-          ...state,
-          channelId: opponentPosition.channel.channelId,
-          ourIndex: 0,
-          participants: [ourAddress2, opponentAddress2],
-          channelNonce: opponentPosition.channel.channelNonce,
-          turnNum: 0,
-          position0: action.data,
-        });
-      } catch {
-        return state;
-      }
+      // if so, unpack its contents into the state
+      return states.waitForPreFundSetup({
+        ...state,
+        libraryAddress: opponentPosition.channel.gameLibrary,
+        channelId: opponentPosition.channel.channelId,
+        ourIndex: 0,
+        participants: [ourAddress2, opponentAddress2],
+        channelNonce: opponentPosition.channel.channelNonce,
+        turnNum: 0,
+        lastPosition: action.data,
+      });
 
     default:
       return state;
@@ -97,7 +92,8 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       return states.waitForFundingRequest({
         ...state,
         turnNum: 1,
-        position1: action.data,
+        lastPosition: action.data,
+        penultimatePosition: state.lastPosition,
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -110,20 +106,15 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
 
       const opponentAddress2 = state.participants[1 - state.ourIndex];
 
-      try {
-        const signerAddress = recoverAddress(hashMessage(action.data), action.signature);
+      if (!validSignature(action.data, action.signature, opponentAddress2)) { return state; }
 
-        if (signerAddress !== getAddress(opponentAddress2)) { return state; }
-
-        // if so, unpack its contents into the state
-        return states.waitForFundingRequest({
-          ...state,
-          turnNum: 1,
-          position1: action.data,
-        });
-      } catch {
-        return state;
-      }
+      // if so, unpack its contents into the state
+      return states.waitForFundingRequest({
+        ...state,
+        turnNum: 1,
+        lastPosition: action.data,
+        penultimatePosition: state.lastPosition,
+      });
 
     default:
       return state;

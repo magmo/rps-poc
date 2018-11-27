@@ -1,5 +1,5 @@
 import {
-  AdjudicatorExists
+  AdjudicatorExists, adjudicatorExists
 } from './shared';
 
 export const CHALLENGING = 'CHALLENGING';
@@ -14,6 +14,9 @@ export const ACKNOWLEDGE_CHALLENGE_TIMEOUT = 'ACKNOWLEDGE_CHALLENGE_TIMEOUT';
 interface ApproveChallenge extends AdjudicatorExists {
   type: typeof APPROVE_CHALLENGE;
   stage: typeof CHALLENGING;
+}
+export function approveChallenge<T extends AdjudicatorExists>(params: T): ApproveChallenge {
+  return { type: APPROVE_CHALLENGE, stage: CHALLENGING, ...adjudicatorExists(params) };
 }
 
 interface InitiateChallenge extends AdjudicatorExists {

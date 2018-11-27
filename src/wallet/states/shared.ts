@@ -21,15 +21,16 @@ export interface AddressExists extends LoggedIn {
 
 export interface ChannelPartiallyOpen extends AddressExists {
   channelId: string;
+  libraryAddress: string;
   ourIndex: number;
   participants: [string, string];
   channelNonce: number;
   turnNum: number;
-  position0: string;
+  lastPosition: string;
 }
 
 export interface ChannelOpen extends ChannelPartiallyOpen {
-  position1: string;
+  penultimatePosition: string;
 }
 
 export interface AdjudicatorExists extends ChannelOpen {
@@ -53,13 +54,13 @@ export function addressExists<T extends AddressExists>(params: T): AddressExists
 }
 
 export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T): ChannelPartiallyOpen {
-  const { channelId, ourIndex, participants, channelNonce, turnNum, position0 } = params;
-  return { ...addressExists(params), channelId, ourIndex, participants, channelNonce, turnNum, position0 };
+  const { channelId, ourIndex, participants, channelNonce, turnNum, lastPosition, libraryAddress } = params;
+  return { ...addressExists(params), channelId, ourIndex, participants, channelNonce, turnNum, lastPosition, libraryAddress };
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  const { position1 } = params;
-  return { ...channelPartiallyOpen(params), position1 };
+  const { penultimatePosition } = params;
+  return { ...channelPartiallyOpen(params), penultimatePosition };
 }
 
 export function adjudicatorExists<T extends AdjudicatorExists>(params: T): AdjudicatorExists {

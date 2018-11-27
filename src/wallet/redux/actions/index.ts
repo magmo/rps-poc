@@ -47,12 +47,23 @@ export const DEPOSIT_SUBMITTED = '.'; // when submitted to network
 export const DEPOSIT_CONFIRMED = '.'; // when first seen in a block
 export const DEPOSIT_FINALISED = '.'; // when X blocks deep
 
+export const CHALLENGE_REQUESTED = 'WALLET.CHALLENGE_REQUESTED';
+export const challengeRequested = () => ({
+  type: CHALLENGE_REQUESTED as typeof CHALLENGE_REQUESTED,
+});
+export type ChallengeRequested = ReturnType<typeof challengeRequested>;
+
 export const CHALLENGE_INITIATED = '.';
 export const CHALLENGE_SUBMITTED = '.';
 export const CHALLENGE_CONFIRMED = '.';
 export const CHALLENGE_FINALISED = '.';
 
-export const OPPONENT_CHALLENGE_DETECTED = '.';
+export const OPPONENT_CHALLENGE_DETECTED = 'WALLET.OPPONENT_CHALLENGE_DETECTED';
+export const opponentChallengeDetected = () => ({
+  type: OPPONENT_CHALLENGE_DETECTED as typeof OPPONENT_CHALLENGE_DETECTED,
+});
+export type OpponentChallengeDetected = ReturnType<typeof opponentChallengeDetected>;
+
 export const OPPONENT_CHALLENGE_FINALISED = '.';
 
 export const CHALLENGE_RESPONSE_INITIATED = '.';
@@ -71,4 +82,6 @@ export type WalletAction = (
   | KeysLoaded
   | OwnPositionReceived
   | OpponentPositionReceived
+  | ChallengeRequested
+  | OpponentChallengeDetected
 );

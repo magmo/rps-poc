@@ -17,3 +17,12 @@ export const itDoesntTransition = (oldState: WalletState, newState: WalletState)
     expect(newState).toEqual(oldState);
   });
 };
+
+export const itIncreasesTurnNumBy = (increase: number, oldState: WalletState, newState: WalletState) => {
+  it(`increases the turnNum by ${increase}`, () => {
+    if (!('turnNum' in newState) || !('turnNum' in oldState)) {
+      return fail('turnNum does not exist on one of the states');
+    }
+    expect(newState.turnNum).toEqual(oldState.turnNum + increase);
+  });
+};
