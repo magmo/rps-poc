@@ -1,6 +1,8 @@
+import { TransactionToSend } from "../domain/TransactionToSend";
+
 export interface Base {
   messageOutbox?: any;
-  transactionOutbox?: any;
+  transactionOutbox?: TransactionToSend;
 }
 
 export interface LoggedIn extends Base {
