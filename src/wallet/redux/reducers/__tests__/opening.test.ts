@@ -65,7 +65,7 @@ describe('when in WaitForPreFundSetup', () => {
     participants,
     channelNonce,
     turnNum: 0,
-    position0: preFundSetupAHex
+    position0: preFundSetupAHex,
   };
 
   describe('when we send a PreFundSetupB', () => {
