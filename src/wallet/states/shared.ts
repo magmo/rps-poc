@@ -1,11 +1,4 @@
-export enum DisplayMode {
-  None,
-  Minimized,
-  Full,
-}
-
 export interface Base {
-  displayMode: DisplayMode;
   messageOutbox?: any;
   transactionOutbox?: any;
 }
@@ -39,9 +32,9 @@ export interface AdjudicatorExists extends ChannelOpen {
 
 
 // creators
-
 export function base<T extends Base>(params: T): Base {
-  return { displayMode: params.displayMode };
+  const { messageOutbox, transactionOutbox } = params;
+  return { messageOutbox, transactionOutbox };
 }
 
 export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {

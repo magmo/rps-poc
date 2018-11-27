@@ -23,7 +23,6 @@ const {
 
 const defaults = {
   uid: 'uid',
-  displayMode: states.DisplayMode.None,
   address: asAddress,
   privateKey: asPrivateKey,
   libraryAddress,
