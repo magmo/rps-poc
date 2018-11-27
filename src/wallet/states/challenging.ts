@@ -7,6 +7,7 @@ export const CHALLENGING = 'CHALLENGING';
 
 export const APPROVE_CHALLENGE = "APPROVE_CHALLENGE";
 export const INITIATE_CHALLENGE = 'INITIATE_CHALLENGE';
+export const WAIT_FOR_CHALLENGE_SUBMISSION = 'WAIT_FOR_CHALLENGE_SUBMISSION';
 export const WAIT_FOR_CHALLENGE_CONFIRMATION = 'WAIT_FOR_CHALLENGE_CONFIRMATION';
 
 export const WAIT_FOR_RESPONSE_OR_TIMEOUT = 'WAIT_FOR_RESPONSE_OR_TIMEOUT';
@@ -38,11 +39,23 @@ export function initiateChallenge<T extends AdjudicatorExists>(params: T): Initi
   };
 }
 
+export interface WaitForChallengeSubmission extends AdjudicatorExists {
+  type: typeof WAIT_FOR_CHALLENGE_SUBMISSION;
+  stage: typeof CHALLENGING;
+}
+export function waitForChallengeSubmission<T extends AdjudicatorExists>(params: T): WaitForChallengeSubmission {
+  return {
+    type: WAIT_FOR_CHALLENGE_SUBMISSION,
+    stage: CHALLENGING,
+    ...adjudicatorExists(params),
+  };
+}
+
+
 export interface WaitForChallengeConfirmation extends AdjudicatorExists {
   type: typeof WAIT_FOR_CHALLENGE_CONFIRMATION;
   stage: typeof CHALLENGING;
 }
-
 export function waitForChallengeConfirmation<T extends AdjudicatorExists>(params: T): WaitForChallengeConfirmation {
   return {
     type: WAIT_FOR_CHALLENGE_CONFIRMATION,
@@ -93,6 +106,7 @@ export function acknowledgeChallengeTimeout<T extends AdjudicatorExists>(params:
 
 export type ChallengingState = (
   | InitiateChallenge
+  | WaitForChallengeSubmission
   | WaitForChallengeConfirmation
   | WaitForResponseOrTimeout
   | AcknowledgeChallengeResponse

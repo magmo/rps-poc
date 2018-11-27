@@ -122,6 +122,23 @@ export const acknowledgeChallengeResponse = () => ({
 });
 export type AcknowledgeChallengeResponse = ReturnType<typeof acknowledgeChallengeResponse>;
 
+export const ACKNOWLEDGE_CHALLENGE = 'WALLET.ACKNOWLEDGE_CHALLENGE';
+export const acknowledgeChallenge = () => ({
+  type: ACKNOWLEDGE_CHALLENGE,
+});
+export type AcknowledgeChallenge = ReturnType<typeof acknowledgeChallenge>;
+
+export const SELECT_RESPOND_WITH_MOVE = 'WALLET.SELECT_RESPOND_WITH_MOVE';
+export const selectRespondWithMove = () => ({
+  type: SELECT_RESPOND_WITH_MOVE,
+});
+export type SelectRespondWithMove = ReturnType<typeof selectRespondWithMove>;
+
+export const SELECT_RESPOND_WITH_REFUTE = 'WALLET.SELECT_RESPOND_WITH_REFUTE';
+export const selectRespondWithRefute = () => ({
+  type: SELECT_RESPOND_WITH_REFUTE,
+});
+export type SelectRespondWithRefute = ReturnType<typeof selectRespondWithRefute>;
 
 export const CHALLENGE_RESPONSE_INITIATED = '.';
 export const CHALLENGE_RESPONSE_SUBMITTED = '.';
