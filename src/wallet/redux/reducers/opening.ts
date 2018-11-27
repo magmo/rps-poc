@@ -79,7 +79,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       }
 
     default:
-      return state
+      return state;
   }
 };
 
@@ -126,6 +126,6 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       }
 
     default:
-      return state
+      return state;
   }
 };

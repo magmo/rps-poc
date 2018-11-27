@@ -17,7 +17,7 @@ const {
   bsPrivateKey,
   channelId,
   participants,
-  channelNonce, 
+  channelNonce,
 } = scenarios.standard;
 
 const defaults = { uid: 'uid', displayMode: states.DisplayMode.None, address: asAddress, privateKey: asPrivateKey };
@@ -39,12 +39,14 @@ describe('when in WaitForChannel', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_PRE_FUND_SETUP, updatedState);
 
-    describe('but the signature is bad', () => {
-      const action = actions.opponentPositionReceived(preFundSetupAHex, 'not-a-signature');
-      const updatedState = walletReducer(state, action);
+  });
 
-      itDoesntTransition(state, updatedState);
-    });
+  describe('when an oppoent sends a PreFundSetupA but the signature is bad', () => {
+    const state = states.waitForChannel({ ...defaults, address: bsAddress, privateKey: bsPrivateKey });
+    const action = actions.opponentPositionReceived(preFundSetupAHex, 'not-a-signature');
+    const updatedState = walletReducer(state, action);
+
+    itDoesntTransition(state, updatedState);
   });
 
   describe('when we send in a a non-PreFundSetupA', () => {
@@ -75,20 +77,21 @@ describe('when in WaitForPreFundSetup', () => {
     itTransitionsToStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
   });
 
-  describe('when an opponent sends a PreFundSetupA', () => {
+  describe('when an opponent sends a PreFundSetupB', () => {
     // preFundSetupB is B's move, so in this case we need to be player A
     const state = states.waitForPreFundSetup({ ...defaults2, ourIndex: 0 });
     const action = actions.opponentPositionReceived(preFundSetupBHex, preFundSetupBSig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_FUNDING_REQUEST, updatedState);
+  });
 
-    describe('but the signature is bad', () => {
-      const action = actions.opponentPositionReceived(preFundSetupAHex, 'not-a-signature');
-      const updatedState = walletReducer(state, action);
+  describe('when an opponent sends a PreFundSetupB but the signature is bad', () => {
+    const state = states.waitForPreFundSetup({ ...defaults2, ourIndex: 0 });
+    const action = actions.opponentPositionReceived(preFundSetupAHex, 'not-a-signature');
+    const updatedState = walletReducer(state, action);
 
-      itDoesntTransition(state, updatedState);
-    });
+    itDoesntTransition(state, updatedState);
   });
 
   describe('when we send in a a non-PreFundSetupB', () => {
