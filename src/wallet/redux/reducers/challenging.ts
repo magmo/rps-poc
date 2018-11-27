@@ -11,6 +11,8 @@ export const challengingReducer = (state: states.ChallengingState, action: Walle
       return approveChallengeReducer(state, action);
     case states.INITIATE_CHALLENGE:
       return initiateChallengeReducer(state, action);
+    case states.WAIT_FOR_CHALLENGE_SUBMISSION:
+      return waitForChallengeSubmissionReducer(state, action);
     case states.WAIT_FOR_CHALLENGE_CONFIRMATION:
       return waitForChallengeConfirmationReducer(state, action);
     case states.WAIT_FOR_RESPONSE_OR_TIMEOUT:
@@ -38,7 +40,16 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
 const initiateChallengeReducer = (state: states.InitiateChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_INITIATED:
-      return states.waitForChallengeConfirmation({ ...state });
+      return states.waitForChallengeSubmission({ ...state });
+    default:
+      return state;
+  }
+};
+
+const waitForChallengeSubmissionReducer = (state: states.WaitForChallengeSubmission, action: WalletAction): WalletState => {
+  switch (action.type) {
+    case actions.CHALLENGE_SUBMITTED:
+      return states.waitForChallengeConfirmation(state);
     default:
       return state;
   }

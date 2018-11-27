@@ -56,9 +56,22 @@ describe('when in INITIATE_CHALLENGE', () => {
         const updatedState = walletReducer(state, action);
 
         itSendsATransaction(updatedState);
+        itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
+    });
+});
+
+describe('when in WAIT_FOR_CHALLENGE_SUBMISSION', () => {
+    const state = states.waitForChallengeSubmission(defaults);
+
+    describe('when a challenge is submitted', () => {
+        const action = actions.challengeSubmitted();
+        const updatedState = walletReducer(state, action);
+
         itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_CONFIRMATION, updatedState);
     });
 });
+
+
 
 describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
     const state = states.waitForChallengeConfirmation({ ...defaults });
