@@ -6,13 +6,11 @@ import {
 // stage
 export const RUNNING = 'RUNNING';
 
-
 export const WAIT_FOR_UPDATE = 'WAIT_FOR_UPDATE';
 
-interface WaitForUpdate extends AdjudicatorExists {
+export interface WaitForUpdate extends AdjudicatorExists {
   type: typeof WAIT_FOR_UPDATE;
   stage: typeof RUNNING;
-
 }
 
 export function waitForUpdate<T extends AdjudicatorExists>(params: T): WaitForUpdate {
