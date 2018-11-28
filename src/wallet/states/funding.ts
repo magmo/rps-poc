@@ -1,4 +1,4 @@
-import { AdjudicatorExists, ChannelOpen, channelOpen, } from './shared';
+import { AdjudicatorExists, ChannelOpen, channelOpen, adjudicatorExists, } from './shared';
 
 // stage
 export const FUNDING = 'FUNDING';
@@ -12,6 +12,8 @@ export const WAIT_FOR_DEPLOY_CONFIRMATION = 'WAIT_FOR_DEPLOY_CONFIRMATION';
 export const B_INITIATE_DEPOSIT = 'B_INITIATE_DEPOSIT';
 export const A_WAIT_FOR_DEPOSIT_INITIATION = 'A_WAIT_FOR_DEPOSIT_INITIATION';
 export const WAIT_FOR_DEPOSIT_CONFIRMATION = 'WAIT_FOR_DEPOSIT_CONFIRMATION';
+export const A_SEND_POST_FUND = 'A_SEND_POST_FUND';
+export const B_SEND_POST_FUND = 'B_SEND_POST_FUND';
 export const B_WAIT_FOR_POST_FUND_SETUP = 'B_WAIT_FOR_POST_FUND_SETUP';
 export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
 export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
@@ -21,52 +23,53 @@ export interface WaitForFundingRequest extends ChannelOpen {
   stage: typeof FUNDING;
 }
 
-interface ApproveFunding extends ChannelOpen {
+export interface ApproveFunding extends ChannelOpen {
   type: typeof APPROVE_FUNDING;
   stage: typeof FUNDING;
 }
 
-interface AInitiateDeploy extends ChannelOpen {
+export interface AInitiateDeploy extends ChannelOpen {
   type: typeof A_INITIATE_DEPLOY;
   stage: typeof FUNDING;
 }
 
-interface BWaitForDeployInitiation extends ChannelOpen {
+export interface BWaitForDeployInitiation extends ChannelOpen {
   type: typeof B_WAIT_FOR_DEPLOY_INITIATION;
   stage: typeof FUNDING;
 }
 
-interface WaitForDeployConfirmation extends AdjudicatorExists {
+export interface WaitForDeployConfirmation extends AdjudicatorExists {
   type: typeof WAIT_FOR_DEPLOY_CONFIRMATION;
   stage: typeof FUNDING;
 }
 
-interface BInitiateDeposit extends AdjudicatorExists {
+export interface BInitiateDeposit extends AdjudicatorExists {
   type: typeof B_INITIATE_DEPOSIT;
   stage: typeof FUNDING;
 }
 
-interface AWaitForDepositInitiation extends AdjudicatorExists {
+export interface AWaitForDepositInitiation extends AdjudicatorExists {
   type: typeof A_WAIT_FOR_DEPOSIT_INITIATION;
   stage: typeof FUNDING;
 }
 
-interface WaitForDepositConfirmation extends AdjudicatorExists {
+export interface WaitForDepositConfirmation extends AdjudicatorExists {
   type: typeof WAIT_FOR_DEPOSIT_CONFIRMATION;
   stage: typeof FUNDING;
 }
 
-interface BWaitForPostFundSetup extends AdjudicatorExists {
-  type: typeof B_WAIT_FOR_POST_FUND_SETUP;
-  stage: typeof FUNDING;
-}
 
-interface AWaitForPostFundSetup extends AdjudicatorExists {
+export interface AWaitForPostFundSetup extends AdjudicatorExists {
   type: typeof A_WAIT_FOR_POST_FUND_SETUP;
   stage: typeof FUNDING;
 }
 
-interface AcknowledgeFundingSuccess extends AdjudicatorExists {
+export interface BWaitForPostFundSetup extends AdjudicatorExists {
+  type: typeof B_WAIT_FOR_POST_FUND_SETUP;
+  stage: typeof FUNDING;
+}
+
+export interface AcknowledgeFundingSuccess extends AdjudicatorExists {
   type: typeof ACKNOWLEDGE_FUNDING_SUCCESS;
   stage: typeof FUNDING;
 }
@@ -77,6 +80,42 @@ export function waitForFundingRequest<T extends ChannelOpen>(params: T): WaitFor
 
 export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding {
   return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
+}
+
+export function deployInitiated<T extends ChannelOpen>(params: T): AInitiateDeploy {
+  return { type: A_INITIATE_DEPLOY, stage: FUNDING, ...channelOpen(params) };
+}
+
+export function bWaitForDeployInitiation<T extends ChannelOpen>(params: T): BWaitForDeployInitiation {
+  return { type: B_WAIT_FOR_DEPLOY_INITIATION, stage: FUNDING, ...channelOpen(params) };
+}
+
+export function waitForDeployConfirmation<T extends AdjudicatorExists>(params: T): WaitForDeployConfirmation {
+  return { type: WAIT_FOR_DEPLOY_CONFIRMATION, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
+export function aWaitForDepositInitiation<T extends AdjudicatorExists>(params: T): AWaitForDepositInitiation {
+  return { type: A_WAIT_FOR_DEPOSIT_INITIATION, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
+export function bInitiateDeposit<T extends AdjudicatorExists>(params: T): BInitiateDeposit {
+  return { type: B_INITIATE_DEPOSIT, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
+export function waitForDepositConfirmation<T extends AdjudicatorExists>(params: T): WaitForDepositConfirmation {
+  return { type: WAIT_FOR_DEPOSIT_CONFIRMATION, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
+export function aWaitForPostFundSetup<T extends AdjudicatorExists>(params: T): AWaitForPostFundSetup {
+  return { type: A_WAIT_FOR_POST_FUND_SETUP, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
+export function bWaitForPostFundSetup<T extends AdjudicatorExists>(params: T): BWaitForPostFundSetup {
+  return { type: B_WAIT_FOR_POST_FUND_SETUP, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
+export function acknowledgeFundingSuccess<T extends AdjudicatorExists>(params: T): AcknowledgeFundingSuccess {
+  return { type: ACKNOWLEDGE_FUNDING_SUCCESS, stage: FUNDING, ...adjudicatorExists(params) };
 }
 
 export type FundingState = (
