@@ -3,7 +3,7 @@ import { walletReducer } from '..';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itDoesntTransition, itIncreasesTurnNumBy} from './helpers';
+import { itTransitionsToStateType, itDoesntTransition, itIncreasesTurnNumBy } from './helpers';
 import { scenarios } from '../../../../core';
 
 const {
@@ -30,6 +30,7 @@ const defaults = {
   penultimatePosition: acceptHex,
   turnNum: 6,
   adjudicator: 'adj-address',
+  challengeExpiry: new Date(),
 };
 
 const bParams = { address: bsAddress, ourIndex: 1, privateKey: bsPrivateKey };
@@ -74,7 +75,7 @@ describe('when in WaitForUpdate on our turn', () => {
   });
 
   describe('when the wallet detects an opponent challenge', () => {
-    const action = actions.opponentChallengeDetected();
+    const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
@@ -110,14 +111,14 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 
-  describe('when an oppoent sends a new position with the wrong turnNum', () => {
+  describe('when an opponent sends a new position with the wrong turnNum', () => {
     const action = actions.opponentPositionReceived(acceptHex, acceptSig);
     const updatedState = walletReducer(state, action);
 
     itDoesntTransition(state, updatedState);
   });
 
-  describe('when an oppoent sends a new position with the wrong signature', () => {
+  describe('when an opponent sends a new position with the wrong signature', () => {
     const action = actions.opponentPositionReceived(restingHex, 'not-a-signature');
     const updatedState = walletReducer(state, action);
 
@@ -133,7 +134,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
   });
 
   describe('when the wallet detects an opponent challenge', () => {
-    const action = actions.opponentChallengeDetected();
+    const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);

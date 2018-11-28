@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 
 import { itTransitionsToStateType } from './helpers';
 
-const defaults = { uid: 'uid', address: '0xa', privateKey: '0xb'};
+const defaults = { uid: 'uid', address: '0xa', privateKey: '0xb' };
 
 describe('when in WaitForLogin', () => {
   const state = states.waitForLogin();

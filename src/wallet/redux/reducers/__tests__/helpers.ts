@@ -6,6 +6,12 @@ export const itSendsAMessage = (state: WalletState) => {
   });
 };
 
+export const itSendsATransaction = (state: WalletState) => {
+  it(`sends a transaction`, () => {
+    expect(state.transactionOutbox).toEqual(expect.anything());
+  });
+};
+
 export const itTransitionsToStateType = (type, state: WalletState) => {
   it(`transitions to ${type}`, () => {
     expect(state.type).toEqual(type);
