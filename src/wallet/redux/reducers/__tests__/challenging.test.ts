@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 
 import { itTransitionsToStateType, itSendsATransaction } from './helpers';
 import { scenarios } from '../../../../core';
-import { ChallengeProof } from 'src/wallet/domain/ChallengeProof';
+import { ChallengeProof } from '../../../domain/ChallengeProof';
 const {
     asPrivateKey,
     revealHex,
