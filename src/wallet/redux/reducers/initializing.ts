@@ -13,7 +13,7 @@ import { WalletAction, KEYS_LOADED, LOGGED_IN } from '../actions';
 import { unreachable } from '../../utils';
 
 export const initializingReducer = (state: InitializingState, action: WalletAction): WalletState => {
-  switch(state.type) {
+  switch (state.type) {
     case WAIT_FOR_LOGIN:
       return waitForLoginReducer(state, action);
     case WAIT_FOR_ADDRESS:
@@ -24,7 +24,7 @@ export const initializingReducer = (state: InitializingState, action: WalletActi
 };
 
 const waitForLoginReducer = (state: WaitForLogin, action: any) => {
-  switch(action.type) {
+  switch (action.type) {
     case LOGGED_IN:
       const { uid } = action.uid;
       return waitForAddress({ ...state, uid });
@@ -34,10 +34,10 @@ const waitForLoginReducer = (state: WaitForLogin, action: any) => {
 };
 
 const waitForAddressReducer = (state: WaitForAddress, action: any) => {
-  switch(action.type) {
+  switch (action.type) {
     case KEYS_LOADED:
       const { address, privateKey } = action;
-      return waitForChannel({...state, address, privateKey});
+      return waitForChannel({ ...state, address, privateKey });
     default:
       return state;
   }
