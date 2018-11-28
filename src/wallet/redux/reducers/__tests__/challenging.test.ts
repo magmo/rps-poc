@@ -3,7 +3,7 @@ import { walletReducer } from '..';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itSendsATransaction, itTransitionsToStage } from './helpers';
+import { itTransitionsToStateType, itSendsATransaction } from './helpers';
 import { scenarios } from '../../../../core';
 const {
     asPrivateKey,
@@ -44,7 +44,7 @@ describe('when in APPROVE_CHALLENGE', () => {
     describe('when a challenge is declined', () => {
         const action = actions.declineChallenge();
         const updatedState = walletReducer(state, action);
-        itTransitionsToStage(states.RUNNING, updatedState);
+        itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     });
 });
 
@@ -108,7 +108,7 @@ describe('when in ACKNOWLEDGE_RESPONSE', () => {
     const action = actions.acknowledgeChallengeResponse();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStage(states.RUNNING, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
 
 });
 
@@ -117,6 +117,6 @@ describe('when in ACKNOWLEDGE_TIMEOUT', () => {
     const action = actions.acknowledgeChallengeTimeout();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStage(states.RUNNING, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
 
 });

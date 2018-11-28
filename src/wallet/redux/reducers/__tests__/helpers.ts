@@ -12,12 +12,6 @@ export const itSendsATransaction = (state: WalletState) => {
   });
 };
 
-export const itTransitionsToStage = (stage, state: WalletState) => {
-  it(`transitions to stage ${stage}`, () => {
-    expect(state.stage).toEqual(stage);
-  });
-};
-
 export const itTransitionsToStateType = (type, state: WalletState) => {
   it(`transitions to ${type}`, () => {
     expect(state.type).toEqual(type);
