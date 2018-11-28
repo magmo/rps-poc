@@ -36,18 +36,67 @@ export const opponentPositionReceived = (data: string, signature: string) => ({
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
 export const FUNDING_REQUESTED = '.';
-export const FUNDING_APPROVED = '.';
+
+export const FUNDING_APPROVED = 'WALLET.FUNDING_APPROVED';
+export const fundingApproved = () => ({
+  type: FUNDING_APPROVED as typeof FUNDING_APPROVED,
+});
+export type FundingApproved = ReturnType<typeof fundingApproved>;
+
 export const FUNDING_CANCELLED = '.';
 
-export const DEPLOYMENT_INITIATED = '.'; // when sent to metamask
-export const DEPLOYMENT_SUBMITTED = '.'; // when submitted to network
-export const DEPLOYMENT_CONFIRMED = '.'; // when first seen in a block
-export const DEPLOYMENT_FINALISED = '.'; // when X blocks deep
+export const DEPLOY_INITIATED = 'WALLET.DEPLOY_INITIATED'; // when sent to metamask
+export const deployInitiated = () => ({
+  type: DEPLOY_INITIATED as typeof DEPLOY_INITIATED,
+});
+export type DeployInitiated = ReturnType<typeof deployInitiated>;
 
-export const DEPOSIT_INITIATED = '.'; // when sent to metamask
+export const DEPLOY_SUBMITTED = 'WALLET.DEPLOY_SUBMITTED'; // when submitted to network
+export const deploySubmitted = (adjudicator: string) => ({
+  type: DEPLOY_SUBMITTED as typeof DEPLOY_SUBMITTED,
+  adjudicator,
+});
+export type DeploySubmitted = ReturnType<typeof deploySubmitted>;
+
+
+export const DEPLOY_CONFIRMED = '.'; // when first seen in a block
+
+export const DEPLOY_FINALISED = 'WALLET.DEPLOY_FINALISED'; // when X blocks deep
+export const deployFinalised = () => ({
+  type: DEPLOY_FINALISED as typeof DEPLOY_FINALISED,
+});
+export type DeployFinalised = ReturnType<typeof deployFinalised>;
+
+export const DEPOSIT_INITIATED = 'WALLET.DEPOSIT_INITIATED'; // when sent to metamask
+export const depositInitiated = () => ({
+  type: DEPOSIT_INITIATED as typeof DEPOSIT_INITIATED,
+});
+export type DepositInitiated = ReturnType<typeof depositInitiated>;
+
+
 export const DEPOSIT_SUBMITTED = '.'; // when submitted to network
 export const DEPOSIT_CONFIRMED = '.'; // when first seen in a block
-export const DEPOSIT_FINALISED = '.'; // when X blocks deep
+
+export const DEPOSIT_FINALISED = 'WALLET.DEPOSIT_FINALISED'; // when X blocks deep
+export const depositFinalised = () => ({
+  type: DEPOSIT_FINALISED as typeof DEPOSIT_FINALISED,
+});
+export type DepositFinalised = ReturnType<typeof depositFinalised>;
+
+export const FUNDING_SUCCESS_ACKNOWLEDGED = 'WALLET.FUNDING_SUCCESS_ACKNOWLEDGED';
+export const fundingSuccessAcknowledged = () => ({
+  type: FUNDING_SUCCESS_ACKNOWLEDGED as typeof FUNDING_SUCCESS_ACKNOWLEDGED,
+});
+export type FundingSuccessAcknowledged = ReturnType<typeof fundingSuccessAcknowledged>;
+
+
+export const POST_FUND_SETUP_RECEIVED = 'WALLET.POST_FUND_SETUP_RECEIVED'; // when X blocks deep
+export const postFundSetupReceived = (data: string, signature: string) => ({
+  type: POST_FUND_SETUP_RECEIVED as typeof POST_FUND_SETUP_RECEIVED,
+  data,
+  signature,
+});
+export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
 
 export const APPROVE_CHALLENGE = 'WALLET.APPROVE_CHALLENGE';
 export const approveChallenge = () => ({
@@ -190,6 +239,14 @@ export type WalletAction = (
   | KeysLoaded
   | OwnPositionReceived
   | OpponentPositionReceived
+  | FundingApproved
+  | DeployInitiated
+  | DeploySubmitted
+  | DeployFinalised
+  | DepositInitiated
+  | DepositFinalised
+  | PostFundSetupReceived
+  | FundingSuccessAcknowledged
   | ChallengeRequested
   | OpponentChallengeDetected
   | ChallengeInitiated
