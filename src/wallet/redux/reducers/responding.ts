@@ -61,7 +61,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
     default:
       return state;
   }
-}
+};
 
 export const initiateResponseReducer = (state: states.InitiateResponse, action: WalletAction): WalletState => {
   switch (action.type) {
