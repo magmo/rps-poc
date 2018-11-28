@@ -140,10 +140,38 @@ export const selectRespondWithRefute = () => ({
 });
 export type SelectRespondWithRefute = ReturnType<typeof selectRespondWithRefute>;
 
-export const CHALLENGE_RESPONSE_INITIATED = '.';
-export const CHALLENGE_RESPONSE_SUBMITTED = '.';
-export const CHALLENGE_RESPONSE_CONFIRMED = '.';
-export const CHALLENGE_RESPONSE_FINALISED = '.';
+export const CHALLENGE_RESPONSE_INITIATED = 'WALLET.CHALLENGE_RESPONSE_INITIATED';
+export const challengeResponseInitiated = () => ({
+  type: CHALLENGE_RESPONSE_INITIATED,
+});
+export type ChallengeResponseInitiated = ReturnType<typeof challengeResponseInitiated>;
+
+
+export const CHALLENGE_RESPONSE_SUBMITTED = 'WALLET.CHALLENGE_RESPONSE_SUBMITTED';
+export const challengeResponseSubmitted = () => ({
+  type: CHALLENGE_RESPONSE_SUBMITTED,
+});
+export type ChallengeResponseSubmitted = ReturnType<typeof challengeResponseSubmitted>;
+
+export const CHALLENGE_RESPONSE_CONFIRMED = 'WALLET.CHALLENGE_RESPONSE_CONFIRMED';
+export const challengeResponseConfirmed = () => ({
+  type: CHALLENGE_RESPONSE_CONFIRMED,
+});
+export type ChallengeResponseConfirmed = ReturnType<typeof challengeResponseConfirmed>;
+
+export const TAKE_MOVE_IN_APP = 'WALLET.TAKE_MOVE_IN_APP';
+export const takeMoveInApp = (position: string) => ({
+  type: TAKE_MOVE_IN_APP,
+  position,
+});
+export type TakeMoveInApp = ReturnType<typeof takeMoveInApp>;
+
+export const ACKNOWLEDGE_CHALLENGE_COMPLETE = 'WALLET.ACKNOWLEDGE_CHALLENGE_COMPLETE';
+export const acknowledgeChallengeComplete = () => ({
+  type: ACKNOWLEDGE_CHALLENGE_COMPLETE,
+});
+export type AcknowledgeChallengeComplete = ReturnType<typeof acknowledgeChallengeComplete>;
+
 
 export const WITHDRAWAL_REQUESTED = '.';
 export const WITHDRAWAL_INTITIATED = '.'; // when sent to metamask
@@ -160,5 +188,9 @@ export type WalletAction = (
   | ChallengeRequested
   | ChallengeConfirmed
   | ChallengeResponseReceived
+  | ChallengeResponseInitiated
+  | ChallengeResponseSubmitted
+  | ChallengeResponseConfirmed
   | ChallengeTimeout
+  | TakeMoveInApp
 );
