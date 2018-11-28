@@ -20,7 +20,6 @@
     "ajv": "^6.5.1",
     "aphrodite": "^2.2.2",
     "autoprefixer": "^9.1.5",
-    "babel-core": "6",
     "babel-preset-react-app": "^3.1.1",
     "babel-runtime": "^6.23.0",
     "bn.js": "^4.11.8",
@@ -78,9 +77,11 @@
     "postinstall": "rm -f node_modules/web3/index.d.ts"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.6",
     "@babel/runtime": "^7.0.0-beta.53",
     "@types/jest": "^23.3.1",
-    "babel-jest": "^23.4.2",
+    "babel-core": "^7.0.0-bridge",
+    "babel-jest": "^23.6.0",
     "babel-loader": "^7.1.5",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
