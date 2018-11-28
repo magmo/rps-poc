@@ -1,3 +1,5 @@
+import { ChallengeProof } from "src/wallet/domain/ChallengeProof";
+
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
   type: LOGGED_IN as typeof LOGGED_IN,
@@ -66,8 +68,10 @@ export const challengeRequested = () => ({
 export type ChallengeRequested = ReturnType<typeof challengeRequested>;
 
 export const CHALLENGE_INITIATED = 'WALLET.CHALLENGE_INITIATED';
-export const challengeInitiated = () => ({
+export const challengeInitiated = (challengeProof: ChallengeProof) => ({
   type: CHALLENGE_INITIATED as typeof CHALLENGE_INITIATED,
+  challengeProof,
+
 });
 export type ChallengeInitiated = ReturnType<typeof challengeInitiated>;
 
@@ -160,9 +164,10 @@ export const challengeResponseConfirmed = () => ({
 export type ChallengeResponseConfirmed = ReturnType<typeof challengeResponseConfirmed>;
 
 export const TAKE_MOVE_IN_APP = 'WALLET.TAKE_MOVE_IN_APP';
-export const takeMoveInApp = (position: string) => ({
+export const takeMoveInApp = (position: string, signature: string) => ({
   type: TAKE_MOVE_IN_APP as typeof TAKE_MOVE_IN_APP,
   position,
+  signature,
 });
 export type TakeMoveInApp = ReturnType<typeof takeMoveInApp>;
 

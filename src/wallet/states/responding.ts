@@ -27,7 +27,6 @@ export interface ChooseResponse extends AdjudicatorExists {
 export function chooseResponse<T extends AdjudicatorExists>(params: T): ChooseResponse {
   return { type: CHOOSE_RESPONSE, stage: RESPONDING, ...adjudicatorExists(params) };
 }
-
 export interface TakeMoveInApp extends AdjudicatorExists {
   type: typeof TAKE_MOVE_IN_APP;
   stage: typeof RESPONDING;
