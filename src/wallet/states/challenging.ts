@@ -1,8 +1,6 @@
 import {
   AdjudicatorExists, adjudicatorExists
 } from './shared';
-import { TransactionType } from '../domain/TransactionToSend';
-
 export const CHALLENGING = 'CHALLENGING';
 
 export const APPROVE_CHALLENGE = "APPROVE_CHALLENGE";
@@ -35,7 +33,7 @@ export function initiateChallenge<T extends AdjudicatorExists>(params: T): Initi
     type: INITIATE_CHALLENGE,
     stage: CHALLENGING,
     ...adjudicatorExists(params),
-    transactionOutbox: { type: TransactionType.Challenge, data: {} },
+    transactionOutbox: {},
   };
 }
 
