@@ -3,7 +3,7 @@ import { walletReducer } from '..';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 
-import { itTransitionsToStateType, itTransitionsToStage } from './helpers';
+import { itTransitionsToStateType } from './helpers';
 import { scenarios } from '../../../../core';
 const {
     asPrivateKey,
