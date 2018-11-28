@@ -111,14 +111,14 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 
-  describe('when an oppoent sends a new position with the wrong turnNum', () => {
+  describe('when an opponent sends a new position with the wrong turnNum', () => {
     const action = actions.opponentPositionReceived(acceptHex, acceptSig);
     const updatedState = walletReducer(state, action);
 
     itDoesntTransition(state, updatedState);
   });
 
-  describe('when an oppoent sends a new position with the wrong signature', () => {
+  describe('when an opponent sends a new position with the wrong signature', () => {
     const action = actions.opponentPositionReceived(restingHex, 'not-a-signature');
     const updatedState = walletReducer(state, action);
 
