@@ -5,10 +5,14 @@ import * as actions from '../../actions';
 
 import { itTransitionsToStateType, itSendsATransaction } from './helpers';
 import { scenarios } from '../../../../core';
+import { ChallengeProof } from 'src/wallet/domain/ChallengeProof';
 const {
     asPrivateKey,
     revealHex,
     acceptHex,
+    acceptSig,
+    proposeHex,
+    proposeSig,
     participants,
     channelId,
     channelNonce,
@@ -28,12 +32,13 @@ const defaults = {
     ourIndex: 0,
     address: 'address',
     privateKey: asPrivateKey,
+    challengeProof: new ChallengeProof(proposeHex, acceptHex, proposeSig, acceptSig),
+
 };
 
 
 describe('when in APPROVE_CHALLENGE', () => {
     const state = states.approveChallenge({ ...defaults });
-
     describe('when a challenge is approved', () => {
         const action = actions.approveChallenge();
         const updatedState = walletReducer(state, action);
@@ -52,7 +57,7 @@ describe('when in INITIATE_CHALLENGE', () => {
     const state = states.initiateChallenge({ ...defaults });
 
     describe('when a challenge is initiated', () => {
-        const action = actions.challengeInitiated();
+        const action = actions.challengeInitiated(defaults.challengeProof);
         const updatedState = walletReducer(state, action);
 
         itSendsATransaction(updatedState);
