@@ -35,7 +35,7 @@ export function initiateChallenge<T extends AdjudicatorExists>(params: T): Initi
     type: INITIATE_CHALLENGE,
     stage: CHALLENGING,
     ...adjudicatorExists(params),
-    transactionOutbox: { type: TransactionType.Challenge },
+    transactionOutbox: { type: TransactionType.Challenge, data: {} },
   };
 }
 
