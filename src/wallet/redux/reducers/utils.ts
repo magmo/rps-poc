@@ -36,4 +36,4 @@ export const signPositionHex = (positionHex: string, privateKey: string) => {
   const signature = joinSignature(signer.signDigest(hashMessage(positionHex)));
 
   return signature;
-}
+};
