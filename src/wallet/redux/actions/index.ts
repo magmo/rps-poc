@@ -264,5 +264,6 @@ export type WalletAction = (
   | WithdrawalRejected
   | TransactionSubmitted
   | TransactionConfirmed
+  | TransactionInitiated
   | WithdrawalSuccessAcknowledged
 );
