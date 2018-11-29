@@ -1,6 +1,6 @@
 import { Wallet } from "ethers";
 import { select, call, put } from "redux-saga/effects";
-import { getProvider } from "src/contracts/simpleAdjudicatorUtils";
+import { getProvider } from "../../../contracts/simpleAdjudicatorUtils";
 import { transactionInitiated, transactionSubmitted, transactionConfirmed, transactionFinalized } from "../actions";
 
 export function* transactionSender(transaction) {
