@@ -20,7 +20,7 @@ const itChecksSig = (name, positionHex, signature, address) => {
   it(`checks the signature of ${name}`, () => {
     expect(validSignature(positionHex, signature, address)).toEqual(true);
   });
-}
+};
 
 describe('validSignature', () => {
   itChecksSig('PreFundSetupA', s.preFundSetupAHex, s.preFundSetupASig, s.asAddress);
