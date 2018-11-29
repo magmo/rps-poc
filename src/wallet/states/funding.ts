@@ -12,8 +12,6 @@ export const WAIT_FOR_DEPLOY_CONFIRMATION = 'WAIT_FOR_DEPLOY_CONFIRMATION';
 export const B_INITIATE_DEPOSIT = 'B_INITIATE_DEPOSIT';
 export const A_WAIT_FOR_DEPOSIT_INITIATION = 'A_WAIT_FOR_DEPOSIT_INITIATION';
 export const WAIT_FOR_DEPOSIT_CONFIRMATION = 'WAIT_FOR_DEPOSIT_CONFIRMATION';
-export const A_SEND_POST_FUND = 'A_SEND_POST_FUND';
-export const B_SEND_POST_FUND = 'B_SEND_POST_FUND';
 export const B_WAIT_FOR_POST_FUND_SETUP = 'B_WAIT_FOR_POST_FUND_SETUP';
 export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
 export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
@@ -82,7 +80,7 @@ export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding
   return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function deployInitiated<T extends ChannelOpen>(params: T): AInitiateDeploy {
+export function aInitiateDeploy<T extends ChannelOpen>(params: T): AInitiateDeploy {
   return { type: A_INITIATE_DEPLOY, stage: FUNDING, ...channelOpen(params) };
 }
 

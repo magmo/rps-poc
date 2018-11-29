@@ -58,7 +58,6 @@ export const deploySubmitted = (adjudicator: string) => ({
 });
 export type DeploySubmitted = ReturnType<typeof deploySubmitted>;
 
-
 export const DEPLOY_CONFIRMED = '.'; // when first seen in a block
 
 export const DEPLOY_FINALISED = 'WALLET.DEPLOY_FINALISED'; // when X blocks deep
