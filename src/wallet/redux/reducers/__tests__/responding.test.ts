@@ -85,7 +85,7 @@ describe('when in TAKE_MOVE_IN_APP', () => {
 describe('when in INITIATE_RESPONSE', () => {
   const state = states.initiateResponse(defaults);
   describe('when the challenge response is initiated', () => {
-    const action = actions.challengeResponseInitiated();
+    const action = actions.transactionInitiated();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_RESPONSE_SUBMISSION, updatedState);
 
@@ -95,7 +95,7 @@ describe('when in INITIATE_RESPONSE', () => {
 describe('when in WAIT_FOR_RESPONSE_SUBMISSION', () => {
   const state = states.waitForResponseSubmission(defaults);
   describe('when the challenge response is submitted', () => {
-    const action = actions.challengeResponseSubmitted();
+    const action = actions.transactionSubmitted();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_RESPONSE_CONFIRMATION, updatedState);
 
@@ -105,7 +105,7 @@ describe('when in WAIT_FOR_RESPONSE_SUBMISSION', () => {
 describe('when in WAIT_FOR_RESPONSE_CONFIRMED', () => {
   const state = states.waitForResponseConfirmation(defaults);
   describe('when the challenge response is confirmed', () => {
-    const action = actions.challengeResponseConfirmed();
+    const action = actions.transactionConfirmed();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_COMPLETE, updatedState);
 
