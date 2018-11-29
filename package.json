@@ -4,6 +4,9 @@
   "private": true,
   "main": "index.js",
   "module": "src/index.js",
+  "resolutions": {
+    "firebase/**/grpc": "^1.16.1"
+  },
   "dependencies": {
     "@firebase/app-types": "^0.3.2",
     "@fortawesome/fontawesome-svg-core": "^1.2.4",
