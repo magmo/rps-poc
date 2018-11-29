@@ -225,9 +225,9 @@ export const withdrawalRejected = () => ({
 });
 export type WithdrawalRejected = ReturnType<typeof withdrawalRejected>;
 
-export const WITHDRAWAL_SUCCESS_ACKNOWLEGED = 'WALLET.WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
+export const WITHDRAWAL_SUCCESS_ACKNOWLEDGED = 'WALLET.WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
 export const withdrawalSuccessAcknowledged = () => ({
-  type: WITHDRAWAL_SUCCESS_ACKNOWLEGED as typeof WITHDRAWAL_SUCCESS_ACKNOWLEGED,
+  type: WITHDRAWAL_SUCCESS_ACKNOWLEDGED as typeof WITHDRAWAL_SUCCESS_ACKNOWLEDGED,
 });
 export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
 
