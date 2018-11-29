@@ -50,7 +50,7 @@ const waitForWithdrawalConfirmationReducer = (state: states.WaitForWithdrawalCon
 
 const acknowledgeWithdrawalSuccessReducer = (state: states.AcknowledgeWithdrawalSuccess, action: actions.WalletAction): states.WalletState => {
   switch (action.type) {
-    case actions.WITHDRAWAL_SUCCESS_ACKNOWLEGED:
+    case actions.WITHDRAWAL_SUCCESS_ACKNOWLEDGED:
       return states.waitForChannel(state);
     default:
       return state;
