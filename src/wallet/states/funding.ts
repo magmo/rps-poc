@@ -6,8 +6,9 @@ export const FUNDING = 'FUNDING';
 // state types
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 export const APPROVE_FUNDING = 'APPROVE_FUNDING';
-export const A_INITIATE_DEPLOY = 'A_INITIATE_DEPLOY';
-export const B_WAIT_FOR_DEPLOY_INITIATION = 'B_WAIT_FOR_DEPLOY_INITIATION';
+export const A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK = 'A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK';
+export const A_SUBMIT_DEPLOY_IN_METAMASK = 'A_SUBMIT_DEPLOY_IN_METAMASK';
+export const B_WAIT_FOR_DEPLOY_ADDRESS = 'B_WAIT_FOR_DEPLOY_ADDRESS';
 export const WAIT_FOR_DEPLOY_CONFIRMATION = 'WAIT_FOR_DEPLOY_CONFIRMATION';
 export const B_INITIATE_DEPOSIT = 'B_INITIATE_DEPOSIT';
 export const A_WAIT_FOR_DEPOSIT_INITIATION = 'A_WAIT_FOR_DEPOSIT_INITIATION';
@@ -26,13 +27,17 @@ export interface ApproveFunding extends ChannelOpen {
   stage: typeof FUNDING;
 }
 
-export interface AInitiateDeploy extends ChannelOpen {
-  type: typeof A_INITIATE_DEPLOY;
+export interface AWaitForDeployToBeSentToMetaMask extends ChannelOpen {
+  type: typeof A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK;
+  stage: typeof FUNDING;
+}
+export interface ASubmitDeployInMetaMask extends ChannelOpen {
+  type: typeof A_SUBMIT_DEPLOY_IN_METAMASK;
   stage: typeof FUNDING;
 }
 
-export interface BWaitForDeployInitiation extends ChannelOpen {
-  type: typeof B_WAIT_FOR_DEPLOY_INITIATION;
+export interface BWaitForDeployAddress extends ChannelOpen {
+  type: typeof B_WAIT_FOR_DEPLOY_ADDRESS;
   stage: typeof FUNDING;
 }
 
@@ -80,12 +85,16 @@ export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding
   return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function aInitiateDeploy<T extends ChannelOpen>(params: T): AInitiateDeploy {
-  return { type: A_INITIATE_DEPLOY, stage: FUNDING, ...channelOpen(params) };
+export function aWaitForDeployToBeSentToMetaMask<T extends ChannelOpen>(params: T): AWaitForDeployToBeSentToMetaMask {
+  return { type: A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function bWaitForDeployInitiation<T extends ChannelOpen>(params: T): BWaitForDeployInitiation {
-  return { type: B_WAIT_FOR_DEPLOY_INITIATION, stage: FUNDING, ...channelOpen(params) };
+export function aSubmitDeployInMetaMask<T extends ChannelOpen>(params: T): ASubmitDeployInMetaMask {
+  return { type: A_SUBMIT_DEPLOY_IN_METAMASK, stage: FUNDING, ...channelOpen(params) };
+}
+
+export function bWaitForDeployAddress<T extends ChannelOpen>(params: T): BWaitForDeployAddress {
+  return { type: B_WAIT_FOR_DEPLOY_ADDRESS, stage: FUNDING, ...channelOpen(params) };
 }
 
 export function waitForDeployConfirmation<T extends AdjudicatorExists>(params: T): WaitForDeployConfirmation {
@@ -119,8 +128,9 @@ export function acknowledgeFundingSuccess<T extends AdjudicatorExists>(params: T
 export type FundingState = (
   | WaitForFundingRequest
   | ApproveFunding
-  | AInitiateDeploy
-  | BWaitForDeployInitiation
+  | AWaitForDeployToBeSentToMetaMask
+  | ASubmitDeployInMetaMask
+  | BWaitForDeployAddress
   | WaitForDeployConfirmation
   | BInitiateDeposit
   | AWaitForDepositInitiation

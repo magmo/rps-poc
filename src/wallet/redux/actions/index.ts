@@ -35,7 +35,12 @@ export const opponentPositionReceived = (data: string, signature: string) => ({
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
-export const FUNDING_REQUESTED = '.';
+export const FUNDING_REQUESTED = 'WALLET.FUNDING_REQUESTED';
+export const fundingRequested = () => ({
+  type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
+});
+export type FundingRequested = ReturnType<typeof fundingRequested>;
+
 
 export const FUNDING_APPROVED = 'WALLET.FUNDING_APPROVED';
 export const fundingApproved = () => ({
@@ -49,11 +54,11 @@ export const fundingRejected = () => ({
 });
 export type FundingRejected = ReturnType<typeof fundingRejected>;
 
-export const DEPLOY_INITIATED = 'WALLET.DEPLOY_INITIATED'; // when sent to metamask
-export const deployInitiated = () => ({
-  type: DEPLOY_INITIATED as typeof DEPLOY_INITIATED,
+export const DEPLOY_SENT_TO_METAMASK = 'WALLET.DEPLOY_SENT_TO_METAMASK'; // when sent to metamask
+export const deploySentToMetaMask = () => ({
+  type: DEPLOY_SENT_TO_METAMASK as typeof DEPLOY_SENT_TO_METAMASK,
 });
-export type DeployInitiated = ReturnType<typeof deployInitiated>;
+export type DeploySentToMetaMask = ReturnType<typeof deploySentToMetaMask>;
 
 export const DEPLOY_SUBMITTED = 'WALLET.DEPLOY_SUBMITTED'; // when submitted to network
 export const deploySubmitted = (adjudicator: string) => ({
@@ -69,6 +74,14 @@ export const deployFinalised = () => ({
   type: DEPLOY_FINALISED as typeof DEPLOY_FINALISED,
 });
 export type DeployFinalised = ReturnType<typeof deployFinalised>;
+
+export const DEPLOY_ADDRESS_RECEIVED = 'WALLET.DEPLOY_ADDRESS_RECEIVED';
+export const deployAddressReceived = (adjudicator: string) => ({
+  type: DEPLOY_ADDRESS_RECEIVED as typeof DEPLOY_ADDRESS_RECEIVED,
+  adjudicator,
+});
+export type DeployAddressReceived = ReturnType<typeof deployAddressReceived>;
+
 
 export const DEPOSIT_INITIATED = 'WALLET.DEPOSIT_INITIATED'; // when sent to metamask
 export const depositInitiated = () => ({
@@ -255,10 +268,12 @@ export type WalletAction = (
   | KeysLoaded
   | OwnPositionReceived
   | OpponentPositionReceived
+  | FundingRequested
   | FundingApproved
-  | DeployInitiated
+  | DeploySentToMetaMask
   | DeploySubmitted
   | DeployFinalised
+  | DeployAddressReceived
   | DepositInitiated
   | DepositFinalised
   | PostFundSetupReceived

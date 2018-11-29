@@ -11,6 +11,7 @@ import { itTransitionsToStateType } from './helpers';
 const {
   asAddress,
   asPrivateKey,
+  bsPrivateKey,
   channelId,
   channelNonce,
   libraryAddress,
@@ -19,6 +20,8 @@ const {
   preFundSetupBHex,
   postFundSetupAHex,
   postFundSetupBHex,
+  postFundSetupASig,
+  postFundSetupBSig,
 } = scenarios.standard;
 
 const defaults = {
@@ -27,20 +30,21 @@ const defaults = {
   channelId,
   channelNonce,
   libraryAddress,
+  networkId: 123,
   participants,
-  privateKey: asPrivateKey,
   uid: 'uid',
-  networkId: 233,
 };
 
 const defaultsA = {
   ...defaults,
   ourIndex: 0,
+  privateKey: asPrivateKey,
 };
 
 const defaultsB = {
   ...defaults,
   ourIndex: 1,
+  privateKey: bsPrivateKey,
 };
 
 const justReceivedPreFundSetupB = {
@@ -48,55 +52,75 @@ const justReceivedPreFundSetupB = {
   lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   turnNum: 1,
 };
-
-const justReceivedPostFundSetupA = {
+ const justReceivedPostFundSetupA = {
   penultimatePosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   lastPosition: { data: postFundSetupAHex, signature: 'fake-sig' },
   turnNum: 2,
 };
-
-const justReceivedPostFundSetupB = {
+ const justReceivedPostFundSetupB = {
   penultimatePosition: { data: postFundSetupAHex, signature: 'fake-sig' },
   lastPosition: { data: postFundSetupBHex, signature: 'fake-sig' },
   turnNum: 3,
 };
 
+
 describe('start in WaitForFundingRequest', () => {
-  describe('action taken: approve funding', () => { // player A scenario
+  describe('action taken: funding requested', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForFundingRequest(testDefaults);
-    const action = actions.fundingApproved();
+    const action = actions.fundingRequested();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
   });
+
+  describe('action taken: funding requested', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
+    const state = states.waitForFundingRequest(testDefaults);
+    const action = actions.fundingRequested();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
+  });
+
 });
 
 describe('start in ApproveFunding', () => {
-  describe('incoming action: deploy initiated', () => { // player A scenario
+  describe('incoming action: funding approved', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.approveFunding(testDefaults);
-    const action = actions.deployInitiated();
+    const action = actions.fundingApproved();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.A_INITIATE_DEPLOY, updatedState);
+    itTransitionsToStateType(states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK, updatedState);
   });
 
-  describe('action taken: deploy initiated', () => { // player B scenario
+  describe('action taken: funding approved', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.approveFunding(testDefaults);
-    const action = actions.deployInitiated();
+    const action = actions.fundingApproved();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.B_WAIT_FOR_DEPLOY_INITIATION, updatedState);
+    itTransitionsToStateType(states.B_WAIT_FOR_DEPLOY_ADDRESS, updatedState);
   });
 
 });
 
-describe('start in AInitiateDeploy', () => {
+describe('start in aWaitForDeployToBeSentToMetaMask', () => {
+  describe('incoming action: deploySentToMetaMask', () => { // player A scenario
+    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+    const state = states.aWaitForDeployToBeSentToMetaMask(testDefaults);
+    const action = actions.deploySentToMetaMask();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.A_SUBMIT_DEPLOY_IN_METAMASK, updatedState);
+  });
+});
+
+describe('start in aSubmitDeployInMetaMask', () => {
   describe('incoming action: deploy submitted', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
-    const state = states.aInitiateDeploy(testDefaults);
+    const state = states.aSubmitDeployInMetaMask(testDefaults);
     const action = actions.deploySubmitted(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
@@ -104,11 +128,12 @@ describe('start in AInitiateDeploy', () => {
   });
 });
 
-describe('start in BWaitForDeployInitiation', () => {
-  describe('incoming action: deploy submitted', () => { // player B scenario
+
+describe('start in BWaitForDeployAddress', () => {
+  describe('incoming action: deploy initiated', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
-    const state = states.bWaitForDeployInitiation(testDefaults);
-    const action = actions.deploySubmitted(defaults.adjudicator);
+    const state = states.bWaitForDeployAddress(testDefaults);
+    const action = actions.deployAddressReceived(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_DEPLOY_CONFIRMATION, updatedState);
@@ -116,7 +141,7 @@ describe('start in BWaitForDeployInitiation', () => {
 });
 
 describe('start in WaitForDeployConfirmation', () => {
-  describe('incoming action: deploy confirmed', () => { // player A scenario
+  describe('incoming action: deploy finalised', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
     const action = actions.deployFinalised();
@@ -125,7 +150,7 @@ describe('start in WaitForDeployConfirmation', () => {
     itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT_INITIATION, updatedState);
   });
 
-  describe('incoming action: deploy confirmed', () => { // player B scenario
+  describe('incoming action: deploy finalised', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
     const action = actions.deployFinalised();
@@ -158,7 +183,7 @@ describe('start in BInitiateDeposti', () => {
 });
 
 describe('start in WaitForDepositConfirmation', () => {
-  describe('incoming action: deposit confirmed', () => { // player A scenario
+  describe('incoming action: deposit finalised', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForDepositConfirmation(testDefaults);
     const action = actions.depositFinalised();
@@ -167,7 +192,7 @@ describe('start in WaitForDepositConfirmation', () => {
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
   });
 
-  describe('incoming action: deposit confirmed', () => { // player B scenario
+  describe('incoming action: deposit finalised', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.waitForDepositConfirmation(testDefaults);
     const action = actions.depositFinalised();
@@ -181,7 +206,7 @@ describe('start in AWaitForPostFundSetup', () => {
   describe('incoming action: B post fund setup', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
     const state = states.aWaitForPostFundSetup(testDefaults);
-    const action = actions.postFundSetupReceived(postFundSetupBHex, "fake-signature");
+    const action = actions.postFundSetupReceived(postFundSetupBHex, postFundSetupBSig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
@@ -189,10 +214,10 @@ describe('start in AWaitForPostFundSetup', () => {
 });
 
 describe('start in BWaitForPostFundSetup', () => {
-  describe('incoming action: A post fund setup', () => { // player A scenario
-    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+  describe('incoming action: A post fund setup', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.bWaitForPostFundSetup(testDefaults);
-    const action = actions.postFundSetupReceived(postFundSetupAHex, "fake-signature");
+    const action = actions.postFundSetupReceived(postFundSetupAHex, postFundSetupASig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
@@ -202,6 +227,15 @@ describe('start in BWaitForPostFundSetup', () => {
 describe('start in AcknowledgeFundingSuccess', () => {
   describe('incoming action: FundingSuccessAcknowledged', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupB };
+    const state = states.acknowledgeFundingSuccess(testDefaults);
+    const action = actions.fundingSuccessAcknowledged();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+  });
+
+  describe('incoming action: FundingSuccessAcknowledged', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPostFundSetupB };
     const state = states.acknowledgeFundingSuccess(testDefaults);
     const action = actions.fundingSuccessAcknowledged();
     const updatedState = walletReducer(state, action);
