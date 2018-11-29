@@ -6,11 +6,13 @@ import * as actions from '../../actions';
 
 import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
+import { signPositionHex } from '../utils';
 
 
 const {
   asAddress,
   asPrivateKey,
+  bsPrivateKey,
   channelId,
   channelNonce,
   libraryAddress,
@@ -19,6 +21,8 @@ const {
   preFundSetupBHex,
   postFundSetupAHex,
   postFundSetupBHex,
+  postFundSetupASig,
+  postFundSetupBSig,
 } = scenarios.standard;
 
 const defaults = {
@@ -223,7 +227,7 @@ describe('start in AWaitForPostFundSetup', () => {
       turnNum: 2,
     };
     const state = states.aWaitForPostFundSetup(testDefaults);
-    const action = actions.postFundSetupReceived(postFundSetupBHex, "fake-signature");
+    const action = actions.postFundSetupReceived(postFundSetupBHex, postFundSetupBSig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
@@ -239,7 +243,7 @@ describe('start in BWaitForPostFundSetup', () => {
       turnNum: 1,
     };
     const state = states.bWaitForPostFundSetup(testDefaults);
-    const action = actions.postFundSetupReceived(postFundSetupAHex, "fake-signature");
+    const action = actions.postFundSetupReceived(postFundSetupAHex, postFundSetupASig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);

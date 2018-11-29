@@ -2,7 +2,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 
 import decode from '../../domain/decode';
-import { validTransition } from './utils';
+import { validSignature, validTransition } from './utils';
 
 import { unreachable } from '../../utils';
 
@@ -116,7 +116,6 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
   switch(action.type) {
     case actions.DEPOSIT_FINALISED:
       if (state.ourIndex === 0) {
-        // TODO: validate state
         // TODO: send postfund state
         return states.aWaitForPostFundSetup(state);
       } else {
@@ -130,15 +129,8 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
   switch(action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
-      const postFundBPosition = decode(action.data);
-
-      // TODO: comment this back in once the test cases contain proper signatures
-      // check signature
-      // const opponentAddress = state.participants[1];
-      // if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
-      // check transition
-      if (!validTransition(state, postFundBPosition)) { return state; }
-
+      if (!validPostFundState(state, action)) { return state; }
+      
       return states.acknowledgeFundingSuccess({
         ...state, 
         turnNum: state.turnNum + 1,
@@ -154,6 +146,8 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch(action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
+    if (!validPostFundState(state, action)) { return state; }
+
       return states.acknowledgeFundingSuccess(state);
     default:
       return state;
@@ -167,4 +161,13 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
     default:
       return state;
   }
+};
+
+const validPostFundState = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup, action: actions.PostFundSetupReceived) => {
+  const postFundBPosition = decode(action.data);
+  const opponentAddress = state.participants[1 - state.ourIndex];
+  if (!validSignature(action.data, action.signature, opponentAddress)) { return false; }
+  // check transition
+  if (!validTransition(state, postFundBPosition)) { return false; }
+  return true;
 };
