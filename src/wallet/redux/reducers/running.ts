@@ -3,7 +3,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import decode from '../../domain/decode';
 
-import { validSignature, validTransition, ourTurn } from './helpers';
+import { validSignature, validTransition, ourTurn } from './utils';
 import { State } from 'fmg-core';
 
 export const runningReducer = (state: states.RunningState, action: actions.WalletAction): states.WalletState => {
