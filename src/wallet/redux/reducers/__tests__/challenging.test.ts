@@ -90,9 +90,8 @@ describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
   });
 });
 
-
 describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
-  const state = states.waitForResponseOrTimeout({ ...defaults });
+  const state = states.waitForResponseOrTimeout(defaults);
 
   describe('when the opponent responds', () => {
     const action = actions.challengeResponseReceived('0xC1');

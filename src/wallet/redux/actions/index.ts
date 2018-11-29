@@ -151,6 +151,12 @@ export const acknowledgeChallenge = () => ({
 });
 export type AcknowledgeChallenge = ReturnType<typeof acknowledgeChallenge>;
 
+export const SELECT_RESPOND_WITH_EXISTING_MOVE = 'WALLET.SELECT_RESPOND_WITH_EXISTING_MOVE';
+export const selectRespondWithExistingMove = () => ({
+  type: SELECT_RESPOND_WITH_EXISTING_MOVE as typeof SELECT_RESPOND_WITH_EXISTING_MOVE,
+});
+export type SelectRespondWithExistingMove = ReturnType<typeof selectRespondWithExistingMove>;
+
 export const SELECT_RESPOND_WITH_MOVE = 'WALLET.SELECT_RESPOND_WITH_MOVE';
 export const selectRespondWithMove = () => ({
   type: SELECT_RESPOND_WITH_MOVE as typeof SELECT_RESPOND_WITH_MOVE,
@@ -162,25 +168,6 @@ export const selectRespondWithRefute = () => ({
   type: SELECT_RESPOND_WITH_REFUTE as typeof SELECT_RESPOND_WITH_REFUTE,
 });
 export type SelectRespondWithRefute = ReturnType<typeof selectRespondWithRefute>;
-
-export const CHALLENGE_RESPONSE_INITIATED = 'WALLET.CHALLENGE_RESPONSE_INITIATED';
-export const challengeResponseInitiated = () => ({
-  type: CHALLENGE_RESPONSE_INITIATED as typeof CHALLENGE_RESPONSE_INITIATED,
-});
-export type ChallengeResponseInitiated = ReturnType<typeof challengeResponseInitiated>;
-
-
-export const CHALLENGE_RESPONSE_SUBMITTED = 'WALLET.CHALLENGE_RESPONSE_SUBMITTED';
-export const challengeResponseSubmitted = () => ({
-  type: CHALLENGE_RESPONSE_SUBMITTED as typeof CHALLENGE_RESPONSE_SUBMITTED,
-});
-export type ChallengeResponseSubmitted = ReturnType<typeof challengeResponseSubmitted>;
-
-export const CHALLENGE_RESPONSE_CONFIRMED = 'WALLET.CHALLENGE_RESPONSE_CONFIRMED';
-export const challengeResponseConfirmed = () => ({
-  type: CHALLENGE_RESPONSE_CONFIRMED as typeof CHALLENGE_RESPONSE_CONFIRMED,
-});
-export type ChallengeResponseConfirmed = ReturnType<typeof challengeResponseConfirmed>;
 
 export const TAKE_MOVE_IN_APP = 'WALLET.TAKE_MOVE_IN_APP';
 export const takeMoveInApp = (position: string, signature: string) => ({
