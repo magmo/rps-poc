@@ -2,7 +2,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 
 import decode from '../../domain/decode';
-import { validSignature, validTransition } from './utils';
+import { validTransition } from './utils';
 
 import { unreachable } from '../../utils';
 
@@ -48,7 +48,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
   switch(action.type) {
     case actions.DEPLOY_INITIATED:
       if (state.ourIndex === 0) {
-        return states.deployInitiated(state);
+        return states.aInitiateDeploy(state);
       } else {
         return states.bWaitForDeployInitiation(state);
       } 

@@ -98,7 +98,7 @@ describe('start in AInitiateDeploy', () => {
       lastPosition: preFundSetupBHex,
       turnNum: 1,
     };
-    const state = states.deployInitiated(testDefaults);
+    const state = states.aInitiateDeploy(testDefaults);
     const action = actions.deploySubmitted(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
