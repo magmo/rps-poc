@@ -52,7 +52,8 @@ contract('RockPaperScissors', (accounts) => {
   });
 
   it("allows ROUNDACCEPTED -> REVEAL", async () => {
-    assertRevert(await validTransition(accept, reveal));
+    // assertRevert(await validTransition(accept, reveal)); // this still passes
+    assert(await validTransition(accept, reveal)); // this makes more sense
   });
 
   it("allows REVEAL -> (updated) START", async () => {
