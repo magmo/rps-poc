@@ -1,4 +1,4 @@
-import { AdjudicatorExists } from './shared'; 
+import { AdjudicatorExists, adjudicatorExists } from './shared'; 
 
 // stage
 export const WITHDRAWING = 'STAGE.WITHDRAWING';
@@ -9,24 +9,40 @@ export const INITIATE_WITHDRAWAL = 'INITIATE_WITHDRAWAL';
 export const WAIT_FOR_WITHDRAWAL_CONFIRMATION = 'WAIT_FOR_WITHDRAWAL_CONFIRMATION';
 export const ACKNOWLEDGE_WITHDRAWAL_SUCCESS = 'ACKNOWLEDGE_WITHDRAWAL_SUCCESS';
 
-interface ApproveWithdrawal extends AdjudicatorExists {
+export interface ApproveWithdrawal extends AdjudicatorExists {
   type: typeof APPROVE_WITHDRAWAL;
   stage: typeof WITHDRAWING;
 }
 
-interface InitiateWithdrawal extends AdjudicatorExists {
+export interface InitiateWithdrawal extends AdjudicatorExists {
   type: typeof INITIATE_WITHDRAWAL;
   stage: typeof WITHDRAWING;
 }
 
-interface WaitForWithdrawalConfirmation extends AdjudicatorExists {
+export interface WaitForWithdrawalConfirmation extends AdjudicatorExists {
   type: typeof WAIT_FOR_WITHDRAWAL_CONFIRMATION;
   stage: typeof WITHDRAWING;
 }
 
-interface AcknowledgeWithdrawalSuccess extends AdjudicatorExists {
+export interface AcknowledgeWithdrawalSuccess extends AdjudicatorExists {
   type: typeof ACKNOWLEDGE_WITHDRAWAL_SUCCESS;
   stage: typeof WITHDRAWING;
+}
+
+export function approveWithdrawal<T extends AdjudicatorExists>(params: T): ApproveWithdrawal {
+  return { ...adjudicatorExists(params), type: APPROVE_WITHDRAWAL, stage: WITHDRAWING };
+}
+
+export function initiateWithdrawal<T extends AdjudicatorExists>(params: T): InitiateWithdrawal {
+  return { ...adjudicatorExists(params), type: INITIATE_WITHDRAWAL, stage: WITHDRAWING };
+}
+
+export function waitForWithdrawalConfirmation<T extends AdjudicatorExists>(params: T): WaitForWithdrawalConfirmation {
+  return { ...adjudicatorExists(params), type: WAIT_FOR_WITHDRAWAL_CONFIRMATION, stage: WITHDRAWING };
+}
+
+export function acknowledgeWithdrawalSuccess<T extends AdjudicatorExists>(params: T): AcknowledgeWithdrawalSuccess {
+  return { ...adjudicatorExists(params), type: ACKNOWLEDGE_WITHDRAWAL_SUCCESS, stage: WITHDRAWING };
 }
 
 export type WithdrawingState = (

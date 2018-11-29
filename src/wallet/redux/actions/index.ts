@@ -227,10 +227,40 @@ export type AcknowledgeChallengeComplete = ReturnType<typeof acknowledgeChalleng
 
 
 export const WITHDRAWAL_REQUESTED = '.';
-export const WITHDRAWAL_INTITIATED = '.'; // when sent to metamask
-export const WITHDRAWAL_SUBMITTED = '.';
-export const WITHDRAWAL_CONFIRMED = '.';
-export const WITHDRAWAL_FINALISED = '.';
+
+export const WITHDRAWAL_APPROVED = 'WALLET.WITHDRAWAL_APPROVED';
+export const withdrawalApproved = (destinationAddress: string) => ({
+  type: WITHDRAWAL_APPROVED as typeof WITHDRAWAL_APPROVED,
+  destinationAddress,
+});
+export type WithdrawalApproved = ReturnType<typeof withdrawalApproved>;
+
+export const WITHDRAWAL_REJECTED = 'WALLET.WITHDRAWAL_REJECTED';
+export const withdrawalRejected = () => ({
+  type: WITHDRAWAL_REJECTED as typeof WITHDRAWAL_REJECTED,
+});
+export type WithdrawalRejected = ReturnType<typeof withdrawalRejected>;
+
+export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED'; // when sent to metamask
+export const transactionSubmitted = () => ({
+  type: TRANSACTION_SUBMITTED as typeof TRANSACTION_SUBMITTED,
+  // todo: add an id
+});
+export type TransactionSubmitted = ReturnType<typeof transactionSubmitted>;
+
+export const TRANSACTION_CONFIRMED = 'WALLET.TRANSACTION_CONFIRMED'; // when sent to metamask
+export const transactionConfirmed = () => ({
+  type: TRANSACTION_CONFIRMED as typeof TRANSACTION_CONFIRMED,
+  // todo: add an id
+});
+export type TransactionConfirmed = ReturnType<typeof transactionConfirmed>;
+
+export const WITHDRAWAL_SUCCESS_ACKNOWLEGED = 'WALLET.WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
+export const withdrawalSuccessAcknowledged = () => ({
+  type: WITHDRAWAL_SUCCESS_ACKNOWLEGED as typeof WITHDRAWAL_SUCCESS_ACKNOWLEGED,
+});
+export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
+
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
@@ -265,4 +295,9 @@ export type WalletAction = (
   | AcknowledgeChallenge
   | SelectRespondWithMove
   | SelectRespondWithRefute
+  | WithdrawalApproved
+  | WithdrawalRejected
+  | TransactionSubmitted
+  | TransactionConfirmed
+  | WithdrawalSuccessAcknowledged
 );
