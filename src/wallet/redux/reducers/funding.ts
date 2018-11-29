@@ -60,6 +60,8 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
 const aInitiateDeployReducer = (state: states.AInitiateDeploy, action: actions.WalletAction) => {
   switch(action.type) {
     case actions.DEPLOY_INITIATED:
+      // TODO: initiate adjudicator deploy
+      // TODO: inform opponent of deploy iniation
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
@@ -106,6 +108,7 @@ const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions
 const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiation, action: actions.WalletAction) => {
   switch(action.type) {
     case actions.DEPOSIT_INITIATED:
+      // TODO: create deposit transaction
       return states.waitForDepositConfirmation(state);
     default:
       return state;
@@ -147,6 +150,7 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
   switch(action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
     if (!validPostFundState(state, action)) { return state; }
+      // TODO: send postfund state
       return states.acknowledgeFundingSuccess(state);
     default:
       return state;
