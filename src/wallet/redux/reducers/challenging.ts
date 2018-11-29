@@ -4,12 +4,13 @@ import { unreachable } from '../../utils';
 import { WalletState } from '../../states';
 import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
+import { createForceMoveTransaction } from 'src/wallet/domain/TransactionGenerator';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
     case states.APPROVE_CHALLENGE:
       return approveChallengeReducer(state, action);
-    case states.INITIATE_CHALLENGE:
+    case states.WAIT_FOR_CHALLENGE_INITIATION:
       return initiateChallengeReducer(state, action);
     case states.WAIT_FOR_CHALLENGE_SUBMISSION:
       return waitForChallengeSubmissionReducer(state, action);
@@ -29,7 +30,8 @@ export const challengingReducer = (state: states.ChallengingState, action: Walle
 const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.APPROVE_CHALLENGE:
-      return states.initiateChallenge({ ...state });
+      transaction = createForceMoveTransaction(state.adjudicator, state.penultimatePosition, state.lastPosition)
+      return states.waitForChallengeInitiation({ ...state });
     case actions.DECLINE_CHALLENGE:
       return runningStates.waitForUpdate({ ...state });
     default:
@@ -37,7 +39,7 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
   }
 };
 
-const initiateChallengeReducer = (state: states.InitiateChallenge, action: WalletAction): WalletState => {
+const initiateChallengeReducer = (state: states.WaitForChallengeInitiation, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_INITIATED:
       return states.waitForChallengeSubmission({ ...state });
