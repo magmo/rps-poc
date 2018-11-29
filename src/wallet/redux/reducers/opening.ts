@@ -1,5 +1,5 @@
 import { State } from 'fmg-core';
-import { validSignature } from './helpers';
+import { validSignature } from './utils';
 
 import * as states from '../../states';
 import * as actions from '../actions';
