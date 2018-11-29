@@ -1,5 +1,3 @@
-import { ChallengeProof } from "src/wallet/domain/ChallengeProof";
-
 export const LOGGED_IN = 'WALLET.LOGGED_IN';
 export const loggedIn = (uid: string) => ({
   type: LOGGED_IN as typeof LOGGED_IN,
@@ -240,20 +238,6 @@ export const withdrawalRejected = () => ({
 });
 export type WithdrawalRejected = ReturnType<typeof withdrawalRejected>;
 
-export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED'; // when sent to metamask
-export const transactionSubmitted = () => ({
-  type: TRANSACTION_SUBMITTED as typeof TRANSACTION_SUBMITTED,
-  // todo: add an id
-});
-export type TransactionSubmitted = ReturnType<typeof transactionSubmitted>;
-
-export const TRANSACTION_CONFIRMED = 'WALLET.TRANSACTION_CONFIRMED'; // when sent to metamask
-export const transactionConfirmed = () => ({
-  type: TRANSACTION_CONFIRMED as typeof TRANSACTION_CONFIRMED,
-  // todo: add an id
-});
-export type TransactionConfirmed = ReturnType<typeof transactionConfirmed>;
-
 export const WITHDRAWAL_SUCCESS_ACKNOWLEGED = 'WALLET.WITHDRAWAL_SUCCESS_ACKNOWLEDGED';
 export const withdrawalSuccessAcknowledged = () => ({
   type: WITHDRAWAL_SUCCESS_ACKNOWLEGED as typeof WITHDRAWAL_SUCCESS_ACKNOWLEGED,
@@ -277,9 +261,6 @@ export type WalletAction = (
   | FundingSuccessAcknowledged
   | ChallengeRequested
   | OpponentChallengeDetected
-  | ChallengeInitiated
-  | ChallengeSubmitted
-  | ChallengeConfirmed
   | ChallengeResponseReceived
   | ChallengeResponseInitiated
   | ChallengeResponseSubmitted

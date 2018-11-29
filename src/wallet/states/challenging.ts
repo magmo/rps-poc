@@ -1,6 +1,7 @@
 import {
   AdjudicatorExists, adjudicatorExists
 } from './shared';
+import { TransactionRequest } from 'ethers/providers';
 export const CHALLENGING = 'CHALLENGING';
 
 export const APPROVE_CHALLENGE = "APPROVE_CHALLENGE";
@@ -28,7 +29,7 @@ export interface WaitForChallengeInitiation extends AdjudicatorExists {
   type: typeof WAIT_FOR_CHALLENGE_INITIATION;
   stage: typeof CHALLENGING;
 }
-export function waitForChallengeInitiation<T extends AdjudicatorExists>(transaction: string, params: T): WaitForChallengeInitiation {
+export function waitForChallengeInitiation<T extends AdjudicatorExists>(transaction: TransactionRequest, params: T): WaitForChallengeInitiation {
   return {
     type: WAIT_FOR_CHALLENGE_INITIATION,
     stage: CHALLENGING,

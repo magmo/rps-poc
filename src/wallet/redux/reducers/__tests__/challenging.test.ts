@@ -6,6 +6,7 @@ import * as actions from '../../actions';
 import { itTransitionsToStateType, itSendsATransaction } from './helpers';
 import { scenarios } from '../../../../core';
 import { ChallengeProof } from '../../../domain/ChallengeProof';
+
 const {
   asPrivateKey,
   revealHex,
@@ -42,7 +43,7 @@ describe('when in APPROVE_CHALLENGE', () => {
   describe('when a challenge is approved', () => {
     const action = actions.approveChallenge();
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.INITIATE_CHALLENGE, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
     itSendsATransaction(updatedState);
   });
 
@@ -54,10 +55,11 @@ describe('when in APPROVE_CHALLENGE', () => {
 });
 
 describe('when in INITIATE_CHALLENGE', () => {
-  const state = states.initiateChallenge({ ...defaults });
+  const transaction = {};
+  const state = states.waitForChallengeInitiation(transaction, defaults);
 
   describe('when a challenge is initiated', () => {
-    const action = actions.challengeInitiated(defaults.challengeProof);
+    const action = actions.transactionInitiated();
     const updatedState = walletReducer(state, action);
 
     itSendsATransaction(updatedState);
@@ -69,7 +71,7 @@ describe('when in WAIT_FOR_CHALLENGE_SUBMISSION', () => {
   const state = states.waitForChallengeSubmission(defaults);
 
   describe('when a challenge is submitted', () => {
-    const action = actions.challengeSubmitted();
+    const action = actions.transactionSubmitted();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_CONFIRMATION, updatedState);
@@ -77,12 +79,11 @@ describe('when in WAIT_FOR_CHALLENGE_SUBMISSION', () => {
 });
 
 
-
 describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
   const state = states.waitForChallengeConfirmation({ ...defaults });
 
   describe('when a challenge is confirmed', () => {
-    const action = actions.challengeConfirmed();
+    const action = actions.transactionConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_RESPONSE_OR_TIMEOUT, updatedState);
