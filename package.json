@@ -78,10 +78,12 @@
     "test:truffle": "node scripts/test_truffle.js",
     "truffle:migrate": "deploy-contracts",
     "ganache:start": "start-ganache",
-    "postinstall": "rm -f node_modules/web3/index.d.ts"
+    "postinstall": "rm -f node_modules/web3/index.d.ts",
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "devDependencies": {
     "@babel/runtime": "^7.0.0-beta.53",
+    "@storybook/react": "4.0.9",
     "@types/jest": "^23.3.1",
     "babel-jest": "^23.4.2",
     "babel-loader": "^7.1.5",
