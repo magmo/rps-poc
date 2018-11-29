@@ -1,5 +1,5 @@
 import { WalletState } from '../../states';
-import { recoverAddress, getAddress, hashMessage } from 'ethers/utils';
+import { recoverAddress, getAddress, hashMessage, SigningKey, joinSignature } from 'ethers/utils';
 import { State } from 'fmg-core';
 
 export const validTransition = (fromState: WalletState, toState: State) => {
@@ -29,4 +29,11 @@ export const ourTurn = (state: WalletState) => {
   if (!('turnNum' in state)) { return false; }
 
   return state.turnNum % 2 !== state.ourIndex;
+};
+
+export const signPositionHex = (positionHex: string, privateKey: string) => {
+  const signer = new SigningKey(privateKey);
+  const signature = joinSignature(signer.signDigest(hashMessage(positionHex)));
+
+  return signature;
 };
