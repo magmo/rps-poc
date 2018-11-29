@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { approveFunding } from '../states';
 
 import { scenarios } from '../../core';
-
+import '../../index.scss';
 
 const {
   asAddress,
@@ -33,18 +33,19 @@ const defaults = {
   turnNum: 1,
 };
 
-const state = approveFunding(defaults); 
+const state = approveFunding(defaults);
 
 const store = {
   dispatch: action => {
     alert(`Action ${action.type} triggered`);
     return action;
   },
-  getState: () => ({ wallet: state }), 
+  getState: () => ({ wallet: state }),
   subscribe: () => (() => {/* empty */ }),
   replaceReducer: () => { /* empty */ },
 };
 
 storiesOf('Button', module)
+
   .addDecorator(story => <Provider store={store}>{story()}</Provider>)
   .add('test', () => <Wallet />);
