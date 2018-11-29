@@ -249,9 +249,6 @@ export type WalletAction = (
   | ChallengeRequested
   | OpponentChallengeDetected
   | ChallengeResponseReceived
-  | ChallengeResponseInitiated
-  | ChallengeResponseSubmitted
-  | ChallengeResponseConfirmed
   | ChallengeTimeout
   | TakeMoveInApp
   | ApproveChallenge
@@ -261,6 +258,7 @@ export type WalletAction = (
   | AcknowledgeChallengeComplete
   | AcknowledgeChallenge
   | SelectRespondWithMove
+  | SelectRespondWithExistingMove
   | SelectRespondWithRefute
   | WithdrawalApproved
   | WithdrawalRejected
