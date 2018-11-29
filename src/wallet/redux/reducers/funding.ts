@@ -37,7 +37,7 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
 
 const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.FUNDING_APPROVED:
+    case actions.FUNDING_REQUESTED:
       return states.approveFunding(state);
     default:
       return state;
@@ -46,7 +46,7 @@ const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, actio
 
 const approveFundingReducer = (state: states.ApproveFunding, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPLOY_INITIATED:
+    case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
         return states.aInitiateDeploy(state);
       } else {
@@ -59,7 +59,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
 
 const aInitiateDeployReducer = (state: states.AInitiateDeploy, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPLOY_SUBMITTED:
+    case actions.DEPLOY_INITIATED:
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
@@ -71,7 +71,7 @@ const aInitiateDeployReducer = (state: states.AInitiateDeploy, action: actions.W
 
 const bWaitForDeployInitiationReducer = (state: states.BWaitForDeployInitiation, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPLOY_SUBMITTED:
+    case actions.DEPLOY_INITIATED:
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
@@ -147,7 +147,6 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
   switch(action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
     if (!validPostFundState(state, action)) { return state; }
-
       return states.acknowledgeFundingSuccess(state);
     default:
       return state;

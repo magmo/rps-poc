@@ -33,7 +33,12 @@ export const opponentPositionReceived = (data: string, signature: string) => ({
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
-export const FUNDING_REQUESTED = '.';
+export const FUNDING_REQUESTED = 'WALLET.FUNDING_REQUESTED';
+export const fundingRequested = () => ({
+  type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
+});
+export type FundingRequested = ReturnType<typeof fundingRequested>;
+
 
 export const FUNDING_APPROVED = 'WALLET.FUNDING_APPROVED';
 export const fundingApproved = () => ({
@@ -44,8 +49,9 @@ export type FundingApproved = ReturnType<typeof fundingApproved>;
 export const FUNDING_CANCELLED = '.';
 
 export const DEPLOY_INITIATED = 'WALLET.DEPLOY_INITIATED'; // when sent to metamask
-export const deployInitiated = () => ({
+export const deployInitiated = (adjudicator: string) => ({
   type: DEPLOY_INITIATED as typeof DEPLOY_INITIATED,
+  adjudicator,
 });
 export type DeployInitiated = ReturnType<typeof deployInitiated>;
 
@@ -238,6 +244,7 @@ export type WalletAction = (
   | KeysLoaded
   | OwnPositionReceived
   | OpponentPositionReceived
+  | FundingRequested
   | FundingApproved
   | DeployInitiated
   | DeploySubmitted
