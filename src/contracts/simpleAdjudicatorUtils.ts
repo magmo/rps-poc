@@ -30,6 +30,11 @@ export async function createFactory(): Promise<ethers.ContractFactory> {
   return new ethers.ContractFactory(simpleAdjudicatorArtifact.abi, await linkBytecode(simpleAdjudicatorArtifact), provider.getSigner());
 }
 
+
+export function getSimpleAdjudicatorInterface(): ethers.utils.Interface {
+  return new ethers.utils.Interface(simpleAdjudicatorArtifact.abi);
+}
+
 async function linkBytecode(contractArtifact) {
   const network = await detectNetwork(web3.currentProvider);
   let contractBytecode = contractArtifact.bytecode;

@@ -65,7 +65,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
 
 export const initiateResponseReducer = (state: states.InitiateResponse, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.CHALLENGE_RESPONSE_INITIATED:
+    case actions.TRANSACTION_INITIATED:
       return states.waitForResponseSubmission(state);
     default:
       return state;
@@ -74,7 +74,7 @@ export const initiateResponseReducer = (state: states.InitiateResponse, action: 
 
 export const waitForResponseSubmissionReducer = (state: states.WaitForResponseSubmission, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.CHALLENGE_RESPONSE_SUBMITTED:
+    case actions.TRANSACTION_SUBMITTED:
       return states.waitForResponseConfirmation(state);
     default:
       return state;
@@ -83,7 +83,7 @@ export const waitForResponseSubmissionReducer = (state: states.WaitForResponseSu
 
 export const waitForResponseConfirmationReducer = (state: states.WaitForResponseConfirmation, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.CHALLENGE_RESPONSE_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       return states.acknowledgeChallengeComplete(state);
     default:
       return state;

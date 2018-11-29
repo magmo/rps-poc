@@ -1,10 +1,11 @@
 import {
   AdjudicatorExists, adjudicatorExists
 } from './shared';
+import { TransactionRequest } from 'ethers/providers';
 export const CHALLENGING = 'CHALLENGING';
 
 export const APPROVE_CHALLENGE = "APPROVE_CHALLENGE";
-export const INITIATE_CHALLENGE = 'INITIATE_CHALLENGE';
+export const WAIT_FOR_CHALLENGE_INITIATION = 'INITIATE_CHALLENGE';
 export const WAIT_FOR_CHALLENGE_SUBMISSION = 'WAIT_FOR_CHALLENGE_SUBMISSION';
 export const WAIT_FOR_CHALLENGE_CONFIRMATION = 'WAIT_FOR_CHALLENGE_CONFIRMATION';
 
@@ -24,16 +25,16 @@ export function approveChallenge<T extends AdjudicatorExists>(params: T): Approv
   };
 }
 
-export interface InitiateChallenge extends AdjudicatorExists {
-  type: typeof INITIATE_CHALLENGE;
+export interface WaitForChallengeInitiation extends AdjudicatorExists {
+  type: typeof WAIT_FOR_CHALLENGE_INITIATION;
   stage: typeof CHALLENGING;
 }
-export function initiateChallenge<T extends AdjudicatorExists>(params: T): InitiateChallenge {
+export function waitForChallengeInitiation<T extends AdjudicatorExists>(transaction: TransactionRequest, params: T): WaitForChallengeInitiation {
   return {
-    type: INITIATE_CHALLENGE,
+    type: WAIT_FOR_CHALLENGE_INITIATION,
     stage: CHALLENGING,
     ...adjudicatorExists(params),
-    transactionOutbox: {},
+    transactionOutbox: transaction,
   };
 }
 
@@ -103,7 +104,7 @@ export function acknowledgeChallengeTimeout<T extends AdjudicatorExists>(params:
 }
 
 export type ChallengingState = (
-  | InitiateChallenge
+  | WaitForChallengeInitiation
   | WaitForChallengeSubmission
   | WaitForChallengeConfirmation
   | WaitForResponseOrTimeout

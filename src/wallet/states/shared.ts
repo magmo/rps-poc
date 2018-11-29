@@ -1,6 +1,8 @@
+import { TransactionRequest } from "ethers/providers";
+
 export interface Base {
   messageOutbox?: any;
-  transactionOutbox?: any;
+  transactionOutbox?: TransactionRequest;
 }
 
 export interface LoggedIn extends Base {
