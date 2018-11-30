@@ -85,7 +85,7 @@ describe('when in TAKE_MOVE_IN_APP', () => {
 describe('when in INITIATE_RESPONSE', () => {
   const state = states.initiateResponse(defaults);
   describe('when the challenge response is initiated', () => {
-    const action = actions.transactionInitiated();
+    const action = actions.transactionSentToMetamask();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_RESPONSE_SUBMISSION, updatedState);
 

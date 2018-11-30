@@ -1,7 +1,7 @@
 
 import { Signature } from "./Signature";
 import { TransactionRequest } from "ethers/providers";
-import { getSimpleAdjudicatorInterface } from '../../contracts/simpleAdjudicatorUtils';
+import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytedcode, getSimpleAdjudicatorBytecode } from '../../contracts/simpleAdjudicatorUtils';
 import { utils } from 'ethers';
 
 export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, signature: Signature): TransactionRequest {
@@ -22,12 +22,21 @@ export function createRespondWithMoveTransaction(contractAddress: string, nextSt
   };
 }
 
-export function createRefuteransaction(contractAddress: string, refuteState: string, signature: Signature): TransactionRequest {
+export function createRefuteTransaction(contractAddress: string, refuteState: string, signature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
   const data = adjudicatorInterface.functions.refute.encode([refuteState, ...convertSignature(signature)]);
   return {
     to: contractAddress,
     data,
+  };
+}
+
+export function createDeployTransaction(networkId: number, channelId: string, depositAmount: string) {
+  const byteCode = getSimpleAdjudicatorBytecode(networkId);
+  const data = getSimpleAdjudicatorInterface().deployFunction.encode(byteCode, [channelId, 2]);
+  return {
+    data,
+    value: depositAmount,
   };
 }
 

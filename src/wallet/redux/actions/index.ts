@@ -6,10 +6,12 @@ export const loggedIn = (uid: string) => ({
 export type LoggedIn = ReturnType<typeof loggedIn>;
 
 export const KEYS_LOADED = 'WALLET.KEYS_LOADED';
-export const keysLoaded = (address: string, privateKey: string) => ({
+export const keysLoaded = (address: string, privateKey: string, networkId: string) => ({
   type: KEYS_LOADED as typeof KEYS_LOADED,
   address,
   privateKey,
+  // TODO: This should be separated off into its own action
+  networkId,
 });
 export type KeysLoaded = ReturnType<typeof keysLoaded>;
 
@@ -184,11 +186,19 @@ export const acknowledgeChallengeComplete = () => ({
 export type AcknowledgeChallengeComplete = ReturnType<typeof acknowledgeChallengeComplete>;
 
 // Common Transaction Actions
-export const TRANSACTION_INITIATED = 'WALLET.TRANSACTION_INITIATED';
-export const transactionInitiated = () => ({
-  type: TRANSACTION_INITIATED as typeof TRANSACTION_INITIATED,
+export const TRANSACTION_SENT_TO_METAMASK = 'WALLET.TRANSACTION_SENT_TO_METAMASK';
+export const transactionSentToMetamask = () => ({
+  type: TRANSACTION_SENT_TO_METAMASK as typeof TRANSACTION_SENT_TO_METAMASK,
 });
-export type TransactionInitiated = ReturnType<typeof transactionInitiated>;
+export type TransactionSentToMetamask = ReturnType<typeof transactionSentToMetamask>;
+
+export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.TRANSACTION_SUBMISSION_FAILED';
+export const transactionSubmissionFailed = (error) => ({
+  error,
+  type: TRANSACTION_SUBMISSION_FAILED as typeof TRANSACTION_SUBMISSION_FAILED,
+});
+export type TransactionSubmissionFailed = ReturnType<typeof transactionSentToMetamask>;
+
 
 export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED';
 export const transactionSubmitted = () => ({
@@ -264,6 +274,6 @@ export type WalletAction = (
   | WithdrawalRejected
   | TransactionSubmitted
   | TransactionConfirmed
-  | TransactionInitiated
+  | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
 );

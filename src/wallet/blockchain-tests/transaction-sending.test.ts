@@ -1,10 +1,12 @@
 import { ethers } from "ethers";
 import simpleAdjudicatorArtifact from '../../../build/contracts/SimpleAdjudicator.json';
 import { Channel } from "fmg-core";
-import { createForceMoveTransaction } from "../domain/TransactionGenerator";
+import { createForceMoveTransaction, createDeployTransaction } from "../domain/TransactionGenerator";
 import { scenarios } from "../../core";
 import { Signature } from "../domain/Signature";
 import { transactionSender } from "../redux/sagas/transaction-sender";
+import { transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
+import { put } from "redux-saga/effects";
 jest.setTimeout(20000);
 
 describe('transaction sending', () => {
@@ -20,42 +22,40 @@ describe('transaction sending', () => {
   const participantB = ethers.Wallet.createRandom();
   const participants = [participantA.address, participantB.address];
   const channel = new Channel(gameLibrary, channelNonce, participants);
-  let deployedContract;
 
   beforeEach(async () => {
-    networkId = (await provider.getNetwork()).chainId;
-    function linkedByteCode() {
-      let contractBytecode = simpleAdjudicatorArtifact.bytecode;
-      const links = simpleAdjudicatorArtifact.networks[networkId].links;
-      Object.keys(links).forEach(linkName => {
-        const replace = `__${linkName}_________________________________`;
-        contractBytecode = contractBytecode.replace(
-          new RegExp(replace, "g"),
-          links[linkName].substr(2)
-        );
-      });
-      return contractBytecode;
-    }
-    const factory = new ethers.ContractFactory(simpleAdjudicatorArtifact.abi, await linkedByteCode(), provider.getSigner());
-    const deployTransaction = await factory.deploy(channel.id, 2, { value: 1 });
-    // wait for the contract deployment transaction to be mined
-    deployedContract = await deployTransaction.deployed();
+
+    const network = await provider.getNetwork();
+    networkId = network.chainId;
+
   });
-
-  it.only('does stuff', async () => {
-    const sig = new Signature(scenarios.standard.acceptSig);
-    const transactionToSend = { to: deployedContract.address, value: 1 };
-    const saga = transactionSender(transactionToSend);
-    saga.next();
+  it.only('should deploy a contract', async () => {
+    const deployTransaction = createDeployTransaction(networkId, channel.id, '0x5');
+    const saga = transactionSender(deployTransaction);
+    expect(saga.next()).toEqual(put(transactionSentToMetamask()));
     saga.next(provider);
-    saga.next();
+    expect(saga.next()).toEqual(put(transactionSubmitted()));
     const signer = provider.getSigner();
-    await signer.sendTransaction(transactionToSend).catch(err => console.log(err));
-    const transaction = await signer.sendTransaction(transactionToSend);
-
+    const transaction = await signer.sendTransaction(deployTransaction);
+    console.log(saga.next(transaction));
     saga.next(transaction);
-    saga.next();
-    saga.next();
+
+  });
+  it('does stuff', async () => {
+
+    // const sig = new Signature(scenarios.standard.acceptSig);
+    // const transactionToSend = createForceMoveTransaction()
+    // const saga = transactionSender(transactionToSend);
+    // saga.next();
+    // saga.next(provider);
+    // saga.next();
+    // const signer = provider.getSigner();
+    // await signer.sendTransaction(transactionToSend).catch(err => console.log(err));
+    // const transaction = await signer.sendTransaction(transactionToSend);
+
+    // saga.next(transaction);
+    // saga.next();
+    // saga.next();
 
   });
 });

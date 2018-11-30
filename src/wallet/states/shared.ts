@@ -12,6 +12,7 @@ export interface LoggedIn extends Base {
 export interface AddressExists extends LoggedIn {
   address: string;
   privateKey: string;
+  networkId: number;
 }
 
 export interface ChannelPartiallyOpen extends AddressExists {
@@ -44,8 +45,8 @@ export function loggedIn<T extends LoggedIn>(params: T): LoggedIn {
 }
 
 export function addressExists<T extends AddressExists>(params: T): AddressExists {
-  const { address, privateKey } = params;
-  return { ...loggedIn(params), address, privateKey };
+  const { address, privateKey, networkId } = params;
+  return { ...loggedIn(params), address, privateKey, networkId };
 }
 
 export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T): ChannelPartiallyOpen {

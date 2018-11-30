@@ -45,7 +45,7 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
 
 const initiateChallengeReducer = (state: states.WaitForChallengeInitiation, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.TRANSACTION_INITIATED:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.waitForChallengeSubmission({ ...state });
     default:
       return state;

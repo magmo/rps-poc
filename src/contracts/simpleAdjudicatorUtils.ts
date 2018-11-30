@@ -1,15 +1,7 @@
 import { ethers, utils } from 'ethers';
-import simpleAdjudicatorArtifact from '../../contracts/artifacts/SimpleAdjudicator.json';
-import detectNetwork from 'web3-detect-network';
+import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
 import BN from 'bn.js';
 
-export async function deployContract(channelId, amount: BN) {
-  const factory = await createFactory();
-  const value = utils.bigNumberify(amount.toString());
-  const deployedContract = await factory.deploy(channelId, 2, { value });
-  // wait for the contract deployment transaction to be mined
-  return await deployedContract.deployed();
-}
 export async function depositFunds(address: string, amount: BN) {
   const depositTransaction = {
     to: address,
@@ -25,20 +17,20 @@ export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
 }
 
-export async function createFactory(): Promise<ethers.ContractFactory> {
-  const provider = await getProvider();
-  return new ethers.ContractFactory(simpleAdjudicatorArtifact.abi, await linkBytecode(simpleAdjudicatorArtifact), provider.getSigner());
-}
-
 
 export function getSimpleAdjudicatorInterface(): ethers.utils.Interface {
   return new ethers.utils.Interface(simpleAdjudicatorArtifact.abi);
 }
 
-async function linkBytecode(contractArtifact) {
-  const network = await detectNetwork(web3.currentProvider);
+export function getSimpleAdjudicatorBytecode(networkId) {
+  console.log(networkId);
+  return linkBytecode(simpleAdjudicatorArtifact, networkId);
+}
+
+function linkBytecode(contractArtifact, networkId) {
+  console.log(contractArtifact.networks);
   let contractBytecode = contractArtifact.bytecode;
-  const links = contractArtifact.networks[network.id].links;
+  const links = contractArtifact.networks[networkId].links;
   Object.keys(links).forEach(linkName => {
     /*
       `truffle compile` creates bytecode that is not a hex string.
