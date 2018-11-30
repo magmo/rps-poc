@@ -210,7 +210,11 @@ export type TransactionFinalized = ReturnType<typeof transactionFinalized>;
 
 
 
-export const WITHDRAWAL_REQUESTED = '.';
+export const WITHDRAWAL_REQUESTED = 'WALLET.WITHDRAWAL_REQUESTED';
+export const withdrawalRequested = () => ({
+  type: WITHDRAWAL_REQUESTED as typeof WITHDRAWAL_REQUESTED,
+});
+export type WithdrawalRequested = ReturnType<typeof withdrawalRequested>;
 
 export const WITHDRAWAL_APPROVED = 'WALLET.WITHDRAWAL_APPROVED';
 export const withdrawalApproved = (destinationAddress: string) => ({
@@ -260,6 +264,7 @@ export type WalletAction = (
   | SelectRespondWithMove
   | SelectRespondWithExistingMove
   | SelectRespondWithRefute
+  | WithdrawalRequested
   | WithdrawalApproved
   | WithdrawalRejected
   | TransactionSubmitted

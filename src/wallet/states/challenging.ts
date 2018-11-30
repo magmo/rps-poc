@@ -17,6 +17,7 @@ export interface ApproveChallenge extends AdjudicatorExists {
   type: typeof APPROVE_CHALLENGE;
   stage: typeof CHALLENGING;
 }
+
 export function approveChallenge<T extends AdjudicatorExists>(params: T): ApproveChallenge {
   return {
     type: APPROVE_CHALLENGE,

@@ -7,14 +7,18 @@ import * as states from '../states';
 import Todo from '../components/Todo';
 import WaitForResponseOrTimeout from '../components/challenging/WaitForResponseOrTimeout';
 import WaitForChallengeConfirmation from '../components/challenging/WaitForChallengeConfirmation';
+import AcknowledgeChallengeTimeout from '../components/challenging/AcknowledgeChallengeTimeout';
+import { connect } from 'react-redux';
+import { withdrawalRequested } from '../redux/actions';
 
 interface Props {
   state: states.ChallengingState;
+  withdraw: () => void;
 }
 
-export default class ChallengingContainer extends PureComponent<Props> {
+class ChallengingContainer extends PureComponent<Props> {
   render() {
-    const state = this.props.state;
+    const { state, withdraw } = this.props;
 
     switch (state.type) {
       case states.APPROVE_CHALLENGE:
@@ -30,9 +34,20 @@ export default class ChallengingContainer extends PureComponent<Props> {
       case states.ACKNOWLEDGE_CHALLENGE_RESPONSE:
         return <Todo stateType={state.type} />;
       case states.ACKNOWLEDGE_CHALLENGE_TIMEOUT:
-        return <Todo stateType={state.type} />;
+        return <AcknowledgeChallengeTimeout expirationTime={100 /*todo*/} withdraw={withdraw} />;
       default:
         return unreachable(state);
     }
   }
 }
+const mapDispatchToProps = {
+  withdraw: withdrawalRequested, 
+};
+
+// why does it think that mapStateToProps can return undefined??
+
+export default connect(
+  () => ({}),
+  mapDispatchToProps,
+)(ChallengingContainer);
+
