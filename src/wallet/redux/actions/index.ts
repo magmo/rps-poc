@@ -41,7 +41,11 @@ export const fundingApproved = () => ({
 });
 export type FundingApproved = ReturnType<typeof fundingApproved>;
 
-export const FUNDING_CANCELLED = '.';
+export const FUNDING_REJECTED = 'WALLET.FUNDING_REJECTED';
+export const fundingRejected = () => ({
+  type: FUNDING_REJECTED as typeof FUNDING_REJECTED,
+});
+export type FundingRejected = ReturnType<typeof fundingRejected>;
 
 export const DEPLOY_INITIATED = 'WALLET.DEPLOY_INITIATED'; // when sent to metamask
 export const deployInitiated = () => ({
@@ -95,17 +99,17 @@ export const postFundSetupReceived = (data: string, signature: string) => ({
 });
 export type PostFundSetupReceived = ReturnType<typeof postFundSetupReceived>;
 
-export const APPROVE_CHALLENGE = 'WALLET.APPROVE_CHALLENGE';
-export const approveChallenge = () => ({
-  type: APPROVE_CHALLENGE as typeof APPROVE_CHALLENGE,
+export const CHALLENGE_APPROVED = 'WALLET.CHALLENGE_APPROVED';
+export const challengeApproved = () => ({
+  type: CHALLENGE_APPROVED as typeof CHALLENGE_APPROVED,
 });
-export type ApproveChallenge = ReturnType<typeof approveChallenge>;
+export type ChallengeApproved = ReturnType<typeof challengeApproved>;
 
-export const DECLINE_CHALLENGE = 'WALLET.DECLINE_CHALLENGE';
-export const declineChallenge = () => ({
-  type: DECLINE_CHALLENGE as typeof DECLINE_CHALLENGE,
+export const CHALLENGE_REJECTED = 'WALLET.CHALLENGE_REJECTED';
+export const challengeRejected = () => ({
+  type: CHALLENGE_REJECTED as typeof CHALLENGE_REJECTED,
 });
-export type DeclineChallenge = ReturnType<typeof declineChallenge>;
+export type ChallengeRejected = ReturnType<typeof challengeRejected>;
 
 export const CHALLENGE_REQUESTED = 'WALLET.CHALLENGE_REQUESTED';
 export const challengeRequested = () => ({
@@ -127,61 +131,59 @@ export const challengeResponseReceived = (data: string) => ({
 });
 export type ChallengeResponseReceived = ReturnType<typeof challengeResponseReceived>;
 
-export const CHALLENGE_TIMEOUT = 'WALLET.CHALLENGE_TIMEOUT';
-export const challengeTimeout = () => ({
-  type: CHALLENGE_TIMEOUT as typeof CHALLENGE_TIMEOUT,
+export const CHALLENGE_TIMED_OUT = 'WALLET.CHALLENGE_TIMED_OUT';
+export const challengedTimedOut = () => ({
+  type: CHALLENGE_TIMED_OUT as typeof CHALLENGE_TIMED_OUT,
 });
-export type ChallengeTimeout = ReturnType<typeof challengeTimeout>;
+export type ChallengedTimedOut = ReturnType<typeof challengedTimedOut>;
 
-export const ACKNOWLEDGE_CHALLENGE_TIMEOUT = 'WALLET.ACKNOWLEDGE_CHALLENGE_TIMEOUT';
-export const acknowledgeChallengeTimeout = () => ({
-  type: ACKNOWLEDGE_CHALLENGE_TIMEOUT as typeof ACKNOWLEDGE_CHALLENGE_TIMEOUT,
+export const CHALLENGE_TIME_OUT_ACKNOWLEDGED = 'WALLET.CHALLENGE_TIME_OUT_ACKNOWLEDGED';
+export const challengedTimedOutAcknowledged = () => ({
+  type: CHALLENGE_TIME_OUT_ACKNOWLEDGED as typeof CHALLENGE_TIME_OUT_ACKNOWLEDGED,
 });
-export type AcknowledgeChallengeTimeout = ReturnType<typeof acknowledgeChallengeTimeout>;
+export type ChallengeTimeoutAcknowledged = ReturnType<typeof challengedTimedOutAcknowledged>;
 
-export const ACKNOWLEDGE_CHALLENGE_RESPONSE = 'WALLET.ACKNOWLEDGE_CHALLENGE_RESPONSE';
-export const acknowledgeChallengeResponse = () => ({
-  type: ACKNOWLEDGE_CHALLENGE_RESPONSE as typeof ACKNOWLEDGE_CHALLENGE_RESPONSE,
+export const CHALLENGE_RESPONSE_ACKNOWLEDGED = 'WALLET.CHALLENGE_RESPONSE_ACKNOWLEDGED';
+export const challengeResponseAcknowledged = () => ({
+  type: CHALLENGE_RESPONSE_ACKNOWLEDGED as typeof CHALLENGE_RESPONSE_ACKNOWLEDGED,
 });
-export type AcknowledgeChallengeResponse = ReturnType<typeof acknowledgeChallengeResponse>;
+export type ChallengeResponseAcknowledged = ReturnType<typeof challengeResponseAcknowledged>;
 
-export const ACKNOWLEDGE_CHALLENGE = 'WALLET.ACKNOWLEDGE_CHALLENGE';
-export const acknowledgeChallenge = () => ({
-  type: ACKNOWLEDGE_CHALLENGE as typeof ACKNOWLEDGE_CHALLENGE,
+export const CHALLENGE_ACKNOWLEDGED = 'WALLET.CHALLENGE_ACKNOWLEDGED';
+export const challengeAcknowledged = () => ({
+  type: CHALLENGE_ACKNOWLEDGED as typeof CHALLENGE_ACKNOWLEDGED,
 });
-export type AcknowledgeChallenge = ReturnType<typeof acknowledgeChallenge>;
+export type ChallengeAcknowledged = ReturnType<typeof challengeAcknowledged>;
 
-export const SELECT_RESPOND_WITH_EXISTING_MOVE = 'WALLET.SELECT_RESPOND_WITH_EXISTING_MOVE';
-export const selectRespondWithExistingMove = () => ({
-  type: SELECT_RESPOND_WITH_EXISTING_MOVE as typeof SELECT_RESPOND_WITH_EXISTING_MOVE,
+export const RESPOND_WITH_EXISTING_MOVE_CHOSEN = 'WALLET.RESPOND_WITH_EXISTING_MOVE_CHOSEN';
+export const respondWithExistingMoveChosen = () => ({
+  type: RESPOND_WITH_EXISTING_MOVE_CHOSEN as typeof RESPOND_WITH_EXISTING_MOVE_CHOSEN,
 });
-export type SelectRespondWithExistingMove = ReturnType<typeof selectRespondWithExistingMove>;
+export type RespondWithExistingMoveChosen = ReturnType<typeof respondWithExistingMoveChosen>;
 
-export const SELECT_RESPOND_WITH_MOVE = 'WALLET.SELECT_RESPOND_WITH_MOVE';
-export const selectRespondWithMove = () => ({
-  type: SELECT_RESPOND_WITH_MOVE as typeof SELECT_RESPOND_WITH_MOVE,
+export const RESPOND_WITH_MOVE_CHOSEN = 'WALLET.RESPOND_WITH_MOVE_CHOSEN';
+export const respondWithMoveChosen = () => ({
+  type: RESPOND_WITH_MOVE_CHOSEN as typeof RESPOND_WITH_MOVE_CHOSEN,
 });
-export type SelectRespondWithMove = ReturnType<typeof selectRespondWithMove>;
+export type RespondWithMoveChosen = ReturnType<typeof respondWithMoveChosen>;
 
-export const SELECT_RESPOND_WITH_REFUTE = 'WALLET.SELECT_RESPOND_WITH_REFUTE';
-export const selectRespondWithRefute = () => ({
-  type: SELECT_RESPOND_WITH_REFUTE as typeof SELECT_RESPOND_WITH_REFUTE,
+export const RESPOND_WITH_REFUTE_CHOSEN = 'WALLET.RESPOND_WITH_REFUTE_CHOSEN';
+export const respondWithRefuteChosen = () => ({
+  type: RESPOND_WITH_REFUTE_CHOSEN as typeof RESPOND_WITH_REFUTE_CHOSEN,
 });
-export type SelectRespondWithRefute = ReturnType<typeof selectRespondWithRefute>;
+export type RespondWithRefuteChosen = ReturnType<typeof respondWithRefuteChosen>;
 
-export const TAKE_MOVE_IN_APP = 'WALLET.TAKE_MOVE_IN_APP';
-export const takeMoveInApp = (position: string, signature: string) => ({
-  type: TAKE_MOVE_IN_APP as typeof TAKE_MOVE_IN_APP,
-  position,
-  signature,
+export const TAKE_MOVE_IN_APP_ACKNOWLEDGED = 'WALLET.TAKE_MOVE_IN_APP_ACKNOWLEDGED';
+export const takeMoveInAppAcknowledged = (position: string, signature: string) => ({
+  type: TAKE_MOVE_IN_APP_ACKNOWLEDGED as typeof TAKE_MOVE_IN_APP_ACKNOWLEDGED,
 });
-export type TakeMoveInApp = ReturnType<typeof takeMoveInApp>;
+export type TakeMoveInAppAcknowledged = ReturnType<typeof takeMoveInAppAcknowledged>;
 
-export const ACKNOWLEDGE_CHALLENGE_COMPLETE = 'WALLET.ACKNOWLEDGE_CHALLENGE_COMPLETE';
-export const acknowledgeChallengeComplete = () => ({
-  type: ACKNOWLEDGE_CHALLENGE_COMPLETE as typeof ACKNOWLEDGE_CHALLENGE_COMPLETE,
+export const CHALLENGE_COMPLETION_ACKNOWLEDGED = 'WALLET.CHALLENGE_COMPLETION_ACKNOWLEDGED';
+export const challengeCompletionAcknowledged = () => ({
+  type: CHALLENGE_COMPLETION_ACKNOWLEDGED as typeof CHALLENGE_COMPLETION_ACKNOWLEDGED,
 });
-export type AcknowledgeChallengeComplete = ReturnType<typeof acknowledgeChallengeComplete>;
+export type ChallengeCompletionAcknowledged = ReturnType<typeof challengeCompletionAcknowledged>;
 
 // Common Transaction Actions
 export const TRANSACTION_INITIATED = 'WALLET.TRANSACTION_INITIATED';
@@ -253,17 +255,17 @@ export type WalletAction = (
   | ChallengeRequested
   | OpponentChallengeDetected
   | ChallengeResponseReceived
-  | ChallengeTimeout
-  | TakeMoveInApp
-  | ApproveChallenge
-  | DeclineChallenge
-  | AcknowledgeChallengeResponse
-  | AcknowledgeChallengeTimeout
-  | AcknowledgeChallengeComplete
-  | AcknowledgeChallenge
-  | SelectRespondWithMove
-  | SelectRespondWithExistingMove
-  | SelectRespondWithRefute
+  | ChallengedTimedOut
+  | TakeMoveInAppAcknowledged
+  | ChallengeApproved
+  | ChallengeRejected
+  | ChallengeResponseAcknowledged
+  | ChallengeTimeoutAcknowledged
+  | ChallengeCompletionAcknowledged
+  | ChallengeAcknowledged
+  | RespondWithMoveChosen
+  | RespondWithExistingMoveChosen
+  | RespondWithRefuteChosen
   | WithdrawalRequested
   | WithdrawalApproved
   | WithdrawalRejected

@@ -41,14 +41,14 @@ const defaults = {
 describe('when in APPROVE_CHALLENGE', () => {
   const state = states.approveChallenge({ ...defaults });
   describe('when a challenge is approved', () => {
-    const action = actions.approveChallenge();
+    const action = actions.challengeApproved();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_INITIATION, updatedState);
     itSendsATransaction(updatedState);
   });
 
   describe('when a challenge is declined', () => {
-    const action = actions.declineChallenge();
+    const action = actions.challengeRejected();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
@@ -101,7 +101,7 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
   });
 
   describe('when the challenge times out', () => {
-    const action = actions.challengeTimeout();
+    const action = actions.challengedTimedOut();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_TIMEOUT, updatedState);
@@ -110,7 +110,7 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
 
 describe('when in ACKNOWLEDGE_RESPONSE', () => {
   const state = states.acknowledgeChallengeResponse({ ...defaults });
-  const action = actions.acknowledgeChallengeResponse();
+  const action = actions.challengeResponseAcknowledged();
   const updatedState = walletReducer(state, action);
 
   itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
@@ -119,7 +119,7 @@ describe('when in ACKNOWLEDGE_RESPONSE', () => {
 
 describe('when in ACKNOWLEDGE_TIMEOUT', () => {
   const state = states.acknowledgeChallengeTimeout({ ...defaults });
-  const action = actions.acknowledgeChallengeTimeout();
+  const action = actions.challengedTimedOutAcknowledged();
   const updatedState = walletReducer(state, action);
 
   itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
