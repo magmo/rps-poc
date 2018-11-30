@@ -40,7 +40,7 @@ describe('when in ApproveWithdrawal', () => {
     const action = actions.withdrawalApproved(destinationAddress);
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.INITIATE_WITHDRAWAL, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_WITHDRAWAL_INITIATION, updatedState);
 
     it.skip('puts the withdrawal transaction in the outbox', () => {
       expect(updatedState.transactionOutbox).toBe(expect.anything());
@@ -56,8 +56,8 @@ describe('when in ApproveWithdrawal', () => {
   });
 });
 
-describe('when in InitiateWithdrawal', () => {
-  const state = states.initiateWithdrawal(defaults);
+describe('when in WaitForWithdrawalInitiation', () => {
+  const state = states.waitForWithdrawalInitiation(defaults);
 
   describe('and the transaction is submitted', () => {
     const action = actions.transactionSubmitted();

@@ -5,7 +5,7 @@ export const WITHDRAWING = 'STAGE.WITHDRAWING';
 
 // state types
 export const APPROVE_WITHDRAWAL = 'APPROVE_WITHDRAWAL';
-export const INITIATE_WITHDRAWAL = 'INITIATE_WITHDRAWAL';
+export const WAIT_FOR_WITHDRAWAL_INITIATION = 'WAIT_FOR_WITHDRAWAL_INITIATION';
 export const WAIT_FOR_WITHDRAWAL_CONFIRMATION = 'WAIT_FOR_WITHDRAWAL_CONFIRMATION';
 export const ACKNOWLEDGE_WITHDRAWAL_SUCCESS = 'ACKNOWLEDGE_WITHDRAWAL_SUCCESS';
 
@@ -14,8 +14,8 @@ export interface ApproveWithdrawal extends AdjudicatorExists {
   stage: typeof WITHDRAWING;
 }
 
-export interface InitiateWithdrawal extends AdjudicatorExists {
-  type: typeof INITIATE_WITHDRAWAL;
+export interface WaitForWithdrawalInitiation extends AdjudicatorExists {
+  type: typeof WAIT_FOR_WITHDRAWAL_INITIATION;
   stage: typeof WITHDRAWING;
 }
 
@@ -33,8 +33,8 @@ export function approveWithdrawal<T extends AdjudicatorExists>(params: T): Appro
   return { ...adjudicatorExists(params), type: APPROVE_WITHDRAWAL, stage: WITHDRAWING };
 }
 
-export function initiateWithdrawal<T extends AdjudicatorExists>(params: T): InitiateWithdrawal {
-  return { ...adjudicatorExists(params), type: INITIATE_WITHDRAWAL, stage: WITHDRAWING };
+export function waitForWithdrawalInitiation<T extends AdjudicatorExists>(params: T): WaitForWithdrawalInitiation {
+  return { ...adjudicatorExists(params), type: WAIT_FOR_WITHDRAWAL_INITIATION, stage: WITHDRAWING };
 }
 
 export function waitForWithdrawalConfirmation<T extends AdjudicatorExists>(params: T): WaitForWithdrawalConfirmation {
@@ -47,7 +47,7 @@ export function acknowledgeWithdrawalSuccess<T extends AdjudicatorExists>(params
 
 export type WithdrawingState = (
   | ApproveWithdrawal
-  | InitiateWithdrawal
+  | WaitForWithdrawalInitiation
   | WaitForWithdrawalConfirmation
   | AcknowledgeWithdrawalSuccess
 );

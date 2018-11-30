@@ -1,7 +1,7 @@
 import React from 'react';
-import Button from 'reactstrap/lib/Button';
 import walletIcon from '../../../images/wallet_icon.svg';
 import SidebarLayout from '../SidebarLayout';
+import YesOrNo from '../YesOrNo';
 
 interface Props {
   challengeApproved: () => void;
@@ -17,14 +17,8 @@ export default class ApproveChallenge extends React.PureComponent<Props> {
         <img src={walletIcon} />
         <div className="challenge-expired-title">Launch a challenge!</div>
         <p>You've selected to launch an on-chain challenge. Do you want to proceed?</p>
-        <div className="challenge-expired-button-container" >
-          <Button className="challenge-expired-button" onClick={challengeApproved} >
-            Yes
-          </Button>
-          <Button className="challenge-expired-button" onClick={challengeRejected} >
-            No
-          </Button>
-        </div>
+
+        <YesOrNo yesAction={challengeApproved} noAction={challengeRejected} />
       </SidebarLayout>
     );
   }

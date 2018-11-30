@@ -4,22 +4,23 @@ import walletIcon from '../../../images/wallet_icon.svg';
 import SidebarLayout from '../SidebarLayout';
 
 interface Props {
-  challengeResponseAcknowledged: () => void;
+  fundingSuccessAcknowledged: () => void;
 }
 
-export default class AcknowledgeChallengeResponse extends React.PureComponent<Props> {
+export default class AcknowledgeFundingSuccess extends React.PureComponent<Props> {
   render() {
+    const { fundingSuccessAcknowledged } = this.props;
     return (
       <SidebarLayout>
         <img src={walletIcon} />
         <div className="challenge-expired-title">
-          Challenge over!
+          Funding successful!
         </div>
         <p>
-          Your opponent responded to the challenge
+          You have successfully deposited funds into your channel.
         </p>
         <div className="challenge-expired-button-container" >
-          <Button className="challenge-expired-button" onClick={this.props.challengeResponseAcknowledged} >
+          <Button className="challenge-expired-button" onClick={fundingSuccessAcknowledged} >
             Return to game
           </Button>
         </div>

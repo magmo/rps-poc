@@ -1,22 +1,30 @@
 import React from 'react';
 import { PureComponent } from 'react';
+import { connect } from 'react-redux';
 
 import { unreachable } from '../utils';
 
 import * as states from '../states';
+import * as actions from '../redux/actions';
 
 import Todo from '../components/Todo';
+import AcknowledgeChallenge from '../components/responding/AcknowledgeChallenge';
 
 interface Props {
   state: states.RespondingState;
+  challengeAcknowledged: () => void;
 }
 
-export default class InitializingContainer extends PureComponent<Props> {
+class RespondingContainer extends PureComponent<Props> {
   render() {
-    const state = this.props.state;
+    const {
+      state,
+      challengeAcknowledged,
+    } = this.props;
 
     switch (state.type) {
       case states.ACKNOWLEDGE_CHALLENGE:
+        return <AcknowledgeChallenge challengeAcknowledged={challengeAcknowledged} />;
       case states.CHOOSE_RESPONSE:
       case states.TAKE_MOVE_IN_APP:
       case states.INITIATE_RESPONSE:
@@ -29,3 +37,12 @@ export default class InitializingContainer extends PureComponent<Props> {
     }
   }
 }
+
+const mapDispatchToProps = {
+  challengeAcknowledged: actions.challengeAcknowledged,
+};
+
+export default connect(
+  () => ({}),
+  mapDispatchToProps,
+)(RespondingContainer);

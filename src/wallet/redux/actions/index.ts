@@ -41,7 +41,11 @@ export const fundingApproved = () => ({
 });
 export type FundingApproved = ReturnType<typeof fundingApproved>;
 
-export const FUNDING_CANCELLED = '.';
+export const FUNDING_REJECTED = 'WALLET.FUNDING_REJECTED';
+export const fundingRejected = () => ({
+  type: FUNDING_REJECTED as typeof FUNDING_REJECTED,
+});
+export type FundingRejected = ReturnType<typeof fundingRejected>;
 
 export const DEPLOY_INITIATED = 'WALLET.DEPLOY_INITIATED'; // when sent to metamask
 export const deployInitiated = () => ({

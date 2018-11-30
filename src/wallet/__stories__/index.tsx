@@ -72,7 +72,7 @@ storiesOf('Wallet Screens / Funding / Player B', module)
 
 storiesOf('Wallet Screens / Withdrawing', module)
   .add('ApproveWithdrawal', testState(states.approveWithdrawal(defaults)))
-  .add('InitiateWithdrawal', testState(states.initiateWithdrawal(defaults)))
+  .add('WaitForWithdrawalInitiation', testState(states.waitForWithdrawalInitiation(defaults)))
   .add('WaitForWithdrawalConfirmation', testState(states.waitForWithdrawalConfirmation(defaults)))
   .add('AcknowledgeWithdrawalSuccess', testState(states.acknowledgeWithdrawalSuccess(defaults)));
 
@@ -86,7 +86,7 @@ storiesOf('Wallet Screens / Challenging', module)
   .add('AcknowledgeChallengeTimeout', testState(states.acknowledgeChallengeTimeout(defaults)));
 
 storiesOf('Wallet Screens / Responding', module)
-  .add('AcknowledgeChallenge', testState(states.approveChallenge(defaults)))
+  .add('AcknowledgeChallenge', testState(states.acknowledgeChallenge(defaults)))
   .add('ChooseResponse', testState(states.chooseResponse(defaults)))
   .add('TakeMoveInApp', testState(states.takeMoveInApp(defaults)))
   .add('InitiateResponse', testState(states.initiateResponse(defaults)))

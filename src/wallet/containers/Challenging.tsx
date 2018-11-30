@@ -1,17 +1,16 @@
 import React from 'react';
 import { PureComponent } from 'react';
+import { connect } from 'react-redux';
 
 import { unreachable } from '../utils';
 import * as states from '../states';
+import * as actions from '../redux/actions';
 
 import AcknowledgeChallengeResponse from '../components/challenging/AcknowledgeChallengeResponse';
 import WaitForResponseOrTimeout from '../components/challenging/WaitForResponseOrTimeout';
 import WaitForChallengeConfirmation from '../components/challenging/WaitForChallengeConfirmation';
 import AcknowledgeChallengeTimeout from '../components/challenging/AcknowledgeChallengeTimeout';
 import ApproveChallenge from '../components/challenging/ApproveChallenge';
-
-import { connect } from 'react-redux';
-import * as actions from '../redux/actions';
 import WaitForChallengeInitiation from '../components/challenging/WaitForChallengeInitiation';
 import WaitForChallengeSubmission from '../components/challenging/WaitForChallengeSubmission';
 
@@ -67,14 +66,13 @@ class ChallengingContainer extends PureComponent<Props> {
     }
   }
 }
+
 const mapDispatchToProps = {
   withdrawalRequested: actions.withdrawalRequested,
   challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
   challengeApproved: actions.challengeApproved,
   challengeRejected: actions.challengeRejected,
 };
-
-// why does it think that mapStateToProps can return undefined??
 
 export default connect(
   () => ({}),
