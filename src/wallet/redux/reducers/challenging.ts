@@ -32,11 +32,11 @@ export const challengingReducer = (state: states.ChallengingState, action: Walle
 
 const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.APPROVE_CHALLENGE:
+    case actions.CHALLENGE_APPROVED:
       const signature = new Signature(signPositionHex(state.lastPosition, state.privateKey));
       const transaction = createForceMoveTransaction(state.adjudicator, state.penultimatePosition, state.lastPosition, signature);
       return states.waitForChallengeInitiation(transaction, state);
-    case actions.DECLINE_CHALLENGE:
+    case actions.CHALLENGE_REJECTED:
       return runningStates.waitForUpdate({ ...state });
     default:
       return state;
@@ -74,7 +74,7 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
   switch (action.type) {
     case actions.CHALLENGE_RESPONSE_RECEIVED:
       return states.acknowledgeChallengeResponse({ ...state });
-    case actions.CHALLENGE_TIMEOUT:
+    case actions.CHALLENGE_TIMED_OUT:
       return states.acknowledgeChallengeTimeout({ ...state });
     default:
       return state;
@@ -83,7 +83,7 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
 
 const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeResponse, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.ACKNOWLEDGE_CHALLENGE_RESPONSE:
+    case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return runningStates.waitForUpdate({ ...state });
     default:
       return state;
@@ -92,7 +92,7 @@ const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeR
 
 const acknowledgeChallengeTimeoutReducer = (state: states.AcknowledgeChallengeTimeout, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.ACKNOWLEDGE_CHALLENGE_TIMEOUT:
+    case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
       return runningStates.waitForUpdate({ ...state });
     default:
       return state;

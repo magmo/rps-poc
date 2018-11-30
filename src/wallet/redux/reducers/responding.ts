@@ -30,9 +30,9 @@ export const respondingReducer = (state: RespondingState, action: WalletAction):
 
 export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.ACKNOWLEDGE_CHALLENGE:
+    case actions.CHALLENGE_ACKNOWLEDGED:
       return states.chooseResponse(state);
-    case actions.CHALLENGE_TIMEOUT:
+    case actions.CHALLENGE_TIMED_OUT:
       return challengeStates.acknowledgeChallengeTimeout(state);
     default:
       return state;
@@ -41,11 +41,11 @@ export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, 
 
 export const chooseResponseReducer = (state: states.ChooseResponse, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.SELECT_RESPOND_WITH_MOVE:
+    case actions.RESPOND_WITH_MOVE_CHOSEN:
       return states.takeMoveInApp(state);
-    case actions.SELECT_RESPOND_WITH_REFUTE:
+    case actions.RESPOND_WITH_REFUTE_CHOSEN:
       return states.initiateResponse(state);
-    case actions.CHALLENGE_TIMEOUT:
+    case actions.CHALLENGE_TIMED_OUT:
       return challengeStates.acknowledgeChallengeTimeout(state);
     default:
       return state;
@@ -54,9 +54,9 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
 
 export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.TAKE_MOVE_IN_APP:
+    case actions.TAKE_MOVE_IN_APP_ACKNOWLEDGED:
       return states.initiateResponse(state);
-    case actions.CHALLENGE_TIMEOUT:
+    case actions.CHALLENGE_TIMED_OUT:
       return challengeStates.acknowledgeChallengeTimeout(state);
     default:
       return state;
@@ -92,7 +92,7 @@ export const waitForResponseConfirmationReducer = (state: states.WaitForResponse
 
 export const acknowledgeChallengeCompleteReducer = (state: states.AcknowledgeChallengeComplete, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.ACKNOWLEDGE_CHALLENGE_COMPLETE:
+    case actions.CHALLENGE_COMPLETION_ACKNOWLEDGED:
       return runningStates.waitForUpdate(state);
     default:
       return state;
