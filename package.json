@@ -53,7 +53,6 @@
     "react-loader-spinner": "^2.0.6",
     "react-modal": "^3.5.1",
     "react-redux": "^5.0.7",
-    "react-sidebar": "3.0.2",
     "react-test-renderer": "^16.4.1",
     "reactstrap": "^6.4.0",
     "redux": "^4.0.0",
@@ -97,7 +96,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "extract-text-webpack-plugin": "3.0.2",
-    "file-loader": "0.11.2",
+    "file-loader": "^2.0.0",
     "fork-ts-checker-webpack-plugin": "0.4.9",
     "ganache-cli": "^6.1.8",
     "html-webpack-plugin": "2.29.0",
@@ -126,7 +125,7 @@
     "typescript": "^3.0.1",
     "typescript-eslint-parser": "^17.0.1",
     "uglifyjs-webpack-plugin": "^1.1.8",
-    "url-loader": "0.6.2"
+    "url-loader": "^1.1.2"
   },
   "jest": {
     "collectCoverageFrom": [

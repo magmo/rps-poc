@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'reactstrap/lib/Button';
-import { ChallengeResponse as ResponseOption, RespondWithMove, RespondWithAlternativeMove, Refute, Conclude } from '../domain/ChallengeResponse';
-import { Signature, ConclusionProof } from '../domain';
+import { ChallengeResponse as ResponseOption, RespondWithMove, RespondWithAlternativeMove, Refute, Conclude } from '../../domain/ChallengeResponse';
+import { Signature, ConclusionProof } from '../../domain';
 import walletIcon from '../../images/wallet_icon.svg';
 
 interface Props {

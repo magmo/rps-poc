@@ -1,15 +1,14 @@
 import React from 'react';
+import { PureComponent } from 'react';
 
 import { unreachable } from '../utils';
 
-import { PureComponent } from 'react';
-
-import { InitializingState, WAIT_FOR_ADDRESS, WAIT_FOR_LOGIN } from '../states';
+import * as states from '../states';
 
 import Todo from '../components/Todo';
 
 interface Props {
-  state: InitializingState;
+  state: states.WithdrawingState;
 }
 
 export default class InitializingContainer extends PureComponent<Props> {
@@ -17,9 +16,10 @@ export default class InitializingContainer extends PureComponent<Props> {
     const state = this.props.state;
 
     switch (state.type) {
-      case WAIT_FOR_LOGIN:
-        return <Todo stateType={state.type} />;
-      case WAIT_FOR_ADDRESS:
+      case states.APPROVE_WITHDRAWAL:
+      case states.INITIATE_WITHDRAWAL:
+      case states.WAIT_FOR_WITHDRAWAL_CONFIRMATION:
+      case states.ACKNOWLEDGE_WITHDRAWAL_SUCCESS:
         return <Todo stateType={state.type} />;
       default:
         return unreachable(state);

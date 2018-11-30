@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 
 import * as states from '../states';
 import { SiteState } from '../../redux/reducer';
-import FullContainer from './Full';
-import SidebarLayout from '../components/SidebarLayout';
-import FooterLayout from './WalletFooter';
+import FundingContainer from './Funding';
+import RespondingContainer from './Responding';
+import ChallengingContainer from './Challenging';
+import WithdrawingContainer from './Withdrawing';
 
 interface WalletProps {
   state: states.WalletState;
@@ -19,48 +20,22 @@ class Wallet extends PureComponent<WalletProps> {
 
     switch (state.stage) {
       case states.FUNDING:
-        if (state.type === states.WAIT_FOR_FUNDING_REQUEST) {
-          return hideWallet(state, children);
-        } else {
-          return showWallet(state, children);
-        }
+        return <FundingContainer state={state} children={children} />;
       case states.CHALLENGING:
+        return <ChallengingContainer state={state} children={children} />;
       case states.WITHDRAWING:
-        return showWallet(state, children);
+        return <WithdrawingContainer state={state} children={children} />;
       case states.RESPONDING:
-        if (state.type === states.TAKE_MOVE_IN_APP) {
-          return showFooter(state, children);
-        } else {
-          return showWallet(state, children);
-        }
-      case states.CLOSING:
-        // todo: figure out what the workflow here should be
+        return <RespondingContainer state={state} children={children} />;
       default:
         return hideWallet(state, children);
     }
   }
 }
 
-function showWallet(state, children) {
-  return (
-    <SidebarLayout contents={<FullContainer state={state} />}>
-      {children}
-    </SidebarLayout>
-  );
-}
-
-function showFooter(state, children) {
-  return (
-    <FooterLayout>
-      {children}
-    </FooterLayout>
-  );
-}
-
 function hideWallet(state, children) {
   return children;
 }
-
 
 const mapStateToProps = (state: SiteState): WalletProps => ({
   state: state.wallet,

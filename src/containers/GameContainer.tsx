@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { Move } from '../core';
@@ -38,7 +38,13 @@ interface GameProps {
 }
 
 function GameContainer(props: GameProps) {
-  return <Wallet>{RenderGame(props)}</Wallet>;
+  return (
+    <Fragment>
+      {RenderGame(props)}
+
+      <Wallet />
+    </Fragment>
+  );
 }
 
 function RenderGame(props: GameProps) {

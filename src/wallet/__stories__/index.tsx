@@ -80,7 +80,7 @@ storiesOf('Wallet Screens / Challenging', module)
   .add('ApproveChallenge', testState(states.approveChallenge(defaults)))
   .add('WaitForChallengeInitiation', testState(states.waitForChallengeInitiation({}, defaults)))
   .add('WaitForChallengeSubmission', testState(states.waitForChallengeSubmission(defaults)))
-  .add('WaitForChallengeConfirmation', testState(states.waitForChallengeSubmission(defaults)))
+  .add('WaitForChallengeConfirmation', testState(states.waitForChallengeConfirmation(defaults)))
   .add('WaitForResponseOrTimeout', testState(states.waitForResponseOrTimeout(defaults)))
   .add('AcknowledgeChallengeResponse', testState(states.acknowledgeChallengeResponse(defaults)))
   .add('AcknowledgeChallengeTimeout', testState(states.acknowledgeChallengeTimeout(defaults)));

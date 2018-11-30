@@ -1,14 +1,15 @@
 import React from 'react';
+import SidebarLayout from '../SidebarLayout';
 
-export default class WaitingForCreateChallenge extends React.PureComponent<{}> {
+export default class WaitForChallengeConfirmation extends React.PureComponent<{}> {
   render() {
     return (
-      <div>
+      <SidebarLayout>
         <h1>Waiting for Challenge Creation</h1>
         <p>
           Waiting for the challenge transaction to be recorded.
         </p>
-      </div>
+      </SidebarLayout>
     );
   }
 }
