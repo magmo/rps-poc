@@ -40,6 +40,13 @@ export function createDeployTransaction(networkId: number, channelId: string, de
   };
 }
 
+export function createDepositTransaction(contractAddress: string, depositAmount: string) {
+  return {
+    to: contractAddress,
+    value: depositAmount,
+  };
+}
+
 function convertSignature(signature: Signature) {
   // TODO: Move this into the Signature class
   const v = Array.from(utils.arrayify('0x' + signature.v.toString(16)));
