@@ -1,12 +1,11 @@
 import React from 'react';
-import walletHeaderIcon from '../../images/wallet_header_icon.svg';
+import walletHeaderIcon from '../../../images/wallet_header_icon.svg';
 
 export interface Props {
   expirationTime;
 }
 
-export default class WalletMessage extends React.Component<Props>{
-
+export default class WaitForResponseOrTimeout extends React.Component<Props>{
   parsedExpiryDateTime() {
     return new Date(this.props.expirationTime * 1000).toLocaleTimeString();
   }
