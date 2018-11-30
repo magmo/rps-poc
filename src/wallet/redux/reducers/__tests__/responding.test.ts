@@ -25,7 +25,7 @@ const defaults = {
   penultimatePosition: acceptHex,
   turnNum: 6,
   adjudicator: 'adj-address',
-  ourIndex: 0,
+  ourIndex: 1,
   address: 'address',
   privateKey: asPrivateKey,
 };
@@ -49,13 +49,13 @@ describe('when in ACKNOWLEDGE_CHALLENGE', () => {
 describe('when in CHOOSE_RESPONSE', () => {
   const state = states.chooseResponse(defaults);
 
-  describe('when respond with move is selected', () => {
+  describe('when respond with move is chosen', () => {
     const action = actions.respondWithMoveChosen();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.TAKE_MOVE_IN_APP, updatedState);
   });
 
-  describe('when respond with refute is selected', () => {
+  describe('when respond with refute is chosen', () => {
     const action = actions.respondWithRefuteChosen();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
@@ -70,8 +70,9 @@ describe('when in CHOOSE_RESPONSE', () => {
 
 describe('when in TAKE_MOVE_IN_APP', () => {
   const state = states.takeMoveInApp(defaults);
+
   describe('when a move is taken in the application', () => {
-    const action = actions.takeMoveInAppAcknowledged(scenarios.standard.proposeHex, scenarios.standard.proposeSig);
+    const action = actions.ownPositionReceived(scenarios.aResignsAfterOneRound.restingHex);
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
   });
