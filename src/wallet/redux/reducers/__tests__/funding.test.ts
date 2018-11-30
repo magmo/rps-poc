@@ -46,32 +46,45 @@ const defaultsB = {
   privateKey: bsPrivateKey,
 };
 
+const defaultsPrefund = {
+  penultimatePosition: preFundSetupAHex,
+  lastPosition: preFundSetupBHex,
+  turnNum: 1,
+};
+
+const defaultsPrefundA = {
+  ...defaultsA,
+  ...defaultsPrefund,
+};
+
+const defaultsPrefundB = {
+  ...defaultsB,
+  ...defaultsPrefund,
+};
+
 
 describe('start in WaitForFundingRequest', () => {
   describe('action taken: funding requested', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.waitForFundingRequest(testDefaults);
+    const state = states.waitForFundingRequest(defaultsPrefundA);
     const action = actions.fundingRequested();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
   });
+
+  describe('action taken: funding requested', () => { // player B scenario
+    const state = states.waitForFundingRequest(defaultsPrefundB);
+    const action = actions.fundingRequested();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
+  });
+
 });
 
 describe('start in ApproveFunding', () => {
   describe('incoming action: funding approved', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.approveFunding(testDefaults);
+    const state = states.approveFunding(defaultsPrefundA);
     const action = actions.fundingApproved();
     const updatedState = walletReducer(state, action);
 
@@ -96,13 +109,7 @@ describe('start in ApproveFunding', () => {
 
 describe('start in AInitiateDeploy', () => {
   describe('incoming action: deploy initiated', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.aInitiateDeploy(testDefaults);
+    const state = states.aInitiateDeploy(defaultsPrefundA);
     const action = actions.deployInitiated(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
@@ -112,13 +119,7 @@ describe('start in AInitiateDeploy', () => {
 
 describe('start in BWaitForDeployInitiation', () => {
   describe('incoming action: deploy initiated', () => { // player B scenario
-    const testDefaults = {
-      ...defaultsB,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.bWaitForDeployInitiation(testDefaults);
+    const state = states.bWaitForDeployInitiation(defaultsPrefundB);
     const action = actions.deployInitiated(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
@@ -128,13 +129,7 @@ describe('start in BWaitForDeployInitiation', () => {
 
 describe('start in WaitForDeployConfirmation', () => {
   describe('incoming action: deploy finalised', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.waitForDeployConfirmation(testDefaults);
+    const state = states.waitForDeployConfirmation(defaultsPrefundA);
     const action = actions.deployFinalised();
     const updatedState = walletReducer(state, action);
 
@@ -142,13 +137,7 @@ describe('start in WaitForDeployConfirmation', () => {
   });
 
   describe('incoming action: deploy finalised', () => { // player B scenario
-    const testDefaults = {
-      ...defaultsB,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.waitForDeployConfirmation(testDefaults);
+    const state = states.waitForDeployConfirmation(defaultsPrefundB);
     const action = actions.deployFinalised();
     const updatedState = walletReducer(state, action);
 
@@ -158,13 +147,7 @@ describe('start in WaitForDeployConfirmation', () => {
 
 describe('start in AWaitForDepositInitiation', () => {
   describe('incoming action: deposit initiated', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.aWaitForDepositInitiation(testDefaults);
+    const state = states.aWaitForDepositInitiation(defaultsPrefundA);
     const action = actions.depositInitiated();
     const updatedState = walletReducer(state, action);
 
@@ -174,13 +157,7 @@ describe('start in AWaitForDepositInitiation', () => {
 
 describe('start in BInitiateDeposti', () => {
   describe('incoming action: deposit initiated', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.bInitiateDeposit(testDefaults);
+    const state = states.bInitiateDeposit(defaultsPrefundA);
     const action = actions.depositInitiated();
     const updatedState = walletReducer(state, action);
 
@@ -190,13 +167,7 @@ describe('start in BInitiateDeposti', () => {
 
 describe('start in WaitForDepositConfirmation', () => {
   describe('incoming action: deposit finalised', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsA,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.waitForDepositConfirmation(testDefaults);
+    const state = states.waitForDepositConfirmation(defaultsPrefundA);
     const action = actions.depositFinalised();
     const updatedState = walletReducer(state, action);
 
@@ -204,13 +175,7 @@ describe('start in WaitForDepositConfirmation', () => {
   });
 
   describe('incoming action: deposit finalised', () => { // player B scenario
-    const testDefaults = {
-      ...defaultsB,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.waitForDepositConfirmation(testDefaults);
+    const state = states.waitForDepositConfirmation(defaultsPrefundB);
     const action = actions.depositFinalised();
     const updatedState = walletReducer(state, action);
 
@@ -235,14 +200,8 @@ describe('start in AWaitForPostFundSetup', () => {
 });
 
 describe('start in BWaitForPostFundSetup', () => {
-  describe('incoming action: A post fund setup', () => { // player A scenario
-    const testDefaults = {
-      ...defaultsB,
-      penultimatePosition: preFundSetupAHex,
-      lastPosition: preFundSetupBHex,
-      turnNum: 1,
-    };
-    const state = states.bWaitForPostFundSetup(testDefaults);
+  describe('incoming action: A post fund setup', () => { // player B scenario
+    const state = states.bWaitForPostFundSetup(defaultsPrefundB);
     const action = actions.postFundSetupReceived(postFundSetupAHex, postFundSetupASig);
     const updatedState = walletReducer(state, action);
 
@@ -264,4 +223,19 @@ describe('start in AcknowledgeFundingSuccess', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
   });
+
+  describe('incoming action: FundingSuccessAcknowledged', () => { // player B scenario
+    const testDefaults = {
+      ...defaultsB,
+      penultimatePosition: postFundSetupAHex,
+      lastPosition: postFundSetupBHex,
+      turnNum: 3,
+    };
+    const state = states.acknowledgeFundingSuccess(testDefaults);
+    const action = actions.fundingSuccessAcknowledged();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+  });
+
 });
