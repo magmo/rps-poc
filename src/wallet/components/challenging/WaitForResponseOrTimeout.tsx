@@ -1,30 +1,20 @@
 import React from 'react';
-import walletHeaderIcon from '../../../images/wallet_header_icon.svg';
+import SidebarLayout from '../SidebarLayout';
 
-export interface Props {
-  expirationTime;
+interface Props {
+  expirationTime: number;
 }
 
-export default class WaitForResponseOrTimeout extends React.Component<Props>{
-  parsedExpiryDateTime() {
-    return new Date(this.props.expirationTime * 1000).toLocaleTimeString();
-  }
-
+export default class WaitForResponseOrTimeout extends React.PureComponent<Props> {
   render() {
-    const parsedExpiryDateTime = this.parsedExpiryDateTime;
     return (
-      <div className="message-container">
-        <div className="message-header">
-          <img src={walletHeaderIcon} className="message-header-icon" />
-        </div>
-        <div className="message-text">
-          <div className="message-title">Challenge Issued</div>
-          <div>
-            <p>Your challenge has been issued.</p>
-            <p>The game will automatically conclude by {parsedExpiryDateTime} if no action is taken.</p>
-          </div>
-        </div>
-      </div>
+      <SidebarLayout>
+        <h1>Waiting for your opponent to respond!</h1>
+        <p>
+          If they don't respond by XXX, the channel will be closed and you can
+          withdraw your funds.
+        </p>
+      </SidebarLayout>
     );
   }
 }

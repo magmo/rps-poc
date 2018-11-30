@@ -5,9 +5,9 @@ export default class WaitForChallengeConfirmation extends React.PureComponent<{}
   render() {
     return (
       <SidebarLayout>
-        <h1>Waiting for Challenge Creation</h1>
+        <h1>Waiting for your challenge to be mined!</h1>
         <p>
-          Waiting for the challenge transaction to be recorded.
+          Hold tight! Visit <a>this link [TODO]</a> to check on its status.
         </p>
       </SidebarLayout>
     );
