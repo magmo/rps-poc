@@ -1,4 +1,5 @@
 import { ethers, utils } from 'ethers';
+//@ts-ignore
 import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
 import BN from 'bn.js';
 
