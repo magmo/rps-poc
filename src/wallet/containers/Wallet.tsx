@@ -16,25 +16,21 @@ interface WalletProps {
 class Wallet extends PureComponent<WalletProps> {
 
   render() {
-    const { state, children } = this.props;
+    const { state } = this.props;
 
     switch (state.stage) {
       case states.FUNDING:
-        return <FundingContainer state={state} children={children} />;
+        return <FundingContainer state={state} />;
       case states.CHALLENGING:
-        return <ChallengingContainer state={state} children={children} />;
+        return <ChallengingContainer state={state} />;
       case states.WITHDRAWING:
-        return <WithdrawingContainer state={state} children={children} />;
+        return <WithdrawingContainer state={state} />;
       case states.RESPONDING:
-        return <RespondingContainer state={state} children={children} />;
+        return <RespondingContainer state={state} />;
       default:
-        return hideWallet(state, children);
+        return null;
     }
   }
-}
-
-function hideWallet(state, children) {
-  return children;
 }
 
 const mapStateToProps = (state: SiteState): WalletProps => ({
