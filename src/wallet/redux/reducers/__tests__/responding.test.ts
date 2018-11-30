@@ -28,6 +28,7 @@ const defaults = {
   ourIndex: 0,
   address: 'address',
   privateKey: asPrivateKey,
+  networkId: 2323,
 };
 
 describe('when in ACKNOWLEDGE_CHALLENGE', () => {

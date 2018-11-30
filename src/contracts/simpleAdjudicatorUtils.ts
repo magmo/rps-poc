@@ -23,12 +23,10 @@ export function getSimpleAdjudicatorInterface(): ethers.utils.Interface {
 }
 
 export function getSimpleAdjudicatorBytecode(networkId) {
-  console.log(networkId);
   return linkBytecode(simpleAdjudicatorArtifact, networkId);
 }
 
 function linkBytecode(contractArtifact, networkId) {
-  console.log(contractArtifact.networks);
   let contractBytecode = contractArtifact.bytecode;
   const links = contractArtifact.networks[networkId].links;
   Object.keys(links).forEach(linkName => {

@@ -16,8 +16,8 @@ export function* transactionSender(transaction) {
     return;
   }
   yield put(transactionSubmitted());
-  yield call(transactionResult.wait);
-  yield put(transactionConfirmed());
+  const confirmedTransaction = yield call(transactionResult.wait);
+  yield put(transactionConfirmed(confirmedTransaction.contractAddress));
   yield call(transactionResult.wait, 5);
   yield put(transactionFinalized());
 

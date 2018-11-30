@@ -29,6 +29,7 @@ const defaults = {
   ourIndex: 0,
   address: 'address',
   privateKey: asPrivateKey,
+  networkId: 23213,
 };
 
 

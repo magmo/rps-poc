@@ -1,7 +1,7 @@
 
 import { Signature } from "./Signature";
 import { TransactionRequest } from "ethers/providers";
-import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytedcode, getSimpleAdjudicatorBytecode } from '../../contracts/simpleAdjudicatorUtils';
+import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytecode } from '../../contracts/simpleAdjudicatorUtils';
 import { utils } from 'ethers';
 
 export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, signature: Signature): TransactionRequest {

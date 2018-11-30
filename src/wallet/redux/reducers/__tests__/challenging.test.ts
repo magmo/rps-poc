@@ -34,6 +34,7 @@ const defaults = {
   address: 'address',
   privateKey: asPrivateKey,
   challengeProof: new ChallengeProof(proposeHex, acceptHex, proposeSig, acceptSig),
+  networkId: 2323,
 
 };
 

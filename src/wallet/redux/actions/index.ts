@@ -207,8 +207,9 @@ export const transactionSubmitted = () => ({
 export type TransactionSubmitted = ReturnType<typeof transactionSubmitted>;
 
 export const TRANSACTION_CONFIRMED = 'WALLET.TRANSACTION_CONFIRMED';
-export const transactionConfirmed = () => ({
+export const transactionConfirmed = (contractAddress?: string) => ({
   type: TRANSACTION_CONFIRMED as typeof TRANSACTION_CONFIRMED,
+  contractAddress,
 });
 export type TransactionConfirmed = ReturnType<typeof transactionConfirmed>;
 
