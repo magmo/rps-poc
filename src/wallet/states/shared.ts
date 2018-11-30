@@ -14,6 +14,11 @@ export interface AddressExists extends LoggedIn {
   privateKey: string;
 }
 
+export interface SignedPosition {
+  data: string;
+  signature: string;
+}
+
 export interface ChannelPartiallyOpen extends AddressExists {
   channelId: string;
   libraryAddress: string;
@@ -21,11 +26,11 @@ export interface ChannelPartiallyOpen extends AddressExists {
   participants: [string, string];
   channelNonce: number;
   turnNum: number;
-  lastPosition: string;
+  lastPosition: SignedPosition;
 }
 
 export interface ChannelOpen extends ChannelPartiallyOpen {
-  penultimatePosition: string;
+  penultimatePosition: SignedPosition;
 }
 
 export interface AdjudicatorExists extends ChannelOpen {

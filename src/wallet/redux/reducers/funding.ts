@@ -142,7 +142,7 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
       return states.acknowledgeFundingSuccess({
         ...state, 
         turnNum: state.turnNum + 1,
-        lastPosition: action.data,
+        lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
 
       });

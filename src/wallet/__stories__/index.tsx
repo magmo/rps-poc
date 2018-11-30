@@ -29,8 +29,8 @@ const defaults = {
   privateKey: asPrivateKey,
   uid: 'uid',
   ourIndex: 0,
-  penultimatePosition: preFundSetupAHex,
-  lastPosition: preFundSetupBHex,
+  penultimatePosition: { data: preFundSetupAHex, signature: 'fake-sig' },
+  lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   turnNum: 1,
 };
 

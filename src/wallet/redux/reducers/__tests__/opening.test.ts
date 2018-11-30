@@ -71,7 +71,7 @@ describe('when in WaitForPreFundSetup', () => {
     participants,
     channelNonce,
     turnNum: 0,
-    lastPosition: preFundSetupAHex,
+    lastPosition: { data: preFundSetupAHex, signature: 'fake-sig' },
   };
 
   describe('when we send a PreFundSetupB', () => {

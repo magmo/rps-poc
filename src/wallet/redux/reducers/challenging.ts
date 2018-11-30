@@ -33,8 +33,9 @@ export const challengingReducer = (state: states.ChallengingState, action: Walle
 const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_APPROVED:
-      const signature = new Signature(signPositionHex(state.lastPosition, state.privateKey));
-      const transaction = createForceMoveTransaction(state.adjudicator, state.penultimatePosition, state.lastPosition, signature);
+      // todo: fix this to use the stored signature
+      const signature = new Signature(signPositionHex(state.lastPosition.data, state.privateKey));
+      const transaction = createForceMoveTransaction(state.adjudicator, state.penultimatePosition.data, state.lastPosition.data, signature);
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
       return runningStates.waitForUpdate({ ...state });

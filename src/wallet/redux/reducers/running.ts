@@ -3,7 +3,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import decode from '../../domain/decode';
 
-import { validSignature, validTransition, ourTurn } from './utils';
+import { validSignature, validTransition, ourTurn, signPositionHex } from './utils';
 import { State } from 'fmg-core';
 
 export const runningReducer = (state: states.RunningState, action: actions.WalletAction): states.WalletState => {
@@ -13,19 +13,22 @@ export const runningReducer = (state: states.RunningState, action: actions.Walle
 const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.WalletAction): states.WalletState => {
   switch (action.type) {
     case actions.OWN_POSITION_RECEIVED:
-      const position = decode(action.data);
+      const data = action.data;
+      const position = decode(data);
       // check it's our turn
       if (!ourTurn(state)) { return state; }
 
       // check transition
       if (!validTransition(state, position)) { return state; }
 
+      const signature = signPositionHex(data, state.privateKey);
+
       // if conclude => concluding
       if (position.stateType === State.StateType.Conclude) {
         return states.concluding({
           ...state,
           turnNum: state.turnNum + 1,
-          lastPosition: action.data,
+          lastPosition: { data, signature },
           penultimatePosition: state.lastPosition,
         });
       } else {
@@ -33,7 +36,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
         return states.waitForUpdate({
           ...state,
           turnNum: state.turnNum + 1,
-          lastPosition: action.data,
+          lastPosition: { data, signature },
           penultimatePosition: state.lastPosition,
         });
       }
@@ -53,7 +56,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
         return states.concluding({
           ...state,
           turnNum: state.turnNum + 1,
-          lastPosition: action.data,
+          lastPosition: { data: action.data, signature: action.signature },
           penultimatePosition: state.lastPosition,
         });
       } else {
@@ -61,7 +64,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
         return states.waitForUpdate({
           ...state,
           turnNum: state.turnNum + 1,
-          lastPosition: action.data,
+          lastPosition: { data: action.data, signature: action.signature },
           penultimatePosition: state.lastPosition,
         });
       }
