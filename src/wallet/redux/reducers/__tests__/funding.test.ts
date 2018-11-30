@@ -110,12 +110,23 @@ describe('start in ApproveFunding', () => {
 describe('start in AInitiateDeploy', () => {
   describe('incoming action: deploy initiated', () => { // player A scenario
     const state = states.aInitiateDeploy(defaultsPrefundA);
-    const action = actions.deployInitiated(defaults.adjudicator);
+    const action = actions.deployInitiated();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.A_WAIT_FOR_CONTRACT_ADDRESS, updatedState);
+  });
+});
+
+describe('start in AWaitForContractAddress', () => {
+  describe('incoming action: deploy submitted', () => { // player A scenario
+    const state = states.aWaitForContractAddress(defaultsPrefundA);
+    const action = actions.deploySubmitted(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_DEPLOY_CONFIRMATION, updatedState);
   });
 });
+
 
 describe('start in BWaitForDeployInitiation', () => {
   describe('incoming action: deploy initiated', () => { // player B scenario

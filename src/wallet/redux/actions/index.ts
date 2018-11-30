@@ -49,9 +49,8 @@ export type FundingApproved = ReturnType<typeof fundingApproved>;
 export const FUNDING_CANCELLED = '.';
 
 export const DEPLOY_INITIATED = 'WALLET.DEPLOY_INITIATED'; // when sent to metamask
-export const deployInitiated = (adjudicator: string) => ({
+export const deployInitiated = () => ({
   type: DEPLOY_INITIATED as typeof DEPLOY_INITIATED,
-  adjudicator,
 });
 export type DeployInitiated = ReturnType<typeof deployInitiated>;
 

@@ -14,6 +14,8 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return approveFundingReducer(state, action);
     case states.A_INITIATE_DEPLOY:
       return aInitiateDeployReducer(state, action);
+    case states.A_WAIT_FOR_CONTRACT_ADDRESS:
+      return aWaitForContractAddressReducer(state, action);
     case states.B_WAIT_FOR_DEPLOY_INITIATION:
       return bWaitForDeployInitiationReducer(state, action);
     case states.WAIT_FOR_DEPLOY_CONFIRMATION:
@@ -61,10 +63,23 @@ const aInitiateDeployReducer = (state: states.AInitiateDeploy, action: actions.W
   switch(action.type) {
     case actions.DEPLOY_INITIATED:
       // TODO: initiate adjudicator deploy
-      // TODO: inform opponent of deploy iniation
+      return states.aWaitForContractAddress({
+        ...state,
+        transactionOutbox: undefined,
+      });
+    default:
+      return state;
+  }
+};
+
+const aWaitForContractAddressReducer = (state: states.AWaitForContractAddress, action: actions.WalletAction) => {
+  switch(action.type) {
+    case actions.DEPLOY_SUBMITTED:
+      // TODO: inform opponent of the contract address
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
+        messageOutbox: undefined,
       });
     default:
       return state;
@@ -109,7 +124,10 @@ const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiatio
   switch(action.type) {
     case actions.DEPOSIT_INITIATED:
       // TODO: create deposit transaction
-      return states.waitForDepositConfirmation(state);
+      return states.waitForDepositConfirmation({
+        ...state,
+        transactionOutbox: undefined,
+      });
     default:
       return state;
   }
@@ -120,7 +138,10 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
     case actions.DEPOSIT_FINALISED:
       if (state.ourIndex === 0) {
         // TODO: send postfund state
-        return states.aWaitForPostFundSetup(state);
+        return states.aWaitForPostFundSetup({
+          ...state,
+          messageOutbox: undefined,
+        });
       } else {
         return states.bWaitForPostFundSetup(state);
       }
@@ -151,7 +172,10 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
     case actions.POST_FUND_SETUP_RECEIVED:
     if (!validPostFundState(state, action)) { return state; }
       // TODO: send postfund state
-      return states.acknowledgeFundingSuccess(state);
+      return states.acknowledgeFundingSuccess({
+        ...state,
+        transactionOutbox: undefined,
+      });
     default:
       return state;
   }

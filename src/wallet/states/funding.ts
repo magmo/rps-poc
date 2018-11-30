@@ -7,6 +7,7 @@ export const FUNDING = 'FUNDING';
 export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 export const APPROVE_FUNDING = 'APPROVE_FUNDING';
 export const A_INITIATE_DEPLOY = 'A_INITIATE_DEPLOY';
+export const A_WAIT_FOR_CONTRACT_ADDRESS = 'A_WAIT_FOR_CONTRACT_ADDRESS';
 export const B_WAIT_FOR_DEPLOY_INITIATION = 'B_WAIT_FOR_DEPLOY_INITIATION';
 export const WAIT_FOR_DEPLOY_CONFIRMATION = 'WAIT_FOR_DEPLOY_CONFIRMATION';
 export const B_INITIATE_DEPOSIT = 'B_INITIATE_DEPOSIT';
@@ -30,6 +31,12 @@ export interface AInitiateDeploy extends ChannelOpen {
   type: typeof A_INITIATE_DEPLOY;
   stage: typeof FUNDING;
 }
+
+export interface AWaitForContractAddress extends ChannelOpen {
+  type: typeof A_WAIT_FOR_CONTRACT_ADDRESS;
+  stage: typeof FUNDING;
+}
+
 
 export interface BWaitForDeployInitiation extends ChannelOpen {
   type: typeof B_WAIT_FOR_DEPLOY_INITIATION;
@@ -84,6 +91,11 @@ export function aInitiateDeploy<T extends ChannelOpen>(params: T): AInitiateDepl
   return { type: A_INITIATE_DEPLOY, stage: FUNDING, ...channelOpen(params) };
 }
 
+export function aWaitForContractAddress<T extends ChannelOpen>(params: T): AWaitForContractAddress {
+  return { type: A_WAIT_FOR_CONTRACT_ADDRESS, stage: FUNDING, ...channelOpen(params) };
+}
+
+
 export function bWaitForDeployInitiation<T extends ChannelOpen>(params: T): BWaitForDeployInitiation {
   return { type: B_WAIT_FOR_DEPLOY_INITIATION, stage: FUNDING, ...channelOpen(params) };
 }
@@ -120,6 +132,7 @@ export type FundingState = (
   | WaitForFundingRequest
   | ApproveFunding
   | AInitiateDeploy
+  | AWaitForContractAddress
   | BWaitForDeployInitiation
   | WaitForDeployConfirmation
   | BInitiateDeposit
