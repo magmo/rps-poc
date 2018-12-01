@@ -131,7 +131,7 @@ describe('start in AWaitForContractAddress', () => {
 describe('start in BWaitForDeployInitiation', () => {
   describe('incoming action: deploy initiated', () => { // player B scenario
     const state = states.bWaitForDeployInitiation(defaultsPrefundB);
-    const action = actions.deployInitiated(defaults.adjudicator);
+    const action = actions.deployInitiated();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_DEPLOY_CONFIRMATION, updatedState);

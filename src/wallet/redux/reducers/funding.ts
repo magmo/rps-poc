@@ -88,7 +88,7 @@ const aWaitForContractAddressReducer = (state: states.AWaitForContractAddress, a
 
 const bWaitForDeployInitiationReducer = (state: states.BWaitForDeployInitiation, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPLOY_INITIATED:
+    case actions.DEPLOY_FINALISED:
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
