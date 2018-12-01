@@ -31,6 +31,7 @@ const defaults = {
   turnNum: 6,
   adjudicator: 'adj-address',
   challengeExpiry: new Date(),
+  networkId:2132,
 };
 
 const bParams = { address: bsAddress, ourIndex: 1, privateKey: bsPrivateKey };

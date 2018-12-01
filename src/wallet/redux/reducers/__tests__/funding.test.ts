@@ -30,6 +30,7 @@ const defaults = {
   participants,
   privateKey: asPrivateKey,
   uid: 'uid',
+  networkId: 233,
 };
 
 const defaultsA = {

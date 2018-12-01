@@ -4,6 +4,7 @@ import { default as firebase, reduxSagaFirebase } from '../../../gateways/fireba
 import ChannelWallet from '../../domain/ChannelWallet';
 import { SiteState } from '../../../redux/reducer';
 import { keysLoaded } from '../actions';
+import { getProvider } from '../../../contracts/simpleAdjudicatorUtils';
 
 interface WalletParams {
   uid: string;
@@ -21,8 +22,10 @@ export function* keyLoader() {
     // fetch again instead of using return val, just in case another wallet was created in the interim
     wallet = yield* fetchWallet(uid);
   }
-
-  yield put(keysLoaded(wallet.address, wallet.privateKey));
+  // TODO: This should probably be its own saga? or at least its
+  const provider = yield call(getProvider);
+  const network = yield call(provider.getNetwork());
+  yield put(keysLoaded(wallet.address, wallet.privateKey, network.chainId));
 }
 
 const walletTransformer = (data: any) =>

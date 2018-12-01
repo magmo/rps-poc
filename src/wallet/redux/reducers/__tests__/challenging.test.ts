@@ -34,6 +34,7 @@ const defaults = {
   address: 'address',
   privateKey: asPrivateKey,
   challengeProof: new ChallengeProof(proposeHex, acceptHex, proposeSig, acceptSig),
+  networkId: 2323,
 
 };
 
@@ -59,7 +60,7 @@ describe('when in INITIATE_CHALLENGE', () => {
   const state = states.waitForChallengeInitiation(transaction, defaults);
 
   describe('when a challenge is initiated', () => {
-    const action = actions.transactionInitiated();
+    const action = actions.transactionSentToMetamask();
     const updatedState = walletReducer(state, action);
 
     itSendsATransaction(updatedState);

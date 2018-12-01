@@ -22,7 +22,7 @@ describe('when in WaitForAddress', () => {
   const state = states.waitForAddress(defaults);
 
   describe('when the key loader provides the keys', () => {
-    const action = actions.keysLoaded('address', 'privateKey');
+    const action = actions.keysLoaded('address', 'privateKey', 'networkId');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);

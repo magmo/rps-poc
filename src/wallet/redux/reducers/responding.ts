@@ -80,7 +80,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
 
 export const initiateResponseReducer = (state: states.InitiateResponse, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.TRANSACTION_INITIATED:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.waitForResponseSubmission(state);
     default:
       return state;

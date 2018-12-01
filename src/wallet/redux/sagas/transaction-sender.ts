@@ -1,16 +1,23 @@
 import { call, put } from "redux-saga/effects";
 import { getProvider } from "../../../contracts/simpleAdjudicatorUtils";
-import { transactionInitiated, transactionSubmitted, transactionConfirmed, transactionFinalized } from "../actions";
+import { transactionSentToMetamask, transactionSubmitted, transactionConfirmed, transactionFinalized, transactionSubmissionFailed } from "../actions";
+import { ethers } from "ethers";
 
 export function* transactionSender(transaction) {
 
-  const provider = yield call(getProvider);
-
-  yield put(transactionInitiated());
-  const transactionResult = yield call(provider.sendTransaction, transaction);
+  const provider: ethers.providers.JsonRpcProvider = yield call(getProvider);
+  const signer = provider.getSigner();
+  yield put(transactionSentToMetamask());
+  let transactionResult;
+  try {
+    transactionResult = yield call(signer.sendTransaction, transaction);
+  } catch (err) {
+    yield put(transactionSubmissionFailed(err));
+    return;
+  }
   yield put(transactionSubmitted());
-  yield call(transactionResult.wait);
-  yield put(transactionConfirmed());
+  const confirmedTransaction = yield call(transactionResult.wait);
+  yield put(transactionConfirmed(confirmedTransaction.contractAddress));
   yield call(transactionResult.wait, 5);
   yield put(transactionFinalized());
 

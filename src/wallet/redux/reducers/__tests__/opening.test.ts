@@ -22,6 +22,7 @@ const {
 } = scenarios.standard;
 
 const defaults = {
+  networkId:123,
   uid: 'uid',
   address: asAddress,
   privateKey: asPrivateKey,

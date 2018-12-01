@@ -36,8 +36,8 @@ const waitForLoginReducer = (state: WaitForLogin, action: any) => {
 const waitForAddressReducer = (state: WaitForAddress, action: any) => {
   switch (action.type) {
     case KEYS_LOADED:
-      const { address, privateKey } = action;
-      return waitForChannel({ ...state, address, privateKey });
+      const { address, privateKey, networkId } = action;
+      return waitForChannel({ ...state, address, privateKey, networkId });
     default:
       return state;
   }
