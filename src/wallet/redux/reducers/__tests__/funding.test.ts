@@ -52,12 +52,14 @@ const justReceivedPreFundSetupB = {
   lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   turnNum: 1,
 };
- const justReceivedPostFundSetupA = {
+
+const justReceivedPostFundSetupA = {
   penultimatePosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   lastPosition: { data: postFundSetupAHex, signature: 'fake-sig' },
   turnNum: 2,
 };
- const justReceivedPostFundSetupB = {
+
+const justReceivedPostFundSetupB = {
   penultimatePosition: { data: postFundSetupAHex, signature: 'fake-sig' },
   lastPosition: { data: postFundSetupBHex, signature: 'fake-sig' },
   turnNum: 3,
