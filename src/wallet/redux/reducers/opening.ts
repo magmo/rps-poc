@@ -1,5 +1,5 @@
 import { State } from 'fmg-core';
-import { validSignature } from './utils';
+import { validSignature, signPositionHex } from './utils';
 
 import * as states from '../../states';
 import * as actions from '../actions';
@@ -21,7 +21,8 @@ export const openingReducer = (state: states.OpeningState, action: actions.Walle
 const waitForChannelReducer = (state: states.WaitForChannel, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.OWN_POSITION_RECEIVED:
-      const ownPosition = decode(action.data);
+      const data = action.data;
+      const ownPosition = decode(data);
 
       // all these checks will fail silently for the time being
       // check it's a PreFundSetupA
@@ -33,6 +34,8 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
 
       if (ourAddress !== state.address) { return state; }
 
+      const signature = signPositionHex(data, state.privateKey); 
+
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
@@ -42,7 +45,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         participants: [ourAddress, opponentAddress],
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
-        lastPosition: action.data,
+        lastPosition: { data, signature },
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -70,7 +73,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         participants: [ourAddress2, opponentAddress2],
         channelNonce: opponentPosition.channel.channelNonce,
         turnNum: 0,
-        lastPosition: action.data,
+        lastPosition: { data: action.data, signature: action.signature },
       });
 
     default:
@@ -81,18 +84,21 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
 const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.OWN_POSITION_RECEIVED:
-      const ownPosition = decode(action.data);
+      const data = action.data;
+      const ownPosition = decode(data);
 
       // all these checks will fail silently for the time being
       // check it's a PreFundSetupB
       if (ownPosition.stateType !== State.StateType.PreFundSetup) { return state; }
       if (ownPosition.stateCount !== 1) { return state; }
 
+      const signature = signPositionHex(data, state.privateKey); 
+
       // if so, unpack its contents into the state
       return states.waitForFundingRequest({
         ...state,
         turnNum: 1,
-        lastPosition: action.data,
+        lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
       });
 
@@ -112,7 +118,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       return states.waitForFundingRequest({
         ...state,
         turnNum: 1,
-        lastPosition: action.data,
+        lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
       });
 

@@ -1,4 +1,4 @@
-import { validTransition, ourTurn } from './utils';
+import { validTransition, ourTurn, signPositionHex } from './utils';
 import decode from '../../domain/decode';
 
 import { WalletState, RespondingState } from '../../states';
@@ -58,17 +58,20 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
 export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.OWN_POSITION_RECEIVED:
-      const position = decode(action.data);
+      const data = action.data;
+      const position = decode(data);
       // check it's our turn
       if (!ourTurn(state)) { return state; }
 
       // check transition
       if (!validTransition(state, position)) { return state; }
 
+      const signature = signPositionHex(data, state.privateKey);
+
       return states.initiateResponse({
         ...state,
         turnNum: state.turnNum + 1,
-        lastPosition: action.data,
+        lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
       });
     case actions.CHALLENGE_TIMED_OUT:
