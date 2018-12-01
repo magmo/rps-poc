@@ -25,6 +25,7 @@ const defaults = {
   channelId,
   channelNonce,
   libraryAddress,
+  networkId: 123,
   participants,
   privateKey: asPrivateKey,
   uid: 'uid',
@@ -54,7 +55,8 @@ const testState = (state) => (
 
 storiesOf('Wallet Screens / Funding / Player A', module)
   .add('ApproveFunding', testState(states.approveFunding(defaults)))
-  .add('AInitiateDeploy', testState(states.aInitiateDeploy(defaults)))
+  .add('AWaitForDeployToBeSentToMetaMask', testState(states.aWaitForDeployToBeSentToMetaMask(defaults)))
+  .add('ASubmitDeployInMetaMask', testState(states.aSubmitDeployInMetaMask(defaults)))
   .add('WaitForDeployConfirmation', testState(states.waitForDeployConfirmation(defaults)))
   .add('AWaitForDepositInitiation', testState(states.aWaitForDepositInitiation(defaults)))
   .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(defaults)))
@@ -63,7 +65,7 @@ storiesOf('Wallet Screens / Funding / Player A', module)
 
 storiesOf('Wallet Screens / Funding / Player B', module)
   .add('ApproveFunding', testState(states.approveFunding(defaults)))
-  .add('BWaitForDeployInitiation', testState(states.bWaitForDeployInitiation(defaults)))
+  .add('BWaitForDeployAddress', testState(states.bWaitForDeployAddress(defaults)))
   .add('WaitForDeployConfirmation', testState(states.waitForDeployConfirmation(defaults)))
   .add('BInitiateDeposit', testState(states.bInitiateDeposit(defaults)))
   .add('WaitForDepositConfirmation', testState(states.waitForDepositConfirmation(defaults)))
