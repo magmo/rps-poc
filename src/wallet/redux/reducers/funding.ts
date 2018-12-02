@@ -70,7 +70,7 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
 
 const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPLOY_SUBMITTED:
+    case actions.DEPLOY_SUBMITTED_IN_METAMASK:
       // TODO: inform opponent of the contract address
       return states.waitForDeployConfirmation({
         ...state,

@@ -123,7 +123,7 @@ describe('start in aSubmitDeployInMetaMask', () => {
   describe('incoming action: deploy submitted', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.aSubmitDeployInMetaMask(testDefaults);
-    const action = actions.deploySubmitted(defaults.adjudicator);
+    const action = actions.deploySubmittedInMetaMask(defaults.adjudicator);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_DEPLOY_CONFIRMATION, updatedState);
