@@ -143,19 +143,19 @@ describe('start in BWaitForDeployAddress', () => {
 });
 
 describe('start in WaitForDeployConfirmation', () => {
-  describe('incoming action: deploy finalised', () => { // player A scenario
+  describe('incoming action: deploy confirmed', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
-    const action = actions.deployFinalised();
+    const action = actions.deployConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT_INITIATION, updatedState);
   });
 
-  describe('incoming action: deploy finalised', () => { // player B scenario
+  describe('incoming action: deploy confirmed', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
-    const action = actions.deployFinalised();
+    const action = actions.deployConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_INITIATE_DEPOSIT, updatedState);
@@ -185,19 +185,19 @@ describe('start in BInitiateDeposti', () => {
 });
 
 describe('start in WaitForDepositConfirmation', () => {
-  describe('incoming action: deposit finalised', () => { // player A scenario
+  describe('incoming action: deposit confirmed', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForDepositConfirmation(testDefaults);
-    const action = actions.depositFinalised();
+    const action = actions.depositConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
   });
 
-  describe('incoming action: deposit finalised', () => { // player B scenario
+  describe('incoming action: deposit confirmed', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.waitForDepositConfirmation(testDefaults);
-    const action = actions.depositFinalised();
+    const action = actions.depositConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);

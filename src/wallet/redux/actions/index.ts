@@ -67,7 +67,11 @@ export const deploySubmittedInMetaMask = (adjudicator: string) => ({
 });
 export type DeploySubmittedInMetaMask = ReturnType<typeof deploySubmittedInMetaMask>;
 
-export const DEPLOY_CONFIRMED = '.'; // when first seen in a block
+export const DEPLOY_CONFIRMED = 'WALLET.DEPLOY_CONFIRMED'; // when first seen in a block
+export const deployConfirmed = ()=> ({
+  type: DEPLOY_CONFIRMED as typeof DEPLOY_CONFIRMED,
+});
+export type DeployConfirmed = ReturnType <typeof deployConfirmed>;
 
 export const DEPLOY_FINALISED = 'WALLET.DEPLOY_FINALISED'; // when X blocks deep
 export const deployFinalised = () => ({
@@ -91,7 +95,12 @@ export type DepositInitiated = ReturnType<typeof depositInitiated>;
 
 
 export const DEPOSIT_SUBMITTED = '.'; // when submitted to network
-export const DEPOSIT_CONFIRMED = '.'; // when first seen in a block
+
+export const DEPOSIT_CONFIRMED = 'WALLET.DEPOSIT_CONFIRMED'; // when first seen in a block
+export const depositConfirmed = ()=> ({
+  type: DEPOSIT_CONFIRMED as typeof DEPOSIT_CONFIRMED,
+});
+export type DepositConfirmed = ReturnType <typeof depositConfirmed>;
 
 export const DEPOSIT_FINALISED = 'WALLET.DEPOSIT_FINALISED'; // when X blocks deep
 export const depositFinalised = () => ({
@@ -272,10 +281,10 @@ export type WalletAction = (
   | FundingApproved
   | DeploySentToMetaMask
   | DeploySubmittedInMetaMask
-  | DeployFinalised
+  | DeployConfirmed
   | DeployAddressReceived
   | DepositInitiated
-  | DepositFinalised
+  | DepositConfirmed
   | PostFundSetupReceived
   | FundingSuccessAcknowledged
   | ChallengeRequested

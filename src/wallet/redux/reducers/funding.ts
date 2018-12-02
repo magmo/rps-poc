@@ -97,7 +97,7 @@ const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, actio
 
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPLOY_FINALISED:
+    case actions.DEPLOY_CONFIRMED:
       if (state.ourIndex === 0) {
         return states.aWaitForDepositInitiation(state);
       } else {
@@ -132,7 +132,7 @@ const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiatio
 
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch(action.type) {
-    case actions.DEPOSIT_FINALISED:
+    case actions.DEPOSIT_CONFIRMED:
       if (state.ourIndex === 0) {
         // TODO: send postfund state
         return states.aWaitForPostFundSetup({
