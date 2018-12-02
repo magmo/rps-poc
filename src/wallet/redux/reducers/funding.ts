@@ -5,6 +5,7 @@ import decode from '../../domain/decode';
 import { validSignature, validTransition } from './utils';
 
 import { unreachable } from '../../utils';
+import { createDeployTransaction, createDepositTransaction } from '../../domain/TransactionGenerator';
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
   switch(state.type) {
@@ -50,7 +51,11 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
   switch(action.type) {
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
-        return states.aWaitForDeployToBeSentToMetaMask(state);
+        // TODO: the deposit should not be hardcoded.
+        return states.aWaitForDeployToBeSentToMetaMask({
+          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '1000'), 
+          ...state,
+        });
       } else {
         return states.bWaitForDeployAddress(state);
       } 
@@ -75,7 +80,6 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
-        transactionOutbox: undefined,
         messageOutbox: undefined,
       });
     default:
@@ -99,7 +103,11 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
   switch(action.type) {
     case actions.DEPLOY_CONFIRMED:
       if (state.ourIndex === 0) {
-        return states.aWaitForDepositInitiation(state);
+        // TODO: deposit value should not be hardcoded.
+        return states.aWaitForDepositInitiation({
+          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"), 
+          ...state,
+        });
       } else {
         return states.bInitiateDeposit(state);
       } 
@@ -120,11 +128,7 @@ const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions
 const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiation, action: actions.WalletAction) => {
   switch(action.type) {
     case actions.DEPOSIT_INITIATED:
-      // TODO: create deposit transaction
-      return states.waitForDepositConfirmation({
-        ...state,
-        transactionOutbox: undefined,
-      });
+      return states.waitForDepositConfirmation(state);
     default:
       return state;
   }
@@ -171,7 +175,7 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
       // TODO: send postfund state
       return states.acknowledgeFundingSuccess({
         ...state,
-        transactionOutbox: undefined,
+        messageOutbox: undefined,
       });
     default:
       return state;

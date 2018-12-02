@@ -30,7 +30,7 @@ const defaults = {
   channelId,
   channelNonce,
   libraryAddress,
-  networkId: 123,
+  networkId: 3,
   participants,
   uid: 'uid',
 };
