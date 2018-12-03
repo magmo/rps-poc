@@ -1,12 +1,19 @@
 
-import { Signature } from "./Signature";
+
 import { TransactionRequest } from "ethers/providers";
 import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytecode } from '../../contracts/simpleAdjudicatorUtils';
-import { utils } from 'ethers';
+import { ethers } from "ethers";
+import { Signature } from "./Signature";
 
-export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, signature: Signature): TransactionRequest {
+
+
+export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, fromSignature: Signature, toSignature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.forceMove.encode([fromState, toState, ...convertSignature(signature)]);
+  const v = [fromSignature.v, toSignature.v];
+  const r = [fromSignature.r, toSignature.r];
+  console.log(fromSignature.r);
+  const s = [fromSignature.s, toSignature.s];
+  const data = adjudicatorInterface.functions.forceMove.encode([fromState, toState, v, r, s]);
   return {
     to: contractAddress,
     data,
@@ -15,7 +22,7 @@ export function createForceMoveTransaction(contractAddress: string, fromState: s
 
 export function createRespondWithMoveTransaction(contractAddress: string, nextState: string, signature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.respondWithMove.encode([nextState, ...convertSignature(signature)]);
+  const data = adjudicatorInterface.functions.respondWithMove.encode([nextState, signature]);
   return {
     to: contractAddress,
     data,
@@ -24,7 +31,7 @@ export function createRespondWithMoveTransaction(contractAddress: string, nextSt
 
 export function createRefuteTransaction(contractAddress: string, refuteState: string, signature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.refute.encode([refuteState, ...convertSignature(signature)]);
+  const data = adjudicatorInterface.functions.refute.encode([refuteState, signature]);
   return {
     to: contractAddress,
     data,
@@ -45,12 +52,4 @@ export function createDepositTransaction(contractAddress: string, depositAmount:
     to: contractAddress,
     value: depositAmount,
   };
-}
-
-function convertSignature(signature: Signature) {
-  // TODO: Move this into the Signature class
-  const v = Array.from(utils.arrayify('0x' + signature.v.toString(16)));
-  const r = [signature.r];
-  const s = [signature.s];
-  return [v, r, s];
 }
