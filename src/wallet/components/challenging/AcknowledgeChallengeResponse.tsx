@@ -1,7 +1,5 @@
 import React from 'react';
-import Button from 'reactstrap/lib/Button';
-import walletIcon from '../../../images/wallet_icon.svg';
-import SidebarLayout from '../SidebarLayout';
+import AcknowledgeX from '../AcknowledgeX';
 
 interface Props {
   challengeResponseAcknowledged: () => void;
@@ -9,21 +7,14 @@ interface Props {
 
 export default class AcknowledgeChallengeResponse extends React.PureComponent<Props> {
   render() {
+    const { challengeResponseAcknowledged } = this.props;
     return (
-      <SidebarLayout>
-        <img src={walletIcon} />
-        <div className="challenge-expired-title">
-          Challenge over!
-        </div>
-        <p>
-          Your opponent responded to the challenge
-        </p>
-        <div className="challenge-expired-button-container" >
-          <Button className="challenge-expired-button" onClick={this.props.challengeResponseAcknowledged} >
-            Return to game
-          </Button>
-        </div>
-      </SidebarLayout>
+      <AcknowledgeX
+        title="Challenge over!"
+        action={challengeResponseAcknowledged}
+        description="Your opponent responded to the challenge."
+        actionTitle="Return to game"
+      />
     );
   }
 }

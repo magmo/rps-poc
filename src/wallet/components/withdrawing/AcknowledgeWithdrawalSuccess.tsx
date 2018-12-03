@@ -1,7 +1,5 @@
 import React from 'react';
-import Button from 'reactstrap/lib/Button';
-import walletIcon from '../../../images/wallet_icon.svg';
-import SidebarLayout from '../SidebarLayout';
+import AcknowledgeX from '../AcknowledgeX';
 
 interface Props {
   withdrawalSuccessAcknowledged: () => void;
@@ -11,20 +9,12 @@ export default class AcknowledgeWithdrawalSuccess extends React.PureComponent<Pr
   render() {
     const { withdrawalSuccessAcknowledged } = this.props;
     return (
-      <SidebarLayout>
-        <img src={walletIcon} />
-        <div className="challenge-expired-title">
-          Withdrawal successful!
-        </div>
-        <p>
-          You have successfully deposited funds into your channel.
-        </p>
-        <div className="challenge-expired-button-container" >
-          <Button className="challenge-expired-button" onClick={withdrawalSuccessAcknowledged} >
-            Return to app
-          </Button>
-        </div>
-      </SidebarLayout>
+      <AcknowledgeX
+        title="Withdrawal successful!"
+        description="You have successfully withdrawn your funds."
+        action={withdrawalSuccessAcknowledged}
+        actionTitle="Return to app"
+      />
     );
   }
 }

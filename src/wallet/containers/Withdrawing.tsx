@@ -7,7 +7,7 @@ import * as actions from '../redux/actions';
 
 import ApproveWithdrawal from '../components/withdrawing/ApproveWithdrawal';
 import AcknowledgeWithdrawalSuccess from '../components/withdrawing/AcknowledgeWithdrawalSuccess';
-import WaitForWithdrawalInitiation from '../components/withdrawing/WaitForWithdrawalInitiation';
+import WaitForWithdrawalInitiation from '../components/withdrawing/WaitForWithdrawalToBeSentToMetaMask';
 import WaitForWithdrawalConfirmation from '../components/withdrawing/WaitForWithdrawalConfirmation';
 import { unreachable } from '../utils/reducer-utils';
 

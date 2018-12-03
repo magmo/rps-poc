@@ -1,7 +1,5 @@
 import React from 'react';
-import Button from 'reactstrap/lib/Button';
-import walletIcon from '../../../images/wallet_icon.svg';
-import SidebarLayout from '../SidebarLayout';
+import AcknowledgeX from '../AcknowledgeX';
 
 interface Props {
   expirationTime: number;
@@ -13,15 +11,14 @@ export default class AcknowledgeChallengeTimeout extends React.PureComponent<Pro
   render() {
     const { expirationTime, withdrawalRequested } = this.props;
     const parsedExpiryDate = new Date(expirationTime * 1000).toLocaleTimeString();
+    const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;
     return (
-      <SidebarLayout>
-        <img src={walletIcon} />
-        <div className="challenge-expired-title">A challenge has expired</div>
-        <p>The challenge expired at {parsedExpiryDate}. You may now withdraw your funds.</p>
-        <div className="challenge-expired-button-container" >
-          <Button className="challenge-expired-button" onClick={() => { withdrawalRequested(); }} >Withdraw</Button>
-          </div>
-      </SidebarLayout>
+      <AcknowledgeX
+        title="A challenge has expired"
+        description={description}
+        action={withdrawalRequested}
+        actionTitle="Withdraw your funds"
+      />
     );
   }
 }
