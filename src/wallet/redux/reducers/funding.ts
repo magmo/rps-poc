@@ -7,6 +7,8 @@ import { validSignature, validTransition } from './utils';
 import { unreachable } from '../../utils';
 import { createDeployTransaction, createDepositTransaction } from '../../domain/TransactionGenerator';
 
+import {postFundSetupA, postFundSetupB } from '../../../core/positions';
+
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
   switch(state.type) {
     case states.WAIT_FOR_FUNDING_REQUEST:
@@ -138,10 +140,17 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
   switch(action.type) {
     case actions.DEPOSIT_CONFIRMED:
       if (state.ourIndex === 0) {
-        // TODO: send postfund state
+        const postFundStateA = postFundSetupA({
+          roundBuyIn: "1000",
+          libraryAddress: state.libraryAddress,
+          channelNonce: state.channelNonce,
+          participants: state.participants,
+          turnNum: state.turnNum + 1,
+          balances: ["0", "0"],
+        });
         return states.aWaitForPostFundSetup({
           ...state,
-          messageOutbox: undefined,
+          messageOutbox: postFundStateA,
         });
       } else {
         return states.bWaitForPostFundSetup(state);
@@ -172,10 +181,18 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
   switch(action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
     if (!validPostFundState(state, action)) { return state; }
-      // TODO: send postfund state
+      const postFundStateB = postFundSetupB({
+        roundBuyIn: "1000",
+        libraryAddress: state.libraryAddress,
+        channelNonce: state.channelNonce,
+        participants: state.participants,
+        turnNum: state.turnNum + 1,
+        balances: ["0", "0"],
+      });
+
       return states.acknowledgeFundingSuccess({
         ...state,
-        messageOutbox: undefined,
+        messageOutbox: postFundStateB,
       });
     default:
       return state;
