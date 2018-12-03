@@ -49,13 +49,12 @@ describe('transactions', () => {
     networkId = network.chainId;
 
   });
-  // Currently this test will only work when ganache is running and the contracts are deployed
-  // Need to update the scripts to do this so it passes on the CI server => {
-  it.skip('should deploy the contract', async () => {
+
+  it('should deploy the contract', async () => {
     const deployTransaction = createDeployTransaction(networkId, channel.id, '0x5');
     await testTransactionSender(deployTransaction);
   });
-  it.skip('should deposit into the contract', async () => {
+  it('should deposit into the contract', async () => {
     const contractAddress = await deployContract() as string;
     const depositTransaction = createDepositTransaction(contractAddress, '0x5');
     await testTransactionSender(depositTransaction);

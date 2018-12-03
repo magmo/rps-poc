@@ -1,6 +1,5 @@
 import { ethers, utils } from 'ethers';
-// TODO: This needs to be switched to the build contract ../../build/contracts/SimpleAdjudicator.json once we deploy contracts
-import simpleAdjudicatorArtifact from '../../contracts/artifacts/SimpleAdjudicator.json';
+import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
 import BN from 'bn.js';
 
 export async function depositFunds(address: string, amount: BN) {
