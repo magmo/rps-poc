@@ -43,9 +43,10 @@ class FundingContainer extends PureComponent<Props> {
             fundingRejected={fundingRejected}
           />
         );
-      case states.A_INITIATE_DEPLOY:
+      case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
+      case states.A_SUBMIT_DEPLOY_IN_METAMASK:
         return <AInitiateDeploy />;
-      case states.B_WAIT_FOR_DEPLOY_INITIATION:
+      case states.B_WAIT_FOR_DEPLOY_ADDRESS:
         return <BWaitForDeployInitiation />;
       case states.WAIT_FOR_DEPLOY_CONFIRMATION:
         return <WaitForDeployConfirmation />;

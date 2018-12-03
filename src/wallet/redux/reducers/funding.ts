@@ -2,20 +2,25 @@ import * as states from '../../states';
 import * as actions from '../actions';
 
 import decode from '../../domain/decode';
-import { validTransition } from './utils';
+import { validSignature, validTransition } from './utils';
 
 import { unreachable } from '../../utils';
+import { createDeployTransaction, createDepositTransaction } from '../../domain/TransactionGenerator';
+
+import { postFundSetupA, postFundSetupB } from '../../../core/positions';
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
-  switch(state.type) {
+  switch (state.type) {
     case states.WAIT_FOR_FUNDING_REQUEST:
       return waitForFundingRequestReducer(state, action);
     case states.APPROVE_FUNDING:
       return approveFundingReducer(state, action);
-    case states.A_INITIATE_DEPLOY:
-      return aInitiateDeployReducer(state, action);
-    case states.B_WAIT_FOR_DEPLOY_INITIATION:
-      return bWaitForDeployInitiationReducer(state, action);
+    case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
+      return aWaitForDeployToBeSentToMetaMaskReducer(state, action);
+    case states.A_SUBMIT_DEPLOY_IN_METAMASK:
+      return aSubmitDeployToMetaMaskReducer(state, action);
+    case states.B_WAIT_FOR_DEPLOY_ADDRESS:
+      return bWaitForDeployAddressReducer(state, action);
     case states.WAIT_FOR_DEPLOY_CONFIRMATION:
       return waitForDeployConfirmationReducer(state, action);
     case states.B_INITIATE_DEPOSIT:
@@ -36,8 +41,8 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
 };
 
 const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, action: actions.WalletAction) => {
-  switch(action.type) {
-    case actions.FUNDING_APPROVED:
+  switch (action.type) {
+    case actions.FUNDING_REQUESTED:
       return states.approveFunding(state);
     default:
       return state;
@@ -45,33 +50,48 @@ const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, actio
 };
 
 const approveFundingReducer = (state: states.ApproveFunding, action: actions.WalletAction) => {
-  switch(action.type) {
-    case actions.DEPLOY_INITIATED:
+  switch (action.type) {
+    case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
-        return states.aInitiateDeploy(state);
+        // TODO: the deposit should not be hardcoded.
+        return states.aWaitForDeployToBeSentToMetaMask({
+          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '1000'),
+          ...state,
+        });
       } else {
-        return states.bWaitForDeployInitiation(state);
-      } 
+        return states.bWaitForDeployAddress(state);
+      }
     default:
       return state;
   }
 };
 
-const aInitiateDeployReducer = (state: states.AInitiateDeploy, action: actions.WalletAction) => {
-  switch(action.type) {
-    case actions.DEPLOY_SUBMITTED:
+const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToBeSentToMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.DEPLOY_SENT_TO_METAMASK:
+      return states.aSubmitDeployInMetaMask(state);
+    default:
+      return state;
+  }
+};
+
+const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.DEPLOY_SUBMITTED_IN_METAMASK:
+      // TODO: inform opponent of the contract address
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
+        messageOutbox: undefined,
       });
     default:
       return state;
   }
 };
 
-const bWaitForDeployInitiationReducer = (state: states.BWaitForDeployInitiation, action: actions.WalletAction) => {
-  switch(action.type) {
-    case actions.DEPLOY_SUBMITTED:
+const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.DEPLOY_ADDRESS_RECEIVED:
       return states.waitForDeployConfirmation({
         ...state,
         adjudicator: action.adjudicator,
@@ -82,20 +102,24 @@ const bWaitForDeployInitiationReducer = (state: states.BWaitForDeployInitiation,
 };
 
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
-  switch(action.type) {
-    case actions.DEPLOY_FINALISED:
+  switch (action.type) {
+    case actions.DEPLOY_CONFIRMED:
       if (state.ourIndex === 0) {
-        return states.aWaitForDepositInitiation(state);
+        // TODO: deposit value should not be hardcoded.
+        return states.aWaitForDepositInitiation({
+          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"),
+          ...state,
+        });
       } else {
         return states.bInitiateDeposit(state);
-      } 
+      }
     default:
       return state;
   }
 };
 
 const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPOSIT_INITIATED:
       return states.waitForDepositConfirmation(state);
     default:
@@ -104,7 +128,7 @@ const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions
 };
 
 const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiation, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPOSIT_INITIATED:
       return states.waitForDepositConfirmation(state);
     default:
@@ -113,12 +137,21 @@ const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiatio
 };
 
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
-  switch(action.type) {
-    case actions.DEPOSIT_FINALISED:
+  switch (action.type) {
+    case actions.DEPOSIT_CONFIRMED:
       if (state.ourIndex === 0) {
-        // TODO: validate state
-        // TODO: send postfund state
-        return states.aWaitForPostFundSetup(state);
+        const postFundStateA = postFundSetupA({
+          roundBuyIn: "1000",
+          libraryAddress: state.libraryAddress,
+          channelNonce: state.channelNonce,
+          participants: state.participants,
+          turnNum: state.turnNum + 1,
+          balances: ["0", "0"],
+        });
+        return states.aWaitForPostFundSetup({
+          ...state,
+          messageOutbox: postFundStateA,
+        });
       } else {
         return states.bWaitForPostFundSetup(state);
       }
@@ -128,19 +161,12 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 };
 
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
-      const postFundBPosition = decode(action.data);
-
-      // TODO: comment this back in once the test cases contain proper signatures
-      // check signature
-      // const opponentAddress = state.participants[1];
-      // if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
-      // check transition
-      if (!validTransition(state, postFundBPosition)) { return state; }
+      if (!validPostFundState(state, action)) { return state; }
 
       return states.acknowledgeFundingSuccess({
-        ...state, 
+        ...state,
         turnNum: state.turnNum + 1,
         lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
@@ -152,19 +178,41 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 };
 
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
-      return states.acknowledgeFundingSuccess(state);
+      if (!validPostFundState(state, action)) { return state; }
+      const postFundStateB = postFundSetupB({
+        roundBuyIn: "1000",
+        libraryAddress: state.libraryAddress,
+        channelNonce: state.channelNonce,
+        participants: state.participants,
+        turnNum: state.turnNum + 1,
+        balances: ["0", "0"],
+      });
+
+      return states.acknowledgeFundingSuccess({
+        ...state,
+        messageOutbox: postFundStateB,
+      });
     default:
       return state;
   }
 };
 
 const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSuccess, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
       return states.waitForUpdate(state);
     default:
       return state;
   }
+};
+
+const validPostFundState = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup, action: actions.PostFundSetupReceived) => {
+  const postFundBPosition = decode(action.data);
+  const opponentAddress = state.participants[1 - state.ourIndex];
+  if (!validSignature(action.data, action.signature, opponentAddress)) { return false; }
+  // check transition
+  if (!validTransition(state, postFundBPosition)) { return false; }
+  return true;
 };
