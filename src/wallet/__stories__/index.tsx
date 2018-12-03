@@ -32,6 +32,7 @@ const defaults = {
   penultimatePosition: preFundSetupAHex,
   lastPosition: preFundSetupBHex,
   turnNum: 1,
+  networkId: 1234,
 };
 
 const fakeStore = (state) => ({
@@ -39,7 +40,7 @@ const fakeStore = (state) => ({
     alert(`Action ${action.type} triggered`);
     return action;
   },
-  getState: () => ({ wallet: state }), 
+  getState: () => ({ wallet: state }),
   subscribe: () => (() => {/* empty */ }),
   replaceReducer: () => { /* empty */ },
 });
@@ -47,7 +48,7 @@ const fakeStore = (state) => ({
 const testState = (state) => (
   () => (
     <Provider store={fakeStore(state)}>
-      <Wallet children={<div/>} />
+      <Wallet children={<div />} />
     </Provider>
   )
 );

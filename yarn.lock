@@ -8878,7 +8878,7 @@ ltgt@~2.2.0:
 
 "magmo-devtools@https://github.com/magmo/devtools":
   version "0.1.0"
-  resolved "https://github.com/magmo/devtools#e9a395b4746c64fb969782a4b6674c1ae90bb698"
+  resolved "https://github.com/magmo/devtools#e04286964496360d1af943134bfe4620d66968ef"
   dependencies:
     detect-port "^1.3.0"
 
