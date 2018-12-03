@@ -7,10 +7,10 @@ import { validSignature, validTransition } from './utils';
 import { unreachable } from '../../utils';
 import { createDeployTransaction, createDepositTransaction } from '../../domain/TransactionGenerator';
 
-import {postFundSetupA, postFundSetupB } from '../../../core/positions';
+import { postFundSetupA, postFundSetupB } from '../../../core/positions';
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
-  switch(state.type) {
+  switch (state.type) {
     case states.WAIT_FOR_FUNDING_REQUEST:
       return waitForFundingRequestReducer(state, action);
     case states.APPROVE_FUNDING:
@@ -41,7 +41,7 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
 };
 
 const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.FUNDING_REQUESTED:
       return states.approveFunding(state);
     default:
@@ -50,24 +50,24 @@ const waitForFundingRequestReducer = (state: states.WaitForFundingRequest, actio
 };
 
 const approveFundingReducer = (state: states.ApproveFunding, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
         // TODO: the deposit should not be hardcoded.
         return states.aWaitForDeployToBeSentToMetaMask({
-          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '1000'), 
+          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '1000'),
           ...state,
         });
       } else {
         return states.bWaitForDeployAddress(state);
-      } 
+      }
     default:
       return state;
   }
 };
 
 const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToBeSentToMetaMask, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPLOY_SENT_TO_METAMASK:
       return states.aSubmitDeployInMetaMask(state);
     default:
@@ -76,7 +76,7 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
 };
 
 const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPLOY_SUBMITTED_IN_METAMASK:
       // TODO: inform opponent of the contract address
       return states.waitForDeployConfirmation({
@@ -90,7 +90,7 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
 };
 
 const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPLOY_ADDRESS_RECEIVED:
       return states.waitForDeployConfirmation({
         ...state,
@@ -102,24 +102,24 @@ const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, actio
 };
 
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPLOY_CONFIRMED:
       if (state.ourIndex === 0) {
         // TODO: deposit value should not be hardcoded.
         return states.aWaitForDepositInitiation({
-          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"), 
+          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"),
           ...state,
         });
       } else {
         return states.bInitiateDeposit(state);
-      } 
+      }
     default:
       return state;
   }
 };
 
 const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPOSIT_INITIATED:
       return states.waitForDepositConfirmation(state);
     default:
@@ -128,7 +128,7 @@ const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions
 };
 
 const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiation, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPOSIT_INITIATED:
       return states.waitForDepositConfirmation(state);
     default:
@@ -137,7 +137,7 @@ const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiatio
 };
 
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.DEPOSIT_CONFIRMED:
       if (state.ourIndex === 0) {
         const postFundStateA = postFundSetupA({
@@ -161,12 +161,12 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 };
 
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
       if (!validPostFundState(state, action)) { return state; }
-      
+
       return states.acknowledgeFundingSuccess({
-        ...state, 
+        ...state,
         turnNum: state.turnNum + 1,
         lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
@@ -178,9 +178,9 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 };
 
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
-    if (!validPostFundState(state, action)) { return state; }
+      if (!validPostFundState(state, action)) { return state; }
       const postFundStateB = postFundSetupB({
         roundBuyIn: "1000",
         libraryAddress: state.libraryAddress,
@@ -200,7 +200,7 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
 };
 
 const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSuccess, action: actions.WalletAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
       return states.waitForUpdate(state);
     default:
