@@ -193,7 +193,7 @@ describe('transactions', () => {
     const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
     const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
     const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
-    const toSignature = new Signature(signPositionHex(fromState, participantB.privateKey));
+    const toSignature = new Signature(signPositionHex(toState, participantB.privateKey));
     const verificationSignature = new Signature(signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey));
     const concludeAndWithdrawArgs: ConcludeAndWithdrawArgs = {
       contractAddress,
@@ -207,30 +207,28 @@ describe('transactions', () => {
       verificationSignature,
     };
     const concludeAndWithdrawTransaction = createConcludeAndWithdrawTransaction(concludeAndWithdrawArgs);
-    testTransactionSender(concludeAndWithdrawTransaction);
+    await testTransactionSender(concludeAndWithdrawTransaction);
   });
 
-  // TODO: Get this working
-  // it("should send a conclude transaction", async () => {
-  //   const channel = new Channel(libraryAddress, getNextNonce(), participants);
-  //   const { channelNonce } = channel;
-  //   const contractAddress = await deployContract(channelNonce) as string;
-  //   await depositContract(contractAddress);
+  it("should send a conclude transaction", async () => {
+    const channel = new Channel(libraryAddress, getNextNonce(), participants);
+    const { channelNonce } = channel;
+    const contractAddress = await deployContract(channelNonce) as string;
+    await depositContract(contractAddress);
 
-  //   const concludeArgs = {
-  //     ...baseMoveArgs,
-  //     balances: fiveFive,
-  //     libraryAddress,
-  //     channelNonce,
+    const concludeArgs = {
+      ...baseMoveArgs,
+      balances: fiveFive,
+      libraryAddress,
+      channelNonce,
 
-  //   };
-  //   const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
-  //   const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
-  //   const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
-  //   const toSignature = new Signature(signPositionHex(fromState, participantB.privateKey));
+    };
+    const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
+    const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
+    const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
+    const toSignature = new Signature(signPositionHex(toState, participantB.privateKey));
 
-  //   const concludeTransaction = createConcludeTransaction(contractAddress, fromState, toState, fromSignature, toSignature);
-  //   testTransactionSender(concludeTransaction);
-  // });
-
+    const concludeTransaction = createConcludeTransaction(contractAddress, fromState, toState, fromSignature, toSignature);
+    await testTransactionSender(concludeTransaction);
+  });
 });
