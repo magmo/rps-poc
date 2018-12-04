@@ -11,9 +11,9 @@ export function createForceMoveTransaction(contractAddress: string, fromState: s
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
   const v = [fromSignature.v, toSignature.v];
   const r = [fromSignature.r, toSignature.r];
-  console.log(fromSignature.r);
   const s = [fromSignature.s, toSignature.s];
   const data = adjudicatorInterface.functions.forceMove.encode([fromState, toState, v, r, s]);
+
   return {
     to: contractAddress,
     data,
@@ -22,7 +22,8 @@ export function createForceMoveTransaction(contractAddress: string, fromState: s
 
 export function createRespondWithMoveTransaction(contractAddress: string, nextState: string, signature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.respondWithMove.encode([nextState, signature]);
+  const { v, r, s } = signature;
+  const data = adjudicatorInterface.functions.respondWithMove.encode([nextState, v, r, s]);
   return {
     to: contractAddress,
     data,
@@ -31,7 +32,8 @@ export function createRespondWithMoveTransaction(contractAddress: string, nextSt
 
 export function createRefuteTransaction(contractAddress: string, refuteState: string, signature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const data = adjudicatorInterface.functions.refute.encode([refuteState, signature]);
+  const { v, r, s } = signature;
+  const data = adjudicatorInterface.functions.refute.encode([refuteState, v, r, s]);
   return {
     to: contractAddress,
     data,

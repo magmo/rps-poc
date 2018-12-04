@@ -1,5 +1,6 @@
 import { ethers, utils } from 'ethers';
 import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
+import rpsGamesArtifact from '../../build/contracts/RockPaperScissorsGame.json';
 import BN from 'bn.js';
 
 
@@ -18,8 +19,8 @@ export function getSimpleAdjudicatorBytecode(networkId) {
 }
 
 export function getLibraryAddress(networkId) {
-  const links = simpleAdjudicatorArtifact.networks[networkId].links;
-  return links.Rules;
+  return rpsGamesArtifact.networks[networkId].address;
+  
 }
 
 function linkBytecode(contractArtifact, networkId) {

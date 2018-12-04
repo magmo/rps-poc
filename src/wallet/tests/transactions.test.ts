@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { Channel, sign as coreSign } from "fmg-core";
-import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction } from "../domain/TransactionGenerator";
+import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createRespondWithMoveTransaction } from "../domain/TransactionGenerator";
 
 import { transactionSender } from "../redux/sagas/transaction-sender";
 import { transactionSentToMetamask, transactionSubmitted, transactionConfirmed, transactionFinalized } from '../redux/actions';
@@ -11,7 +11,7 @@ import { getLibraryAddress } from "../../contracts/simpleAdjudicatorUtils";
 import BN from 'bn.js';
 import bnToHex from "../../utils/bnToHex";
 import { Signature } from "../domain";
-import { signPositionHex } from "../redux/reducers/utils";
+
 
 jest.setTimeout(20000);
 
@@ -23,7 +23,7 @@ describe('transactions', () => {
   const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
   const fiveFive = [new BN(5), new BN(5)].map(bnToHex) as [string, string];
-  const sixFour = [new BN(6), new BN(4)].map(bnToHex) as [string, string];
+  const fourSix = [new BN(4), new BN(6)].map(bnToHex) as [string, string];
   const channelNonce = 15;
   const participantA = ethers.Wallet.createRandom();
   const participantB = ethers.Wallet.createRandom();
@@ -40,9 +40,10 @@ describe('transactions', () => {
     expect(saga.next(transactionReceipt).value).toEqual(put(transactionSubmitted()));
     const confirmedTransaction = await transactionReceipt.wait();
     saga.next();
-    contractAddress = confirmedTransaction.contractAddress;
+    contractAddress = confirmedTransaction.contractAddress || contractAddress;
     expect(saga.next(confirmedTransaction).value).toEqual(put(transactionConfirmed(confirmedTransaction.contractAddress)));
-    // We don't actually bother waiting for 5 confirmations as that will make the test take too long
+
+
     saga.next();
     expect(saga.next(confirmedTransaction).value).toEqual(put(transactionFinalized()));
     expect(saga.next().done).toBe(true);
@@ -59,22 +60,30 @@ describe('transactions', () => {
 
 
   it('should deploy the contract', async () => {
+
     const deployTransaction = createDeployTransaction(networkId, channel.id, '0x5');
     await testTransactionSender(deployTransaction);
+
   });
   it('should deposit into the contract', async () => {
+
     const depositTransaction = createDepositTransaction(contractAddress, '0x5');
     await testTransactionSender(depositTransaction);
+
   });
   it("should send a forceMove transaction", async () => {
+
+
+
     const baseMoveArgs = {
       salt: randomHex(64),
-      asMove: Move.Paper,
+      asMove: Move.Rock,
       roundBuyIn: '0x1',
       libraryAddress: gameLibrary,
       channelNonce,
       participants,
     };
+
     const proposeArgs = {
       ...baseMoveArgs,
       turnNum: 5,
@@ -86,16 +95,42 @@ describe('transactions', () => {
       preCommit: positions.hashCommitment(baseMoveArgs.asMove, baseMoveArgs.salt),
       bsMove: Move.Paper,
       turnNum: 6,
-      balances: sixFour,
+      balances: fourSix,
     };
     const fromPosition = encode(positions.proposeFromSalt(proposeArgs));
     const toPosition = encode(positions.accept(acceptArgs));
+    // TODO Update signPositionHex to work
+    const fromSigString = coreSign(fromPosition, participantB.privateKey);
+    const toSigString = coreSign(toPosition, participantA.privateKey);
 
-    const fromSig = new Signature(signPositionHex(fromPosition, participantA.privateKey));
-    const toSig = new Signature(signPositionHex(toPosition, participantB.privateKey));
+    const fromSig = new Signature(fromSigString.r + fromSigString.s.substr(2) + fromSigString.v.substr(2));
+    const toSig = new Signature(toSigString.r + toSigString.s.substr(2) + toSigString.v.substr(2));
 
     const forceMoveTransaction = createForceMoveTransaction(contractAddress, fromPosition, toPosition, fromSig, toSig);
-    testTransactionSender(forceMoveTransaction);
+    await testTransactionSender(forceMoveTransaction);
+
+  });
+
+  it("should send a respondWithMove transaction", async () => {
+
+    const revealArgs = {
+      turnNum: 7,
+      balances: fourSix,
+      salt: randomHex(64),
+      asMove: Move.Rock,
+      bsMove: Move.Paper,
+      roundBuyIn: '0x1',
+      libraryAddress: gameLibrary,
+      channelNonce,
+      participants,
+    };
+
+    const toPosition = encode(positions.reveal(revealArgs));
+    const toSigString = coreSign(toPosition, participantB.privateKey);
+    const toSig = new Signature(toSigString.r + toSigString.s.substr(2) + toSigString.v.substr(2));
+
+    const respondWithMoveTransaction = createRespondWithMoveTransaction(contractAddress, toPosition, toSig);
+    await testTransactionSender(respondWithMoveTransaction);
   });
 
 });
