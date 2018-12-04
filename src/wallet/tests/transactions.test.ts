@@ -7,7 +7,7 @@ import { encode, Move, positions } from "../../core";
 import bnToHex from "../../utils/bnToHex";
 import { randomHex } from "../../utils/randomHex";
 import { Signature } from "../domain";
-import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createRespondWithMoveTransaction, createRefuteTransaction, createConcludeAndWithdrawTransaction, ConcludeAndWithdrawArgs, createConcludeTransaction } from "../domain/TransactionGenerator";
+import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createRespondWithMoveTransaction, createRefuteTransaction, createConcludeAndWithdrawTransaction, ConcludeAndWithdrawArgs, createConcludeTransaction, createWithdrawTransaction } from "../domain/TransactionGenerator";
 import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
 import { signPositionHex, signVerificationData } from "../redux/reducers/utils";
 import { transactionSender } from "../redux/sagas/transaction-sender";
@@ -92,6 +92,25 @@ describe('transactions', () => {
     const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
     const challengeTransaction = createForceMoveTransaction(address, fromPosition, toPosition, fromSig, toSig);
     const transactionReceipt = await signer.sendTransaction(challengeTransaction);
+    await transactionReceipt.wait();
+  }
+
+  async function concludeGame(address, channelNonce) {
+    const signer = provider.getSigner();
+    const concludeArgs = {
+      ...baseMoveArgs,
+      balances: fiveFive,
+      libraryAddress,
+      channelNonce,
+
+    };
+    const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
+    const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
+    const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
+    const toSignature = new Signature(signPositionHex(toState, participantB.privateKey));
+
+    const concludeTransaction = createConcludeTransaction(address, fromState, toState, fromSignature, toSignature);
+    const transactionReceipt = await signer.sendTransaction(concludeTransaction);
     await transactionReceipt.wait();
   }
 
@@ -230,5 +249,16 @@ describe('transactions', () => {
 
     const concludeTransaction = createConcludeTransaction(contractAddress, fromState, toState, fromSignature, toSignature);
     await testTransactionSender(concludeTransaction);
+  });
+
+  it("should send a withdraw transaction", async () => {
+    const channel = new Channel(libraryAddress, getNextNonce(), participants);
+    const { channelNonce } = channel;
+    const contractAddress = await deployContract(channelNonce) as string;
+    await depositContract(contractAddress);
+    await concludeGame(contractAddress, channelNonce);
+    const verificationSignature = new Signature(signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey));
+    const withdrawTransaction = createWithdrawTransaction(contractAddress, participantA.address, participantA.address, channel.id, verificationSignature);
+    await testTransactionSender(withdrawTransaction);
   });
 });

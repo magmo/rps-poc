@@ -78,6 +78,17 @@ export function createConcludeTransaction(contractAddress: string, fromState: st
   };
 }
 
+export function createWithdrawTransaction(contractAddress: string, participant: string, destination: string, channelId: string, verificationSignature: Signature) {
+  const adjudicatorInterface = getSimpleAdjudicatorInterface();
+  const { v, r, s } = verificationSignature;
+  const data = adjudicatorInterface.functions.withdraw.encode([participant, destination, channelId, v, r, s]);
+
+  return {
+    to: contractAddress,
+    data,
+  };
+}
+
 export function createDeployTransaction(networkId: number, channelId: string, depositAmount: string) {
   const byteCode = getSimpleAdjudicatorBytecode(networkId);
   const data = getSimpleAdjudicatorInterface().deployFunction.encode(byteCode, [channelId, 2]);
