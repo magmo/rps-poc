@@ -1,6 +1,7 @@
 import { splitSignature } from 'ethers/utils';
-import { recover, sign, State } from 'fmg-core';
+import { recover, sign, State, SolidityType } from 'fmg-core';
 import { WalletState } from '../../states';
+import { string } from 'prop-types';
 
 export const validTransition = (fromState: WalletState, toState: State) => {
   // todo: check the game rules
@@ -37,7 +38,16 @@ export const ourTurn = (state: WalletState) => {
 };
 
 export const signPositionHex = (positionHex: string, privateKey: string) => {
-
   const signature = sign(positionHex, privateKey) as any;
+  return signature.signature;
+};
+
+export const signVerificationData = (playerAddress: string, destination: string, channelId: string, privateKey) => {
+  const data = [
+    { type: SolidityType.address, value: playerAddress },
+    { type: SolidityType.address, value: destination },
+    { type: SolidityType.bytes32, value: channelId },
+  ];
+  const signature = sign(data, privateKey) as any;
   return signature.signature;
 };

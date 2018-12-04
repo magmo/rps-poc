@@ -1,4 +1,4 @@
-import { signPositionHex, validSignature } from '../utils';
+import { signPositionHex, validSignature, signVerificationData } from '../utils';
 import * as scenarios from '../../../../core/test-scenarios';
 
 const s = scenarios.standard;
@@ -27,4 +27,9 @@ describe('validSignature', () => {
   itChecksSig('PreFundSetupB', s.preFundSetupBHex, s.preFundSetupBSig, s.bsAddress);
   itChecksSig('Propose', s.proposeHex, s.proposeSig, s.asAddress);
   itChecksSig('Accept', s.acceptHex, s.acceptSig, s.bsAddress);
+});
+
+it('should sign verification data', () => {
+  const signature = signVerificationData(s.asAddress, s.asAddress, s.channelId, s.asPrivateKey);
+  expect(signature).toEqual('0x01fc4122f240d67822f54fe21095bd3577000603fb3661c7f68cf3ebb5cef39c3e1b5b3460e3240082eba63dc5ef61ab59ffc625af71378b4137b1f23cc708101c');
 });
