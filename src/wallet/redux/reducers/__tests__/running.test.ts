@@ -1,11 +1,8 @@
 import { walletReducer } from '..';
-
+import { scenarios } from '../../../../core';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-
-import { itTransitionsToStateType, itDoesntTransition, itIncreasesTurnNumBy } from './helpers';
-import { scenarios, encode } from '../../../../core';
-import { signPositionHex } from '../utils';
+import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType } from './helpers';
 
 const {
   asAddress,

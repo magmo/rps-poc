@@ -2,7 +2,6 @@
 
 import { TransactionRequest } from "ethers/providers";
 import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytecode } from '../../contracts/simpleAdjudicatorUtils';
-import { ethers } from "ethers";
 import { Signature } from "./Signature";
 
 

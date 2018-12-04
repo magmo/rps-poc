@@ -1,18 +1,16 @@
-import { ethers } from "ethers";
-import { Channel, sign as coreSign } from "fmg-core";
-import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createRespondWithMoveTransaction } from "../domain/TransactionGenerator";
-
-import { transactionSender } from "../redux/sagas/transaction-sender";
-import { transactionSentToMetamask, transactionSubmitted, transactionConfirmed, transactionFinalized } from '../redux/actions';
-import { put } from "redux-saga/effects";
-import { positions, Move, encode } from "../../core";
-import { randomHex } from "../../utils/randomHex";
-import { getLibraryAddress } from "../../contracts/simpleAdjudicatorUtils";
 import BN from 'bn.js';
+import { ethers } from "ethers";
+import { Channel } from "fmg-core";
+import { put } from "redux-saga/effects";
+import { getLibraryAddress } from "../../contracts/simpleAdjudicatorUtils";
+import { encode, Move, positions } from "../../core";
 import bnToHex from "../../utils/bnToHex";
+import { randomHex } from "../../utils/randomHex";
 import { Signature } from "../domain";
+import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createRespondWithMoveTransaction } from "../domain/TransactionGenerator";
+import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
 import { signPositionHex } from "../redux/reducers/utils";
-
+import { transactionSender } from "../redux/sagas/transaction-sender";
 
 jest.setTimeout(20000);
 

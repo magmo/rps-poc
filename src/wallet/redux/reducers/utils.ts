@@ -1,7 +1,6 @@
-import { WalletState } from '../../states';
-import { State, sign, recover, decodeSignature } from 'fmg-core';
-import { number } from 'prop-types';
 import { splitSignature } from 'ethers/utils';
+import { recover, sign, State } from 'fmg-core';
+import { WalletState } from '../../states';
 
 export const validTransition = (fromState: WalletState, toState: State) => {
   // todo: check the game rules

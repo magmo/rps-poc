@@ -1,8 +1,6 @@
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
 import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
 import rpsGamesArtifact from '../../build/contracts/RockPaperScissorsGame.json';
-import BN from 'bn.js';
-
 
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {

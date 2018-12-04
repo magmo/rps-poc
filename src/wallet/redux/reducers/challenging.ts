@@ -1,14 +1,11 @@
-import { WalletAction } from '../actions';
-import * as actions from '../actions';
-import { unreachable } from '../../utils';
+import { Signature } from '../../domain';
+import { createForceMoveTransaction } from '../../domain/TransactionGenerator';
 import { WalletState } from '../../states';
 import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
-import { createForceMoveTransaction } from '../../domain/TransactionGenerator';
-import { signPositionHex } from './utils';
-import { Signature } from '../../domain';
-
-
+import { unreachable } from '../../utils';
+import * as actions from '../actions';
+import { WalletAction } from '../actions';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
