@@ -55,7 +55,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
       if (state.ourIndex === 0) {
         // TODO: the deposit should not be hardcoded.
         return states.aWaitForDeployToBeSentToMetaMask({
-          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '1000'),
+          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '0x5'),
           ...state,
         });
       } else {
@@ -105,13 +105,13 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
   switch (action.type) {
     case actions.DEPLOY_CONFIRMED:
       if (state.ourIndex === 0) {
-        // TODO: deposit value should not be hardcoded.
-        return states.aWaitForDepositInitiation({
-          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"),
-          ...state,
-        });
+        return states.aWaitForDepositInitiation(state);
       } else {
-        return states.bInitiateDeposit(state);
+        // TODO: deposit value should not be hardcoded.
+        return states.bInitiateDeposit({
+          ...state,
+          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"),
+        });
       }
     default:
       return state;
@@ -141,11 +141,9 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
     case actions.DEPOSIT_CONFIRMED:
       if (state.ourIndex === 0) {
         const postFundStateA = postFundSetupA({
-          roundBuyIn: "1000",
-          libraryAddress: state.libraryAddress,
-          channelNonce: state.channelNonce,
-          participants: state.participants,
+          ...state,
           turnNum: state.turnNum + 1,
+          roundBuyIn: "1000",
           balances: ["0", "0"],
         });
         return states.aWaitForPostFundSetup({
@@ -182,11 +180,9 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
     case actions.POST_FUND_SETUP_RECEIVED:
       if (!validPostFundState(state, action)) { return state; }
       const postFundStateB = postFundSetupB({
-        roundBuyIn: "1000",
-        libraryAddress: state.libraryAddress,
-        channelNonce: state.channelNonce,
-        participants: state.participants,
+        ...state,
         turnNum: state.turnNum + 1,
+        roundBuyIn: "1000",
         balances: ["0", "0"],
       });
 

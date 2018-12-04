@@ -6,6 +6,7 @@ import * as actions from '../../actions';
 
 import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
+import * as TransactionGenerator from '../../../domain/TransactionGenerator';
 
 
 const {
@@ -89,12 +90,15 @@ describe('start in WaitForFundingRequest', () => {
 
 describe('start in ApproveFunding', () => {
   describe('incoming action: funding approved', () => { // player A scenario
+    const createDeployTxMock = jest.fn();
+    Object.defineProperty(TransactionGenerator, 'createDeployTransaction', { value: createDeployTxMock });
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.approveFunding(testDefaults);
     const action = actions.fundingApproved();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK, updatedState);
+    expect(createDeployTxMock.mock.calls.length).toBe(1);
   });
 
   describe('action taken: funding approved', () => { // player B scenario
@@ -153,12 +157,15 @@ describe('start in WaitForDeployConfirmation', () => {
   });
 
   describe('incoming action: deploy confirmed', () => { // player B scenario
+    const createDepositTxMock = jest.fn();
+    Object.defineProperty(TransactionGenerator, 'createDepositTransaction', { value: createDepositTxMock });
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
     const action = actions.deployConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_INITIATE_DEPOSIT, updatedState);
+    expect(createDepositTxMock.mock.calls.length).toBe(1);
   });
 });
 
