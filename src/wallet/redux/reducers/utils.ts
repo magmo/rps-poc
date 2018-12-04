@@ -1,7 +1,6 @@
 import { splitSignature } from 'ethers/utils';
 import { recover, sign, State, SolidityType } from 'fmg-core';
 import { WalletState } from '../../states';
-import { string } from 'prop-types';
 
 export const validTransition = (fromState: WalletState, toState: State) => {
   // todo: check the game rules
