@@ -1,6 +1,7 @@
 import { WalletState } from '../../states';
-import { recoverAddress, getAddress, hashMessage, SigningKey, joinSignature } from 'ethers/utils';
-import { State } from 'fmg-core';
+import { State, sign, recover, decodeSignature } from 'fmg-core';
+import { number } from 'prop-types';
+import { splitSignature } from 'ethers/utils';
 
 export const validTransition = (fromState: WalletState, toState: State) => {
   // todo: check the game rules
@@ -18,9 +19,14 @@ export const validTransition = (fromState: WalletState, toState: State) => {
 
 export const validSignature = (data: string, signature: string, address: string) => {
   try {
-    const signerAddress = recoverAddress(hashMessage(data), signature);
-    return signerAddress === getAddress(address);
-  } catch {
+    const { v: vNum, r, s } = splitSignature(signature);
+    const v = '0x' + (vNum as number).toString(16);
+
+    const recovered = recover(data, v, r, s);
+
+    return recovered === address;
+  } catch (err) {
+
     return false;
   }
 };
@@ -32,8 +38,7 @@ export const ourTurn = (state: WalletState) => {
 };
 
 export const signPositionHex = (positionHex: string, privateKey: string) => {
-  const signer = new SigningKey(privateKey);
-  const signature = joinSignature(signer.signDigest(hashMessage(positionHex)));
 
-  return signature;
+  const signature = sign(positionHex, privateKey) as any;
+  return signature.signature;
 };

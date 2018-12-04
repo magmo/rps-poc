@@ -11,6 +11,7 @@ import { getLibraryAddress } from "../../contracts/simpleAdjudicatorUtils";
 import BN from 'bn.js';
 import bnToHex from "../../utils/bnToHex";
 import { Signature } from "../domain";
+import { signPositionHex } from "../redux/reducers/utils";
 
 
 jest.setTimeout(20000);
@@ -99,12 +100,9 @@ describe('transactions', () => {
     };
     const fromPosition = encode(positions.proposeFromSalt(proposeArgs));
     const toPosition = encode(positions.accept(acceptArgs));
-    // TODO Update signPositionHex to work
-    const fromSigString = coreSign(fromPosition, participantB.privateKey);
-    const toSigString = coreSign(toPosition, participantA.privateKey);
+    const fromSig = new Signature(signPositionHex(fromPosition, participantB.privateKey));
+    const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
 
-    const fromSig = new Signature(fromSigString.r + fromSigString.s.substr(2) + fromSigString.v.substr(2));
-    const toSig = new Signature(toSigString.r + toSigString.s.substr(2) + toSigString.v.substr(2));
 
     const forceMoveTransaction = createForceMoveTransaction(contractAddress, fromPosition, toPosition, fromSig, toSig);
     await testTransactionSender(forceMoveTransaction);
@@ -126,8 +124,8 @@ describe('transactions', () => {
     };
 
     const toPosition = encode(positions.reveal(revealArgs));
-    const toSigString = coreSign(toPosition, participantB.privateKey);
-    const toSig = new Signature(toSigString.r + toSigString.s.substr(2) + toSigString.v.substr(2));
+
+    const toSig = new Signature(signPositionHex(toPosition, participantB.privateKey));
 
     const respondWithMoveTransaction = createRespondWithMoveTransaction(contractAddress, toPosition, toSig);
     await testTransactionSender(respondWithMoveTransaction);
