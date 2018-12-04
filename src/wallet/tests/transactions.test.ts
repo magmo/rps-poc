@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { ethers } from "ethers";
-import { Channel, sign } from "fmg-core";
+import { Channel } from "fmg-core";
 import { put } from "redux-saga/effects";
 import { getLibraryAddress } from "../../contracts/simpleAdjudicatorUtils";
 import { encode, Move, positions } from "../../core";
