@@ -2,12 +2,11 @@ import * as states from '../../states';
 import * as actions from '../actions';
 
 import decode from '../../domain/decode';
-import { validSignature, validTransition } from './utils';
-
-import { unreachable } from '../../utils';
-import { createDeployTransaction, createDepositTransaction } from '../../domain/TransactionGenerator';
 
 import { postFundSetupA, postFundSetupB } from '../../../core/positions';
+import { unreachable, validTransition } from '../../utils/reducer-utils';
+import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
+import { validSignature } from '../../utils/signing-utils';
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {

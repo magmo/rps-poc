@@ -1,5 +1,5 @@
-import { signPositionHex, validSignature, signVerificationData } from '../utils';
-import * as scenarios from '../../../../core/test-scenarios';
+import { scenarios } from '../../../core';
+import { signPositionHex, validSignature, signVerificationData } from '../signing-utils';
 
 const s = scenarios.standard;
 

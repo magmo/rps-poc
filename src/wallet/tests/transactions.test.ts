@@ -2,15 +2,25 @@ import BN from 'bn.js';
 import { ethers } from "ethers";
 import { Channel } from "fmg-core";
 import { put } from "redux-saga/effects";
-import { getLibraryAddress } from "../../contracts/simpleAdjudicatorUtils";
 import { encode, Move, positions } from "../../core";
 import bnToHex from "../../utils/bnToHex";
 import { randomHex } from "../../utils/randomHex";
 import { Signature } from "../domain";
-import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createRespondWithMoveTransaction, createRefuteTransaction, createConcludeAndWithdrawTransaction, ConcludeAndWithdrawArgs, createConcludeTransaction, createWithdrawTransaction } from "../domain/TransactionGenerator";
 import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
-import { signPositionHex, signVerificationData } from "../redux/reducers/utils";
 import { transactionSender } from "../redux/sagas/transaction-sender";
+import { signPositionHex, signVerificationData } from '../utils/signing-utils';
+import { getLibraryAddress } from '../utils/contract-utils';
+import {
+  createDeployTransaction,
+  createDepositTransaction,
+  createForceMoveTransaction,
+  createConcludeTransaction,
+  createRespondWithMoveTransaction,
+  createRefuteTransaction,
+  ConcludeAndWithdrawArgs,
+  createConcludeAndWithdrawTransaction,
+  createWithdrawTransaction
+} from '../utils/transaction-generator';
 
 jest.setTimeout(20000);
 

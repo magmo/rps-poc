@@ -2,8 +2,6 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import { unreachable } from '../utils';
-
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
@@ -11,6 +9,7 @@ import ApproveWithdrawal from '../components/withdrawing/ApproveWithdrawal';
 import AcknowledgeWithdrawalSuccess from '../components/withdrawing/AcknowledgeWithdrawalSuccess';
 import WaitForWithdrawalInitiation from '../components/withdrawing/WaitForWithdrawalInitiation';
 import WaitForWithdrawalConfirmation from '../components/withdrawing/WaitForWithdrawalConfirmation';
+import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
   state: states.WithdrawingState;

@@ -1,4 +1,3 @@
-import { validTransition, ourTurn, signPositionHex } from './utils';
 import decode from '../../domain/decode';
 
 import { WalletState, RespondingState } from '../../states';
@@ -7,7 +6,9 @@ import * as challengeStates from '../../states/challenging';
 import * as runningStates from '../../states/running';
 import { WalletAction } from '../actions';
 import * as actions from '../actions';
-import { unreachable } from '../../utils';
+import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
+import { signPositionHex } from '../../utils/signing-utils';
+
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
   switch (state.type) {

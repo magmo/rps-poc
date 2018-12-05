@@ -10,7 +10,7 @@ import {
 } from '../../states';
 
 import { WalletAction, KEYS_LOADED, LOGGED_IN } from '../actions';
-import { unreachable } from '../../utils';
+import { unreachable } from '../../utils/reducer-utils';
 
 export const initializingReducer = (state: InitializingState, action: WalletAction): WalletState => {
   switch (state.type) {
