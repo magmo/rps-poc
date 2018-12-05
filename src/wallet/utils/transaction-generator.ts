@@ -1,10 +1,8 @@
 
 
 import { TransactionRequest } from "ethers/providers";
-import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytecode } from '../../contracts/simpleAdjudicatorUtils';
-import { Signature } from "./Signature";
-
-
+import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytecode } from "./contract-utils";
+import { Signature } from "../domain";
 
 export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, fromSignature: Signature, toSignature: Signature): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();

@@ -2,13 +2,12 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import { unreachable } from '../utils';
-
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
 import Todo from '../components/Todo';
 import AcknowledgeChallenge from '../components/responding/AcknowledgeChallenge';
+import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
   state: states.RespondingState;

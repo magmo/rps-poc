@@ -1,5 +1,3 @@
-import { unreachable } from '../../utils';
-
 import {
   WalletState,
   INITIALIZING,
@@ -22,6 +20,7 @@ import { respondingReducer } from './responding';
 import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
 import { WalletAction } from '../actions';
+import { unreachable } from '../../utils/reducer-utils';
 
 const initialState = waitForLogin();
 

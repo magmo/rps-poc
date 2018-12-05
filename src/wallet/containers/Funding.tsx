@@ -2,8 +2,6 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import { unreachable } from '../utils';
-
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
@@ -16,6 +14,7 @@ import AWaitForDepositInitiation from '../components/funding/AWaitForDepositInit
 import BWaitForPostFundSetup from '../components/funding/BWaitForPostFundSetup';
 import AWaitForPostFundSetup from '../components/funding/AWaitForPostFundSetup';
 import AcknowledgeFundingSuccess from '../components/funding/AcknowledgeFundingSuccess';
+import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
   state: states.FundingState;

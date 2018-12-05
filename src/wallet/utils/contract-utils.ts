@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
-import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
-import rpsGamesArtifact from '../../build/contracts/RockPaperScissorsGame.json';
+import simpleAdjudicatorArtifact from '../../../build/contracts/SimpleAdjudicator.json';
+import rpsGamesArtifact from '../../../build/contracts/RockPaperScissorsGame.json';
 
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
@@ -18,7 +18,7 @@ export function getSimpleAdjudicatorBytecode(networkId) {
 
 export function getLibraryAddress(networkId) {
   return rpsGamesArtifact.networks[networkId].address;
-  
+
 }
 
 function linkBytecode(contractArtifact, networkId) {

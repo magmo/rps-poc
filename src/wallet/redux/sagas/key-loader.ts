@@ -4,7 +4,8 @@ import { default as firebase, reduxSagaFirebase } from '../../../gateways/fireba
 import ChannelWallet from '../../domain/ChannelWallet';
 import { SiteState } from '../../../redux/reducer';
 import { keysLoaded } from '../actions';
-import { getProvider } from '../../../contracts/simpleAdjudicatorUtils';
+import { getProvider } from '../../utils/contract-utils';
+
 
 interface WalletParams {
   uid: string;

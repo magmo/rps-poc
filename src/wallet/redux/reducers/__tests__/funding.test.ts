@@ -6,7 +6,7 @@ import * as actions from '../../actions';
 
 import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
-import * as TransactionGenerator from '../../../domain/TransactionGenerator';
+import * as TransactionGenerator from '../../../utils/transaction-generator';
 
 
 const {

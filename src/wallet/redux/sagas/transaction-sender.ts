@@ -1,7 +1,7 @@
 import { call, put } from "redux-saga/effects";
-import { getProvider } from "../../../contracts/simpleAdjudicatorUtils";
 import { transactionSentToMetamask, transactionSubmitted, transactionConfirmed, transactionFinalized, transactionSubmissionFailed } from "../actions";
 import { ethers } from "ethers";
+import { getProvider } from "../../utils/contract-utils";
 
 export function* transactionSender(transaction) {
 

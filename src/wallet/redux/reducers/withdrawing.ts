@@ -1,6 +1,6 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { unreachable } from '../../utils';
+import { unreachable } from '../../utils/reducer-utils';
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {

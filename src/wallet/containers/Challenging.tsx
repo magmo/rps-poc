@@ -2,7 +2,6 @@ import React from 'react';
 import { PureComponent } from 'react';
 import { connect } from 'react-redux';
 
-import { unreachable } from '../utils';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
@@ -13,6 +12,7 @@ import AcknowledgeChallengeTimeout from '../components/challenging/AcknowledgeCh
 import ApproveChallenge from '../components/challenging/ApproveChallenge';
 import WaitForChallengeInitiation from '../components/challenging/WaitForChallengeInitiation';
 import WaitForChallengeSubmission from '../components/challenging/WaitForChallengeSubmission';
+import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
   state: states.ChallengingState;

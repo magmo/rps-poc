@@ -1,11 +1,12 @@
 import { State } from 'fmg-core';
-import { validSignature, signPositionHex } from './utils';
 
 import * as states from '../../states';
 import * as actions from '../actions';
-import { unreachable } from '../../utils';
+
 
 import decode from '../../domain/decode';
+import { unreachable } from '../../utils/reducer-utils';
+import { signPositionHex, validSignature } from '../../utils/signing-utils';
 
 export const openingReducer = (state: states.OpeningState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {
@@ -34,7 +35,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
 
       if (ourAddress !== state.address) { return state; }
 
-      const signature = signPositionHex(data, state.privateKey); 
+      const signature = signPositionHex(data, state.privateKey);
 
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
@@ -92,7 +93,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
       if (ownPosition.stateType !== State.StateType.PreFundSetup) { return state; }
       if (ownPosition.stateCount !== 1) { return state; }
 
-      const signature = signPositionHex(data, state.privateKey); 
+      const signature = signPositionHex(data, state.privateKey);
 
       // if so, unpack its contents into the state
       return states.waitForFundingRequest({
