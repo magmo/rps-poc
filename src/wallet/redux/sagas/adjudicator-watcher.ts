@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 enum AdjudicatorEventType {
   FundsReceived,
   ChallengeCreated,
+  GameConcluded,
 }
 
 interface AdjudicatorEvent {
@@ -19,14 +20,23 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
 
   const channel = eventChannel((emitter) => {
     const fundReceivedFilter = simpleAdjudicator.filters.FundsReceived();
-    const challengeCreatedEvent = simpleAdjudicator.filters.ChallengeCreated();
+    const challengeCreatedFilter = simpleAdjudicator.filters.ChallengeCreated();
+    const gameConcludedFilter = simpleAdjudicator.filters.GameConcluded();
     simpleAdjudicator.on(fundReceivedFilter, (amountReceived, sender, adjudicatorBalance) => {
       emitter({ eventType: AdjudicatorEventType.FundsReceived, eventArgs: { amountReceived, sender, adjudicatorBalance } });
     });
-    simpleAdjudicator.on(challengeCreatedEvent, (channelId, state, expirationTime, payouts) => {
+    simpleAdjudicator.on(challengeCreatedFilter, (channelId, state, expirationTime, payouts) => {
       emitter({ eventType: AdjudicatorEventType.ChallengeCreated, eventArgs: { channelId, state, expirationTime, payouts } });
     });
-    return () => { /* bleg */ };
+    simpleAdjudicator.on(gameConcludedFilter, () => {
+      emitter({ eventType: AdjudicatorEventType.GameConcluded, eventArgs: null });
+    });
+    return () => {
+      // This function is called when the channel gets closed
+      simpleAdjudicator.removeAllListeners(fundReceivedFilter);
+      simpleAdjudicator.removeAllListeners(challengeCreatedFilter);
+      simpleAdjudicator.removeAllListeners(gameConcludedFilter);
+    };
   });
 
 
@@ -41,6 +51,9 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
         const { channelId, state, expirationTime, } = event.eventArgs;
         const payouts = event.eventArgs.payouts.map(bn => bn.toHexString());
         yield put(actions.challengeCreatedEvent(channelId, state, expirationTime, payouts));
+        break;
+      case AdjudicatorEventType.GameConcluded:
+        yield put(actions.gameConcludedEvent());
         break;
 
     }

@@ -277,6 +277,7 @@ export const fundingReceivedEvent = (amountReceived, sender, adjudicatorBalance)
   adjudicatorBalance,
   type: FUNDING_RECEIVED_EVENT as typeof FUNDING_RECEIVED_EVENT,
 });
+export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
 
 export const CHALLENGE_CREATED_EVENT = 'CHALLENGE_CREATED_EVENT';
 export const challengeCreatedEvent = (channelId, state, expirationTime, payouts) => ({
@@ -288,7 +289,13 @@ export const challengeCreatedEvent = (channelId, state, expirationTime, payouts)
 });
 export type ChallengeCreatedEvent = ReturnType<typeof challengeCreatedEvent>;
 
-export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
+export const GAME_CONCLUDED_EVENT = 'GAME_CONCLUDED_EVENT';
+export const gameConcludedEvent = () => ({
+  type: GAME_CONCLUDED_EVENT as typeof GAME_CONCLUDED_EVENT,
+});
+export type GameConcludedEvent = ReturnType<typeof gameConcludedEvent>;
+
+
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
   | LoggedIn

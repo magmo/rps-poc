@@ -4,15 +4,19 @@ import { scenarios } from "../../core";
 import { ethers } from "ethers";
 import SagaTester from 'redux-saga-tester';
 import * as actions from "../redux/actions";
-import { deployContract, depositContract, createChallenge } from './test-utils';
+import { deployContract, depositContract, createChallenge, concludeGame } from './test-utils';
 jest.setTimeout(20000);
 describe('adjudicator listener', () => {
   const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
   const particpantA = ethers.Wallet.createRandom();
   const particpantB = ethers.Wallet.createRandom();
-
+  let nonce = 5;
+  function getNextNonce() {
+    return ++nonce;
+  }
   it("should handle a funds received event", async () => {
-    const contractAddress = await deployContract(1, [particpantA, particpantB]);
+    const channelNonce = getNextNonce();
+    const contractAddress = await deployContract(channelNonce, [particpantA, particpantB]);
     const sagaTester = new SagaTester({});
     sagaTester.start(adjudicatorWatcher, contractAddress, provider);
     await depositContract(contractAddress);
@@ -27,16 +31,29 @@ describe('adjudicator listener', () => {
   });
 
   it("should handle a challengeCreated event", async () => {
-    const contractAddress = await deployContract(2, [particpantA, particpantB]);
+    const channelNonce = getNextNonce();
+    const contractAddress = await deployContract(channelNonce, [particpantA, particpantB]);
     await depositContract(contractAddress);
 
     const sagaTester = new SagaTester({});
     sagaTester.start(adjudicatorWatcher, contractAddress, provider);
-    const challengeState = await createChallenge(contractAddress, 2, [particpantA, particpantB]);
+    const challengeState = await createChallenge(contractAddress, channelNonce, [particpantA, particpantB]);
     await sagaTester.waitFor(actions.CHALLENGE_CREATED_EVENT);
     const action = sagaTester.getLatestCalledAction();
     expect(action.type === action.CHALLENGE_CREATED_EVENT);
     expect(action.expirationTime * 1000).toBeGreaterThan(Date.now());
     expect(action.state.toUpperCase()).toEqual(challengeState.toUpperCase());
+  });
+
+  it("should handle a concluded event", async () => {
+    const channelNonce = getNextNonce();
+    const contractAddress = await deployContract(channelNonce, [particpantA, particpantB]);
+    await depositContract(contractAddress);
+    const sagaTester = new SagaTester({});
+    sagaTester.start(adjudicatorWatcher, contractAddress, provider);
+    await concludeGame(contractAddress, channelNonce, [particpantA, particpantB]);
+    await sagaTester.waitFor(actions.GAME_CONCLUDED_EVENT);
+    const action = sagaTester.getLatestCalledAction();
+    expect(action.type === actions.GAME_CONCLUDED_EVENT);
   });
 });
