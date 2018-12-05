@@ -25,7 +25,6 @@ const defaults = {
   channelId,
   channelNonce,
   libraryAddress,
-  networkId: 123,
   participants,
   privateKey: asPrivateKey,
   uid: 'uid',
