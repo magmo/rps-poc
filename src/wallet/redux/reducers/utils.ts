@@ -1,6 +1,6 @@
+import { splitSignature } from 'ethers/utils';
+import { recover, sign, State, SolidityType } from 'fmg-core';
 import { WalletState } from '../../states';
-import { recoverAddress, getAddress, hashMessage, SigningKey, joinSignature } from 'ethers/utils';
-import { State } from 'fmg-core';
 
 export const validTransition = (fromState: WalletState, toState: State) => {
   // todo: check the game rules
@@ -18,9 +18,14 @@ export const validTransition = (fromState: WalletState, toState: State) => {
 
 export const validSignature = (data: string, signature: string, address: string) => {
   try {
-    const signerAddress = recoverAddress(hashMessage(data), signature);
-    return signerAddress === getAddress(address);
-  } catch {
+    const { v: vNum, r, s } = splitSignature(signature);
+    const v = '0x' + (vNum as number).toString(16);
+
+    const recovered = recover(data, v, r, s);
+
+    return recovered === address;
+  } catch (err) {
+
     return false;
   }
 };
@@ -32,8 +37,16 @@ export const ourTurn = (state: WalletState) => {
 };
 
 export const signPositionHex = (positionHex: string, privateKey: string) => {
-  const signer = new SigningKey(privateKey);
-  const signature = joinSignature(signer.signDigest(hashMessage(positionHex)));
+  const signature = sign(positionHex, privateKey) as any;
+  return signature.signature;
+};
 
-  return signature;
+export const signVerificationData = (playerAddress: string, destination: string, channelId: string, privateKey) => {
+  const data = [
+    { type: SolidityType.address, value: playerAddress },
+    { type: SolidityType.address, value: destination },
+    { type: SolidityType.bytes32, value: channelId },
+  ];
+  const signature = sign(data, privateKey) as any;
+  return signature.signature;
 };

@@ -16,10 +16,14 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       const data = action.data;
       const position = decode(data);
       // check it's our turn
-      if (!ourTurn(state)) { return state; }
+      if (!ourTurn(state)) {
+        return state;
+      }
 
       // check transition
-      if (!validTransition(state, position)) { return state; }
+      if (!validTransition(state, position)) {
+        return state;
+      }
 
       const signature = signPositionHex(data, state.privateKey);
 

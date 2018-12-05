@@ -1,10 +1,8 @@
 import { walletReducer } from '..';
-
+import { scenarios } from '../../../../core';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-
-import { itTransitionsToStateType, itDoesntTransition, itIncreasesTurnNumBy } from './helpers';
-import { scenarios } from '../../../../core';
+import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType } from './helpers';
 
 const {
   asAddress,
@@ -31,14 +29,14 @@ const defaults = {
   turnNum: 6,
   adjudicator: 'adj-address',
   challengeExpiry: new Date(),
-  networkId:2132,
+  networkId: 2132,
 };
 
 const bParams = { address: bsAddress, ourIndex: 1, privateKey: bsPrivateKey };
 const aParams = { address: asAddress, ourIndex: 0, privateKey: asPrivateKey };
 
-const { restingHex, restingSig } = scenarios.aResignsAfterOneRound;
-const { concludeHex, concludeSig } = scenarios.bResignsAfterOneRound;
+const { restingHex, restingSig, conclude2Hex: aConcludeHex, } = scenarios.aResignsAfterOneRound;
+const { concludeHex: bConcludeHex, concludeSig: bConcludeSig } = scenarios.bResignsAfterOneRound;
 
 describe('when in WaitForUpdate on our turn', () => {
   // after the reveal it is B's turn. So we must be B here
@@ -68,11 +66,12 @@ describe('when in WaitForUpdate on our turn', () => {
   });
 
   describe('when we send in a conclude state', () => {
-    const action = actions.ownPositionReceived(concludeHex);
-    const updatedState = walletReducer(state, action);
+    const waitForUpdateState = states.waitForUpdate({ ...bDefaults, turnNum: 8 });
+    const action = actions.ownPositionReceived(aConcludeHex);
+    const updatedState = walletReducer(waitForUpdateState, action);
 
     itTransitionsToStateType(states.CONCLUDING, updatedState);
-    itIncreasesTurnNumBy(1, state, updatedState);
+    itIncreasesTurnNumBy(1, waitForUpdateState, updatedState);
   });
 
   describe('when the wallet detects an opponent challenge', () => {
@@ -127,7 +126,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
   });
 
   describe('when our opponent sends in a conclude state', () => {
-    const action = actions.opponentPositionReceived(concludeHex, concludeSig);
+    const action = actions.opponentPositionReceived(bConcludeHex, bConcludeSig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.CONCLUDING, updatedState);

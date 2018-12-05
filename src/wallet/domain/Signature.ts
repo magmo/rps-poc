@@ -20,4 +20,5 @@ export class Signature {
     this.s = '0x' + signature.slice(66, 130);
     this.v = toDecimal('0x' + signature.slice(130, 132));
   }
+
 }

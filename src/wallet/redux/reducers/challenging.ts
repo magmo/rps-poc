@@ -1,13 +1,11 @@
-import { WalletAction } from '../actions';
-import * as actions from '../actions';
-import { unreachable } from '../../utils';
+import { Signature } from '../../domain';
+import { createForceMoveTransaction } from '../../domain/TransactionGenerator';
 import { WalletState } from '../../states';
 import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
-import { createForceMoveTransaction } from '../../domain/TransactionGenerator';
-import { signPositionHex } from './utils';
-import { Signature } from '../../domain';
-
+import { unreachable } from '../../utils';
+import * as actions from '../actions';
+import { WalletAction } from '../actions';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -33,9 +31,9 @@ export const challengingReducer = (state: states.ChallengingState, action: Walle
 const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_APPROVED:
-      // todo: fix this to use the stored signature
-      const signature = new Signature(signPositionHex(state.lastPosition.data, state.privateKey));
-      const transaction = createForceMoveTransaction(state.adjudicator, state.penultimatePosition.data, state.lastPosition.data, signature);
+      const { data: fromPosition, signature: fromSignature } = state.penultimatePosition;
+      const { data: toPosition, signature: toSignature } = state.lastPosition;
+      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, new Signature(toSignature), new Signature(fromSignature));
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
       return runningStates.waitForUpdate({ ...state });

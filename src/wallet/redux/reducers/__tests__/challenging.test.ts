@@ -1,15 +1,12 @@
 import { walletReducer } from '..';
-
-import * as states from '../../../states';
-import * as actions from '../../actions';
-
-import { itTransitionsToStateType, itSendsATransaction } from './helpers';
 import { scenarios } from '../../../../core';
 import { ChallengeProof } from '../../../domain/ChallengeProof';
+import * as states from '../../../states';
+import * as actions from '../../actions';
+import { itSendsATransaction, itTransitionsToStateType } from './helpers';
 
 const {
   asPrivateKey,
-  revealHex,
   acceptHex,
   acceptSig,
   proposeHex,
@@ -26,8 +23,8 @@ const defaults = {
   libraryAddress,
   channelId,
   channelNonce,
-  lastPosition: { data: revealHex, signature: 'fake-sig' },
-  penultimatePosition: { data: acceptHex, signature: acceptSig },
+  lastPosition: { data: acceptHex, signature: acceptSig },
+  penultimatePosition: { data: proposeHex, signature: proposeSig },
   turnNum: 6,
   adjudicator: 'adj-address',
   ourIndex: 0,

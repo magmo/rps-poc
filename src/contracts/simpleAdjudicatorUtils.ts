@@ -1,17 +1,7 @@
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
 import simpleAdjudicatorArtifact from '../../build/contracts/SimpleAdjudicator.json';
-import BN from 'bn.js';
+import rpsGamesArtifact from '../../build/contracts/RockPaperScissorsGame.json';
 
-export async function depositFunds(address: string, amount: BN) {
-  const depositTransaction = {
-    to: address,
-    value: utils.bigNumberify(amount.toString()),
-  };
-  const provider = await getProvider();
-  const signer = provider.getSigner();
-
-  return await signer.sendTransaction(depositTransaction);
-}
 
 export async function getProvider(): Promise<ethers.providers.Web3Provider> {
   return await new ethers.providers.Web3Provider(web3.currentProvider);
@@ -24,6 +14,11 @@ export function getSimpleAdjudicatorInterface(): ethers.utils.Interface {
 
 export function getSimpleAdjudicatorBytecode(networkId) {
   return linkBytecode(simpleAdjudicatorArtifact, networkId);
+}
+
+export function getLibraryAddress(networkId) {
+  return rpsGamesArtifact.networks[networkId].address;
+  
 }
 
 function linkBytecode(contractArtifact, networkId) {
