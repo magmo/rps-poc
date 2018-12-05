@@ -5,15 +5,13 @@ import { connect } from 'react-redux';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
-import ApproveFunding from '../components/funding/ApproveFunding';
-import AInitiateDeploy from '../components/funding/AInitiateDeploy';
-import BWaitForDeployInitiation from '../components/funding/BWaitForDeployInitiation';
-import WaitForDeployConfirmation from '../components/funding/WaitForDeployConfirmation';
-import BInitiateDeposit from '../components/funding/BInitiateDeposit';
-import AWaitForDepositInitiation from '../components/funding/AWaitForDepositInitiation';
 import BWaitForPostFundSetup from '../components/funding/BWaitForPostFundSetup';
 import AWaitForPostFundSetup from '../components/funding/AWaitForPostFundSetup';
-import AcknowledgeFundingSuccess from '../components/funding/AcknowledgeFundingSuccess';
+import AcknowledgeX from '../components/AcknowledgeX';
+import WaitForXInitiation from '../components/WaitForXInitiation';
+import WaitForXConfirmation from '../components/WaitForXConfirmation';
+import SubmitX from '../components/SubmitX';
+import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
@@ -37,32 +35,37 @@ class FundingContainer extends PureComponent<Props> {
         return null;
       case states.APPROVE_FUNDING:
         return (
-          <ApproveFunding
-            fundingApproved={fundingApproved}
-            fundingRejected={fundingRejected}
+          <ApproveX
+            title="Fund your channel!"
+            description="Do you wish to open this channel?"
+            approvalAction={fundingApproved}
+            rejectionAction={fundingRejected}
           />
         );
       case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
       case states.A_SUBMIT_DEPLOY_IN_METAMASK:
-        return <AInitiateDeploy />;
+        return <SubmitX name="deploy" />;
       case states.B_WAIT_FOR_DEPLOY_ADDRESS:
-        return <BWaitForDeployInitiation />;
+        return <WaitForXInitiation name="deploy" />;
       case states.WAIT_FOR_DEPLOY_CONFIRMATION:
-        return <WaitForDeployConfirmation />;
+        return <WaitForXConfirmation name="deploy" />;
       case states.B_INITIATE_DEPOSIT:
-        return <BInitiateDeposit />;
+        return <WaitForXInitiation name="deposit" />;
       case states.A_WAIT_FOR_DEPOSIT_INITIATION:
-        return <AWaitForDepositInitiation />;
+        return <WaitForXInitiation name="deploy" />;
       case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
-        return <WaitForDeployConfirmation />;
+        return <WaitForXConfirmation name="deposit" />;
       case states.B_WAIT_FOR_POST_FUND_SETUP:
         return <BWaitForPostFundSetup />;
       case states.A_WAIT_FOR_POST_FUND_SETUP:
         return <AWaitForPostFundSetup />;
       case states.ACKNOWLEDGE_FUNDING_SUCCESS:
         return (
-          <AcknowledgeFundingSuccess
-            fundingSuccessAcknowledged={fundingSuccessAcknowledged}
+          <AcknowledgeX
+            title="Funding successful!"
+            action={fundingSuccessAcknowledged}
+            description="You have successfully deposited funds into your channel"
+            actionTitle="Return to game"
           />
         );
       default:

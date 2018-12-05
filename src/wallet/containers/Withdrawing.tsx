@@ -5,10 +5,10 @@ import { connect } from 'react-redux';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
-import ApproveWithdrawal from '../components/withdrawing/ApproveWithdrawal';
-import AcknowledgeWithdrawalSuccess from '../components/withdrawing/AcknowledgeWithdrawalSuccess';
-import WaitForWithdrawalInitiation from '../components/withdrawing/WaitForWithdrawalToBeSentToMetaMask';
-import WaitForWithdrawalConfirmation from '../components/withdrawing/WaitForWithdrawalConfirmation';
+import AcknowledgeX from '../components/AcknowledgeX';
+import WaitForXConfirmation from '../components/WaitForXConfirmation';
+import WaitForXInitiation from '../components/WaitForXInitiation';
+import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
@@ -30,19 +30,24 @@ class WithdrawingContainer extends PureComponent<Props> {
     switch (state.type) {
       case states.APPROVE_WITHDRAWAL:
         return (
-          <ApproveWithdrawal
-            withdrawalApproved={withdrawalApproved}
-            withdrawalRejected={withdrawalRejected}
+          <ApproveX
+            title="Withdraw your funds"
+            description="Do you wish to withdraw your funds from this channel?"
+            approvalAction={() => withdrawalApproved('todo address')}
+            rejectionAction={withdrawalRejected}
           />
         );
       case states.WAIT_FOR_WITHDRAWAL_INITIATION:
-        return <WaitForWithdrawalInitiation />;
+        return <WaitForXInitiation name="withdrawal" />;
       case states.WAIT_FOR_WITHDRAWAL_CONFIRMATION:
-        return <WaitForWithdrawalConfirmation />;
+        return <WaitForXConfirmation name="withdrawal" />;
       case states.ACKNOWLEDGE_WITHDRAWAL_SUCCESS:
         return (
-          <AcknowledgeWithdrawalSuccess
-            withdrawalSuccessAcknowledged={withdrawalSuccessAcknowledged}
+          <AcknowledgeX
+            title="Withdrawal successful!"
+            description="You have successfully withdrawn your funds."
+            action={withdrawalSuccessAcknowledged}
+            actionTitle="Return to app"
           />
         );
       default:
