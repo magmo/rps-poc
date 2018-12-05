@@ -1,17 +1,25 @@
-import { getAdjudicatorContract } from "../../../contracts/simpleAdjudicatorUtils";
+import { getAdjudicatorContract } from "../../utils/contract-utils";
 import { call, take, put } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
-import { actions } from "../../";
+import * as actions from "../actions";
 import { ethers } from "ethers";
 
+enum AdjudicatorEventType {
+  FundsReceived,
+}
+
+interface AdjudicatorEvent {
+  eventArgs: any;
+  eventType: AdjudicatorEventType;
+}
 
 export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
   const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, adjudicatorAddress, provider);
 
   const channel = eventChannel((emitter) => {
     const fundReceivedFilter = simpleAdjudicator.filters.FundsReceived();
-    simpleAdjudicator.on(fundReceivedFilter, (something) => {
-      emitter(something);
+    simpleAdjudicator.on(fundReceivedFilter, (amountReceived, sender, adjudicatorBalance) => {
+      emitter({ eventType: AdjudicatorEventType.FundsReceived, eventArgs: { amountReceived, sender, adjudicatorBalance } });
     });
     return () => { /* bleg */ };
   });
@@ -19,9 +27,10 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
   console.log(channel);
   while (true) {
     console.log('asda');
-    const something = yield take(channel);
-    console.log(something);
-    yield put(actions.fundingSuccess(something));
+    const event: AdjudicatorEvent = yield take(channel);
+    console.log(event);
+    const { amountReceived, sender, adjudicatorBalance } = event.eventArgs;
+    yield put(actions.fundingReceivedEvent(amountReceived, sender, adjudicatorBalance));
   }
 
 }

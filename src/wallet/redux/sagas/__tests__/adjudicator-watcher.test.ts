@@ -1,16 +1,17 @@
 import { adjudicatorWatcher } from "../adjudicator-watcher";
 
 import { scenarios } from "../../../../core";
-import { createDepositTransaction, createDeployTransaction } from "../../../domain/TransactionGenerator";
+import { createDepositTransaction, createDeployTransaction } from "../../../utils/transaction-generator";
 import { ethers } from "ethers";
 import { Channel } from "fmg-core";
 import SagaTester from 'redux-saga-tester';
-import { actions } from "../../../";
+import * as actions from "../../actions";
 
 describe('adjudicator listener', () => {
-  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
   async function deployContract(channelNonce, libraryAddress) {
+    const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+
     const channel = new Channel(libraryAddress, channelNonce, scenarios.standard.participants);
     const signer = provider.getSigner();
 
@@ -22,6 +23,8 @@ describe('adjudicator listener', () => {
   }
 
   async function depositContract(address) {
+    const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+
     const signer = provider.getSigner();
     const deployTransaction = createDepositTransaction(address, '0x5');
     const transactionReceipt = await signer.sendTransaction(deployTransaction);
@@ -29,6 +32,8 @@ describe('adjudicator listener', () => {
 
   }
   it("should handle a funding event", async () => {
+    const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+
     const contractAddress = await deployContract(1, scenarios.standard.participants);
     const dispatched: any[] = [];
     const sagaTester = new SagaTester({});
@@ -37,7 +42,7 @@ describe('adjudicator listener', () => {
     await depositContract(contractAddress);
     console.log(sagaTester.getLatestCalledAction());
     console.log('b4 wait');
-    await sagaTester.waitFor(actions.FUNDING_SUCCESS);
+    await sagaTester.waitFor(actions.FUNDING_RECEIVED_EVENT);
     console.log('after wait');
   });
 });

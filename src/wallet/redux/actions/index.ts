@@ -270,7 +270,14 @@ export const withdrawalSuccessAcknowledged = () => ({
 });
 export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
 
-
+export const FUNDING_RECEIVED_EVENT = 'FUNDING_RECEIVED_EVENT';
+export const fundingReceivedEvent = (amountReceived, sender, adjudicatorBalance) => ({
+  amountReceived,
+  sender,
+  adjudicatorBalance,
+  type: FUNDING_RECEIVED_EVENT as typeof FUNDING_RECEIVED_EVENT,
+});
+export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
   | LoggedIn
