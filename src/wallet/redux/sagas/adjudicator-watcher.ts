@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 
 enum AdjudicatorEventType {
   FundsReceived,
+  ChallengeCreated,
 }
 
 interface AdjudicatorEvent {
@@ -18,19 +19,32 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
 
   const channel = eventChannel((emitter) => {
     const fundReceivedFilter = simpleAdjudicator.filters.FundsReceived();
+    const challengeCreatedEvent = simpleAdjudicator.filters.ChallengeCreated();
     simpleAdjudicator.on(fundReceivedFilter, (amountReceived, sender, adjudicatorBalance) => {
       emitter({ eventType: AdjudicatorEventType.FundsReceived, eventArgs: { amountReceived, sender, adjudicatorBalance } });
+    });
+    simpleAdjudicator.on(challengeCreatedEvent, (channelId, state, expirationTime, payouts) => {
+      emitter({ eventType: AdjudicatorEventType.ChallengeCreated, eventArgs: { channelId, state, expirationTime, payouts } });
     });
     return () => { /* bleg */ };
   });
 
-  console.log(channel);
+
   while (true) {
-    console.log('asda');
     const event: AdjudicatorEvent = yield take(channel);
-    console.log(event);
-    const { amountReceived, sender, adjudicatorBalance } = event.eventArgs;
-    yield put(actions.fundingReceivedEvent(amountReceived, sender, adjudicatorBalance));
+    switch (event.eventType) {
+      case AdjudicatorEventType.FundsReceived:
+        const { amountReceived, sender, adjudicatorBalance } = event.eventArgs;
+        yield put(actions.fundingReceivedEvent(amountReceived.toHexString(), sender, adjudicatorBalance.toHexString()));
+        break;
+      case AdjudicatorEventType.ChallengeCreated:
+        const { channelId, state, expirationTime, } = event.eventArgs;
+        const payouts = event.eventArgs.payouts.map(bn => bn.toHexString());
+        yield put(actions.challengeCreatedEvent(channelId, state, expirationTime, payouts));
+        break;
+
+    }
+
   }
 
 }

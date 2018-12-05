@@ -22,6 +22,7 @@ export async function deployContract(channelNonce, participants: ethers.Wallet[]
   const deployTransaction = createDeployTransaction(networkId, channel.id, '0x5');
   const transactionReceipt = await signer.sendTransaction(deployTransaction);
   const confirmedTransaction = await transactionReceipt.wait();
+
   return confirmedTransaction.contractAddress as string;
 }
 
@@ -72,6 +73,7 @@ export async function createChallenge(address, channelNonce, participants: ether
   const challengeTransaction = createForceMoveTransaction(address, fromPosition, toPosition, fromSig, toSig);
   const transactionReceipt = await signer.sendTransaction(challengeTransaction);
   await transactionReceipt.wait();
+  return toPosition;
 }
 
 export async function concludeGame(address, channelNonce, participants: ethers.Wallet[]) {
