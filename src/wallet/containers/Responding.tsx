@@ -6,12 +6,15 @@ import * as states from '../states';
 import * as actions from '../redux/actions';
 
 import Todo from '../components/Todo';
-import AcknowledgeChallenge from '../components/responding/AcknowledgeChallenge';
+import AcknowledgeX from '../components/AcknowledgeX';
+import WaitForXConfirmation from '../components/WaitForXConfirmation';
+import SubmitX from '../components/SubmitX';
 import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
   state: states.RespondingState;
   challengeAcknowledged: () => void;
+  challengeResponseAcknowledged: () => void;
 }
 
 class RespondingContainer extends PureComponent<Props> {
@@ -19,18 +22,37 @@ class RespondingContainer extends PureComponent<Props> {
     const {
       state,
       challengeAcknowledged,
+      challengeResponseAcknowledged,
     } = this.props;
 
     switch (state.type) {
       case states.ACKNOWLEDGE_CHALLENGE:
-        return <AcknowledgeChallenge challengeAcknowledged={challengeAcknowledged} />;
+        return (
+          <AcknowledgeX
+            title="Challenge detected!"
+            description="Your opponent has challenged you on-chain."
+            action={challengeAcknowledged}
+            actionTitle="Proceed"
+          />
+        );
       case states.CHOOSE_RESPONSE:
-      case states.TAKE_MOVE_IN_APP:
-      case states.INITIATE_RESPONSE:
-      case states.WAIT_FOR_RESPONSE_CONFIRMATION:
-      case states.WAIT_FOR_RESPONSE_SUBMISSION:
-      case states.ACKNOWLEDGE_CHALLENGE_COMPLETE:
         return <Todo stateType={state.type} />;
+      case states.TAKE_MOVE_IN_APP:
+        return <Todo stateType={state.type} />;
+      case states.WAIT_FOR_RESPONSE_CONFIRMATION:
+        return <WaitForXConfirmation name='response' />;
+      case states.INITIATE_RESPONSE:
+      case states.WAIT_FOR_RESPONSE_SUBMISSION:
+        return <SubmitX name='response' />;
+      case states.ACKNOWLEDGE_CHALLENGE_COMPLETE:
+        return (
+          <AcknowledgeX
+            title="Challenge over!"
+            description="Your response was successfully registered on-chain."
+            action={challengeResponseAcknowledged}
+            actionTitle="Return to app"
+          />
+        );
       default:
         return unreachable(state);
     }
@@ -39,6 +61,7 @@ class RespondingContainer extends PureComponent<Props> {
 
 const mapDispatchToProps = {
   challengeAcknowledged: actions.challengeAcknowledged,
+  challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
 };
 
 export default connect(

@@ -5,13 +5,12 @@ import { connect } from 'react-redux';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
-import AcknowledgeChallengeResponse from '../components/challenging/AcknowledgeChallengeResponse';
+import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForResponseOrTimeout from '../components/challenging/WaitForResponseOrTimeout';
-import WaitForChallengeConfirmation from '../components/challenging/WaitForChallengeConfirmation';
-import AcknowledgeChallengeTimeout from '../components/challenging/AcknowledgeChallengeTimeout';
-import ApproveChallenge from '../components/challenging/ApproveChallenge';
-import WaitForChallengeInitiation from '../components/challenging/WaitForChallengeInitiation';
-import WaitForChallengeSubmission from '../components/challenging/WaitForChallengeSubmission';
+import ApproveX from '../components/ApproveX';
+import WaitForXConfirmation from '../components/WaitForXConfirmation';
+import WaitForXInitiation from '../components/WaitForXInitiation';
+import SubmitX from '../components/SubmitX';
 import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
@@ -35,30 +34,39 @@ class ChallengingContainer extends PureComponent<Props> {
     switch (state.type) {
       case states.APPROVE_CHALLENGE:
         return (
-          <ApproveChallenge
-            challengeApproved={challengeApproved}
-            challengeRejected={challengeRejected}
+          <ApproveX
+            title="Launch a challenge!"
+            description="You've selected to launch an on-chain challenge. Do you want to proceed?"
+            approvalAction={challengeApproved}
+            rejectionAction={challengeRejected}
           />
         );
       case states.WAIT_FOR_CHALLENGE_INITIATION:
-        return <WaitForChallengeInitiation />;
+        return <WaitForXInitiation name="challenge" />;
       case states.WAIT_FOR_CHALLENGE_SUBMISSION:
-        return <WaitForChallengeSubmission />;
+        return <SubmitX name="challenge" />;
       case states.WAIT_FOR_CHALLENGE_CONFIRMATION:
-        return <WaitForChallengeConfirmation />;
+        return <WaitForXConfirmation name="challenge" />;
       case states.WAIT_FOR_RESPONSE_OR_TIMEOUT:
         return <WaitForResponseOrTimeout expirationTime={100 /*todo*/} />;
       case states.ACKNOWLEDGE_CHALLENGE_RESPONSE:
         return (
-          <AcknowledgeChallengeResponse
-            challengeResponseAcknowledged={challengeResponseAcknowledged}
+          <AcknowledgeX
+            title="Challenge over!"
+            action={challengeResponseAcknowledged}
+            description="Your opponent responded to the challenge."
+            actionTitle="Return to game"
           />
         );
       case states.ACKNOWLEDGE_CHALLENGE_TIMEOUT:
+        const parsedExpiryDate = 'TODO'; // need to add expiration time to the state
+        const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;
         return (
-          <AcknowledgeChallengeTimeout
-            expirationTime={100 /*todo*/}
-            withdrawalRequested={withdrawalRequested}
+          <AcknowledgeX
+            title="A challenge has expired"
+            description={description}
+            action={withdrawalRequested}
+            actionTitle="Withdraw your funds"
           />
         );
       default:

@@ -7,7 +7,7 @@ interface Props {
   withdrawalSuccessAcknowledged: () => void;
 }
 
-export default class AcknowledgeWithdrawalSuccess extends React.PureComponent<Props> {
+export default class ApproveWithdrawalRetry extends React.PureComponent<Props> {
   render() {
     const { withdrawalSuccessAcknowledged } = this.props;
     return (

@@ -32,7 +32,7 @@ const defaults = {
   penultimatePosition: { data: preFundSetupAHex, signature: 'fake-sig' },
   lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   turnNum: 1,
-  networkId: 1234,
+  networkId: 123,
 };
 
 const fakeStore = (state) => ({
