@@ -1,7 +1,8 @@
 import { TransactionRequest } from "ethers/providers";
+import { ResponseAction } from "../interface/outgoing";
 
 export interface Base {
-  messageOutbox?: any;
+  messageOutbox?: ResponseAction;
   transactionOutbox?: TransactionRequest;
 }
 

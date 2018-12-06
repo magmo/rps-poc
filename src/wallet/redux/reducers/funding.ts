@@ -1,12 +1,14 @@
 import * as states from '../../states';
 import * as actions from '../actions';
+import { sendMessage, fundingSuccess } from '../../interface/outgoing';
 
 import decode from '../../domain/decode';
+import encode from '../../../core/encode';
 
 import { postFundSetupA, postFundSetupB } from '../../../core/positions';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
-import { validSignature } from '../../utils/signing-utils';
+import { validSignature, signPositionHex } from '../../utils/signing-utils';
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {
@@ -145,9 +147,15 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
           roundBuyIn: "1000",
           balances: ["0", "0"],
         });
+        const positionData = encode(postFundStateA);
+        const positionSignature = signPositionHex(positionData, state.privateKey);
+
+        const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
         return states.aWaitForPostFundSetup({
           ...state,
-          messageOutbox: postFundStateA,
+          lastPosition: { data: positionData, signature: positionSignature },
+          penultimatePosition: state.lastPosition,
+          messageOutbox: sendMessageAction,
         });
       } else {
         return states.bWaitForPostFundSetup(state);
@@ -167,7 +175,6 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
         turnNum: state.turnNum + 1,
         lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
-
       });
     default:
       return state;
@@ -178,16 +185,22 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
   switch (action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
       if (!validPostFundState(state, action)) { return state; }
+
       const postFundStateB = postFundSetupB({
         ...state,
         turnNum: state.turnNum + 1,
         roundBuyIn: "1000",
         balances: ["0", "0"],
       });
+      const positionData = encode(postFundStateB);
+      const positionSignature = signPositionHex(positionData, state.privateKey);
 
+      const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
       return states.acknowledgeFundingSuccess({
         ...state,
-        messageOutbox: postFundStateB,
+        lastPosition: { data: positionData, signature: positionSignature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: sendMessageAction,
       });
     default:
       return state;
@@ -197,7 +210,10 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
 const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSuccess, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
-      return states.waitForUpdate(state);
+      return states.waitForUpdate({
+        ...state,
+        messageOutbox: fundingSuccess(state.channelId),
+      });
     default:
       return state;
   }

@@ -25,7 +25,7 @@ export function* keyLoader() {
   }
   // TODO: This should probably be its own saga? or at least its
   const provider = yield call(getProvider);
-  const network = yield call(provider.getNetwork());
+  const network = yield call(provider.getNetwork);
   yield put(keysLoaded(wallet.address, wallet.privateKey, network.chainId));
 }
 

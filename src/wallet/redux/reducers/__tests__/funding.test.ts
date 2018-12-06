@@ -7,6 +7,7 @@ import * as actions from '../../actions';
 import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
+import * as outgoing from '../../../interface/outgoing';
 
 
 const {
@@ -199,6 +200,7 @@ describe('start in WaitForDepositConfirmation', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
   });
 
   describe('incoming action: deposit confirmed', () => { // player B scenario
@@ -230,6 +232,7 @@ describe('start in BWaitForPostFundSetup', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
   });
 });
 
@@ -250,5 +253,6 @@ describe('start in AcknowledgeFundingSuccess', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+    expect((updatedState.messageOutbox as outgoing.FundingSuccess).type).toEqual(outgoing.FUNDING_SUCCESS);
   });
 });

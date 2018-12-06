@@ -122,10 +122,11 @@ export type InitializationSuccess = ReturnType<typeof initializationSuccess>;
 // =========
 export const SEND_MESSAGE = 'WALLET.MESSAGING.SEND';
 
-export const sendMessage = (to: string, data: string) => ({
+export const sendMessage = (to: string, data: string, signature: string) => ({
   type: SEND_MESSAGE as typeof SEND_MESSAGE,
   to,
   data,
+  signature,
 });
 
 export type SendMessage = ReturnType<typeof sendMessage>;
@@ -139,3 +140,7 @@ export const messageReceived = (positionData: string, signature: string) => ({
 
 
 export type MessageReceived = ReturnType<typeof messageReceived>;
+
+export type ResponseAction =
+  FundingSuccess |
+  SendMessage;
