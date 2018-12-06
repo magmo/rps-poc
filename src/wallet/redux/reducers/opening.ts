@@ -46,7 +46,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data, signature },
-        messageOutbox: signatureSuccess('STILLREQUIRED?', signature),
+        messageOutbox: signatureSuccess(signature),
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -75,7 +75,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         channelNonce: opponentPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data: action.data, signature: action.signature },
-        messageOutbox: validationSuccess('asdas'),
+        messageOutbox: validationSuccess(),
       });
 
     default:
@@ -102,7 +102,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
         turnNum: 1,
         lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
-        messageOutbox: signatureSuccess('STILLREQUIRED?', signature),
+        messageOutbox: signatureSuccess(signature),
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -123,7 +123,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
         turnNum: 1,
         lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
-        messageOutbox: validationSuccess('asda'),
+        messageOutbox: validationSuccess(),
       });
 
     default:

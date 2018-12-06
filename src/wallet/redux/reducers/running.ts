@@ -74,7 +74,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
           turnNum: state.turnNum + 1,
           lastPosition: { data: action.data, signature: action.signature },
           penultimatePosition: state.lastPosition,
-          messageOutbox: validationSuccess('dasd'),
+          messageOutbox: validationSuccess(),
         });
       }
 
