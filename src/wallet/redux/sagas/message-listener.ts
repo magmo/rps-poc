@@ -20,6 +20,9 @@ export function* messageListener() {
     const action = yield take(channel);
 
     switch (action.type) {
+      case incoming.FUNDING_REQUEST:
+        yield put(actions.fundingRequested());
+        break;
       case LOGIN_SUCCESS:
         yield put(actions.loggedIn(action.user.uid));
         break;
