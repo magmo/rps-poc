@@ -16,7 +16,7 @@ interface AdjudicatorEvent {
   eventType: AdjudicatorEventType;
 }
 
-function* createEventChannel(adjudicatorAddress: string, provider)){
+function* createEventChannel(adjudicatorAddress: string, provider){
   const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, adjudicatorAddress, provider);
 
   return eventChannel((emitter) => {

@@ -2,7 +2,7 @@ import { adjudicatorWatcher } from "../redux/sagas/adjudicator-watcher";
 import { ethers } from "ethers";
 import SagaTester from 'redux-saga-tester';
 import * as actions from "../redux/actions";
-import { deployContract, depositContract, createChallenge, concludeGame, fiveFive, refuteChallenge } from './test-utils';
+import { deployContract, depositContract, createChallenge, concludeGame, refuteChallenge } from './test-utils';
 
 jest.setTimeout(20000);
 describe('adjudicator listener', () => {
