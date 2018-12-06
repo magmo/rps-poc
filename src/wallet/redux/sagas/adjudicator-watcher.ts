@@ -8,6 +8,7 @@ enum AdjudicatorEventType {
   FundsReceived,
   ChallengeCreated,
   GameConcluded,
+  Refuted,
 }
 
 interface AdjudicatorEvent {
@@ -15,13 +16,15 @@ interface AdjudicatorEvent {
   eventType: AdjudicatorEventType;
 }
 
-export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
+function* createEventChannel(adjudicatorAddress: string, provider)){
   const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, adjudicatorAddress, provider);
 
-  const channel = eventChannel((emitter) => {
+  return eventChannel((emitter) => {
     const fundReceivedFilter = simpleAdjudicator.filters.FundsReceived();
     const challengeCreatedFilter = simpleAdjudicator.filters.ChallengeCreated();
     const gameConcludedFilter = simpleAdjudicator.filters.GameConcluded();
+    const refutedFilter = simpleAdjudicator.filters.Refuted();
+
     simpleAdjudicator.on(fundReceivedFilter, (amountReceived, sender, adjudicatorBalance) => {
       emitter({ eventType: AdjudicatorEventType.FundsReceived, eventArgs: { amountReceived, sender, adjudicatorBalance } });
     });
@@ -31,15 +34,21 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
     simpleAdjudicator.on(gameConcludedFilter, () => {
       emitter({ eventType: AdjudicatorEventType.GameConcluded, eventArgs: null });
     });
+    simpleAdjudicator.on(refutedFilter,(refuteState)=>{
+      emitter({eventType: AdjudicatorEventType.Refuted, eventArgs:{refuteState}});
+    });
     return () => {
       // This function is called when the channel gets closed
       simpleAdjudicator.removeAllListeners(fundReceivedFilter);
       simpleAdjudicator.removeAllListeners(challengeCreatedFilter);
       simpleAdjudicator.removeAllListeners(gameConcludedFilter);
+      simpleAdjudicator.removeAllListeners(refutedFilter);
     };
   });
-
-
+}
+export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
+ 
+  const channel = yield call(createEventChannel,adjudicatorAddress,provider);
   while (true) {
     const event: AdjudicatorEvent = yield take(channel);
     switch (event.eventType) {
@@ -54,6 +63,9 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
         break;
       case AdjudicatorEventType.GameConcluded:
         yield put(actions.gameConcludedEvent());
+        break;
+      case AdjudicatorEventType.Refuted:
+        yield put(actions.refutedEvent(event.eventArgs.refuteState));
         break;
 
     }

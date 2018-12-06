@@ -295,6 +295,12 @@ export const gameConcludedEvent = () => ({
 });
 export type GameConcludedEvent = ReturnType<typeof gameConcludedEvent>;
 
+export const REFUTED_EVENT = 'REFUTED_EVENT';
+export const refutedEvent = (refuteState) => ({
+  refuteState,
+  type: REFUTED_EVENT as typeof REFUTED_EVENT,
+});
+export type RefutedEvent = ReturnType<typeof refutedEvent>;
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
