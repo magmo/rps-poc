@@ -36,13 +36,12 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       if (ourAddress !== state.address) { return state; }
 
       const signature = signPositionHex(data, state.privateKey);
-
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
         libraryAddress: ownPosition.channel.gameLibrary,
         channelId: ownPosition.channel.id,
-        ourIndex: 0,
+        ourIndex: ownPosition.channel.participants.indexOf(state.address),
         participants: [ourAddress, opponentAddress],
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
@@ -71,7 +70,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         ...state,
         libraryAddress: opponentPosition.channel.gameLibrary,
         channelId: opponentPosition.channel.id,
-        ourIndex: 0,
+        ourIndex: opponentPosition.channel.participants.indexOf(state.address),
         participants: [ourAddress2, opponentAddress2],
         channelNonce: opponentPosition.channel.channelNonce,
         turnNum: 0,
