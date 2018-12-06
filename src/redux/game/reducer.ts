@@ -7,10 +7,10 @@ import { randomHex } from '../../utils/randomHex';
 import { calculateResult, balancesAfterResult, calculateAbsoluteResult, Player, positions } from '../../core';
 import { MessageState, sendMessage } from '../message-service/state';
 import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
-import { InitializationSuccess, INITIALIZATION_SUCCESS } from '../../wallet/redux/actions/_external';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
+import { INITIALIZATION_SUCCESS, InitializationSuccess } from '../../wallet/interface/outgoing';
 
 export interface JointState {
   gameState: states.GameState;
@@ -21,10 +21,10 @@ const emptyJointState: JointState = { messageState: {}, gameState: states.noName
 
 export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
-    const myAddress  =  ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
-    const myName = ('myName' in state.gameState) ? state.gameState.myName: ""; 
-    const newGameState = states.lobby({...state.gameState, myAddress, myName});
-    return {gameState:newGameState, messageState:{}};
+    const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
+    const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
+    const newGameState = states.lobby({ ...state.gameState, myAddress, myName });
+    return { gameState: newGameState, messageState: {} };
   }
   if (action.type === actions.MESSAGE_SENT) {
     const { messageState, gameState } = state;

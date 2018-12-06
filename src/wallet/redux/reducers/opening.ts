@@ -2,7 +2,7 @@ import { State } from 'fmg-core';
 
 import * as states from '../../states';
 import * as actions from '../actions';
-
+import { signatureSuccess, validationSuccess } from '../../interface/outgoing';
 
 import decode from '../../domain/decode';
 import { unreachable } from '../../utils/reducer-utils';
@@ -47,6 +47,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data, signature },
+        messageOutbox: signatureSuccess('STILLREQUIRED?', signature),
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -75,6 +76,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         channelNonce: opponentPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data: action.data, signature: action.signature },
+        messageOutbox: validationSuccess('asdas'),
       });
 
     default:
@@ -101,6 +103,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
         turnNum: 1,
         lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
+        messageOutbox: signatureSuccess('STILLREQUIRED?', signature),
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:

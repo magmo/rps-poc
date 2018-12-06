@@ -186,10 +186,10 @@ function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
   yield put(walletActions.validationRequest(requestId, data, signature));
   const actionFilter = [walletActions.VALIDATION_SUCCESS, walletActions.VALIDATION_FAILURE];
-  let action: walletActions.ValidationResponse = yield take(actionFilter);
-  while (action.requestId !== requestId) {
-    action = yield take(actionFilter);
-  }
+  const action: walletActions.ValidationResponse = yield take(actionFilter);
+  // while (action.requestId !== requestId) {
+  //   action = yield take(actionFilter);
+  // }
   if (action.type === walletActions.VALIDATION_SUCCESS) {
     return true;
   } else {
@@ -204,9 +204,9 @@ function* signMessage(data) {
   yield put(walletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
   const actionFilter = walletActions.SIGNATURE_SUCCESS;
-  let signatureResponse: SignatureSuccess = yield take(actionFilter);
-  while (signatureResponse.requestId !== requestId) {
-    signatureResponse = yield take(actionFilter);
-  }
+  const signatureResponse: SignatureSuccess = yield take(actionFilter);
+  // while (signatureResponse.requestId !== requestId) {
+  //   signatureResponse = yield take(actionFilter);
+  // }
   return signatureResponse.signature;
 }

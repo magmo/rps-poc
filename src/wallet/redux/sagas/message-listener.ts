@@ -30,7 +30,7 @@ export function* messageListener() {
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
       default:
-        // do nothing
+      // do nothing
     }
   }
 }
