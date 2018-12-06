@@ -44,6 +44,7 @@ export function* sagaManager(): IterableIterator<any> {
     // if we have an outgoing message, make sure that the message-sender runs
     if (state.messageOutbox) {
       yield messageSender(state.messageOutbox);
+      state.messageOutbox = undefined;
     }
 
     // if we have an outgoing transaction, make sure that the transaction-sender runs
