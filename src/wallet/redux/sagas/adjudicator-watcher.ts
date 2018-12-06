@@ -3,12 +3,14 @@ import { call, take, put } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import * as actions from "../actions";
 import { ethers } from "ethers";
+import { unreachable } from '../../utils/reducer-utils';
 
 enum AdjudicatorEventType {
   FundsReceived,
   ChallengeCreated,
   GameConcluded,
   Refuted,
+  RespondWithMove,
 }
 
 interface AdjudicatorEvent {
@@ -16,7 +18,7 @@ interface AdjudicatorEvent {
   eventType: AdjudicatorEventType;
 }
 
-function* createEventChannel(adjudicatorAddress: string, provider){
+function* createEventChannel(adjudicatorAddress: string, provider) {
   const simpleAdjudicator: ethers.Contract = yield call(getAdjudicatorContract, adjudicatorAddress, provider);
 
   return eventChannel((emitter) => {
@@ -24,6 +26,7 @@ function* createEventChannel(adjudicatorAddress: string, provider){
     const challengeCreatedFilter = simpleAdjudicator.filters.ChallengeCreated();
     const gameConcludedFilter = simpleAdjudicator.filters.GameConcluded();
     const refutedFilter = simpleAdjudicator.filters.Refuted();
+    const respondWithMoveFilter = simpleAdjudicator.filters.RespondedWithMove();
 
     simpleAdjudicator.on(fundReceivedFilter, (amountReceived, sender, adjudicatorBalance) => {
       emitter({ eventType: AdjudicatorEventType.FundsReceived, eventArgs: { amountReceived, sender, adjudicatorBalance } });
@@ -34,8 +37,11 @@ function* createEventChannel(adjudicatorAddress: string, provider){
     simpleAdjudicator.on(gameConcludedFilter, () => {
       emitter({ eventType: AdjudicatorEventType.GameConcluded, eventArgs: null });
     });
-    simpleAdjudicator.on(refutedFilter,(refuteState)=>{
-      emitter({eventType: AdjudicatorEventType.Refuted, eventArgs:{refuteState}});
+    simpleAdjudicator.on(refutedFilter, (refuteState) => {
+      emitter({ eventType: AdjudicatorEventType.Refuted, eventArgs: { refuteState } });
+    });
+    simpleAdjudicator.on(respondWithMoveFilter, (responseState) => {
+      emitter({ eventType: AdjudicatorEventType.RespondWithMove, eventArgs: { responseState } });
     });
     return () => {
       // This function is called when the channel gets closed
@@ -43,12 +49,13 @@ function* createEventChannel(adjudicatorAddress: string, provider){
       simpleAdjudicator.removeAllListeners(challengeCreatedFilter);
       simpleAdjudicator.removeAllListeners(gameConcludedFilter);
       simpleAdjudicator.removeAllListeners(refutedFilter);
+      simpleAdjudicator.removeAllListeners(respondWithMoveFilter);
     };
   });
 }
 export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
- 
-  const channel = yield call(createEventChannel,adjudicatorAddress,provider);
+
+  const channel = yield call(createEventChannel, adjudicatorAddress, provider);
   while (true) {
     const event: AdjudicatorEvent = yield take(channel);
     switch (event.eventType) {
@@ -67,6 +74,11 @@ export function* adjudicatorWatcher(adjudicatorAddress: string, provider) {
       case AdjudicatorEventType.Refuted:
         yield put(actions.refutedEvent(event.eventArgs.refuteState));
         break;
+      case AdjudicatorEventType.RespondWithMove:
+        yield put(actions.respondWithMoveEvent(event.eventArgs.responseState));
+        break;
+      default:
+        unreachable(event.eventType);
 
     }
 

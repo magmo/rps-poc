@@ -302,6 +302,14 @@ export const refutedEvent = (refuteState) => ({
 });
 export type RefutedEvent = ReturnType<typeof refutedEvent>;
 
+export const RESPOND_WITH_MOVE_EVENT = 'RESPOND_WITH_MOVE_EVENT';
+export const respondWithMoveEvent = (responseState) => ({
+  responseState,
+  type: RESPOND_WITH_MOVE_EVENT as typeof RESPOND_WITH_MOVE_EVENT,
+});
+export type RespondWithMoveEvent = ReturnType<typeof respondWithMoveEvent>;
+
+
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
   | LoggedIn

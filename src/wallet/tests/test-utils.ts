@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { getLibraryAddress } from '../utils/contract-utils';
 import { Channel } from 'fmg-core';
-import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction } from '../utils/transaction-generator';
+import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction, createRespondWithMoveTransaction, createWithdrawTransaction } from '../utils/transaction-generator';
 import { positions, Move, encode } from '../../core';
 import { Signature } from '../domain';
 import { signPositionHex } from '../utils/signing-utils';
@@ -102,7 +102,36 @@ export async function concludeGame(address, channelNonce, participantA, particip
   await transactionReceipt.wait();
 }
 
-export async function refuteChallenge(address, channelNonce, particpantA, particpantB) {
+export async function respondWithMove(address, channelNonce, participantA, participantB) {
+  const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+  const signer = provider.getSigner();
+  const network = await provider.getNetwork();
+  const networkId = network.chainId;
+  const libraryAddress = getLibraryAddress(networkId);
+  const participants = [participantA.address, participantB.address] as [string, string];
+
+  const revealArgs = {
+    turnNum: 7,
+    balances: fourSix,
+    salt: randomHex(64),
+    asMove: Move.Rock,
+    bsMove: Move.Paper,
+    roundBuyIn: '0x1',
+    libraryAddress,
+    channelNonce,
+    participants,
+  };
+
+  const toPosition = encode(positions.reveal(revealArgs));
+  const toSig = new Signature(signPositionHex(toPosition, participantB.privateKey));
+
+  const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toPosition, toSig);
+  const transactionReceipt = await signer.sendTransaction(respondWithMoveTransaction);
+  await transactionReceipt.wait();
+  return toPosition;
+}
+
+export async function refuteChallenge(address, channelNonce, participantA, participantB) {
   const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
   const signer = provider.getSigner();
   const network = await provider.getNetwork();
@@ -112,7 +141,7 @@ export async function refuteChallenge(address, channelNonce, particpantA, partic
     salt: randomHex(64),
     asMove: Move.Rock,
     roundBuyIn: '0x1',
-    participants: [particpantA.address, particpantB.address] as [string, string],
+    participants: [participantA.address, participantB.address] as [string, string],
     turnNum: 100,
     balances: fiveFive,
     channelNonce,
@@ -120,7 +149,7 @@ export async function refuteChallenge(address, channelNonce, particpantA, partic
   };
 
   const toPosition = encode(positions.proposeFromSalt(secondProposeArgs));
-  const toSig = new Signature(signPositionHex(toPosition, particpantA.privateKey));
+  const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
   const refuteTransaction = createRefuteTransaction(address, toPosition, toSig);
   const transactionReceipt = await signer.sendTransaction(refuteTransaction);
   await transactionReceipt.wait();
