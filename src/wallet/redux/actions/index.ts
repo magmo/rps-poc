@@ -270,6 +270,45 @@ export const withdrawalSuccessAcknowledged = () => ({
 });
 export type WithdrawalSuccessAcknowledged = ReturnType<typeof withdrawalSuccessAcknowledged>;
 
+export const FUNDING_RECEIVED_EVENT = 'FUNDING_RECEIVED_EVENT';
+export const fundingReceivedEvent = (amountReceived, sender, adjudicatorBalance) => ({
+  amountReceived,
+  sender,
+  adjudicatorBalance,
+  type: FUNDING_RECEIVED_EVENT as typeof FUNDING_RECEIVED_EVENT,
+});
+export type FundingReceivedEvent = ReturnType<typeof fundingReceivedEvent>;
+
+export const CHALLENGE_CREATED_EVENT = 'CHALLENGE_CREATED_EVENT';
+export const challengeCreatedEvent = (channelId, state, expirationTime, payouts) => ({
+  channelId,
+  state,
+  expirationTime,
+  payouts,
+  type: CHALLENGE_CREATED_EVENT as typeof CHALLENGE_CREATED_EVENT,
+});
+export type ChallengeCreatedEvent = ReturnType<typeof challengeCreatedEvent>;
+
+export const GAME_CONCLUDED_EVENT = 'GAME_CONCLUDED_EVENT';
+export const gameConcludedEvent = () => ({
+  type: GAME_CONCLUDED_EVENT as typeof GAME_CONCLUDED_EVENT,
+});
+export type GameConcludedEvent = ReturnType<typeof gameConcludedEvent>;
+
+export const REFUTED_EVENT = 'REFUTED_EVENT';
+export const refutedEvent = (refuteState) => ({
+  refuteState,
+  type: REFUTED_EVENT as typeof REFUTED_EVENT,
+});
+export type RefutedEvent = ReturnType<typeof refutedEvent>;
+
+export const RESPOND_WITH_MOVE_EVENT = 'RESPOND_WITH_MOVE_EVENT';
+export const respondWithMoveEvent = (responseState) => ({
+  responseState,
+  type: RESPOND_WITH_MOVE_EVENT as typeof RESPOND_WITH_MOVE_EVENT,
+});
+export type RespondWithMoveEvent = ReturnType<typeof respondWithMoveEvent>;
+
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (

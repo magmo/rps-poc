@@ -8,6 +8,7 @@ import { adjudicatorWatcher } from './adjudicator-watcher';
 
 import { SiteState } from '../../../redux/reducer';
 import { WalletState, WAIT_FOR_ADDRESS } from '../../states';
+import { getProvider } from '../../utils/contract-utils';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
@@ -32,7 +33,7 @@ export function* sagaManager(): IterableIterator<any> {
     // if have adjudicator, make sure that the adjudicator watcher is running
     if ('adjudicator' in state) {
       if (!adjudicatorWatcherProcess) {
-        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.adjudicator);
+        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.adjudicator, getProvider());
       }
     } else {
       if (adjudicatorWatcherProcess) {

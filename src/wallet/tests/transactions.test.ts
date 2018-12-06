@@ -75,7 +75,7 @@ describe('transactions', () => {
   });
   it('should deposit into the contract', async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
-    const contractAddress = await deployContract(channel.channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channel.channelNonce, participantA, participantB) as string;
     const depositTransaction = createDepositTransaction(contractAddress, '0x5');
     await testTransactionSender(depositTransaction);
 
@@ -83,7 +83,7 @@ describe('transactions', () => {
   it("should send a forceMove transaction", async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
     const { channelNonce } = channel;
-    const contractAddress = await deployContract(channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
     const baseMoveArgs = {
       salt: randomHex(64),
@@ -118,9 +118,9 @@ describe('transactions', () => {
   it("should send a respondWithMove transaction", async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
     const { channelNonce } = channel;
-    const contractAddress = await deployContract(channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
-    await createChallenge(contractAddress, channelNonce, [participantA, participantB]);
+    await createChallenge(contractAddress, channelNonce, participantA, participantB);
     const revealArgs = {
       turnNum: 7,
       balances: fourSix,
@@ -144,9 +144,9 @@ describe('transactions', () => {
   it("should send a refute transaction", async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
     const { channelNonce } = channel;
-    const contractAddress = await deployContract(channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
-    await createChallenge(contractAddress, channelNonce, [participantA, participantB]);
+    await createChallenge(contractAddress, channelNonce, participantA, participantB);
 
     const secondProposeArgs = {
       salt: randomHex(64),
@@ -169,7 +169,7 @@ describe('transactions', () => {
   it("should send a conclude and withdraw transaction", async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
     const { channelNonce } = channel;
-    const contractAddress = await deployContract(channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
 
     const concludeArgs = {
@@ -205,7 +205,7 @@ describe('transactions', () => {
   it("should send a conclude transaction", async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
     const { channelNonce } = channel;
-    const contractAddress = await deployContract(channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
 
     const concludeArgs = {
@@ -230,9 +230,9 @@ describe('transactions', () => {
   it("should send a withdraw transaction", async () => {
     const channel = new Channel(libraryAddress, getNextNonce(), participants);
     const { channelNonce } = channel;
-    const contractAddress = await deployContract(channelNonce, [participantA, participantB]) as string;
+    const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
-    await concludeGame(contractAddress, channelNonce, [participantA, participantB]);
+    await concludeGame(contractAddress, channelNonce, participantA, participantB);
     const verificationSignature = new Signature(signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey));
     const withdrawTransaction = createWithdrawTransaction(contractAddress, participantA.address, participantA.address, channel.id, verificationSignature);
     await testTransactionSender(withdrawTransaction);
