@@ -1,6 +1,6 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { sendMessage } from '../../interface/outgoing';
+import { sendMessage, fundingSuccess } from '../../interface/outgoing';
 
 import decode from '../../domain/decode';
 import encode from '../../../core/encode';
@@ -185,6 +185,7 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
   switch (action.type) {
     case actions.POST_FUND_SETUP_RECEIVED:
       if (!validPostFundState(state, action)) { return state; }
+
       const postFundStateB = postFundSetupB({
         ...state,
         turnNum: state.turnNum + 1,
@@ -209,7 +210,10 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
 const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSuccess, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
-      return states.waitForUpdate(state);
+      return states.waitForUpdate({
+        ...state,
+        messageOutbox: fundingSuccess(state.channelId),
+      });
     default:
       return state;
   }

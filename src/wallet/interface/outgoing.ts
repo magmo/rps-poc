@@ -142,4 +142,5 @@ export const messageReceived = (positionData: string, signature: string) => ({
 export type MessageReceived = ReturnType<typeof messageReceived>;
 
 export type ResponseAction =
+  FundingSuccess |
   SendMessage;
