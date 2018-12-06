@@ -51,6 +51,8 @@ export function* sagaManager(): IterableIterator<any> {
     // if we have an outgoing transaction, make sure that the transaction-sender runs
     if (state.transactionOutbox) {
       yield transactionSender(state.transactionOutbox);
+      state.transactionOutbox = undefined;
+
     }
   }
 }

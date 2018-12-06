@@ -56,8 +56,8 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
       if (state.ourIndex === 0) {
         // TODO: the deposit should not be hardcoded.
         return states.aWaitForDeployToBeSentToMetaMask({
-          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, '0x5'),
           ...state,
+          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, "0x5"),
         });
       } else {
         return states.bWaitForDeployAddress(state);
