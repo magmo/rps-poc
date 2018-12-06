@@ -129,6 +129,8 @@ function* receiveFromFirebaseSaga(address) {
       } else {
         yield put(gameActions.positionReceived(position));
       }
+    } else {
+      yield put(toWalletActions.receiveMessage(data));
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
