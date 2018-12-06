@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { getLibraryAddress } from '../utils/contract-utils';
 import { Channel } from 'fmg-core';
-import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction, createRespondWithMoveTransaction, createWithdrawTransaction } from '../utils/transaction-generator';
+import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction, createRespondWithMoveTransaction, } from '../utils/transaction-generator';
 import { positions, Move, encode } from '../../core';
 import { Signature } from '../domain';
 import { signPositionHex } from '../utils/signing-utils';
