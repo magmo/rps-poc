@@ -6,6 +6,8 @@ import decode from '../../domain/decode';
 import { State } from 'fmg-core';
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
+import { validationSuccess } from '../../interface/outgoing';
+
 
 export const runningReducer = (state: states.RunningState, action: actions.WalletAction): states.WalletState => {
   return waitForUpdateReducer(state, action);
@@ -63,6 +65,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
           turnNum: state.turnNum + 1,
           lastPosition: { data: action.data, signature: action.signature },
           penultimatePosition: state.lastPosition,
+
         });
       } else {
         // else => running
@@ -71,6 +74,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
           turnNum: state.turnNum + 1,
           lastPosition: { data: action.data, signature: action.signature },
           penultimatePosition: state.lastPosition,
+          messageOutbox: validationSuccess('dasd'),
         });
       }
 

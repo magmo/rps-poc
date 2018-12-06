@@ -124,6 +124,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
         turnNum: 1,
         lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess('asda'),
       });
 
     default:
