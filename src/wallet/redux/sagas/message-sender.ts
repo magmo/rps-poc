@@ -1,4 +1,3 @@
-
-export function* messageSender(message) {
-  // todo
+export function* messageSender(action) {
+  yield put(action);
 }
