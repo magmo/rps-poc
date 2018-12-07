@@ -150,7 +150,7 @@ const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, actio
       return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
         adjudicator: action.deployAddress,
-        transactionOutbox: createDepositTransaction(action.deployAddress, "1000"),
+        transactionOutbox: createDepositTransaction(action.deployAddress, "0x5"),
       });
     default:
       return state;
