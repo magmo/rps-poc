@@ -134,5 +134,4 @@ export type RequestAction =
   SignatureRequest |
   ValidationRequest |
   WithdrawalRequest |
-  CreateChallengeRequest |
-  ReceiveMessage;
+  CreateChallengeRequest;

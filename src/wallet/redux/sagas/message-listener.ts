@@ -32,6 +32,8 @@ export function* messageListener() {
       case incoming.VALIDATION_REQUEST:
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
+      case incoming.RECEIVE_MESSAGE:
+        yield put(actions.deployAddressReceived(action.data));
       default:
       // do nothing
     }
