@@ -13,6 +13,7 @@ import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import SubmitX from '../components/SubmitX';
 import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
+import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
 
 interface Props {
   state: states.FundingState;
@@ -46,13 +47,13 @@ class FundingContainer extends PureComponent<Props> {
       case states.A_SUBMIT_DEPLOY_IN_METAMASK:
         return <SubmitX name="deploy" />;
       case states.B_WAIT_FOR_DEPLOY_ADDRESS:
-        return <WaitForXInitiation name="deploy" />;
+        return <WaitForOtherPlayer name="deployment" />;
       case states.WAIT_FOR_DEPLOY_CONFIRMATION:
         return <WaitForXConfirmation name="deploy" />;
       case states.B_INITIATE_DEPOSIT:
         return <WaitForXInitiation name="deposit" />;
       case states.A_WAIT_FOR_DEPOSIT_INITIATION:
-        return <WaitForXInitiation name="deploy" />;
+        return <WaitForOtherPlayer name="deposit" />;
       case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
         return <WaitForXConfirmation name="deposit" />;
       case states.B_WAIT_FOR_POST_FUND_SETUP:
