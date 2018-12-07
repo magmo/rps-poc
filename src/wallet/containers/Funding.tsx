@@ -44,6 +44,7 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
+        return <WaitForXInitiation name="deploy" />;
       case states.A_SUBMIT_DEPLOY_IN_METAMASK:
         return <SubmitX name="deploy" />;
       case states.WAIT_FOR_DEPLOY_CONFIRMATION:
@@ -55,6 +56,7 @@ class FundingContainer extends PureComponent<Props> {
       case states.B_WAIT_FOR_DEPLOY_ADDRESS:
         return <WaitForOtherPlayer name="deployment" />;
       case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
+        return <SubmitX name="deposit" />;
       case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
         return <WaitForXInitiation name="deposit" />;
       case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
