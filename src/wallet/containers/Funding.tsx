@@ -60,7 +60,11 @@ class FundingContainer extends PureComponent<Props> {
       case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
         return <WaitForXInitiation name="deposit" />;
       case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
-        return <WaitForXConfirmation name="deposit" />;
+        if (state.ourIndex === 0) {
+          return <WaitForOtherPlayer name="deposit" />;
+        } else {
+          return <WaitForXConfirmation name="deposit" />;
+        }
       case states.B_WAIT_FOR_POST_FUND_SETUP:
         return <BWaitForPostFundSetup />;
 
