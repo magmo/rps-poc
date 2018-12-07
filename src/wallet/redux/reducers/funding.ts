@@ -20,20 +20,22 @@ export const fundingReducer = (state: states.FundingState, action: actions.Walle
       return aWaitForDeployToBeSentToMetaMaskReducer(state, action);
     case states.A_SUBMIT_DEPLOY_IN_METAMASK:
       return aSubmitDeployToMetaMaskReducer(state, action);
-    case states.B_WAIT_FOR_DEPLOY_ADDRESS:
-      return bWaitForDeployAddressReducer(state, action);
     case states.WAIT_FOR_DEPLOY_CONFIRMATION:
       return waitForDeployConfirmationReducer(state, action);
-    case states.B_INITIATE_DEPOSIT:
-      return bInitiateDepositReducer(state, action);
-    case states.A_WAIT_FOR_DEPOSIT_INITIATION:
-      return aWaitForDepositInitiationReducer(state, action);
+    case states.A_WAIT_FOR_DEPOSIT:
+      return aWaitForDepositReducer(state, action);
+    case states.A_WAIT_FOR_POST_FUND_SETUP:
+      return aWaitForPostFundSetupReducer(state, action);
+    case states.B_WAIT_FOR_DEPLOY_ADDRESS:
+      return bWaitForDeployAddressReducer(state, action);
+    case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
+      return bWaitForDepositToBeSentToMetaMaskReducer(state, action);
+    case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
+      return bSubmitDepositInMetaMaskReducer(state, action);
     case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
       return waitForDepositConfirmationReducer(state, action);
     case states.B_WAIT_FOR_POST_FUND_SETUP:
       return bWaitForPostFundSetupReducer(state, action);
-    case states.A_WAIT_FOR_POST_FUND_SETUP:
-      return aWaitForPostFundSetupReducer(state, action);
     case states.ACKNOWLEDGE_FUNDING_SUCCESS:
       return acknowledgeFundingSuccessReducer(state, action);
     default:
@@ -79,22 +81,8 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
 const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_SUBMITTED:
-      // TODO: inform opponent of the contract address
       return states.waitForDeployConfirmation({
         ...state,
-        messageOutbox: undefined,
-      });
-    default:
-      return state;
-  }
-};
-
-const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
-  switch (action.type) {
-    case actions.DEPLOY_ADDRESS_RECEIVED:
-      return states.waitForDeployConfirmation({
-        ...state,
-        adjudicator: action.adjudicator,
       });
     default:
       return state;
@@ -104,64 +92,32 @@ const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, actio
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-      if (state.ourIndex === 0) {
-
-        return states.aWaitForDepositInitiation({ ...state, adjudicator: action.contractAddress as string, });
-      } else {
-        // TODO: deposit value should not be hardcoded.
-        return states.bInitiateDeposit({
-          ...state,
-          adjudicator: action.contractAddress as string,
-          transactionOutbox: createDepositTransaction(action.contractAddress as string, "1000"),
-        });
-      }
+      // TODO: send adjudicator address
+      return states.aWaitForDeposit({ ...state, adjudicator: action.contractAddress as string, });
     default:
       return state;
   }
 };
 
-const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions.WalletAction) => {
+const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.TRANSACTION_CONFIRMED:
-      return states.waitForDepositConfirmation(state);
-    default:
-      return state;
-  }
-};
+    case actions.FUNDING_RECEIVED_EVENT:
+      const postFundStateA = postFundSetupA({
+        ...state,
+        turnNum: state.turnNum + 1,
+        roundBuyIn: "1000",
+        balances: ["0", "0"],
+      });
+      const positionData = encode(postFundStateA);
+      const positionSignature = signPositionHex(positionData, state.privateKey);
 
-// TODO Should this exist?
-const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiation, action: actions.WalletAction) => {
-  switch (action.type) {
-    case actions.TRANSACTION_SENT_TO_METAMASK:
-      return states.waitForDepositConfirmation(state);
-    default:
-      return state;
-  }
-};
-
-const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
-  switch (action.type) {
-    case actions.TRANSACTION_CONFIRMED:
-      if (state.ourIndex === 0) {
-        const postFundStateA = postFundSetupA({
-          ...state,
-          turnNum: state.turnNum + 1,
-          roundBuyIn: "1000",
-          balances: ["0", "0"],
-        });
-        const positionData = encode(postFundStateA);
-        const positionSignature = signPositionHex(positionData, state.privateKey);
-
-        const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
-        return states.aWaitForPostFundSetup({
-          ...state,
-          lastPosition: { data: positionData, signature: positionSignature },
-          penultimatePosition: state.lastPosition,
-          messageOutbox: sendMessageAction,
-        });
-      } else {
-        return states.bWaitForPostFundSetup(state);
-      }
+      const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
+      return states.aWaitForPostFundSetup({
+        ...state,
+        lastPosition: { data: positionData, signature: positionSignature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: sendMessageAction,
+      });
     default:
       return state;
   }
@@ -182,6 +138,51 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
       return state;
   }
 };
+
+const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.ADJUDICATOR_ADDRESS_RECEIVED:
+      // TODO: deposit value should not be hardcoded.
+      return states.bWaitForDepositToBeSentToMetaMask({
+        ...state,
+        adjudicator: action.adjudicatorAddress,
+        transactionOutbox: createDepositTransaction(action.adjudicatorAddress, "1000"),
+      });
+    default:
+      return state;
+  }
+};
+
+const bWaitForDepositToBeSentToMetaMaskReducer = (state: states.BWaitForDepositToBeSentToMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_SENT_TO_METAMASK:
+      return states.bSubmitDepositInMetaMask(state);
+    default:
+      return state;
+  }
+};
+
+const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_SUBMITTED:
+      return states.waitForDepositConfirmation(state);
+    default:
+      return state;
+  }
+};
+
+const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_CONFIRMED:
+      return states.bWaitForPostFundSetup(state);
+    default:
+      return state;
+  }
+};
+
+
+
+
 
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {

@@ -8,13 +8,14 @@ export const WAIT_FOR_FUNDING_REQUEST = 'WAIT_FOR_FUNDING_REQUEST';
 export const APPROVE_FUNDING = 'APPROVE_FUNDING';
 export const A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK = 'A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK';
 export const A_SUBMIT_DEPLOY_IN_METAMASK = 'A_SUBMIT_DEPLOY_IN_METAMASK';
-export const B_WAIT_FOR_DEPLOY_ADDRESS = 'B_WAIT_FOR_DEPLOY_ADDRESS';
 export const WAIT_FOR_DEPLOY_CONFIRMATION = 'WAIT_FOR_DEPLOY_CONFIRMATION';
-export const B_INITIATE_DEPOSIT = 'B_INITIATE_DEPOSIT';
-export const A_WAIT_FOR_DEPOSIT_INITIATION = 'A_WAIT_FOR_DEPOSIT_INITIATION';
+export const A_WAIT_FOR_DEPOSIT = 'A_WAIT_FOR_DEPOSIT';
+export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
+export const B_WAIT_FOR_DEPLOY_ADDRESS = 'B_WAIT_FOR_DEPLOY_ADDRESS';
+export const B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK = 'B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK';
+export const B_SUBMIT_DEPOSIT_IN_METAMASK = 'B_SUBMIT_DEPOSIT_IN_METAMASK';
 export const WAIT_FOR_DEPOSIT_CONFIRMATION = 'WAIT_FOR_DEPOSIT_CONFIRMATION';
 export const B_WAIT_FOR_POST_FUND_SETUP = 'B_WAIT_FOR_POST_FUND_SETUP';
-export const A_WAIT_FOR_POST_FUND_SETUP = 'A_WAIT_FOR_POST_FUND_SETUP';
 export const ACKNOWLEDGE_FUNDING_SUCCESS = 'ACKNOWLEDGE_FUNDING_SUCCESS';
 
 export interface WaitForFundingRequest extends ChannelOpen {
@@ -46,13 +47,18 @@ export interface WaitForDeployConfirmation extends ChannelOpen {
   stage: typeof FUNDING;
 }
 
-export interface BInitiateDeposit extends AdjudicatorExists {
-  type: typeof B_INITIATE_DEPOSIT;
+export interface BWaitForDepositToBeSentToMetaMask extends AdjudicatorExists {
+  type: typeof B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK;
   stage: typeof FUNDING;
 }
 
-export interface AWaitForDepositInitiation extends AdjudicatorExists {
-  type: typeof A_WAIT_FOR_DEPOSIT_INITIATION;
+export interface BSubmitDepositInMetaMask extends AdjudicatorExists {
+  type: typeof B_SUBMIT_DEPOSIT_IN_METAMASK;
+  stage: typeof FUNDING;
+}
+
+export interface AWaitForDeposit extends AdjudicatorExists {
+  type: typeof A_WAIT_FOR_DEPOSIT;
   stage: typeof FUNDING;
 }
 
@@ -101,13 +107,18 @@ export function waitForDeployConfirmation<T extends ChannelOpen>(params: T): Wai
   return { type: WAIT_FOR_DEPLOY_CONFIRMATION, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function aWaitForDepositInitiation<T extends AdjudicatorExists>(params: T): AWaitForDepositInitiation {
-  return { type: A_WAIT_FOR_DEPOSIT_INITIATION, stage: FUNDING, ...adjudicatorExists(params) };
+export function aWaitForDeposit<T extends AdjudicatorExists>(params: T): AWaitForDeposit {
+  return { type: A_WAIT_FOR_DEPOSIT, stage: FUNDING, ...adjudicatorExists(params) };
 }
 
-export function bInitiateDeposit<T extends AdjudicatorExists>(params: T): BInitiateDeposit {
-  return { type: B_INITIATE_DEPOSIT, stage: FUNDING, ...adjudicatorExists(params) };
+export function bWaitForDepositToBeSentToMetaMask<T extends AdjudicatorExists>(params: T): BWaitForDepositToBeSentToMetaMask {
+  return { type: B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, stage: FUNDING, ...adjudicatorExists(params) };
 }
+
+export function bSubmitDepositInMetaMask<T extends AdjudicatorExists>(params: T): BSubmitDepositInMetaMask {
+  return { type: B_SUBMIT_DEPOSIT_IN_METAMASK, stage: FUNDING, ...adjudicatorExists(params) };
+}
+
 
 export function waitForDepositConfirmation<T extends AdjudicatorExists>(params: T): WaitForDepositConfirmation {
   return { type: WAIT_FOR_DEPOSIT_CONFIRMATION, stage: FUNDING, ...adjudicatorExists(params) };
@@ -132,8 +143,9 @@ export type FundingState = (
   | ASubmitDeployInMetaMask
   | BWaitForDeployAddress
   | WaitForDeployConfirmation
-  | BInitiateDeposit
-  | AWaitForDepositInitiation
+  | BWaitForDepositToBeSentToMetaMask
+  | BSubmitDepositInMetaMask
+  | AWaitForDeposit
   | WaitForDepositConfirmation
   | BWaitForPostFundSetup
   | AWaitForPostFundSetup

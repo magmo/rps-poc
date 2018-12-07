@@ -35,6 +35,14 @@ export const opponentPositionReceived = (data: string, signature: string) => ({
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
+export const ADJUDICATOR_ADDRESS_RECEIVED = 'WALLET.ADJUDICATOR_ADDRESS_RECEIVED';
+export const adjudicatorAddressReceived = (adjudicatorAddress: string) => ({
+  type: ADJUDICATOR_ADDRESS_RECEIVED as typeof ADJUDICATOR_ADDRESS_RECEIVED,
+  adjudicatorAddress,
+});
+export type AdjudicatorAddressReceived = ReturnType<typeof adjudicatorAddressReceived>;
+
+
 export const FUNDING_REQUESTED = 'WALLET.FUNDING_REQUESTED';
 export const fundingRequested = () => ({
   type: FUNDING_REQUESTED as typeof FUNDING_REQUESTED,
@@ -53,39 +61,6 @@ export const fundingRejected = () => ({
   type: FUNDING_REJECTED as typeof FUNDING_REJECTED,
 });
 export type FundingRejected = ReturnType<typeof fundingRejected>;
-
-export const DEPLOY_SENT_TO_METAMASK = 'WALLET.DEPLOY_SENT_TO_METAMASK'; // when sent to metamask
-export const deploySentToMetaMask = () => ({
-  type: DEPLOY_SENT_TO_METAMASK as typeof DEPLOY_SENT_TO_METAMASK,
-});
-export type DeploySentToMetaMask = ReturnType<typeof deploySentToMetaMask>;
-
-export const DEPLOY_SUBMITTED_IN_METAMASK = 'WALLET.DEPLOY_DEPLOY_SUBMITTED_IN_METAMASK'; // when submitted to network
-export const deploySubmittedInMetaMask = (adjudicator: string) => ({
-  type: DEPLOY_SUBMITTED_IN_METAMASK as typeof DEPLOY_SUBMITTED_IN_METAMASK,
-  adjudicator,
-});
-export type DeploySubmittedInMetaMask = ReturnType<typeof deploySubmittedInMetaMask>;
-
-export const DEPLOY_CONFIRMED = 'WALLET.DEPLOY_CONFIRMED'; // when first seen in a block
-export const deployConfirmed = () => ({
-  type: DEPLOY_CONFIRMED as typeof DEPLOY_CONFIRMED,
-});
-export type DeployConfirmed = ReturnType<typeof deployConfirmed>;
-
-export const DEPLOY_FINALISED = 'WALLET.DEPLOY_FINALISED'; // when X blocks deep
-export const deployFinalised = () => ({
-  type: DEPLOY_FINALISED as typeof DEPLOY_FINALISED,
-});
-export type DeployFinalised = ReturnType<typeof deployFinalised>;
-
-export const DEPLOY_ADDRESS_RECEIVED = 'WALLET.DEPLOY_ADDRESS_RECEIVED';
-export const deployAddressReceived = (adjudicator: string) => ({
-  type: DEPLOY_ADDRESS_RECEIVED as typeof DEPLOY_ADDRESS_RECEIVED,
-  adjudicator,
-});
-export type DeployAddressReceived = ReturnType<typeof deployAddressReceived>;
-
 
 export const DEPOSIT_INITIATED = 'WALLET.DEPOSIT_INITIATED'; // when sent to metamask
 export const depositInitiated = () => ({
@@ -318,10 +293,7 @@ export type WalletAction = (
   | OpponentPositionReceived
   | FundingRequested
   | FundingApproved
-  | DeploySentToMetaMask
-  | DeploySubmittedInMetaMask
-  | DeployConfirmed
-  | DeployAddressReceived
+  | FundingReceivedEvent
   | DepositInitiated
   | DepositConfirmed
   | PostFundSetupReceived
@@ -347,4 +319,5 @@ export type WalletAction = (
   | TransactionConfirmed
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
+  | AdjudicatorAddressReceived
 );
