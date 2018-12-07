@@ -1,5 +1,5 @@
 import { put } from "redux-saga/effects";
-import { transactionSentToMetamask, transactionSubmitted, transactionConfirmed, transactionFinalized, transactionSubmissionFailed } from "../actions";
+import { transactionSentToMetamask, transactionSubmitted, transactionConfirmed, transactionSubmissionFailed, transactionFinalized } from "../actions";
 import { ethers } from "ethers";
 import { getProvider } from "../../utils/contract-utils";
 
@@ -18,7 +18,8 @@ export function* transactionSender(transaction) {
   yield put(transactionSubmitted());
   const confirmedTransaction = yield transactionResult.wait();
   yield put(transactionConfirmed(confirmedTransaction.contractAddress));
-  yield transactionResult.wait(5);
+  // TODO: This does not seem to resolve 
+  // yield transactionResult.wait(5);
   yield put(transactionFinalized());
 
 
