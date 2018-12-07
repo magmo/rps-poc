@@ -41,7 +41,7 @@ export interface BWaitForDeployAddress extends ChannelOpen {
   stage: typeof FUNDING;
 }
 
-export interface WaitForDeployConfirmation extends AdjudicatorExists {
+export interface WaitForDeployConfirmation extends ChannelOpen {
   type: typeof WAIT_FOR_DEPLOY_CONFIRMATION;
   stage: typeof FUNDING;
 }
@@ -97,8 +97,8 @@ export function bWaitForDeployAddress<T extends ChannelOpen>(params: T): BWaitFo
   return { type: B_WAIT_FOR_DEPLOY_ADDRESS, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function waitForDeployConfirmation<T extends AdjudicatorExists>(params: T): WaitForDeployConfirmation {
-  return { type: WAIT_FOR_DEPLOY_CONFIRMATION, stage: FUNDING, ...adjudicatorExists(params) };
+export function waitForDeployConfirmation<T extends ChannelOpen>(params: T): WaitForDeployConfirmation {
+  return { type: WAIT_FOR_DEPLOY_CONFIRMATION, stage: FUNDING, ...channelOpen(params) };
 }
 
 export function aWaitForDepositInitiation<T extends AdjudicatorExists>(params: T): AWaitForDepositInitiation {

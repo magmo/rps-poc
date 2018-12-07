@@ -69,7 +69,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
 
 const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToBeSentToMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPLOY_SENT_TO_METAMASK:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.aSubmitDeployInMetaMask(state);
     default:
       return state;
@@ -78,11 +78,10 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
 
 const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPLOY_SUBMITTED_IN_METAMASK:
+    case actions.TRANSACTION_SUBMITTED:
       // TODO: inform opponent of the contract address
       return states.waitForDeployConfirmation({
         ...state,
-        adjudicator: action.adjudicator,
         messageOutbox: undefined,
       });
     default:
@@ -104,14 +103,16 @@ const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, actio
 
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPLOY_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       if (state.ourIndex === 0) {
-        return states.aWaitForDepositInitiation(state);
+
+        return states.aWaitForDepositInitiation({ ...state, adjudicator: action.contractAddress as string, });
       } else {
         // TODO: deposit value should not be hardcoded.
         return states.bInitiateDeposit({
           ...state,
-          transactionOutbox: createDepositTransaction(state.adjudicator, "1000"),
+          adjudicator: action.contractAddress as string,
+          transactionOutbox: createDepositTransaction(action.contractAddress as string, "1000"),
         });
       }
     default:
@@ -121,16 +122,17 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
 
 const bInitiateDepositReducer = (state: states.BInitiateDeposit, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPOSIT_INITIATED:
+    case actions.TRANSACTION_CONFIRMED:
       return states.waitForDepositConfirmation(state);
     default:
       return state;
   }
 };
 
+// TODO Should this exist?
 const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiation, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPOSIT_INITIATED:
+    case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.waitForDepositConfirmation(state);
     default:
       return state;
@@ -139,7 +141,7 @@ const aWaitForDepositInitiationReducer = (state: states.AWaitForDepositInitiatio
 
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPOSIT_CONFIRMED:
+    case actions.TRANSACTION_CONFIRMED:
       if (state.ourIndex === 0) {
         const postFundStateA = postFundSetupA({
           ...state,
