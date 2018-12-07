@@ -92,8 +92,12 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-      // TODO: send adjudicator address
-      return states.aWaitForDeposit({ ...state, adjudicator: action.contractAddress as string, });
+      const sendAdjudicatorAddressAction = sendMessage(state.participants[1 - state.ourIndex], action.contractAddress as string, "");
+      return states.aWaitForDeposit({
+        ...state,
+        adjudicator: action.contractAddress as string,
+        messageOutbox: sendAdjudicatorAddressAction,
+      });
     default:
       return state;
   }
