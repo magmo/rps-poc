@@ -171,26 +171,17 @@ describe('start in AWaitForPostFundSetup', () => {
 
 describe('start in BWaitForDeployAddress', () => {
   describe('incoming action: message received', () => { // player B scenario
+    const createDepositTxMock = jest.fn();
+    Object.defineProperty(TransactionGenerator, 'createDepositTransaction', { value: createDepositTxMock });
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.bWaitForDeployAddress(testDefaults);
-    const action = actions.adjudicatorAddressReceived("1234");
+    const action = actions.deployAddressReceived("1234");
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    expect(createDepositTxMock.mock.calls.length).toBe(1);
   });
 });
-
-/*describe('incoming action: transaction confirmed', () => { // player B scenario
-  const createDepositTxMock = jest.fn();
-  Object.defineProperty(TransactionGenerator, 'createDepositTransaction', { value: createDepositTxMock });
-  const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
-  const state = states.waitForDeployConfirmation(testDefaults);
-  const action = actions.transactionConfirmed();
-  const updatedState = walletReducer(state, action);
-
-  itTransitionsToStateType(states.B_INITIATE_DEPOSIT, updatedState);
-  expect(createDepositTxMock.mock.calls.length).toBe(1);
-});*/
 
 describe('start in BWaitForDepositToBeSentToMetaMask', () => {
   describe('incoming action: transaction sent to metamask', () => { // player B scenario

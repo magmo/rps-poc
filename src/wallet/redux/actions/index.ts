@@ -35,12 +35,12 @@ export const opponentPositionReceived = (data: string, signature: string) => ({
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
-export const ADJUDICATOR_ADDRESS_RECEIVED = 'WALLET.ADJUDICATOR_ADDRESS_RECEIVED';
-export const adjudicatorAddressReceived = (adjudicatorAddress: string) => ({
-  type: ADJUDICATOR_ADDRESS_RECEIVED as typeof ADJUDICATOR_ADDRESS_RECEIVED,
-  adjudicatorAddress,
+export const DEPLOY_ADDRESS_RECEIVED = 'WALLET.DEPLOY_ADDRESS_RECEIVED';
+export const deployAddressReceived = (deployAddress: string) => ({
+  type: DEPLOY_ADDRESS_RECEIVED as typeof DEPLOY_ADDRESS_RECEIVED,
+  deployAddress,
 });
-export type AdjudicatorAddressReceived = ReturnType<typeof adjudicatorAddressReceived>;
+export type DeployAddressReceived = ReturnType<typeof deployAddressReceived>;
 
 
 export const FUNDING_REQUESTED = 'WALLET.FUNDING_REQUESTED';
@@ -319,5 +319,5 @@ export type WalletAction = (
   | TransactionConfirmed
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
-  | AdjudicatorAddressReceived
+  | DeployAddressReceived
 );

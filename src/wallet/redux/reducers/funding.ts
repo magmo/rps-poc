@@ -141,12 +141,12 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 
 const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.ADJUDICATOR_ADDRESS_RECEIVED:
+    case actions.DEPLOY_ADDRESS_RECEIVED:
       // TODO: deposit value should not be hardcoded.
       return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
-        adjudicator: action.adjudicatorAddress,
-        transactionOutbox: createDepositTransaction(action.adjudicatorAddress, "1000"),
+        adjudicator: action.deployAddress,
+        transactionOutbox: createDepositTransaction(action.deployAddress, "1000"),
       });
     default:
       return state;
@@ -179,10 +179,6 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
       return state;
   }
 };
-
-
-
-
 
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
