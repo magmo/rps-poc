@@ -39,7 +39,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
-        libraryAddress: ownPosition.channel.gameLibrary,
+        libraryAddress: ownPosition.channel.channelType,
         channelId: ownPosition.channel.id,
         ourIndex: ownPosition.channel.participants.indexOf(state.address),
         participants: [ourAddress, opponentAddress],
@@ -68,7 +68,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
-        libraryAddress: opponentPosition.channel.gameLibrary,
+        libraryAddress: opponentPosition.channel.channelType,
         channelId: opponentPosition.channel.id,
         ourIndex: opponentPosition.channel.participants.indexOf(state.address),
         participants: [ourAddress2, opponentAddress2],
