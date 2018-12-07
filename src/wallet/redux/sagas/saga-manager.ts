@@ -33,7 +33,8 @@ export function* sagaManager(): IterableIterator<any> {
     // if have adjudicator, make sure that the adjudicator watcher is running
     if ('adjudicator' in state) {
       if (!adjudicatorWatcherProcess) {
-        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.adjudicator, getProvider());
+        const provider = yield getProvider();
+        adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.adjudicator, provider);
       }
     } else {
       if (adjudicatorWatcherProcess) {
