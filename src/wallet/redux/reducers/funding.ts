@@ -135,7 +135,7 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
       if (!action.signature) { return state; }
-      if (!validPostFundState(state, action)) { return state; }
+      if (!validPostFundState(state, action.data, action.signature)) { return state; }
 
       return states.acknowledgeFundingSuccess({
         ...state,
@@ -182,8 +182,14 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
 
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.MESSAGE_RECEIVED:
+      return states.waitForDepositConfirmation({ ...state, postFundSetupPosition: action.data, postFundSetupSignature: action.signature });
     case actions.TRANSACTION_CONFIRMED:
-      return states.bWaitForPostFundSetup(state);
+      if (state.postFundSetupPosition) {
+        return handlePostFundSetup(state, state.postFundSetupPosition, state.postFundSetupSignature);
+      } else {
+        return states.bWaitForPostFundSetup(state);
+      }
     default:
       return state;
   }
@@ -192,25 +198,7 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      if (!action.signature) { return state; }
-      if (!validPostFundState(state, action)) { return state; }
-
-      const postFundStateB = postFundSetupB({
-        ...state,
-        turnNum: state.turnNum + 1,
-        roundBuyIn: "1000",
-        balances: ["0", "0"],
-      });
-      const positionData = encode(postFundStateB);
-      const positionSignature = signPositionHex(positionData, state.privateKey);
-
-      const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
-      return states.acknowledgeFundingSuccess({
-        ...state,
-        lastPosition: { data: positionData, signature: positionSignature },
-        penultimatePosition: state.lastPosition,
-        messageOutbox: sendMessageAction,
-      });
+      return handlePostFundSetup(state, action.data, action.signature);
     default:
       return state;
   }
@@ -228,11 +216,35 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
   }
 };
 
-const validPostFundState = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup, action: actions.MessageReceived) => {
-  const postFundBPosition = decode(action.data);
+const handlePostFundSetup = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup | states.WaitForDepositConfirmation,
+  data: string, signature: string | undefined) => {
+  if (!signature) { return state; }
+  if (!validPostFundState(state, data, signature)) { return state; }
+
+  const postFundStateB = postFundSetupB({
+    ...state,
+    turnNum: state.turnNum + 1,
+    roundBuyIn: "1000",
+    balances: ["0", "0"],
+  });
+  const positionData = encode(postFundStateB);
+  const positionSignature = signPositionHex(positionData, state.privateKey);
+
+  const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
+  return states.acknowledgeFundingSuccess({
+    ...state,
+    lastPosition: { data: positionData, signature: positionSignature },
+    penultimatePosition: state.lastPosition,
+    messageOutbox: sendMessageAction,
+  });
+};
+
+const validPostFundState = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup | states.WaitForDepositConfirmation,
+  data, signature) => {
+  const postFundBPosition = decode(data);
   const opponentAddress = state.participants[1 - state.ourIndex];
-  if (!action.signature) { return state; }
-  if (!validSignature(action.data, action.signature, opponentAddress)) { return false; }
+  if (!signature) { return state; }
+  if (!validSignature(data, signature, opponentAddress)) { return false; }
   // check transition
   if (!validTransition(state, postFundBPosition)) { return false; }
   return true;

@@ -8,6 +8,7 @@ import decode from '../../domain/decode';
 import { unreachable } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 
+
 export const openingReducer = (state: states.OpeningState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {
     case states.WAIT_FOR_CHANNEL:
@@ -31,7 +32,6 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       if (ownPosition.stateCount !== 0) { return state; }
 
       const ourAddress = ownPosition.channel.participants[0] as string;
-      const opponentAddress = ownPosition.channel.participants[1] as string;
 
       if (ourAddress !== state.address) { return state; }
 
@@ -42,7 +42,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         libraryAddress: ownPosition.channel.channelType,
         channelId: ownPosition.channel.id,
         ourIndex: ownPosition.channel.participants.indexOf(state.address),
-        participants: [ourAddress, opponentAddress],
+        participants: ownPosition.channel.participants,
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data, signature },
@@ -71,7 +71,7 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
         libraryAddress: opponentPosition.channel.channelType,
         channelId: opponentPosition.channel.id,
         ourIndex: opponentPosition.channel.participants.indexOf(state.address),
-        participants: [ourAddress2, opponentAddress2],
+        participants: opponentPosition.channel.participants,
         channelNonce: opponentPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data: action.data, signature: action.signature },
