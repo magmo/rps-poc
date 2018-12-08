@@ -106,6 +106,10 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
 const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
+      // TODO: Instead of a hardcoded value this should check if the balance is 2 * the deposiot amount
+      if (action.adjudicatorBalance !== '0x0a') {
+        return state;
+      }
       const postFundStateA = postFundSetupA({
         ...state,
         turnNum: state.turnNum + 1,
