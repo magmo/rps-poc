@@ -129,7 +129,8 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
 
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.POST_FUND_SETUP_RECEIVED:
+    case actions.MESSAGE_RECEIVED:
+      if (!action.signature) { return state; }
       if (!validPostFundState(state, action)) { return state; }
 
       return states.acknowledgeFundingSuccess({
@@ -145,12 +146,12 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 
 const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.DEPLOY_ADDRESS_RECEIVED:
+    case actions.MESSAGE_RECEIVED:
       // TODO: deposit value should not be hardcoded.
       return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
-        adjudicator: action.deployAddress,
-        transactionOutbox: createDepositTransaction(action.deployAddress, "0x5"),
+        adjudicator: action.data,
+        transactionOutbox: createDepositTransaction(action.data, "0x5"),
       });
     default:
       return state;
@@ -186,7 +187,8 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
-    case actions.POST_FUND_SETUP_RECEIVED:
+    case actions.MESSAGE_RECEIVED:
+      if (!action.signature) { return state; }
       if (!validPostFundState(state, action)) { return state; }
 
       const postFundStateB = postFundSetupB({
@@ -222,9 +224,10 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
   }
 };
 
-const validPostFundState = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup, action: actions.PostFundSetupReceived) => {
+const validPostFundState = (state: states.AWaitForPostFundSetup | states.BWaitForPostFundSetup, action: actions.MessageReceived) => {
   const postFundBPosition = decode(action.data);
   const opponentAddress = state.participants[1 - state.ourIndex];
+  if (!action.signature) { return state; }
   if (!validSignature(action.data, action.signature, opponentAddress)) { return false; }
   // check transition
   if (!validTransition(state, postFundBPosition)) { return false; }

@@ -35,12 +35,13 @@ export const opponentPositionReceived = (data: string, signature: string) => ({
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
-export const DEPLOY_ADDRESS_RECEIVED = 'WALLET.DEPLOY_ADDRESS_RECEIVED';
-export const deployAddressReceived = (deployAddress: string) => ({
-  type: DEPLOY_ADDRESS_RECEIVED as typeof DEPLOY_ADDRESS_RECEIVED,
-  deployAddress,
+export const MESSAGE_RECEIVED = 'WALLET.MESSAGE_RECEIVED';
+export const messageReceived = (data: string, signature?: string) => ({
+  type: MESSAGE_RECEIVED as typeof MESSAGE_RECEIVED,
+  data,
+  signature,
 });
-export type DeployAddressReceived = ReturnType<typeof deployAddressReceived>;
+export type MessageReceived = ReturnType<typeof messageReceived>;
 
 
 export const FUNDING_REQUESTED = 'WALLET.FUNDING_REQUESTED';
@@ -319,5 +320,5 @@ export type WalletAction = (
   | TransactionConfirmed
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
-  | DeployAddressReceived
+  | MessageReceived
 );

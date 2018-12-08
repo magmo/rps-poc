@@ -175,7 +175,7 @@ describe('start in BWaitForDeployAddress', () => {
     Object.defineProperty(TransactionGenerator, 'createDepositTransaction', { value: createDepositTxMock });
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.bWaitForDeployAddress(testDefaults);
-    const action = actions.deployAddressReceived("1234");
+    const action = actions.messageReceived("1234");
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);

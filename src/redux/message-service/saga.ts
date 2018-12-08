@@ -34,8 +34,8 @@ export function* sendWalletMessageSaga() {
   while (true) {
     const action = yield take(fromWalletActions.SEND_MESSAGE);
     const queue = Queue.WALLET;
-    const { data, to } = action;
-    const message = { data, queue };
+    const { data, to, signature } = action;
+    const message = { data, queue, signature };
     yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
   }
 }
@@ -130,7 +130,8 @@ function* receiveFromFirebaseSaga(address) {
         yield put(gameActions.positionReceived(position));
       }
     } else {
-      yield put(toWalletActions.receiveMessage(data));
+      const { signature } = message.value;
+      yield put(toWalletActions.receiveMessage(data, signature));
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }

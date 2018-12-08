@@ -106,9 +106,10 @@ export type CreateChallengeRequest = ReturnType<typeof createChallenge>;
 // wallet meant for wallet-to-wallet communication (e.g. communicating the address of the
 // adjudicator).
 export const RECEIVE_MESSAGE = 'WALLET.MESSAGING.RECEIVE';
-export const receiveMessage = (data: string) => ({
+export const receiveMessage = (data: string, signature?: string) => ({
   type: RECEIVE_MESSAGE,
   data,
+  signature,
 });
 export type ReceiveMessage = ReturnType<typeof receiveMessage>;
 

@@ -33,7 +33,7 @@ export function* messageListener() {
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
-        yield put(actions.deployAddressReceived(action.data));
+        yield put(actions.messageReceived(action.data, action.signature));
       default:
       // do nothing
     }
