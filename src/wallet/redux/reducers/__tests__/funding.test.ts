@@ -8,6 +8,7 @@ import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as outgoing from '../../../interface/outgoing';
+import { WaitForDepositConfirmation } from '../../../states';
 
 
 const {
@@ -21,6 +22,7 @@ const {
   participants,
   preFundSetupAHex,
   preFundSetupBHex,
+  preFundSetupBSig,
   postFundSetupAHex,
   postFundSetupBHex,
   postFundSetupASig,
@@ -51,20 +53,20 @@ const defaultsB = {
 };
 
 const justReceivedPreFundSetupB = {
-  penultimatePosition: { data: preFundSetupAHex, signature: 'fake-sig' },
-  lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
+  penultimatePosition: { data: preFundSetupAHex, signature: '0xDEADBEEF' },
+  lastPosition: { data: preFundSetupBHex, signature: preFundSetupBSig },
   turnNum: 1,
 };
 
 const justReceivedPostFundSetupA = {
-  penultimatePosition: { data: preFundSetupBHex, signature: 'fake-sig' },
-  lastPosition: { data: postFundSetupAHex, signature: 'fake-sig' },
+  penultimatePosition: { data: preFundSetupBHex, signature: '0xDEADBEEF' },
+  lastPosition: { data: postFundSetupAHex, signature: '0xDEADBEEF' },
   turnNum: 2,
 };
 
 const justReceivedPostFundSetupB = {
-  penultimatePosition: { data: postFundSetupAHex, signature: 'fake-sig' },
-  lastPosition: { data: postFundSetupBHex, signature: 'fake-sig' },
+  penultimatePosition: { data: postFundSetupAHex, signature: '0xDEADBEEF' },
+  lastPosition: { data: postFundSetupBHex, signature: '0xDEADBEEF' },
   turnNum: 3,
 };
 
@@ -151,7 +153,7 @@ describe('start in AWaitForDeposit', () => {
   describe('incoming action: funding received event', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.aWaitForDeposit(testDefaults);
-    const action = actions.fundingReceivedEvent(1000, bsAddress, 1000);
+    const action = actions.fundingReceivedEvent(1000, bsAddress, '0x0a');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
@@ -159,10 +161,10 @@ describe('start in AWaitForDeposit', () => {
 });
 
 describe('start in AWaitForPostFundSetup', () => {
-  describe('incoming action: B post fund setup', () => { // player A scenario
+  describe('incoming action: message received', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPostFundSetupA };
     const state = states.aWaitForPostFundSetup(testDefaults);
-    const action = actions.postFundSetupReceived(postFundSetupBHex, postFundSetupBSig);
+    const action = actions.messageReceived(postFundSetupBHex, postFundSetupBSig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
@@ -215,13 +217,33 @@ describe('start in WaitForDepositConfirmation', () => {
 
     itTransitionsToStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
   });
+
+  describe('incoming action: deposit confirmed', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPostFundSetupA };
+    const state = states.waitForDepositConfirmation(testDefaults);
+    const action = actions.transactionConfirmed();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+  });
+
+
+  describe('incoming action: message received', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPostFundSetupA };
+    const state = states.waitForDepositConfirmation(testDefaults);
+    const action = actions.messageReceived(postFundSetupAHex, postFundSetupASig);
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
+    expect((updatedState as WaitForDepositConfirmation).lastPosition.data).toEqual(postFundSetupAHex);
+  });
 });
 
 describe('start in BWaitForPostFundSetup', () => {
-  describe('incoming action: A post fund setup', () => { // player B scenario
+  describe('incoming action: message received', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.bWaitForPostFundSetup(testDefaults);
-    const action = actions.postFundSetupReceived(postFundSetupAHex, postFundSetupASig);
+    const action = actions.messageReceived(postFundSetupAHex, postFundSetupASig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);

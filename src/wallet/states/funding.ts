@@ -1,4 +1,4 @@
-import { AdjudicatorExists, ChannelOpen, channelOpen, adjudicatorExists, postFundSetupReceived, PostFundSetupReceived, } from './shared';
+import { AdjudicatorExists, ChannelOpen, channelOpen, adjudicatorExists, } from './shared';
 
 // stage
 export const FUNDING = 'FUNDING';
@@ -62,7 +62,7 @@ export interface AWaitForDeposit extends AdjudicatorExists {
   stage: typeof FUNDING;
 }
 
-export interface WaitForDepositConfirmation extends PostFundSetupReceived {
+export interface WaitForDepositConfirmation extends AdjudicatorExists {
   type: typeof WAIT_FOR_DEPOSIT_CONFIRMATION;
   stage: typeof FUNDING;
 }
@@ -73,7 +73,7 @@ export interface AWaitForPostFundSetup extends AdjudicatorExists {
   stage: typeof FUNDING;
 }
 
-export interface BWaitForPostFundSetup extends PostFundSetupReceived {
+export interface BWaitForPostFundSetup extends AdjudicatorExists {
   type: typeof B_WAIT_FOR_POST_FUND_SETUP;
   stage: typeof FUNDING;
 }
@@ -119,16 +119,15 @@ export function bSubmitDepositInMetaMask<T extends AdjudicatorExists>(params: T)
   return { type: B_SUBMIT_DEPOSIT_IN_METAMASK, stage: FUNDING, ...adjudicatorExists(params) };
 }
 
-
-export function waitForDepositConfirmation<T extends PostFundSetupReceived>(params: T): WaitForDepositConfirmation {
-  return { type: WAIT_FOR_DEPOSIT_CONFIRMATION, stage: FUNDING, ...postFundSetupReceived(params) };
+export function waitForDepositConfirmation<T extends AdjudicatorExists>(params: T): WaitForDepositConfirmation {
+  return { type: WAIT_FOR_DEPOSIT_CONFIRMATION, stage: FUNDING, ...adjudicatorExists(params) };
 }
 
 export function aWaitForPostFundSetup<T extends AdjudicatorExists>(params: T): AWaitForPostFundSetup {
   return { type: A_WAIT_FOR_POST_FUND_SETUP, stage: FUNDING, ...adjudicatorExists(params) };
 }
 
-export function bWaitForPostFundSetup<T extends PostFundSetupReceived>(params: T): BWaitForPostFundSetup {
+export function bWaitForPostFundSetup<T extends AdjudicatorExists>(params: T): BWaitForPostFundSetup {
   return { type: B_WAIT_FOR_POST_FUND_SETUP, stage: FUNDING, ...adjudicatorExists(params) };
 }
 

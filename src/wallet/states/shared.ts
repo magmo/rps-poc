@@ -39,11 +39,6 @@ export interface AdjudicatorExists extends ChannelOpen {
   adjudicator: string;
 }
 
-export interface PostFundSetupReceived extends AdjudicatorExists {
-  postFundSetupPosition?: string;
-  postFundSetupSignature?: string;
-}
-
 // creators
 export function base<T extends Base>(params: T): Base {
   const { messageOutbox, transactionOutbox } = params;
@@ -71,9 +66,4 @@ export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
 
 export function adjudicatorExists<T extends AdjudicatorExists>(params: T): AdjudicatorExists {
   return { ...channelOpen(params), adjudicator: params.adjudicator };
-}
-
-export function postFundSetupReceived<T extends PostFundSetupReceived>(params: T): PostFundSetupReceived {
-  const { postFundSetupPosition, postFundSetupSignature } = params;
-  return { ...adjudicatorExists(params), postFundSetupPosition, postFundSetupSignature };
 }
