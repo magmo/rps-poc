@@ -1,4 +1,4 @@
-import { AdjudicatorExists, ChannelOpen, channelOpen, adjudicatorExists, } from './shared';
+import { AdjudicatorExists, ChannelOpen, channelOpen, adjudicatorExists, AdjudicatorMightExist, adjudicatorMightExist, } from './shared';
 
 // stage
 export const FUNDING = 'FUNDING';
@@ -23,7 +23,7 @@ export interface WaitForFundingRequest extends ChannelOpen {
   stage: typeof FUNDING;
 }
 
-export interface ApproveFunding extends ChannelOpen {
+export interface ApproveFunding extends AdjudicatorMightExist {
   type: typeof APPROVE_FUNDING;
   stage: typeof FUNDING;
 }
@@ -87,8 +87,8 @@ export function waitForFundingRequest<T extends ChannelOpen>(params: T): WaitFor
   return { type: WAIT_FOR_FUNDING_REQUEST, stage: FUNDING, ...channelOpen(params) };
 }
 
-export function approveFunding<T extends ChannelOpen>(params: T): ApproveFunding {
-  return { type: APPROVE_FUNDING, stage: FUNDING, ...channelOpen(params) };
+export function approveFunding<T extends AdjudicatorMightExist>(params: T): ApproveFunding {
+  return { type: APPROVE_FUNDING, stage: FUNDING, ...adjudicatorMightExist(params) };
 }
 
 export function aWaitForDeployToBeSentToMetaMask<T extends ChannelOpen>(params: T): AWaitForDeployToBeSentToMetaMask {

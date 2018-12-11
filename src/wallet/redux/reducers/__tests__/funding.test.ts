@@ -8,7 +8,7 @@ import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as outgoing from '../../../interface/outgoing';
-import { WaitForDepositConfirmation } from '../../../states';
+import { ApproveFunding, WaitForDepositConfirmation } from '../../../states';
 
 
 const {
@@ -105,8 +105,8 @@ describe('start in ApproveFunding', () => {
     expect(createDeployTxMock.mock.calls.length).toBe(1);
   });
 
-  describe('action taken: funding approved', () => { // player B scenario
-    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
+  describe('action taken: funding approved, adjudicator address not received', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB, adjudicator: undefined };
     const state = states.approveFunding(testDefaults);
     const action = actions.fundingApproved();
     const updatedState = walletReducer(state, action);
@@ -114,6 +114,25 @@ describe('start in ApproveFunding', () => {
     itTransitionsToStateType(states.B_WAIT_FOR_DEPLOY_ADDRESS, updatedState);
   });
 
+  describe('action taken: funding approved, adjudicator address received', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
+    const state = states.approveFunding(testDefaults);
+    const action = actions.fundingApproved();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+  });
+
+
+  describe('action taken: message received', () => { // player B scenario
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
+    const state = states.approveFunding(testDefaults);
+    const action = actions.messageReceived("1234");
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.APPROVE_FUNDING, updatedState);
+    expect((updatedState as ApproveFunding).adjudicator).toEqual("1234");
+  });
 });
 
 describe('start in aWaitForDeployToBeSentToMetaMask', () => {

@@ -62,7 +62,21 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
           transactionOutbox: createDeployTransaction(state.networkId, state.channelId, "0x5"),
         });
       } else {
-        return states.bWaitForDeployAddress(state);
+        if (!state.adjudicator) {
+          return states.bWaitForDeployAddress(state);
+        }
+        return states.bWaitForDepositToBeSentToMetaMask({
+          ...state,
+          adjudicator: state.adjudicator as string,
+          transactionOutbox: createDepositTransaction(state.adjudicator as string, "0x5"),
+        });
+      }
+    case actions.MESSAGE_RECEIVED:
+      if (state.ourIndex === 1) {
+        return states.approveFunding({
+          ...state,
+          adjudicator: action.data,
+        });
       }
     default:
       return state;

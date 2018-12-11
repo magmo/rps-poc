@@ -35,6 +35,10 @@ export interface ChannelOpen extends ChannelPartiallyOpen {
   penultimatePosition: SignedPosition;
 }
 
+export interface AdjudicatorMightExist extends ChannelOpen {
+  adjudicator?: string;
+}
+
 export interface AdjudicatorExists extends ChannelOpen {
   adjudicator: string;
 }
@@ -62,6 +66,10 @@ export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T):
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
   const { penultimatePosition } = params;
   return { ...channelPartiallyOpen(params), penultimatePosition };
+}
+
+export function adjudicatorMightExist<T extends AdjudicatorMightExist>(params: T): AdjudicatorMightExist {
+  return { ...channelOpen(params), adjudicator: params.adjudicator };
 }
 
 export function adjudicatorExists<T extends AdjudicatorExists>(params: T): AdjudicatorExists {
