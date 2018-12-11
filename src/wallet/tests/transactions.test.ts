@@ -54,8 +54,8 @@ describe('transactions', () => {
     saga.next();
     expect(saga.next(confirmedTransaction).value).toEqual(put(transactionConfirmed(confirmedTransaction.contractAddress)));
 
-    saga.next();
-    expect(saga.next(confirmedTransaction).value).toEqual(put(transactionFinalized()));
+    //  saga.next();
+    expect(saga.next().value).toEqual(put(transactionFinalized()));
     expect(saga.next().done).toBe(true);
 
   }
