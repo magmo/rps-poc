@@ -11,6 +11,7 @@ import {
 
 import { WalletAction, KEYS_LOADED, LOGGED_IN } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
+import { initializationSuccess } from '../actions/_external';
 
 export const initializingReducer = (state: InitializingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -37,7 +38,10 @@ const waitForAddressReducer = (state: WaitForAddress, action: any) => {
   switch (action.type) {
     case KEYS_LOADED:
       const { address, privateKey, networkId } = action;
-      return waitForChannel({ ...state, address, privateKey, networkId });
+      return waitForChannel({
+        ...state, address, privateKey, networkId,
+        messageOutbox: initializationSuccess(address),
+      });
     default:
       return state;
   }

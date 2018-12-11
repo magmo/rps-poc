@@ -42,13 +42,11 @@ export type ChannelClosed = ReturnType<typeof channelClosed>;
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 
-export const validationSuccess = (requestId: string) => ({
+export const validationSuccess = () => ({
   type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
-  requestId,
 });
-export const validationFailure = (requestId: string, reason: string) => ({
+export const validationFailure = (reason: string) => ({
   type: VALIDATION_FAILURE as typeof VALIDATION_FAILURE,
-  requestId,
   reason,
 });
 
@@ -63,14 +61,12 @@ export type ValidationResponse = ValidationSuccess | ValidationFailure;
 export const SIGNATURE_SUCCESS = 'WALLET.SIGNATURE.SUCCESS';
 export const SIGNATURE_FAILURE = 'WALLET.SIGNATURE.FAILURE';
 
-export const signatureSuccess = (requestId: string, signature: string) => ({
+export const signatureSuccess = (signature: string) => ({
   type: SIGNATURE_SUCCESS as typeof SIGNATURE_SUCCESS,
-  requestId,
   signature,
 });
-export const signatureFailure = (requestId: string, reason: string) => ({
+export const signatureFailure = (reason: string) => ({
   type: SIGNATURE_FAILURE as typeof SIGNATURE_FAILURE,
-  requestId,
   reason,
 });
 
@@ -142,5 +138,8 @@ export const messageReceived = (positionData: string, signature: string) => ({
 export type MessageReceived = ReturnType<typeof messageReceived>;
 
 export type ResponseAction =
+  InitializationSuccess |
+  ValidationSuccess |
   FundingSuccess |
+  SignatureSuccess |
   SendMessage;

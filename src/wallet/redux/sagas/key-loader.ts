@@ -5,6 +5,7 @@ import ChannelWallet from '../../domain/ChannelWallet';
 import { SiteState } from '../../../redux/reducer';
 import { keysLoaded } from '../actions';
 import { getProvider } from '../../utils/contract-utils';
+import { ethers } from 'ethers';
 
 
 interface WalletParams {
@@ -24,8 +25,8 @@ export function* keyLoader() {
     wallet = yield* fetchWallet(uid);
   }
   // TODO: This should probably be its own saga? or at least its
-  const provider = yield call(getProvider);
-  const network = yield call(provider.getNetwork);
+  const provider: ethers.providers.BaseProvider = yield call(getProvider);
+  const network = yield provider.getNetwork();
   yield put(keysLoaded(wallet.address, wallet.privateKey, network.chainId));
 }
 

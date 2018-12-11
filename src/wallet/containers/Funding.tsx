@@ -13,6 +13,7 @@ import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import SubmitX from '../components/SubmitX';
 import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
+import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
 
 interface Props {
   state: states.FundingState;
@@ -43,22 +44,30 @@ class FundingContainer extends PureComponent<Props> {
           />
         );
       case states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
+        return <WaitForXInitiation name="deploy" />;
       case states.A_SUBMIT_DEPLOY_IN_METAMASK:
         return <SubmitX name="deploy" />;
-      case states.B_WAIT_FOR_DEPLOY_ADDRESS:
-        return <WaitForXInitiation name="deploy" />;
       case states.WAIT_FOR_DEPLOY_CONFIRMATION:
         return <WaitForXConfirmation name="deploy" />;
-      case states.B_INITIATE_DEPOSIT:
-        return <WaitForXInitiation name="deposit" />;
-      case states.A_WAIT_FOR_DEPOSIT_INITIATION:
-        return <WaitForXInitiation name="deploy" />;
-      case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
-        return <WaitForXConfirmation name="deposit" />;
-      case states.B_WAIT_FOR_POST_FUND_SETUP:
-        return <BWaitForPostFundSetup />;
+      case states.A_WAIT_FOR_DEPOSIT:
+        return <WaitForOtherPlayer name="deposit" />;
       case states.A_WAIT_FOR_POST_FUND_SETUP:
         return <AWaitForPostFundSetup />;
+      case states.B_WAIT_FOR_DEPLOY_ADDRESS:
+        return <WaitForOtherPlayer name="deployment" />;
+      case states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK:
+        return <SubmitX name="deposit" />;
+      case states.B_SUBMIT_DEPOSIT_IN_METAMASK:
+        return <WaitForXInitiation name="deposit" />;
+      case states.WAIT_FOR_DEPOSIT_CONFIRMATION:
+        if (state.ourIndex === 0) {
+          return <WaitForOtherPlayer name="deposit" />;
+        } else {
+          return <WaitForXConfirmation name="deposit" />;
+        }
+      case states.B_WAIT_FOR_POST_FUND_SETUP:
+        return <BWaitForPostFundSetup />;
+
       case states.ACKNOWLEDGE_FUNDING_SUCCESS:
         return (
           <AcknowledgeX

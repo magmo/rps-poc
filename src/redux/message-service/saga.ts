@@ -3,7 +3,8 @@ import { buffers } from 'redux-saga';
 import hash from 'object-hash';
 
 import { reduxSagaFirebase } from '../../gateways/firebase';
-import { actions as walletActions } from '../../wallet';
+import * as fromWalletActions from '../../wallet/interface/outgoing';
+import * as toWalletActions from '../../wallet/interface/incoming';
 import { SignatureSuccess } from '../../wallet/redux/actions/_external';
 import * as challengeActions from '../../wallet/redux/actions/_challenge';
 import { encode, decode, Player, positions } from '../../core';
@@ -31,10 +32,10 @@ export default function* messageSaga() {
 
 export function* sendWalletMessageSaga() {
   while (true) {
-    const action = yield take(walletActions.SEND_MESSAGE);
+    const action = yield take(fromWalletActions.SEND_MESSAGE);
     const queue = Queue.WALLET;
-    const { data, to } = action;
-    const message = { data, queue };
+    const { data, to, signature } = action;
+    const message = { data, queue, signature };
     yield call(reduxSagaFirebase.database.create, `/messages/${to.toLowerCase()}`, message);
   }
 }
@@ -69,7 +70,7 @@ export function* sendMessagesSaga() {
       const message = { data, queue, signature, userName };
       const { opponentAddress } = messageState.opponentOutbox;
 
-      yield put(walletActions.messageSent(data, signature));
+      yield put(toWalletActions.messageSent(data, signature));
       yield call(reduxSagaFirebase.database.create, `/messages/${opponentAddress.toLowerCase()}`, message);
       yield put(gameActions.messageSent());
     }
@@ -122,7 +123,6 @@ function* receiveFromFirebaseSaga(address) {
       if (!validMessage) {
         // TODO: Handle this
       }
-      yield put(walletActions.messageReceived(data, signature));
       const position = decode(data);
       if (position.name === positions.PRE_FUND_SETUP_A) {
         yield put(gameActions.initialPositionReceived(position, userName ? userName : 'Opponent'));
@@ -130,7 +130,8 @@ function* receiveFromFirebaseSaga(address) {
         yield put(gameActions.positionReceived(position));
       }
     } else {
-      yield put(walletActions.receiveMessage(data));
+      const { signature } = message.value;
+      yield put(toWalletActions.receiveMessage(data, signature));
     }
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
@@ -143,7 +144,7 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
   switch (type) {
     case "FUNDING_REQUESTED":
       // TODO: We need to close the channel at some point
-      yield put(walletActions.openChannelRequest(channel));
+      yield put(toWalletActions.openChannelRequest(channel));
       const myIndex = player === Player.PlayerA ? 0 : 1;
 
       const opponentAddress = participants[1 - myIndex];
@@ -151,8 +152,8 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       const myBalance = hexToBN(balances[myIndex]);
       const opponentBalance = hexToBN(balances[1 - myIndex]);
 
-      yield put(walletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
-      yield take(walletActions.FUNDING_SUCCESS);
+      yield put(toWalletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
+      yield take(fromWalletActions.FUNDING_SUCCESS);
       yield put(gameActions.messageSent());
       yield put(gameActions.fundingSuccess());
 
@@ -166,11 +167,11 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
         resolution: balances.map(hexToBN),
         stateCount: 0,
       });
-      yield put(walletActions.withdrawalRequest(channelState));
-      yield take(walletActions.WITHDRAWAL_SUCCESS);
+      yield put(toWalletActions.withdrawalRequest(channelState));
+      yield take(fromWalletActions.WITHDRAWAL_SUCCESS);
       yield put(gameActions.messageSent());
       yield put(gameActions.withdrawalSuccess());
-      yield put(walletActions.closeChannelRequest());
+      yield put(toWalletActions.closeChannelRequest());
 
   }
 }
@@ -184,13 +185,13 @@ function* receiveFromWalletSaga() {
 
 function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
-  yield put(walletActions.validationRequest(requestId, data, signature));
-  const actionFilter = [walletActions.VALIDATION_SUCCESS, walletActions.VALIDATION_FAILURE];
-  let action: walletActions.ValidationResponse = yield take(actionFilter);
-  while (action.requestId !== requestId) {
-    action = yield take(actionFilter);
-  }
-  if (action.type === walletActions.VALIDATION_SUCCESS) {
+  yield put(toWalletActions.validationRequest(requestId, data, signature));
+  const actionFilter = [fromWalletActions.VALIDATION_SUCCESS, fromWalletActions.VALIDATION_FAILURE];
+  const action: fromWalletActions.ValidationResponse = yield take(actionFilter);
+  // while (action.requestId !== requestId) {
+  //   action = yield take(actionFilter);
+  // }
+  if (action.type === fromWalletActions.VALIDATION_SUCCESS) {
     return true;
   } else {
     // TODO: Properly handle this.
@@ -201,12 +202,12 @@ function* validateMessage(data, signature) {
 function* signMessage(data) {
   const requestId = hash(data + Date.now());
 
-  yield put(walletActions.signatureRequest(requestId, data));
+  yield put(toWalletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
-  const actionFilter = walletActions.SIGNATURE_SUCCESS;
-  let signatureResponse: SignatureSuccess = yield take(actionFilter);
-  while (signatureResponse.requestId !== requestId) {
-    signatureResponse = yield take(actionFilter);
-  }
+  const actionFilter = fromWalletActions.SIGNATURE_SUCCESS;
+  const signatureResponse: SignatureSuccess = yield take(actionFilter);
+  // while (signatureResponse.requestId !== requestId) {
+  //   signatureResponse = yield take(actionFilter);
+  // }
   return signatureResponse.signature;
 }

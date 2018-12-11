@@ -2,11 +2,12 @@ import { State } from 'fmg-core';
 
 import * as states from '../../states';
 import * as actions from '../actions';
-
+import { signatureSuccess, validationSuccess } from '../../interface/outgoing';
 
 import decode from '../../domain/decode';
 import { unreachable } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
+
 
 export const openingReducer = (state: states.OpeningState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {
@@ -31,22 +32,21 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       if (ownPosition.stateCount !== 0) { return state; }
 
       const ourAddress = ownPosition.channel.participants[0] as string;
-      const opponentAddress = ownPosition.channel.participants[1] as string;
 
       if (ourAddress !== state.address) { return state; }
 
       const signature = signPositionHex(data, state.privateKey);
-
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
-        libraryAddress: ownPosition.channel.gameLibrary,
-        channelId: ownPosition.channel.channelId,
-        ourIndex: 0,
-        participants: [ourAddress, opponentAddress],
+        libraryAddress: ownPosition.channel.channelType,
+        channelId: ownPosition.channel.id,
+        ourIndex: ownPosition.channel.participants.indexOf(state.address),
+        participants: ownPosition.channel.participants,
         channelNonce: ownPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data, signature },
+        messageOutbox: signatureSuccess(signature),
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -68,13 +68,14 @@ const waitForChannelReducer = (state: states.WaitForChannel, action: actions.Wal
       // if so, unpack its contents into the state
       return states.waitForPreFundSetup({
         ...state,
-        libraryAddress: opponentPosition.channel.gameLibrary,
-        channelId: opponentPosition.channel.channelId,
-        ourIndex: 0,
-        participants: [ourAddress2, opponentAddress2],
+        libraryAddress: opponentPosition.channel.channelType,
+        channelId: opponentPosition.channel.id,
+        ourIndex: opponentPosition.channel.participants.indexOf(state.address),
+        participants: opponentPosition.channel.participants,
         channelNonce: opponentPosition.channel.channelNonce,
         turnNum: 0,
         lastPosition: { data: action.data, signature: action.signature },
+        messageOutbox: validationSuccess(),
       });
 
     default:
@@ -101,6 +102,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
         turnNum: 1,
         lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
+        messageOutbox: signatureSuccess(signature),
       });
 
     case actions.OPPONENT_POSITION_RECEIVED:
@@ -121,6 +123,7 @@ const waitForPreFundSetupReducer = (state: states.WaitForPreFundSetup, action: a
         turnNum: 1,
         lastPosition: { data: action.data, signature: action.signature },
         penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess(),
       });
 
     default:

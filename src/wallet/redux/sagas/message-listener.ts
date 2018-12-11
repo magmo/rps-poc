@@ -20,6 +20,9 @@ export function* messageListener() {
     const action = yield take(channel);
 
     switch (action.type) {
+      case incoming.FUNDING_REQUEST:
+        yield put(actions.fundingRequested());
+        break;
       case LOGIN_SUCCESS:
         yield put(actions.loggedIn(action.user.uid));
         break;
@@ -29,8 +32,10 @@ export function* messageListener() {
       case incoming.VALIDATION_REQUEST:
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
+      case incoming.RECEIVE_MESSAGE:
+        yield put(actions.messageReceived(action.data, action.signature));
       default:
-        // do nothing
+      // do nothing
     }
   }
 }
