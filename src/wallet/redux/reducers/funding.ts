@@ -10,6 +10,9 @@ import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
 import { validSignature, signPositionHex } from '../../utils/signing-utils';
 
+import BN from 'bn.js';
+
+
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
   switch (state.type) {
     case states.WAIT_FOR_FUNDING_REQUEST:
@@ -56,19 +59,20 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
   switch (action.type) {
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
-        // TODO: the deposit should not be hardcoded.
+        const fundingAmount = getFundingAmount(state);
         return states.aWaitForDeployToBeSentToMetaMask({
           ...state,
-          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, "0x5"),
+          transactionOutbox: createDeployTransaction(state.networkId, state.channelId, fundingAmount),
         });
       } else {
         if (!state.adjudicator) {
           return states.bWaitForDeployAddress(state);
         }
+        const fundingAmount = getFundingAmount(state);
         return states.bWaitForDepositToBeSentToMetaMask({
           ...state,
           adjudicator: state.adjudicator as string,
-          transactionOutbox: createDepositTransaction(state.adjudicator as string, "0x5"),
+          transactionOutbox: createDepositTransaction(state.adjudicator as string, fundingAmount),
         });
       }
     case actions.MESSAGE_RECEIVED:
@@ -120,8 +124,10 @@ const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmatio
 const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_RECEIVED_EVENT:
-      // TODO: Instead of a hardcoded value this should check if the balance is 2 * the deposiot amount
-      if (action.adjudicatorBalance !== '0x0a') {
+      const resolutions = decode(state.lastPosition.data).resolution;
+      const totalFunds = resolutions[state.ourIndex].add(resolutions[1 - state.ourIndex]);
+      const adjudicatorBalance = new BN(action.adjudicatorBalance.substring(2), 16);
+      if (adjudicatorBalance.cmp(totalFunds)) {
         return state;
       }
 
@@ -156,11 +162,11 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      // TODO: deposit value should not be hardcoded.
+      const fundingAmount = getFundingAmount(state);
       return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
         adjudicator: action.data,
-        transactionOutbox: createDepositTransaction(action.data, "0x5"),
+        transactionOutbox: createDepositTransaction(action.data, fundingAmount),
       });
     default:
       return state;
@@ -273,4 +279,8 @@ const composePostFundState = (fnPostFund: typeof postFundSetupA | typeof postFun
 
   const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
   return { positionData, positionSignature, sendMessageAction };
+};
+
+const getFundingAmount = (state: states.ApproveFunding | states.BWaitForDeployAddress): string => {
+  return "0x" + decode(state.lastPosition.data).resolution[state.ourIndex].toString("hex");
 };

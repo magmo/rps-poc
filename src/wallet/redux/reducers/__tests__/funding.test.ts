@@ -103,6 +103,7 @@ describe('start in ApproveFunding', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDeployTxMock.mock.calls.length).toBe(1);
+    expect(createDeployTxMock.mock.calls[0][2]).toBe("0x5");
   });
 
   describe('action taken: funding approved, adjudicator address not received', () => { // player B scenario
@@ -115,12 +116,16 @@ describe('start in ApproveFunding', () => {
   });
 
   describe('action taken: funding approved, adjudicator address received', () => { // player B scenario
+    const createDepositTxMock = jest.fn();
+    Object.defineProperty(TransactionGenerator, 'createDepositTransaction', { value: createDepositTxMock });
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.approveFunding(testDefaults);
     const action = actions.fundingApproved();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
+    expect(createDepositTxMock.mock.calls.length).toBe(1);
+    expect(createDepositTxMock.mock.calls[0][1]).toBe("0x5");
   });
 
 
@@ -201,6 +206,7 @@ describe('start in BWaitForDeployAddress', () => {
 
     itTransitionsToStateType(states.B_WAIT_FOR_DEPOSIT_TO_BE_SENT_TO_METAMASK, updatedState);
     expect(createDepositTxMock.mock.calls.length).toBe(1);
+    expect(createDepositTxMock.mock.calls[0][1]).toBe("0x5");
   });
 });
 
