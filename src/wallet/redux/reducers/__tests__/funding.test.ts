@@ -170,6 +170,16 @@ describe('start in aSubmitDeployInMetaMask', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_DEPLOY_CONFIRMATION, updatedState);
   });
+
+  describe('incoming action: transaction submission failed', () => { // player A scenario
+    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+    const state = states.aSubmitDeployInMetaMask(testDefaults);
+    const action = actions.transactionSubmissionFailed({ code: "1234" });
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
+  });
+
 });
 
 describe('start in WaitForDeployConfirmation', () => {
@@ -240,6 +250,16 @@ describe('start in BSubmitDepositInMetaMask', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
   });
+
+  describe('incoming action: transaction submission failed', () => { // player B scenario
+    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+    const state = states.bSubmitDepositInMetaMask(testDefaults);
+    const action = actions.transactionSubmissionFailed({ code: "1234" });
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
+  });
+
 });
 
 

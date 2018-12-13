@@ -107,6 +107,11 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
       return states.waitForDeployConfirmation({
         ...state,
       });
+    case actions.TRANSACTION_SUBMISSION_FAILED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, action.error),
+      });
     default:
       return state;
   }
@@ -191,6 +196,11 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
   switch (action.type) {
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDepositConfirmation(state);
+    case actions.TRANSACTION_SUBMISSION_FAILED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, action.error),
+      });
     default:
       return state;
   }

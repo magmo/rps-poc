@@ -164,7 +164,6 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
           break;
         default:
           throw new Error("Expected FUNDING_SUCCESS or FUNDING_FAILURE");
-
       }
       break;
     case "WITHDRAWAL_REQUESTED":
