@@ -10,7 +10,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-import { INITIALIZATION_SUCCESS, InitializationSuccess, FUNDING_FAILURE, FundingFailure } from '../../wallet/interface/outgoing';
+import { INITIALIZATION_SUCCESS, InitializationSuccess } from '../../wallet/interface/outgoing';
 
 export interface JointState {
   gameState: states.GameState;
@@ -19,16 +19,16 @@ export interface JointState {
 
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess | FundingFailure) => {
-  if ((action.type === actions.EXIT_TO_LOBBY || action.type === FUNDING_FAILURE)
+export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess) => {
+  if ((action.type === actions.EXIT_TO_LOBBY || action.type === actions.FUNDING_FAILURE)
     && state.gameState.name !== states.StateName.NoName) {
-    const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
+    let myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
+    if (!myAddress && 'participants' in state.gameState && 'player' in state.gameState) {
+      myAddress = state.gameState.participants[state.gameState.player];
+    }
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
     const newGameState = states.lobby({ ...state.gameState, myAddress, myName });
     return { gameState: newGameState, messageState: {} };
-  }
-  if (action.type === FUNDING_FAILURE) {
-    throw new Error("FUNDING_FAILURE received when not expected.");
   }
 
   if (action.type === actions.MESSAGE_SENT) {
