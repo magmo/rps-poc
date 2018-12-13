@@ -1,6 +1,6 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { sendMessage, fundingSuccess } from '../../interface/outgoing';
+import { sendMessage, fundingSuccess, fundingFailure } from '../../interface/outgoing';
 
 import decode from '../../domain/decode';
 import encode from '../../../core/encode';
@@ -75,6 +75,11 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
           transactionOutbox: createDepositTransaction(state.adjudicator as string, fundingAmount),
         });
       }
+    case actions.FUNDING_REJECTED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, action.type),
+      });
     case actions.MESSAGE_RECEIVED:
       if (state.ourIndex === 1) {
         return states.approveFunding({

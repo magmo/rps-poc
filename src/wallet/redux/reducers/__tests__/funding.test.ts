@@ -106,6 +106,16 @@ describe('start in ApproveFunding', () => {
     expect(createDeployTxMock.mock.calls[0][2]).toBe("0x5");
   });
 
+  describe('incoming action: funding rejected', () => { // player A scenario
+    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
+    const state = states.approveFunding(testDefaults);
+    const action = actions.fundingRejected();
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.WAIT_FOR_CHANNEL, updatedState);
+  });
+
+
   describe('action taken: funding approved, adjudicator address not received', () => { // player B scenario
     const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB, adjudicator: undefined };
     const state = states.approveFunding(testDefaults);

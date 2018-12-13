@@ -141,5 +141,6 @@ export type ResponseAction =
   InitializationSuccess |
   ValidationSuccess |
   FundingSuccess |
+  FundingFailure |
   SignatureSuccess |
   SendMessage;

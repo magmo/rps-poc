@@ -294,6 +294,7 @@ export type WalletAction = (
   | OpponentPositionReceived
   | FundingRequested
   | FundingApproved
+  | FundingRejected
   | FundingReceivedEvent
   | DepositInitiated
   | DepositConfirmed
