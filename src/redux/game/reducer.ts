@@ -20,12 +20,8 @@ export interface JointState {
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
 export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess) => {
-  if ((action.type === actions.EXIT_TO_LOBBY || action.type === actions.FUNDING_FAILURE)
-    && state.gameState.name !== states.StateName.NoName) {
-    let myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
-    if (!myAddress && 'participants' in state.gameState && 'player' in state.gameState) {
-      myAddress = state.gameState.participants[state.gameState.player];
-    }
+  if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
+    const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
     const newGameState = states.lobby({ ...state.gameState, myAddress, myName });
     return { gameState: newGameState, messageState: {} };
@@ -275,6 +271,12 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
 }
 
 function waitForFundingReducer(gameState: states.WaitForFunding, messageState: MessageState, action: actions.GameAction): JointState {
+  if (action.type === actions.FUNDING_FAILURE) {
+    const { participants, player } = gameState;
+    const lobbyGameState = states.lobby({ ...gameState, myAddress: participants[player] });
+    return { gameState: lobbyGameState, messageState: {} };
+  }
+
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
