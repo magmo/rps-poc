@@ -14,7 +14,7 @@ import {
 const {
   preFundSetupA,
   preFundSetupB,
-  postFundSetupA,
+  // postFundSetupA,
   postFundSetupB,
   asMove,
   bsMove,
@@ -54,7 +54,7 @@ describe('player B\'s app', () => {
     myMove: bsMove,
     theirMove: asMove,
     result: bResult,
-    twitterHandle:"tweet",
+    twitterHandle: "tweet",
   };
   describe('when in confirmGameB', () => {
     const gameState = state.confirmGameB({ ...bProps });
@@ -76,7 +76,7 @@ describe('player B\'s app', () => {
     });
   });
 
-  describe('when in waitForFunding', () => {
+  /*describe('when in waitForFunding', () => {
     const gameState = state.waitForFunding({ ...bProps, ...preFundSetupB });
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
@@ -104,9 +104,9 @@ describe('player B\'s app', () => {
         itSends(postFundSetupB, updatedState2);
       });
     });
-  });
+  });*/
 
-  describe('when in WaitForPostFundSetup', () => {
+  /*describe('when in WaitForPostFundSetup', () => {
     const gameState = state.waitForPostFundSetup({ ...bProps, ...preFundSetupB });
     itCanHandleTheOpponentResigning({ gameState, messageState });
 
@@ -118,7 +118,7 @@ describe('player B\'s app', () => {
       itTransitionsTo(state.StateName.PickMove, updatedState);
       itSends(postFundSetupB, updatedState);
     });
-  });
+  });*/
 
   describe('when in PickMove', () => {
     const gameState = state.pickMove({ ...bProps, ...postFundSetupB });

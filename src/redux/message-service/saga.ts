@@ -157,7 +157,7 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       switch (action.type) {
         case fromWalletActions.FUNDING_SUCCESS:
           yield put(gameActions.messageSent());
-          yield put(gameActions.fundingSuccess());
+          yield put(gameActions.fundingSuccess(action.position));
           break;
         case fromWalletActions.FUNDING_FAILURE:
           yield put(gameActions.fundingFailure());

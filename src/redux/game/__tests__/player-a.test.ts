@@ -15,7 +15,7 @@ import {
 const {
   preFundSetupA,
   preFundSetupB,
-  postFundSetupA,
+  // postFundSetupA,
   postFundSetupB,
   asMove,
   bsMove,
@@ -39,7 +39,7 @@ const {
 const { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName } = scenarios.standard;
 const base = { libraryAddress, channelNonce, participants, roundBuyIn, myName, opponentName };
 
-const messageState = { };
+const messageState = {};
 
 describe('player A\'s app', () => {
   const aProps = {
@@ -53,7 +53,7 @@ describe('player A\'s app', () => {
   };
 
   describe('when in waitForGameConfirmationA', () => {
-    const gameState = state.waitForGameConfirmationA({...aProps, ...preFundSetupA });
+    const gameState = state.waitForGameConfirmationA({ ...aProps, ...preFundSetupA });
 
     describe('when receiving preFundSetupB', () => {
       const action = actions.positionReceived(preFundSetupB);
@@ -63,14 +63,14 @@ describe('player A\'s app', () => {
         expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
       });
 
-      itIncreasesTurnNumBy(1, {gameState, messageState}, updatedState);
+      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     });
 
     itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
-  describe('when in waitForFunding', () => {
+  /*describe('when in waitForFunding', () => {
     const gameState = state.waitForFunding({...aProps, ...preFundSetupB });
 
     describe('when funding is successful', () => {
@@ -97,10 +97,10 @@ describe('player A\'s app', () => {
     });
 
     itHandlesResignLikeItsTheirTurn(gameState, messageState);
-  });
+  });*/
 
   describe('when in PickMove', () => {
-    const gameState = state.pickMove({...aProps, ...postFundSetupB });
+    const gameState = state.pickMove({ ...aProps, ...postFundSetupB });
 
     describe('when a move is chosen', () => {
       const action = actions.chooseMove(asMove);
@@ -123,7 +123,7 @@ describe('player A\'s app', () => {
   });
 
   describe('when in WaitForOpponentToPickMoveA', () => {
-    const gameState = state.waitForOpponentToPickMoveA({...aProps, ...propose, salt });
+    const gameState = state.waitForOpponentToPickMoveA({ ...aProps, ...propose, salt });
 
     describe('when Accept arrives', () => {
       describe('when enough funds to continue', () => {
@@ -160,7 +160,7 @@ describe('player A\'s app', () => {
   });
 
   describe('when in PlayAgain', () => {
-    const gameState = state.playAgain({...aProps, ...reveal });
+    const gameState = state.playAgain({ ...aProps, ...reveal });
 
     describe('if the player decides to continue', () => {
       const action = actions.playAgain();
@@ -205,7 +205,7 @@ describe('player A\'s app', () => {
   });
 
   describe('when in WaitForRestingA', () => {
-    const gameState = state.waitForRestingA({...aProps, ...reveal });
+    const gameState = state.waitForRestingA({ ...aProps, ...reveal });
 
     describe('when resting arrives', () => {
       const action = actions.positionReceived(resting);
@@ -220,7 +220,7 @@ describe('player A\'s app', () => {
 
 
   describe('when in WaitToResign', () => {
-    const gameState = state.waitToResign({...aProps, ...reveal });
+    const gameState = state.waitToResign({ ...aProps, ...reveal });
 
     describe('when any position arrives', () => {
       const action = actions.positionReceived(resting);
@@ -234,7 +234,7 @@ describe('player A\'s app', () => {
 
 
   describe('when in InsufficientFunds', () => {
-    const gameState = state.insufficientFunds({...aProps, ...revealInsufficientFunds });
+    const gameState = state.insufficientFunds({ ...aProps, ...revealInsufficientFunds });
 
     describe('when Conclude arrives', () => {
       const action = actions.positionReceived(concludeInsufficientFunds);

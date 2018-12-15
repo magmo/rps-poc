@@ -59,7 +59,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
   switch (action.type) {
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
-        const fundingAmount = getFundingAmount(state);
+        const fundingAmount = getFundingAmount(state, state.ourIndex);
         return states.aWaitForDeployToBeSentToMetaMask({
           ...state,
           transactionOutbox: createDeployTransaction(state.networkId, state.channelId, fundingAmount),
@@ -68,7 +68,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
         if (!state.adjudicator) {
           return states.bWaitForDeployAddress(state);
         }
-        const fundingAmount = getFundingAmount(state);
+        const fundingAmount = getFundingAmount(state, state.ourIndex);
         return states.bWaitForDepositToBeSentToMetaMask({
           ...state,
           adjudicator: state.adjudicator as string,
@@ -172,7 +172,7 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      const fundingAmount = getFundingAmount(state);
+      const fundingAmount = getFundingAmount(state, state.ourIndex);
       return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
         adjudicator: action.data,
@@ -260,9 +260,15 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
 const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSuccess, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
+      // TODO: remove roundBuyIn hardcode
+      const postFundState = postFundSetupB({
+        ...state,
+        roundBuyIn: "1000",
+        balances: [getFundingAmount(state, 0), getFundingAmount(state, 1)],
+      });
       return states.waitForUpdate({
         ...state,
-        messageOutbox: fundingSuccess(state.channelId),
+        messageOutbox: fundingSuccess(state.channelId, postFundState),
       });
     default:
       return state;
@@ -283,11 +289,12 @@ const validPostFundState = (state: states.FundingState, action: actions.MessageR
 
 const composePostFundState = (fnPostFund: typeof postFundSetupA | typeof postFundSetupB,
   state: states.AWaitForDeposit | states.WaitForDepositConfirmation | states.BWaitForPostFundSetup) => {
+  // TODO: remove the roundBuyIn
   const postFundState = fnPostFund({
     ...state,
     turnNum: state.turnNum + 1,
     roundBuyIn: "1000",
-    balances: ["0", "0"],
+    balances: [getFundingAmount(state, 0), getFundingAmount(state, 1)],
   });
   const positionData = encode(postFundState);
   const positionSignature = signPositionHex(positionData, state.privateKey);
@@ -296,6 +303,7 @@ const composePostFundState = (fnPostFund: typeof postFundSetupA | typeof postFun
   return { positionData, positionSignature, sendMessageAction };
 };
 
-const getFundingAmount = (state: states.ApproveFunding | states.BWaitForDeployAddress): string => {
-  return "0x" + decode(state.lastPosition.data).resolution[state.ourIndex].toString("hex");
+const getFundingAmount = (state: states.FundingState, index: number): string => {
+  const decodedPosition = decode(state.lastPosition.data);
+  return "0x" + decodedPosition.resolution[index].toString("hex");
 };

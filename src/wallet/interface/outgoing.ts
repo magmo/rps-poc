@@ -1,12 +1,15 @@
+import { PostFundSetupB } from "src/core/positions";
+
 // FUNDING
 // =======
 
 export const FUNDING_SUCCESS = 'WALLET.FUNDING.SUCCESS';
 export const FUNDING_FAILURE = 'WALLET.FUNDING.FAILURE';
 
-export const fundingSuccess = channelId => ({
+export const fundingSuccess = (channelId, position: PostFundSetupB) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
   channelId,
+  position,
 });
 export const fundingFailure = (channelId, reason) => ({
   type: FUNDING_FAILURE as typeof FUNDING_FAILURE,
