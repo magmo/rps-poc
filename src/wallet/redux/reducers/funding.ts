@@ -144,6 +144,7 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
       const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupA, state);
       return states.aWaitForPostFundSetup({
         ...state,
+        turnNum: decode(positionData).turnNum,
         lastPosition: { data: positionData, signature: positionSignature },
         penultimatePosition: state.lastPosition,
         messageOutbox: sendMessageAction,
@@ -158,9 +159,10 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
     case actions.MESSAGE_RECEIVED:
       if (!validPostFundState(state, action)) { return state; }
 
+      const postFundPosition = decode(action.data);
       return states.acknowledgeFundingSuccess({
         ...state,
-        turnNum: state.turnNum + 1,
+        turnNum: postFundPosition.turnNum,
         lastPosition: { data: action.data, signature: action.signature as string },
         penultimatePosition: state.lastPosition,
       });
@@ -209,7 +211,12 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      return states.waitForDepositConfirmation({ ...state, postFundSetupPosition: action.data, postFundSetupSignature: action.signature });
+      return states.waitForDepositConfirmation({
+        ...state,
+        turnNum: decode(action.data).turnNum,
+        penultimatePosition: state.lastPosition,
+        lastPosition: { data: action.data, signature: action.signature as string },
+      });
     case actions.TRANSACTION_CONFIRMED:
       const lastPositionState = decode(state.lastPosition.data);
       // Player B already received PostFund state from A
@@ -217,6 +224,7 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
         const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, state);
         return states.acknowledgeFundingSuccess({
           ...state,
+          turnNum: decode(positionData).turnNum,
           lastPosition: { data: positionData, signature: positionSignature },
           penultimatePosition: state.lastPosition,
           messageOutbox: sendMessageAction,
@@ -228,8 +236,10 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
       if (!validPostFundState(state, action)) {
         return state;
       }
+      const postFundPosition = decode(action.data);
       return states.waitForDepositConfirmation({
         ...state,
+        turnNum: postFundPosition.turnNum,
         lastPosition: { data: action.data, signature: action.signature as string },
         penultimatePosition: state.lastPosition,
       });
@@ -245,9 +255,12 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
         return state;
       }
 
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, state);
+      const newState = { ...state, turnNum: decode(action.data).turnNum };
+      const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, newState);
+      const postFundPosition = decode(positionData);
       return states.acknowledgeFundingSuccess({
-        ...state,
+        ...newState,
+        turnNum: postFundPosition.turnNum,
         lastPosition: { data: positionData, signature: positionSignature },
         penultimatePosition: { data: action.data, signature: action.signature as string },
         messageOutbox: sendMessageAction,
