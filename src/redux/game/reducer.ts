@@ -280,10 +280,10 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
 
   if (action.type === actions.FUNDING_SUCCESS) {
     const postFundPosition = action.position;
-    const postFundTurnNum = postFundPosition.turnNum;
-    const postFundBalances = postFundPosition.balances;
-    const postFundStateCount = postFundPosition.stateCount;
-    const newGameState = states.pickMove({ ...gameState, postFundTurnNum, postFundBalances, postFundStateCount });
+    const turnNum = postFundPosition.turnNum;
+    const balances = postFundPosition.balances;
+    const stateCount = postFundPosition.stateCount;
+    const newGameState = states.pickMove({ ...gameState, turnNum, balances, stateCount });
     return { gameState: newGameState, messageState };
   }
 

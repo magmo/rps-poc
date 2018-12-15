@@ -14,7 +14,6 @@ import {
 const {
   preFundSetupA,
   preFundSetupB,
-  // postFundSetupA,
   postFundSetupB,
   asMove,
   bsMove,
@@ -76,49 +75,19 @@ describe('player B\'s app', () => {
     });
   });
 
-  /*describe('when in waitForFunding', () => {
+  describe('when in waitForFunding', () => {
     const gameState = state.waitForFunding({ ...bProps, ...preFundSetupB });
 
     itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when funding is successful', () => {
-      const action = actions.fundingSuccess();
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.WaitForPostFundSetup, updatedState);
-    });
-
-    describe('if PostFundSetupA arrives', () => {
-      const action = actions.positionReceived(postFundSetupA);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itStoresAction(action, updatedState);
-
-      describe('when funding is successful', () => {
-        const action2 = actions.fundingSuccess();
-        const updatedState2 = gameReducer(updatedState, action2);
-
-        itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState2);
-        itTransitionsTo(state.StateName.PickMove, updatedState2);
-        itSends(postFundSetupB, updatedState2);
-      });
-    });
-  });*/
-
-  /*describe('when in WaitForPostFundSetup', () => {
-    const gameState = state.waitForPostFundSetup({ ...bProps, ...preFundSetupB });
-    itCanHandleTheOpponentResigning({ gameState, messageState });
-
-    describe('when PostFundSetupA arrives', () => {
-      const action = actions.positionReceived(postFundSetupA);
+      const action = actions.fundingSuccess(postFundSetupB);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PickMove, updatedState);
-      itSends(postFundSetupB, updatedState);
     });
-  });*/
+  });
 
   describe('when in PickMove', () => {
     const gameState = state.pickMove({ ...bProps, ...postFundSetupB });

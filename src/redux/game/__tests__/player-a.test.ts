@@ -15,7 +15,6 @@ import {
 const {
   preFundSetupA,
   preFundSetupB,
-  // postFundSetupA,
   postFundSetupB,
   asMove,
   bsMove,
@@ -70,34 +69,19 @@ describe('player A\'s app', () => {
     itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
-  /*describe('when in waitForFunding', () => {
-    const gameState = state.waitForFunding({...aProps, ...preFundSetupB });
+  describe('when in waitForFunding', () => {
+    const gameState = state.waitForFunding({ ...aProps, ...preFundSetupB });
 
     describe('when funding is successful', () => {
-      const action = actions.fundingSuccess();
+      const action = actions.fundingSuccess(postFundSetupB);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
-      itSends(postFundSetupA, updatedState);
-      itTransitionsTo(state.StateName.WaitForPostFundSetup, updatedState);
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
+      itTransitionsTo(state.StateName.PickMove, updatedState);
+      itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
     });
 
     itHandlesResignLikeItsMyTurn(gameState, messageState);
   });
-
-  describe('when in WaitForPostFundSetup', () => {
-    const gameState = state.waitForPostFundSetup({...aProps, ...postFundSetupA });
-
-    describe('when PostFundSetupB arrives', () => {
-      const action = actions.positionReceived(postFundSetupB);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.PickMove, updatedState);
-    });
-
-    itHandlesResignLikeItsTheirTurn(gameState, messageState);
-  });*/
 
   describe('when in PickMove', () => {
     const gameState = state.pickMove({ ...aProps, ...postFundSetupB });
