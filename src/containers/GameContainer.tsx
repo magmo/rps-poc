@@ -8,7 +8,6 @@ import * as gameActions from '../redux/game/actions';
 import { Wallet, actions as walletActions } from '../wallet';
 import WaitingRoomPage from '../components/WaitingRoomPage';
 import ConfirmGamePage from '../components/ConfirmGamePage';
-import FundingConfirmedPage from '../components/FundingConfirmedPage'; // WaitForPostFundSetup
 import SelectMovePage from '../components/SelectMovePage';
 import WaitForOpponentToPickMove from '../components/WaitForOpponentToPickMove';
 import MoveSelectedPage from '../components/MoveSelectedPage'; // WaitForReveal, WaitForResting
@@ -80,10 +79,7 @@ function RenderGame(props: GameProps) {
     case StateName.GameOver:
     // TODO: We probably want a seperate message for when your opponent resigns
     case StateName.OpponentResigned:
-      return <GameOverPage visible={state.name === StateName.OpponentResigned || state.name === StateName.GameOver}  withdraw={withdraw} />;
-    case StateName.WaitForPostFundSetup:
-      return <FundingConfirmedPage message="Waiting for your opponent to acknowledge" />;
-
+      return <GameOverPage visible={state.name === StateName.OpponentResigned || state.name === StateName.GameOver} withdraw={withdraw} />;
     case StateName.WaitForOpponentToPickMoveB:
       return <WaitForOpponentToPickMove />;
 

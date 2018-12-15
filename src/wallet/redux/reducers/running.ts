@@ -6,7 +6,7 @@ import decode from '../../domain/decode';
 import { State } from 'fmg-core';
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { validationSuccess } from '../../interface/outgoing';
+import { validationSuccess, signatureSuccess } from '../../interface/outgoing';
 
 
 export const runningReducer = (state: states.RunningState, action: actions.WalletAction): states.WalletState => {
@@ -19,9 +19,9 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       const data = action.data;
       const position = decode(data);
       // check it's our turn
-      if (!ourTurn(state)) {
-        return state;
-      }
+      // if (!ourTurn(state)) {
+      //   return state;
+      // }
 
       // check transition
       if (!validTransition(state, position)) {
@@ -45,6 +45,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
           turnNum: state.turnNum + 1,
           lastPosition: { data, signature },
           penultimatePosition: state.lastPosition,
+          messageOutbox: signatureSuccess(signature),
         });
       }
 
