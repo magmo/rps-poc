@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 
 
 import { scenarios } from '../../../../core';
-import { itTransitionsToStateType } from './helpers';
+import { itIncreasesTurnNumBy, itTransitionsToStateType } from './helpers';
 import * as TransactionGenerator from '../../../utils/transaction-generator';
 import * as outgoing from '../../../interface/outgoing';
 import { ApproveFunding, WaitForDepositConfirmation } from '../../../states';
@@ -201,6 +201,7 @@ describe('start in AWaitForDeposit', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
   });
 });
 
@@ -212,6 +213,7 @@ describe('start in AWaitForPostFundSetup', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
   });
 });
 
@@ -271,6 +273,7 @@ describe('start in WaitForDepositConfirmation', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.B_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itIncreasesTurnNumBy(0, state, updatedState);
   });
 
   describe('incoming action: deposit confirmed', () => { // player B scenario
@@ -280,16 +283,18 @@ describe('start in WaitForDepositConfirmation', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
   });
 
 
   describe('incoming action: message received', () => { // player B scenario
-    const testDefaults = { ...defaultsB, ...justReceivedPostFundSetupA };
+    const testDefaults = { ...defaultsB, ...justReceivedPreFundSetupB };
     const state = states.waitForDepositConfirmation(testDefaults);
     const action = actions.messageReceived(postFundSetupAHex, postFundSetupASig);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
     expect((updatedState as WaitForDepositConfirmation).lastPosition.data).toEqual(postFundSetupAHex);
   });
 });
@@ -302,6 +307,7 @@ describe('start in BWaitForPostFundSetup', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
+    itIncreasesTurnNumBy(2, state, updatedState);
     expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
   });
 });
