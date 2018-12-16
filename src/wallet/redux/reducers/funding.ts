@@ -143,8 +143,8 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
       return states.aWaitForPostFundSetup({
         ...state,
         turnNum: decode(positionData).turnNum,
-        lastPosition: { data: positionData, signature: positionSignature },
         penultimatePosition: state.lastPosition,
+        lastPosition: { data: positionData, signature: positionSignature },
         messageOutbox: sendMessageAction,
       });
     default:
@@ -296,14 +296,12 @@ const composePostFundState = (state: states.AWaitForDeposit | states.WaitForDepo
   const lastState = decode(state.lastPosition.data);
   const { libraryAddress, channelNonce, participants, turnNum } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
-  const stateCount = state.ourIndex ? 0 : 1;
-
 
   const channelState = new State({
     channel,
     stateType: State.StateType.PostFundSetup,
     turnNum: turnNum + 1,
-    stateCount,
+    stateCount: state.ourIndex,
     resolution: lastState.resolution,
   });
 

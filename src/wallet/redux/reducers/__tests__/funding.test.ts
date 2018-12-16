@@ -202,6 +202,7 @@ describe('start in AWaitForDeposit', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
+    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
   });
 });
 
