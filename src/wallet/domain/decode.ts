@@ -57,7 +57,10 @@ function extractBalances(hexString: string) {
   return [aBal, bBal];
 }
 
-
+export function extractGameAttributes(hexString: string): string {
+  const charOffset = PREFIX_CHARS + GAME_ATTRIBUTE_OFFSET * CHARS_PER_BYTE;
+  return hexString.substr(charOffset);
+}
 
 export default function decode(hexString) {
   const channel = extractChannel(hexString);
@@ -66,5 +69,4 @@ export default function decode(hexString) {
   const balances = extractBalances(hexString);
   const stateCount = extractStateCount(hexString);
   return new State({ channel, turnNum, resolution: balances, stateCount, stateType });
-
 }

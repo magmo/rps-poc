@@ -156,8 +156,10 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       const action = yield take([fromWalletActions.FUNDING_SUCCESS, fromWalletActions.FUNDING_FAILURE]);
       switch (action.type) {
         case fromWalletActions.FUNDING_SUCCESS:
+          // TODO: why do we need the messageSent here?
           yield put(gameActions.messageSent());
-          yield put(gameActions.fundingSuccess(action.position));
+          const position = decode(action.position);
+          yield put(gameActions.fundingSuccess(position));
           break;
         case fromWalletActions.FUNDING_FAILURE:
           yield put(gameActions.fundingFailure());

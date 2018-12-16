@@ -2,15 +2,13 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import { sendMessage, fundingSuccess, fundingFailure } from '../../interface/outgoing';
 
-import decode from '../../domain/decode';
-import encode from '../../../core/encode';
-
-import { postFundSetupA, postFundSetupB } from '../../../core/positions';
+import decode, { extractGameAttributes } from '../../domain/decode';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
 import { validSignature, signPositionHex } from '../../utils/signing-utils';
 
 import BN from 'bn.js';
+import { State, Channel } from 'fmg-core';
 
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
@@ -141,7 +139,7 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
         return state;
       }
 
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupA, state);
+      const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
       return states.aWaitForPostFundSetup({
         ...state,
         turnNum: decode(positionData).turnNum,
@@ -221,7 +219,7 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
       const lastPositionState = decode(state.lastPosition.data);
       // Player B already received PostFund state from A
       if (lastPositionState.stateType === 1) {
-        const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, state);
+        const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
         return states.acknowledgeFundingSuccess({
           ...state,
           turnNum: decode(positionData).turnNum,
@@ -256,7 +254,7 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
       }
 
       const newState = { ...state, turnNum: decode(action.data).turnNum };
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, newState);
+      const { positionData, positionSignature, sendMessageAction } = composePostFundState(newState);
       const postFundPosition = decode(positionData);
       return states.acknowledgeFundingSuccess({
         ...newState,
@@ -273,15 +271,9 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
 const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSuccess, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
-      // TODO: remove roundBuyIn hardcode
-      const postFundState = postFundSetupB({
-        ...state,
-        roundBuyIn: "1000",
-        balances: [getFundingAmount(state, 0), getFundingAmount(state, 1)],
-      });
       return states.waitForUpdate({
         ...state,
-        messageOutbox: fundingSuccess(state.channelId, postFundState),
+        messageOutbox: fundingSuccess(state.channelId, state.lastPosition.data),
       });
     default:
       return state;
@@ -300,16 +292,22 @@ const validPostFundState = (state: states.FundingState, action: actions.MessageR
   return true;
 };
 
-const composePostFundState = (fnPostFund: typeof postFundSetupA | typeof postFundSetupB,
-  state: states.AWaitForDeposit | states.WaitForDepositConfirmation | states.BWaitForPostFundSetup) => {
-  // TODO: remove the roundBuyIn
-  const postFundState = fnPostFund({
-    ...state,
-    turnNum: state.turnNum + 1,
-    roundBuyIn: "1000",
-    balances: [getFundingAmount(state, 0), getFundingAmount(state, 1)],
+const composePostFundState = (state: states.AWaitForDeposit | states.WaitForDepositConfirmation | states.BWaitForPostFundSetup) => {
+  const lastState = decode(state.lastPosition.data);
+  const { libraryAddress, channelNonce, participants, turnNum } = state;
+  const channel = new Channel(libraryAddress, channelNonce, participants);
+  const stateCount = state.ourIndex ? 0 : 1;
+
+
+  const channelState = new State({
+    channel,
+    stateType: State.StateType.PostFundSetup,
+    turnNum: turnNum + 1,
+    stateCount,
+    resolution: lastState.resolution,
   });
-  const positionData = encode(postFundState);
+
+  const positionData = channelState.toHex() + extractGameAttributes(state.lastPosition.data);
   const positionSignature = signPositionHex(positionData, state.privateKey);
 
   const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);

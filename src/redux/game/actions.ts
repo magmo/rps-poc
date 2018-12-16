@@ -77,7 +77,7 @@ export const positionReceived = (position: Position) => ({
   position,
 });
 
-export const fundingSuccess = (position: positions.PostFundSetupB) => ({
+export const fundingSuccess = (position: Position) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
   position,
 });

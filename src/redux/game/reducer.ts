@@ -11,6 +11,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
 import { INITIALIZATION_SUCCESS, InitializationSuccess } from '../../wallet/interface/outgoing';
+import { PostFundSetupB, POST_FUND_SETUP_B } from 'src/core/positions';
 
 export interface JointState {
   gameState: states.GameState;
@@ -279,10 +280,13 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type === actions.FUNDING_SUCCESS) {
-    const postFundPosition = action.position;
-    const turnNum = postFundPosition.turnNum;
-    const balances = postFundPosition.balances;
-    const stateCount = postFundPosition.stateCount;
+    if (action.position.name !== POST_FUND_SETUP_B) {
+      throw new Error("Game reducer expected PostFundSetupB on FUNDING_SUCCESS");
+    }
+    const postFundPositionB = action.position as PostFundSetupB;
+    const turnNum = postFundPositionB.turnNum;
+    const balances = postFundPositionB.balances;
+    const stateCount = postFundPositionB.stateCount;
     const newGameState = states.pickMove({ ...gameState, turnNum, balances, stateCount });
     return { gameState: newGameState, messageState };
   }

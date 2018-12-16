@@ -1,6 +1,6 @@
 import { Channel, State } from 'fmg-core';
 
-import decode from '../decode';
+import decode, { extractGameAttributes } from '../decode';
 import BN from 'bn.js';
 
 const gameLibrary = '0x0000000000000000000000000000000000000111';
@@ -25,8 +25,18 @@ const testEncodeDecode = (pledge) => {
 };
 
 describe('decode', () => {
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.Conclude}));
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.Game}));
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.PostFundSetup}));
-  testEncodeDecode(new State({channel, turnNum, resolution:balances, stateCount,stateType: State.StateType.PreFundSetup}));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.Conclude }));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.Game }));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.PostFundSetup }));
+  testEncodeDecode(new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.PreFundSetup }));
+});
+
+describe('extractGameAttribute', () => {
+  it('Game attribute extraction', () => {
+    const state = new State({ channel, turnNum, resolution: balances, stateCount, stateType: State.StateType.PostFundSetup });
+    const encoded = state.toHex();
+    const gameAttributes = "ABC1234";
+    const encodedWithGameAttributes = encoded + gameAttributes;
+    expect(gameAttributes).toEqual(extractGameAttributes(encodedWithGameAttributes));
+  });
 });
