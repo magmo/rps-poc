@@ -194,6 +194,16 @@ const bWaitForDepositToBeSentToMetaMaskReducer = (state: states.BWaitForDepositT
 
 const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
+    // This case should not happen in theory, but it does in practice.
+    // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
+    // All of the above happens before B receives transaction submitted
+    case actions.MESSAGE_RECEIVED:
+      return states.bSubmitDepositInMetaMask({
+        ...state,
+        turnNum: decode(action.data).turnNum,
+        penultimatePosition: state.lastPosition,
+        lastPosition: { data: action.data, signature: action.signature as string },
+      });
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDepositConfirmation(state);
     case actions.TRANSACTION_SUBMISSION_FAILED:
