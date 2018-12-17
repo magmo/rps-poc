@@ -78,8 +78,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
           messageOutbox: validationSuccess(),
         });
       }
-
-    case actions.OPPONENT_CHALLENGE_DETECTED:
+    case actions.CHALLENGE_CREATED_EVENT:
       // transition to responding
       return states.acknowledgeChallenge(state);
 

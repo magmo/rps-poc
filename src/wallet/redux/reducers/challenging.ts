@@ -6,6 +6,7 @@ import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
+import { decode } from '../../../core';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -33,7 +34,9 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
     case actions.CHALLENGE_APPROVED:
       const { data: fromPosition, signature: fromSignature } = state.penultimatePosition;
       const { data: toPosition, signature: toSignature } = state.lastPosition;
-      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, new Signature(toSignature), new Signature(fromSignature));
+      console.log('FROM ', decode(fromPosition));
+      console.log('TO ', decode(toPosition));
+      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, new Signature(fromSignature), new Signature(toSignature));
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
       return runningStates.waitForUpdate({ ...state });

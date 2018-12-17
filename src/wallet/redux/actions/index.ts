@@ -117,12 +117,6 @@ export const challengeRequested = () => ({
 });
 export type ChallengeRequested = ReturnType<typeof challengeRequested>;
 
-export const OPPONENT_CHALLENGE_DETECTED = 'WALLET.OPPONENT_CHALLENGE_DETECTED';
-export const opponentChallengeDetected = (challengeExpiry: Date) => ({
-  type: OPPONENT_CHALLENGE_DETECTED as typeof OPPONENT_CHALLENGE_DETECTED,
-  challengeExpiry,
-});
-export type OpponentChallengeDetected = ReturnType<typeof opponentChallengeDetected>;
 
 export const CHALLENGE_RESPONSE_RECEIVED = 'WALLET.CHALLENGE_RESPONSE_RECEIVED';
 export const challengeResponseReceived = (data: string) => ({
@@ -301,7 +295,7 @@ export type WalletAction = (
   | PostFundSetupReceived
   | FundingSuccessAcknowledged
   | ChallengeRequested
-  | OpponentChallengeDetected
+  | ChallengeCreatedEvent
   | ChallengeResponseReceived
   | ChallengedTimedOut
   | TakeMoveInAppAcknowledged

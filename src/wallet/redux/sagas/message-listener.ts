@@ -20,6 +20,9 @@ export function* messageListener() {
     const action = yield take(channel);
 
     switch (action.type) {
+      case incoming.CREATE_CHALLENGE_REQUEST:
+        yield put(actions.challengeRequested());
+        break;
       case incoming.FUNDING_REQUEST:
         yield put(actions.fundingRequested());
         break;
