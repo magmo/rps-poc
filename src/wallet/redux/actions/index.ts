@@ -197,7 +197,7 @@ export const transactionSubmissionFailed = (error) => ({
   error,
   type: TRANSACTION_SUBMISSION_FAILED as typeof TRANSACTION_SUBMISSION_FAILED,
 });
-export type TransactionSubmissionFailed = ReturnType<typeof transactionSentToMetamask>;
+export type TransactionSubmissionFailed = ReturnType<typeof transactionSubmissionFailed>;
 
 
 export const TRANSACTION_SUBMITTED = 'WALLET.TRANSACTION_SUBMITTED';
@@ -294,6 +294,7 @@ export type WalletAction = (
   | OpponentPositionReceived
   | FundingRequested
   | FundingApproved
+  | FundingRejected
   | FundingReceivedEvent
   | DepositInitiated
   | DepositConfirmed
@@ -317,6 +318,7 @@ export type WalletAction = (
   | WithdrawalApproved
   | WithdrawalRejected
   | TransactionSubmitted
+  | TransactionSubmissionFailed
   | TransactionConfirmed
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged

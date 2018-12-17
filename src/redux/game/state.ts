@@ -12,7 +12,6 @@ export enum StateName {
   ConfirmGameB = 'CONFIRM_GAME_B',
   DeclineGame = 'DECLINE_GAME_B',
   WaitForFunding = 'WAIT_FOR_FUNDING',
-  WaitForPostFundSetup = 'WAIT_FOR_POST_FUND_SETUP',
   PickMove = 'PICK_MOVE',
   WaitForOpponentToPickMoveA = 'WAIT_FOR_OPPONENT_TO_PICK_MOVE_A',
   WaitForOpponentToPickMoveB = 'WAIT_FOR_OPPONENT_TO_PICK_MOVE_B',
@@ -186,14 +185,6 @@ export function waitForFunding(state: IncludesBase): WaitForFunding {
   return { ...base(state), name: StateName.WaitForFunding };
 }
 
-export interface WaitForPostFundSetup extends Base {
-  name: StateName.WaitForPostFundSetup;
-  player: Player;
-}
-export function waitForPostFundSetup(state: IncludesBase): WaitForPostFundSetup {
-  return { ...base(state), name: StateName.WaitForPostFundSetup };
-}
-
 export interface PickMove extends Base {
   name: StateName.PickMove;
   player: Player;
@@ -340,7 +331,6 @@ export type PlayingState = (
   | ConfirmGameB
   | DeclineGameB
   | WaitForFunding
-  | WaitForPostFundSetup
   | PickMove
   | WaitForOpponentToPickMoveA
   | WaitForOpponentToPickMoveB

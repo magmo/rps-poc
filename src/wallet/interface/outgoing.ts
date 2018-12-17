@@ -4,9 +4,10 @@
 export const FUNDING_SUCCESS = 'WALLET.FUNDING.SUCCESS';
 export const FUNDING_FAILURE = 'WALLET.FUNDING.FAILURE';
 
-export const fundingSuccess = channelId => ({
+export const fundingSuccess = (channelId, position: string) => ({
   type: FUNDING_SUCCESS as typeof FUNDING_SUCCESS,
   channelId,
+  position,
 });
 export const fundingFailure = (channelId, reason) => ({
   type: FUNDING_FAILURE as typeof FUNDING_FAILURE,
@@ -141,5 +142,6 @@ export type ResponseAction =
   InitializationSuccess |
   ValidationSuccess |
   FundingSuccess |
+  FundingFailure |
   SignatureSuccess |
   SendMessage;

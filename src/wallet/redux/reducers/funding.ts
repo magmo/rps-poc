@@ -1,16 +1,14 @@
 import * as states from '../../states';
 import * as actions from '../actions';
-import { sendMessage, fundingSuccess } from '../../interface/outgoing';
+import { sendMessage, fundingSuccess, fundingFailure } from '../../interface/outgoing';
 
-import decode from '../../domain/decode';
-import encode from '../../../core/encode';
-
-import { postFundSetupA, postFundSetupB } from '../../../core/positions';
+import decode, { extractGameAttributes } from '../../domain/decode';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
 import { validSignature, signPositionHex } from '../../utils/signing-utils';
 
 import BN from 'bn.js';
+import { State, Channel } from 'fmg-core';
 
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
@@ -59,7 +57,7 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
   switch (action.type) {
     case actions.FUNDING_APPROVED:
       if (state.ourIndex === 0) {
-        const fundingAmount = getFundingAmount(state);
+        const fundingAmount = getFundingAmount(state, state.ourIndex);
         return states.aWaitForDeployToBeSentToMetaMask({
           ...state,
           transactionOutbox: createDeployTransaction(state.networkId, state.channelId, fundingAmount),
@@ -68,13 +66,18 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
         if (!state.adjudicator) {
           return states.bWaitForDeployAddress(state);
         }
-        const fundingAmount = getFundingAmount(state);
+        const fundingAmount = getFundingAmount(state, state.ourIndex);
         return states.bWaitForDepositToBeSentToMetaMask({
           ...state,
           adjudicator: state.adjudicator as string,
           transactionOutbox: createDepositTransaction(state.adjudicator as string, fundingAmount),
         });
       }
+    case actions.FUNDING_REJECTED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, action.type),
+      });
     case actions.MESSAGE_RECEIVED:
       if (state.ourIndex === 1) {
         return states.approveFunding({
@@ -101,6 +104,11 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDeployConfirmation({
         ...state,
+      });
+    case actions.TRANSACTION_SUBMISSION_FAILED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, action.error),
       });
     default:
       return state;
@@ -131,11 +139,12 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
         return state;
       }
 
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupA, state);
+      const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
       return states.aWaitForPostFundSetup({
         ...state,
-        lastPosition: { data: positionData, signature: positionSignature },
+        turnNum: decode(positionData).turnNum,
         penultimatePosition: state.lastPosition,
+        lastPosition: { data: positionData, signature: positionSignature },
         messageOutbox: sendMessageAction,
       });
     default:
@@ -148,9 +157,10 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
     case actions.MESSAGE_RECEIVED:
       if (!validPostFundState(state, action)) { return state; }
 
+      const postFundPosition = decode(action.data);
       return states.acknowledgeFundingSuccess({
         ...state,
-        turnNum: state.turnNum + 1,
+        turnNum: postFundPosition.turnNum,
         lastPosition: { data: action.data, signature: action.signature as string },
         penultimatePosition: state.lastPosition,
       });
@@ -162,7 +172,7 @@ const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, actio
 const bWaitForDeployAddressReducer = (state: states.BWaitForDeployAddress, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      const fundingAmount = getFundingAmount(state);
+      const fundingAmount = getFundingAmount(state, state.ourIndex);
       return states.bWaitForDepositToBeSentToMetaMask({
         ...state,
         adjudicator: action.data,
@@ -184,8 +194,23 @@ const bWaitForDepositToBeSentToMetaMaskReducer = (state: states.BWaitForDepositT
 
 const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
+    // This case should not happen in theory, but it does in practice.
+    // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
+    // All of the above happens before B receives transaction submitted
+    case actions.MESSAGE_RECEIVED:
+      return states.bSubmitDepositInMetaMask({
+        ...state,
+        turnNum: decode(action.data).turnNum,
+        penultimatePosition: state.lastPosition,
+        lastPosition: { data: action.data, signature: action.signature as string },
+      });
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDepositConfirmation(state);
+    case actions.TRANSACTION_SUBMISSION_FAILED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: fundingFailure(state.channelId, action.error),
+      });
     default:
       return state;
   }
@@ -194,14 +219,20 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      return states.waitForDepositConfirmation({ ...state, postFundSetupPosition: action.data, postFundSetupSignature: action.signature });
+      return states.waitForDepositConfirmation({
+        ...state,
+        turnNum: decode(action.data).turnNum,
+        penultimatePosition: state.lastPosition,
+        lastPosition: { data: action.data, signature: action.signature as string },
+      });
     case actions.TRANSACTION_CONFIRMED:
       const lastPositionState = decode(state.lastPosition.data);
       // Player B already received PostFund state from A
       if (lastPositionState.stateType === 1) {
-        const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, state);
+        const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
         return states.acknowledgeFundingSuccess({
           ...state,
+          turnNum: decode(positionData).turnNum,
           lastPosition: { data: positionData, signature: positionSignature },
           penultimatePosition: state.lastPosition,
           messageOutbox: sendMessageAction,
@@ -213,8 +244,10 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
       if (!validPostFundState(state, action)) {
         return state;
       }
+      const postFundPosition = decode(action.data);
       return states.waitForDepositConfirmation({
         ...state,
+        turnNum: postFundPosition.turnNum,
         lastPosition: { data: action.data, signature: action.signature as string },
         penultimatePosition: state.lastPosition,
       });
@@ -230,9 +263,12 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
         return state;
       }
 
-      const { positionData, positionSignature, sendMessageAction } = composePostFundState(postFundSetupB, state);
+      const newState = { ...state, turnNum: decode(action.data).turnNum };
+      const { positionData, positionSignature, sendMessageAction } = composePostFundState(newState);
+      const postFundPosition = decode(positionData);
       return states.acknowledgeFundingSuccess({
-        ...state,
+        ...newState,
+        turnNum: postFundPosition.turnNum,
         lastPosition: { data: positionData, signature: positionSignature },
         penultimatePosition: { data: action.data, signature: action.signature as string },
         messageOutbox: sendMessageAction,
@@ -247,7 +283,7 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
     case actions.FUNDING_SUCCESS_ACKNOWLEDGED:
       return states.waitForUpdate({
         ...state,
-        messageOutbox: fundingSuccess(state.channelId),
+        messageOutbox: fundingSuccess(state.channelId, state.lastPosition.data),
       });
     default:
       return state;
@@ -266,21 +302,27 @@ const validPostFundState = (state: states.FundingState, action: actions.MessageR
   return true;
 };
 
-const composePostFundState = (fnPostFund: typeof postFundSetupA | typeof postFundSetupB,
-  state: states.AWaitForDeposit | states.WaitForDepositConfirmation | states.BWaitForPostFundSetup) => {
-  const postFundState = fnPostFund({
-    ...state,
-    turnNum: state.turnNum + 1,
-    roundBuyIn: "1000",
-    balances: ["0", "0"],
+const composePostFundState = (state: states.AWaitForDeposit | states.WaitForDepositConfirmation | states.BWaitForPostFundSetup) => {
+  const lastState = decode(state.lastPosition.data);
+  const { libraryAddress, channelNonce, participants, turnNum } = state;
+  const channel = new Channel(libraryAddress, channelNonce, participants);
+
+  const channelState = new State({
+    channel,
+    stateType: State.StateType.PostFundSetup,
+    turnNum: turnNum + 1,
+    stateCount: state.ourIndex,
+    resolution: lastState.resolution,
   });
-  const positionData = encode(postFundState);
+
+  const positionData = channelState.toHex() + extractGameAttributes(state.lastPosition.data);
   const positionSignature = signPositionHex(positionData, state.privateKey);
 
   const sendMessageAction = sendMessage(state.participants[1 - state.ourIndex], positionData, positionSignature);
   return { positionData, positionSignature, sendMessageAction };
 };
 
-const getFundingAmount = (state: states.ApproveFunding | states.BWaitForDeployAddress): string => {
-  return "0x" + decode(state.lastPosition.data).resolution[state.ourIndex].toString("hex");
+const getFundingAmount = (state: states.FundingState, index: number): string => {
+  const decodedPosition = decode(state.lastPosition.data);
+  return "0x" + decodedPosition.resolution[index].toString("hex");
 };
