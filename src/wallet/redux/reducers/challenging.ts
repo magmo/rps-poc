@@ -6,7 +6,7 @@ import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
-import { decode } from '../../../core';
+import { challengePositionReceived } from '../actions/_external';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -34,8 +34,6 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
     case actions.CHALLENGE_APPROVED:
       const { data: fromPosition, signature: fromSignature } = state.penultimatePosition;
       const { data: toPosition, signature: toSignature } = state.lastPosition;
-      console.log('FROM ', decode(fromPosition));
-      console.log('TO ', decode(toPosition));
       const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, new Signature(fromSignature), new Signature(toSignature));
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
@@ -66,7 +64,10 @@ const waitForChallengeSubmissionReducer = (state: states.WaitForChallengeSubmiss
 const waitForChallengeConfirmationReducer = (state: states.WaitForChallengeConfirmation, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-      return states.waitForResponseOrTimeout({ ...state });
+      // This is a best guess on when the challenge will expire and will be updated by the challenge created event
+      // TODO: Mover challenge duration to a shared constant
+      const challengeExpiry = new Date(Date.now() + 2 * 60000).getTime();
+      return states.waitForResponseOrTimeout({ ...state, challengeExpiry });
     default:
       return state;
   }
@@ -74,8 +75,11 @@ const waitForChallengeConfirmationReducer = (state: states.WaitForChallengeConfi
 
 const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.CHALLENGE_RESPONSE_RECEIVED:
-      return states.acknowledgeChallengeResponse({ ...state });
+    case actions.CHALLENGE_CREATED_EVENT:
+      return states.waitForResponseOrTimeout({ ...state, challengeExpiry: action.expirationTime * 1000 });
+    case actions.RESPOND_WITH_MOVE_EVENT:
+      const message = challengePositionReceived(action.responseState);
+      return states.acknowledgeChallengeResponse({ ...state, messageOutbox: message });
     case actions.CHALLENGE_TIMED_OUT:
       return states.acknowledgeChallengeTimeout({ ...state });
     default:

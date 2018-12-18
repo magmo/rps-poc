@@ -43,6 +43,10 @@ export interface AdjudicatorExists extends ChannelOpen {
   adjudicator: string;
 }
 
+export interface ChallengeExists extends AdjudicatorExists {
+  challengeExpiry: number;
+}
+
 // creators
 export function base<T extends Base>(params: T): Base {
   const { messageOutbox, transactionOutbox } = params;
@@ -74,4 +78,8 @@ export function adjudicatorMightExist<T extends AdjudicatorMightExist>(params: T
 
 export function adjudicatorExists<T extends AdjudicatorExists>(params: T): AdjudicatorExists {
   return { ...channelOpen(params), adjudicator: params.adjudicator };
+}
+
+export function challengeExists<T extends ChallengeExists>(params: T): ChallengeExists {
+  return { ...adjudicatorExists(params), challengeExpiry: params.challengeExpiry };
 }

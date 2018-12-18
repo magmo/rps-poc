@@ -80,7 +80,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       }
     case actions.CHALLENGE_CREATED_EVENT:
       // transition to responding
-      return states.acknowledgeChallenge(state);
+      return states.acknowledgeChallenge({ ...state, challengeExpiry: action.expirationTime });
 
     case actions.CHALLENGE_REQUESTED:
       // transition to challenging

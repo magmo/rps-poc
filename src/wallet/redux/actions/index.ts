@@ -317,4 +317,5 @@ export type WalletAction = (
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
   | MessageReceived
+  | RespondWithMoveEvent
 );

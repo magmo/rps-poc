@@ -1,5 +1,5 @@
 import {
-  AdjudicatorExists, adjudicatorExists
+  AdjudicatorExists, adjudicatorExists, ChallengeExists, challengeExists
 } from './shared';
 import { TransactionRequest } from 'ethers/providers';
 export const CHALLENGING = 'CHALLENGING';
@@ -64,16 +64,16 @@ export function waitForChallengeConfirmation<T extends AdjudicatorExists>(params
   };
 }
 
-export interface WaitForResponseOrTimeout extends AdjudicatorExists {
+export interface WaitForResponseOrTimeout extends ChallengeExists {
   type: typeof WAIT_FOR_RESPONSE_OR_TIMEOUT;
   stage: typeof CHALLENGING;
 }
 
-export function waitForResponseOrTimeout<T extends AdjudicatorExists>(params: T): WaitForResponseOrTimeout {
+export function waitForResponseOrTimeout<T extends ChallengeExists>(params: T): WaitForResponseOrTimeout {
   return {
     type: WAIT_FOR_RESPONSE_OR_TIMEOUT,
     stage: CHALLENGING,
-    ...adjudicatorExists(params),
+    ...challengeExists(params),
   };
 }
 

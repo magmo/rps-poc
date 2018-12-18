@@ -188,8 +188,8 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
 /*
 function* receiveFromWalletSaga() {
   while (true) {
-    // const { position } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
-    // yield put(gameActions.positionReceived(position));
+    const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
+    yield put(gameActions.positionReceived(positionData));
   }
 }
 */

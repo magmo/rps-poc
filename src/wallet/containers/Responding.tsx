@@ -10,11 +10,13 @@ import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import SubmitX from '../components/SubmitX';
 import { unreachable } from '../utils/reducer-utils';
+import ChooseResponse from '../components/responding/ChooseResponse';
 
 interface Props {
   state: states.RespondingState;
   challengeAcknowledged: () => void;
   challengeResponseAcknowledged: () => void;
+  selectRespondWithMove: () => void;
 }
 
 class RespondingContainer extends PureComponent<Props> {
@@ -23,6 +25,7 @@ class RespondingContainer extends PureComponent<Props> {
       state,
       challengeAcknowledged,
       challengeResponseAcknowledged,
+      selectRespondWithMove,
     } = this.props;
 
     switch (state.type) {
@@ -36,7 +39,7 @@ class RespondingContainer extends PureComponent<Props> {
           />
         );
       case states.CHOOSE_RESPONSE:
-        return <Todo stateType={state.type} />;
+        return <ChooseResponse expiryTime={state.challengeExpiry} selectRespondWithMove={selectRespondWithMove} />;
       case states.TAKE_MOVE_IN_APP:
         return <Todo stateType={state.type} />;
       case states.WAIT_FOR_RESPONSE_CONFIRMATION:
@@ -62,6 +65,7 @@ class RespondingContainer extends PureComponent<Props> {
 const mapDispatchToProps = {
   challengeAcknowledged: actions.challengeAcknowledged,
   challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
+  selectRespondWithMove: actions.respondWithMoveChosen,
 };
 
 export default connect(
