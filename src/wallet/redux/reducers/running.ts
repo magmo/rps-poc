@@ -6,7 +6,7 @@ import decode from '../../domain/decode';
 import { State } from 'fmg-core';
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { validationSuccess, signatureSuccess } from '../../interface/outgoing';
+import { validationSuccess, signatureSuccess, challengeRejected } from '../../interface/outgoing';
 
 
 export const runningReducer = (state: states.RunningState, action: actions.WalletAction): states.WalletState => {
@@ -83,6 +83,11 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       return states.acknowledgeChallenge({ ...state, challengeExpiry: action.expirationTime });
 
     case actions.CHALLENGE_REQUESTED:
+      // The application should validate this but just in case we check as well
+      if (ourTurn(state)) {
+        const message = challengeRejected("Challenges can only be issued when waiting for the other user.");
+        return states.waitForUpdate({ ...state, messageOutbox: message });
+      }
       // transition to challenging
       return states.approveChallenge(state);
 

@@ -137,13 +137,19 @@ export const messageReceived = (positionData: string, signature: string) => ({
 });
 export type MessageReceived = ReturnType<typeof messageReceived>;
 
-// This is used when we receive a position from the wallet/adjudicator so we do not need the signature to validate
 export const CHALLENGE_POSITION_RECEIVED = 'WALLET.MESSAGING.CHALLENGE_POSITION_RECEIVED';
 export const challengePositionReceived = (positionData: string) => ({
   type: CHALLENGE_POSITION_RECEIVED as typeof CHALLENGE_POSITION_RECEIVED,
   positionData,
 });
 export type ChallengePositionReceived = ReturnType<typeof challengePositionReceived>;
+
+export const CHALLENGE_REJECTED = 'WALLET.CHALLENGING.CHALLENGE_REJECTED';
+export const challengeRejected = (reason) => ({
+  type: CHALLENGE_REJECTED as typeof CHALLENGE_REJECTED,
+  reason,
+});
+export type ChallengeRejected = ReturnType<typeof challengeRejected>;
 
 export type ResponseAction =
   InitializationSuccess |
@@ -152,4 +158,5 @@ export type ResponseAction =
   FundingFailure |
   SignatureSuccess |
   ChallengePositionReceived |
+  ChallengeRejected |
   SendMessage;
