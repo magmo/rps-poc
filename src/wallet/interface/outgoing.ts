@@ -145,7 +145,6 @@ export const challengePositionReceived = (positionData: string) => ({
 });
 export type ChallengePositionReceived = ReturnType<typeof challengePositionReceived>;
 
-
 export type ResponseAction =
   InitializationSuccess |
   ValidationSuccess |

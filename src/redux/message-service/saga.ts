@@ -189,7 +189,8 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
 function* receiveFromWalletSaga() {
   while (true) {
     const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
-    yield put(gameActions.positionReceived(positionData));
+    const position = decode(positionData);
+    yield put(gameActions.positionReceived(position));
   }
 }
 */

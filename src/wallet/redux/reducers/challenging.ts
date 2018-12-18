@@ -4,9 +4,11 @@ import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
 import * as actions from '../actions';
 import { WalletAction } from '../actions';
-import { unreachable } from '../../utils/reducer-utils';
+import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
-import { challengePositionReceived } from '../actions/_external';
+import { challengePositionReceived, signatureSuccess } from '../../interface/outgoing';
+import decode from '../../domain/decode';
+import { signPositionHex } from '../../utils/signing-utils';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -79,7 +81,15 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
       return states.waitForResponseOrTimeout({ ...state, challengeExpiry: action.expirationTime * 1000 });
     case actions.RESPOND_WITH_MOVE_EVENT:
       const message = challengePositionReceived(action.responseState);
-      return states.acknowledgeChallengeResponse({ ...state, messageOutbox: message });
+      // TODO: Right now we're just storing a dummy signature since we don't get one 
+      // from the challenge. 
+      return states.acknowledgeChallengeResponse({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data: action.responseState, signature: '0x0' },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: message,
+      });
     case actions.CHALLENGE_TIMED_OUT:
       return states.acknowledgeChallengeTimeout({ ...state });
     default:
@@ -89,6 +99,27 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
 
 const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeResponse, action: WalletAction): WalletState => {
   switch (action.type) {
+    case actions.OWN_POSITION_RECEIVED:
+      const data = action.data;
+      const position = decode(data);
+      // check it's our turn
+      if (!ourTurn(state)) {
+        return state;
+      }
+
+      // check transition
+      if (!validTransition(state, position)) {
+        return state;
+      }
+
+      const signature = signPositionHex(data, state.privateKey);
+      return states.acknowledgeChallengeResponse({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data, signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: signatureSuccess(signature),
+      });
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return runningStates.waitForUpdate({ ...state });
     default:

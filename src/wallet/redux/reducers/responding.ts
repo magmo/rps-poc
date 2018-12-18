@@ -7,9 +7,10 @@ import * as runningStates from '../../states/running';
 import { WalletAction } from '../actions';
 import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
-import { signPositionHex } from '../../utils/signing-utils';
+import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
 import { Signature } from '../../domain';
+import { validationSuccess } from '../../interface/outgoing';
 
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
@@ -114,6 +115,22 @@ export const waitForResponseConfirmationReducer = (state: states.WaitForResponse
 
 export const acknowledgeChallengeCompleteReducer = (state: states.AcknowledgeChallengeComplete, action: WalletAction): WalletState => {
   switch (action.type) {
+    case actions.OPPONENT_POSITION_RECEIVED:
+      if (ourTurn(state)) { return state; }
+
+      const position1 = decode(action.data);
+      // check signature
+      const opponentAddress = state.participants[1 - state.ourIndex];
+      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
+      // check transition
+      if (!validTransition(state, position1)) { return state; }
+      return states.acknowledgeChallenge({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data: action.data, signature: action.signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess(),
+      });
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return runningStates.waitForUpdate(state);
     default:
