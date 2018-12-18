@@ -11,7 +11,8 @@ import {
 
 import { WalletAction, KEYS_LOADED, LOGGED_IN } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
-import { initializationSuccess } from '../actions/_external';
+import { initializationSuccess } from '../../interface/outgoing';
+
 
 export const initializingReducer = (state: InitializingState, action: WalletAction): WalletState => {
   switch (state.type) {
