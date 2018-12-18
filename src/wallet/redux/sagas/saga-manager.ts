@@ -9,9 +9,11 @@ import { adjudicatorWatcher } from './adjudicator-watcher';
 import { SiteState } from '../../../redux/reducer';
 import { WalletState, WAIT_FOR_ADDRESS } from '../../states';
 import { getProvider } from '../../utils/contract-utils';
+import challengeTimeout from './challenge-timeout';
 
 export function* sagaManager(): IterableIterator<any> {
   let adjudicatorWatcherProcess;
+  let challengeTimeoutProcess;
 
   // always want the message listenter to be running
   yield fork(messageListener);
@@ -36,10 +38,17 @@ export function* sagaManager(): IterableIterator<any> {
         const provider = yield getProvider();
         adjudicatorWatcherProcess = yield fork(adjudicatorWatcher, state.adjudicator, provider);
       }
+      if (!challengeTimeoutProcess) {
+        challengeTimeoutProcess = yield fork(challengeTimeout);
+      }
     } else {
       if (adjudicatorWatcherProcess) {
         yield cancel(adjudicatorWatcherProcess);
         adjudicatorWatcherProcess = undefined;
+      }
+      if (challengeTimeoutProcess) {
+        yield cancel(challengeTimeoutProcess);
+        challengeTimeoutProcess = undefined;
       }
     }
 
