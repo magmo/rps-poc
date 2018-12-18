@@ -124,7 +124,7 @@ export const acknowledgeChallengeCompleteReducer = (state: states.AcknowledgeCha
       if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
       // check transition
       if (!validTransition(state, position1)) { return state; }
-      return states.acknowledgeChallenge({
+      return states.acknowledgeChallengeComplete({
         ...state,
         turnNum: state.turnNum + 1,
         lastPosition: { data: action.data, signature: action.signature },
