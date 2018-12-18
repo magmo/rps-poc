@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import { Move } from '../core';
 import { SiteState } from '../redux/reducer';
 import * as gameActions from '../redux/game/actions';
+import * as walletActions from '../wallet/interface/incoming';
 
-import { Wallet, actions as walletActions } from '../wallet';
+import { Wallet } from '../wallet';
 import WaitingRoomPage from '../components/WaitingRoomPage';
 import ConfirmGamePage from '../components/ConfirmGamePage';
 import SelectMovePage from '../components/SelectMovePage';
@@ -19,6 +20,7 @@ import WaitForResignationAcknowledgement from '../components/WaitForResignationA
 import GameOverPage from '../components/GameOverPage'; // GameOver, OpponentResigned
 import GameProposedPage from '../components/GameProposedPage';
 import ProfileContainer from './ProfileContainer';
+
 
 import WaitForWallet from '../components/WaitForWallet'; // WaitForFunding, maybe others?
 

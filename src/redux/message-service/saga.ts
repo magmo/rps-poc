@@ -5,8 +5,6 @@ import hash from 'object-hash';
 import { reduxSagaFirebase } from '../../gateways/firebase';
 import * as fromWalletActions from '../../wallet/interface/outgoing';
 import * as toWalletActions from '../../wallet/interface/incoming';
-import { SignatureSuccess } from '../../wallet/redux/actions/_external';
-import * as challengeActions from '../../wallet/redux/actions/_challenge';
 import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
 import { MessageState } from './state';
@@ -187,8 +185,9 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
 
 function* receiveFromWalletSaga() {
   while (true) {
-    const { position } = yield take(challengeActions.SEND_CHALLENGE_POSITION);
-    yield put(gameActions.positionReceived(position));
+    // TODO: Implement this when action is defined
+    // const { position } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
+    // yield put(gameActions.positionReceived(position));
   }
 }
 
@@ -214,7 +213,7 @@ function* signMessage(data) {
   yield put(toWalletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
   const actionFilter = fromWalletActions.SIGNATURE_SUCCESS;
-  const signatureResponse: SignatureSuccess = yield take(actionFilter);
+  const signatureResponse: fromWalletActions.SignatureSuccess = yield take(actionFilter);
   // while (signatureResponse.requestId !== requestId) {
   //   signatureResponse = yield take(actionFilter);
   // }
