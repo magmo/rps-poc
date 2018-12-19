@@ -50,12 +50,15 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       }
 
     case actions.OPPONENT_POSITION_RECEIVED:
+    case actions.MESSAGE_RECEIVED:
       if (ourTurn(state)) { return state; }
 
       const position1 = decode(action.data);
       // check signature
       const opponentAddress = state.participants[1 - state.ourIndex];
-      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
+      if (!action.signature) { return state; }
+      const messageSignature = action.signature as string;
+      if (!validSignature(action.data, messageSignature, opponentAddress)) { return state; }
       // check transition
       if (!validTransition(state, position1)) { return state; }
 
@@ -63,8 +66,8 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       if (position1.stateType === State.StateType.Conclude) {
         return states.approveConclude({
           ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data: action.data, signature: action.signature },
+          turnNum: position1.turnNum,
+          lastPosition: { data: action.data, signature: messageSignature },
           penultimatePosition: state.lastPosition,
 
         });
@@ -73,7 +76,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
         return states.waitForUpdate({
           ...state,
           turnNum: state.turnNum + 1,
-          lastPosition: { data: action.data, signature: action.signature },
+          lastPosition: { data: action.data, signature: messageSignature },
           penultimatePosition: state.lastPosition,
           messageOutbox: validationSuccess(),
         });
