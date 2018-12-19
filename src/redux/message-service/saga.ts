@@ -23,8 +23,7 @@ export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
 
 export default function* messageSaga() {
   yield fork(waitForWalletThenReceiveFromFirebaseSaga);
-  // TODO: Implement this when action is defined
-  // yield fork(receiveFromWalletSaga);
+  yield fork(receiveFromWalletSaga);
   yield fork(sendMessagesSaga);
   yield fork(sendWalletMessageSaga);
 }
@@ -184,8 +183,7 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
   }
 }
 
-// TODO: Implement this when action is defined
-/*
+
 function* receiveFromWalletSaga() {
   while (true) {
     const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
@@ -193,7 +191,7 @@ function* receiveFromWalletSaga() {
     yield put(gameActions.positionReceived(position));
   }
 }
-*/
+
 
 function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
