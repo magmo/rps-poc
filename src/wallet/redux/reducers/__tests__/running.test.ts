@@ -2,7 +2,7 @@ import { walletReducer } from '..';
 import { scenarios } from '../../../../core';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType, itSendsATransaction, itSendsAMessage } from './helpers';
+import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType, itSendsAMessage } from './helpers';
 
 const {
   asAddress,
