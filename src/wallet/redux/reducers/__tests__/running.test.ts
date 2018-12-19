@@ -2,7 +2,7 @@ import { walletReducer } from '..';
 import { scenarios } from '../../../../core';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType } from './helpers';
+import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType, itSendsATransaction, itSendsAMessage } from './helpers';
 
 const {
   asAddress,
@@ -86,8 +86,9 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.challengeRequested();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.APPROVE_CHALLENGE, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
+    itSendsAMessage(updatedState);
   });
 });
 
@@ -141,7 +142,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
-  describe('when we request to launch a challenge', () => {
+  describe('when we request to launch a challenge ', () => {
     const action = actions.challengeRequested();
     const updatedState = walletReducer(state, action);
 
