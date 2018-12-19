@@ -92,7 +92,7 @@ describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
   const state = states.waitForResponseOrTimeout({ ...defaults, challengeExpiry: 1 });
 
   describe('when the opponent responds', () => {
-    const action = actions.challengeResponseReceived('0xC1');
+    const action = actions.respondWithMoveEvent('0xC1');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_RESPONSE, updatedState);

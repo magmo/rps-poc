@@ -119,7 +119,7 @@ describe('when in WAIT_FOR_RESPONSE_CONFIRMED', () => {
 describe('when in ACKNOWLEDGE_CHALLENGE_COMPLETE', () => {
   const state = states.acknowledgeChallengeComplete(defaults);
   describe('when the challenge is acknowledged as complete', () => {
-    const action = actions.challengeCompletionAcknowledged();
+    const action = actions.challengeResponseAcknowledged();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
 
