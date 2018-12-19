@@ -20,7 +20,7 @@ const {
 } = scenarios.standard;
 
 const {
-  concludeHex
+  concludeHex,
 } = scenarios.bResignsAfterOneRound;
 
 const defaults = {
@@ -64,7 +64,7 @@ describe('start in ApproveConclude', () => {
 
     const action = actions.concludeApproved();
     const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.ACKNOWLEDGE_CONCLUDED, updatedState);
+    itTransitionsToStateType(states.ACKNOWLEDGE_CONCLUDE_SUCCESS, updatedState);
   });
 
 });

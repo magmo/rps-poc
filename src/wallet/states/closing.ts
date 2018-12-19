@@ -6,7 +6,7 @@ export const CLOSING = 'CLOSING';
 // state types
 export const APPROVE_CONCLUDE = 'APPROVE_CONCLUDE';
 export const WAIT_FOR_OPPONENT_CONCLUDE = 'WAIT_FOR_OPPONENT_CONCLUDE';
-export const ACKNOWLEDGE_CONCLUDED = 'ACKNOWLEDGE_CONCLUDED';
+export const ACKNOWLEDGE_CONCLUDE_SUCCESS = 'ACKNOWLEDGE_CONCLUDE_SUCCESS';
 export const CLOSED = 'CLOSED';
 export const CLOSED_ON_CHAIN = 'CLOSED_ON_CHAIN';
 
@@ -19,8 +19,8 @@ export interface WaitForOpponentConclude extends AdjudicatorExists {
   type: typeof WAIT_FOR_OPPONENT_CONCLUDE;
   stage: typeof CLOSING;
 }
-export interface AcknowledgeConcluded extends AdjudicatorExists {
-  type: typeof ACKNOWLEDGE_CONCLUDED;
+export interface AcknowledgeConcludeSuccess extends AdjudicatorExists {
+  type: typeof ACKNOWLEDGE_CONCLUDE_SUCCESS;
   stage: typeof CLOSING;
 }
 
@@ -42,8 +42,8 @@ export function waitForOpponentConclude<T extends AdjudicatorExists>(params: T):
   return { type: WAIT_FOR_OPPONENT_CONCLUDE, stage: CLOSING, ...adjudicatorExists(params) };
 }
 
-export function acknowledgeConcluded<T extends AdjudicatorExists>(params: T): AcknowledgeConcluded {
-  return { type: ACKNOWLEDGE_CONCLUDED, stage: CLOSING, ...adjudicatorExists(params) };
+export function acknowledgeConcludeSuccess<T extends AdjudicatorExists>(params: T): AcknowledgeConcludeSuccess {
+  return { type: ACKNOWLEDGE_CONCLUDE_SUCCESS, stage: CLOSING, ...adjudicatorExists(params) };
 }
 
 export function closed<T extends ChannelOpen>(params: T): Closed {
@@ -56,7 +56,7 @@ export function closedOnChain<T extends AdjudicatorExists>(params: T): ClosedOnC
 export type ClosingState = (
   | ApproveConclude
   | WaitForOpponentConclude
-  | AcknowledgeConcluded
+  | AcknowledgeConcludeSuccess
   | ClosedOnChain
   | Closed
 );

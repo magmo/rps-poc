@@ -99,3 +99,8 @@ storiesOf('Wallet Screens / Responding', module)
   .add('InitiateResponse', testState(states.initiateResponse(playerADefaults)))
   .add('WaitForResponseSubmission', testState(states.waitForResponseSubmission(playerADefaults)))
   .add('AcknowledgeChallengeComplete', testState(states.acknowledgeChallengeComplete(playerADefaults)));
+
+storiesOf('Wallet Screens / Closing', module)
+  .add('ApproveConclude', testState(states.approveConclude(playerADefaults)))
+  .add('WaitForOpponentConclude', testState(states.waitForOpponentConclude(playerADefaults)))
+  .add('AcknowledgeConcludeSuccess', testState(states.acknowledgeConcludeSuccess(playerADefaults)));

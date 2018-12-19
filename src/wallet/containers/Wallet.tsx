@@ -8,6 +8,7 @@ import FundingContainer from './Funding';
 import RespondingContainer from './Responding';
 import ChallengingContainer from './Challenging';
 import WithdrawingContainer from './Withdrawing';
+import ClosingContainer from './Closing';
 
 interface WalletProps {
   state: states.WalletState;
@@ -27,6 +28,8 @@ class Wallet extends PureComponent<WalletProps> {
         return <WithdrawingContainer state={state} />;
       case states.RESPONDING:
         return <RespondingContainer state={state} />;
+      case states.CLOSING:
+        return <ClosingContainer state={state} />;
       default:
         return null;
     }

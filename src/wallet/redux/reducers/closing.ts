@@ -15,7 +15,7 @@ export const closingReducer = (state: ClosingState, action: WalletAction): Walle
       return approveConcludeReducer(state, action);
     case states.WAIT_FOR_OPPONENT_CONCLUDE:
       return waitForOpponentConclude(state, action);
-    case states.ACKNOWLEDGE_CONCLUDED:
+    case states.ACKNOWLEDGE_CONCLUDE_SUCCESS:
       return state;
     case states.CLOSED:
       return state;
@@ -34,7 +34,7 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
       const { positionData, positionSignature, sendMessageAction } = composeConcludePosition(state);
       const lastState = decode(state.lastPosition.data);
       if (lastState.stateType === State.StateType.Conclude) {
-        return states.acknowledgeConcluded({
+        return states.acknowledgeConcludeSuccess({
           ...state,
           turnNum: decode(positionData).turnNum,
           penultimatePosition: state.lastPosition,
@@ -66,7 +66,7 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
       if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
       // check transition
       if (!validTransition(state, concludePosition)) { return state; }
-      return states.approveWithdrawal({
+      return states.acknowledgeConcludeSuccess({
         ...state,
         turnNum: concludePosition.turnNum,
         penultimatePosition: state.lastPosition,

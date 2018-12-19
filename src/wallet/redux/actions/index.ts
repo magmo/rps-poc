@@ -297,6 +297,20 @@ export const concludeApproved = () => ({
 });
 export type ConcludeApproved = ReturnType<typeof concludeApproved>;
 
+export const CONCLUDE_REJECTED = 'WALLET.CONCLUDE_REJECTED';
+export const concludeRejected = () => ({
+  type: CONCLUDE_REJECTED as typeof CONCLUDE_REJECTED,
+});
+export type ConcludeRejected = ReturnType<typeof concludeRejected>;
+
+
+export const CONCLUDE_SUCCESS_ACKNOWLEDGED = 'WALLET.CONCLUDE_SUCCESS_ACKNOWLEDGED';
+export const concludeSuccessAcknowledged = () => ({
+  type: CONCLUDE_SUCCESS_ACKNOWLEDGED as typeof CONCLUDE_SUCCESS_ACKNOWLEDGED,
+});
+export type ConcludeSuccessAcknowledged = ReturnType<typeof concludeSuccessAcknowledged>;
+
+
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
@@ -338,4 +352,5 @@ export type WalletAction = (
   | GameConcludedEvent
   | ConcludeRequested
   | ConcludeApproved
+  | ConcludeSuccessAcknowledged
 );
