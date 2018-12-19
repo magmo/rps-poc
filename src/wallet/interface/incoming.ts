@@ -41,6 +41,12 @@ export const openChannelRequest = (channel: Channel) => ({
 });
 export type OpenChannelRequest = ReturnType<typeof openChannelRequest>;
 
+export const CONCLUDE_CHANNEL_REQUEST = 'WALLET.CHANNEL.REQUEST.CONCLUDE';
+export const concludeChannelRequest = () => ({
+  type: CONCLUDE_CHANNEL_REQUEST as typeof CONCLUDE_CHANNEL_REQUEST,
+});
+export type ConcludeChannelRequest = ReturnType<typeof concludeChannelRequest>;
+
 // Currently called by the app's messaging-service, after withdrawal is requested.
 // Responsible for shutting down the sagas that openChannelRequest started.
 // TODO: remove - don't need after the refactor
@@ -135,4 +141,5 @@ export type RequestAction =
   SignatureRequest |
   ValidationRequest |
   WithdrawalRequest |
-  CreateChallengeRequest;
+  CreateChallengeRequest |
+  ConcludeChannelRequest;

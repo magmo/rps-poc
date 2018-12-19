@@ -79,6 +79,8 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
         });
       }
 
+    case actions.CONCLUDE_REQUESTED:
+      return states.approveConclude(state);
     case actions.OPPONENT_CHALLENGE_DETECTED:
       // transition to responding
       return states.acknowledgeChallenge(state);

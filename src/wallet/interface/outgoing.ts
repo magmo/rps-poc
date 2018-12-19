@@ -114,6 +114,24 @@ export const initializationFailure = (message: string) => ({
 
 export type InitializationSuccess = ReturnType<typeof initializationSuccess>;
 
+// CONCLUDE
+// ==============
+
+export const CONCLUDE_SUCCESS = 'WALLET.CONCLUDE.SUCCESS';
+export const CONCLUDE_FAILURE = 'WALLET.CONCLUDE.FAILURE';
+
+export const concludeSuccess = address => ({
+  type: CONCLUDE_SUCCESS as typeof CONCLUDE_SUCCESS,
+  address,
+});
+
+export const concludeFailure = (message: string) => ({
+  type: CONCLUDE_FAILURE as typeof CONCLUDE_FAILURE,
+  message,
+});
+
+export type ConcludeSuccess = ReturnType<typeof concludeSuccess>;
+
 
 // MESSAGING
 // =========
@@ -140,6 +158,7 @@ export type MessageReceived = ReturnType<typeof messageReceived>;
 
 export type ResponseAction =
   InitializationSuccess |
+  ConcludeSuccess |
   ValidationSuccess |
   FundingSuccess |
   FundingFailure |

@@ -7,7 +7,7 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { State, Channel } from 'fmg-core';
 import decode from '../../domain/decode';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { sendMessage } from '../../interface/outgoing';
+import { sendMessage, concludeSuccess } from '../../interface/outgoing';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -71,6 +71,7 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
         turnNum: concludePosition.turnNum,
         penultimatePosition: state.lastPosition,
         lastPosition: { data: action.data, signature: action.signature },
+        messageOutbox: concludeSuccess(state.address),
       });
     default:
       return state;

@@ -192,13 +192,9 @@ function receivedConclude(action: actions.GameAction) {
 
 function resignationReducer(gameState: states.PlayingState, messageState: MessageState): JointState {
   if (itsMyTurn(gameState)) {
-    const { turnNum } = gameState;
     // transition to WaitForResignationAcknowledgement
-    gameState = states.waitForResignationAcknowledgement({ ...gameState, turnNum: turnNum + 1 });
-
-    // and send the latest state to our opponent
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
+    messageState = { ...messageState, walletOutbox: 'CONCLUDE_REQUESTED' };
+    return { messageState, gameState };
   } else {
     // transition to WaitToResign
     gameState = states.waitToResign(gameState);
@@ -212,18 +208,9 @@ function opponentResignationReducer(gameState: states.PlayingState, messageState
 
   const position = action.position;
   if (position.name !== positions.CONCLUDE) { return { gameState, messageState }; }
-  // in taking the turnNum from their position, we're trusting the wallet to have caught
-  // the case where they resign when it isn't their turn
-  const { turnNum } = position;
 
-  // transition to OpponentResigned
-  gameState = states.opponentResigned({ ...gameState, turnNum: turnNum + 1 });
-
-  // send Conclude to our opponent
-  const opponentAddress = states.getOpponentAddress(gameState);
-  messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
-
-  return { gameState, messageState };
+  messageState = { ...messageState, walletOutbox: 'CONCLUDE_REQUESTED' };
+  return { messageState, gameState };
 }
 
 function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmationA, messageState: MessageState, action: actions.GameAction): JointState {

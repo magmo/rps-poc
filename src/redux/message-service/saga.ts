@@ -180,7 +180,10 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       yield put(gameActions.messageSent());
       yield put(gameActions.withdrawalSuccess());
       yield put(toWalletActions.closeChannelRequest());
-
+    case "CONCLUDE_REQUESTED":
+      yield put(toWalletActions.concludeChannelRequest());
+      yield take([fromWalletActions.CONCLUDE_SUCCESS, fromWalletActions.CONCLUDE_FAILURE]);
+      yield put(gameActions.messageSent());
   }
 }
 
