@@ -285,6 +285,18 @@ export const respondWithMoveEvent = (responseState) => ({
 });
 export type RespondWithMoveEvent = ReturnType<typeof respondWithMoveEvent>;
 
+export const CONCLUDE_REQUESTED = 'WALLET.CONCLUDE_REQUESTED';
+export const concludeRequested = () => ({
+  type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
+});
+export type ConcludeRequested = ReturnType<typeof concludeRequested>;
+
+export const CONCLUDE_APPROVED = 'WALLET.CONCLUDE_APPROVED';
+export const concludeApproved = () => ({
+  type: CONCLUDE_APPROVED as typeof CONCLUDE_APPROVED,
+});
+export type ConcludeApproved = ReturnType<typeof concludeApproved>;
+
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
@@ -323,4 +335,7 @@ export type WalletAction = (
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
   | MessageReceived
+  | GameConcludedEvent
+  | ConcludeRequested
+  | ConcludeApproved
 );

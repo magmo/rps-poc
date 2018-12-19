@@ -32,7 +32,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
 
       // if conclude => concluding
       if (position.stateType === State.StateType.Conclude) {
-        return states.concluding({
+        return states.approveConclude({
           ...state,
           turnNum: state.turnNum + 1,
           lastPosition: { data, signature },
@@ -61,7 +61,7 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
 
       // if conclude => concluding
       if (position1.stateType === State.StateType.Conclude) {
-        return states.concluding({
+        return states.approveConclude({
           ...state,
           turnNum: state.turnNum + 1,
           lastPosition: { data: action.data, signature: action.signature },

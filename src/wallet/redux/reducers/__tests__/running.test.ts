@@ -70,7 +70,7 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.ownPositionReceived(aConcludeHex);
     const updatedState = walletReducer(waitForUpdateState, action);
 
-    itTransitionsToStateType(states.CONCLUDING, updatedState);
+    itTransitionsToStateType(states.APPROVE_CONCLUDE, updatedState);
     itIncreasesTurnNumBy(1, waitForUpdateState, updatedState);
   });
 
@@ -129,7 +129,7 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     const action = actions.opponentPositionReceived(bConcludeHex, bConcludeSig);
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.CONCLUDING, updatedState);
+    itTransitionsToStateType(states.APPROVE_CONCLUDE, updatedState);
     itIncreasesTurnNumBy(1, state, updatedState);
   });
 
