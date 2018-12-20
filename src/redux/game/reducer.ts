@@ -11,7 +11,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
 import { INITIALIZATION_SUCCESS, InitializationSuccess } from '../../wallet/interface/outgoing';
-import { PostFundSetupB, POST_FUND_SETUP_B } from 'src/core/positions';
+import { PostFundSetupB, POST_FUND_SETUP_B } from '../../core/positions';
 
 export interface JointState {
   gameState: states.GameState;

@@ -7,7 +7,6 @@ import {
   itSends,
   itTransitionsTo,
   itStoresAction,
-  itCanHandleTheOpponentResigning,
   itIncreasesTurnNumBy,
 } from './helpers';
 
@@ -58,8 +57,6 @@ describe('player B\'s app', () => {
   describe('when in confirmGameB', () => {
     const gameState = state.confirmGameB({ ...bProps });
 
-    itCanHandleTheOpponentResigning({ gameState, messageState });
-
     describe('when player B confirms', () => {
       const action = actions.confirmGame();
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -78,8 +75,6 @@ describe('player B\'s app', () => {
   describe('when in waitForFunding', () => {
     const gameState = state.waitForFunding({ ...bProps, ...preFundSetupB });
 
-    itCanHandleTheOpponentResigning({ gameState, messageState });
-
     describe('when funding is successful', () => {
       const action = actions.fundingSuccess(postFundSetupB);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -91,8 +86,6 @@ describe('player B\'s app', () => {
 
   describe('when in PickMove', () => {
     const gameState = state.pickMove({ ...bProps, ...postFundSetupB });
-
-    itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when a move is chosen', () => {
       const action = actions.chooseMove(bsMove);
@@ -134,8 +127,6 @@ describe('player B\'s app', () => {
   describe('when in WaitForOpponentToPickMoveB', () => {
     const gameState = state.waitForOpponentToPickMoveB({ ...bProps, ...postFundSetupB });
 
-    itCanHandleTheOpponentResigning({ gameState, messageState });
-
     describe('when Propose arrives', () => {
       const action = actions.positionReceived(propose);
       const updatedState = gameReducer({ messageState, gameState }, action);
@@ -148,8 +139,6 @@ describe('player B\'s app', () => {
 
   describe('when in WaitForRevealB', () => {
     const gameState = state.waitForRevealB({ ...bProps, ...accept });
-
-    itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('when Reveal arrives', () => {
       describe('if there are sufficient funds', () => {
@@ -177,8 +166,6 @@ describe('player B\'s app', () => {
 
   describe('when in PlayAgain', () => {
     const gameState = state.playAgain({ ...bProps, ...reveal });
-
-    itCanHandleTheOpponentResigning({ gameState, messageState });
 
     describe('if the player decides to continue', () => {
       const action = actions.playAgain();
