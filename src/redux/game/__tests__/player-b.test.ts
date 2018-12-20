@@ -176,15 +176,6 @@ describe('player B\'s app', () => {
       // is this right?
       itTransitionsTo(state.StateName.PickMove, updatedState);
     });
-
-    describe('if the player decides not to continue', () => {
-      const action = actions.resign();
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itSends(concludeResign, updatedState);
-      itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState);
-    });
   });
 
   describe('when in InsufficientFunds', () => {
@@ -192,21 +183,6 @@ describe('player B\'s app', () => {
 
     describe('when Conclude arrives', () => {
       const action = actions.positionReceived(concludeInsufficientFunds2);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
-      itTransitionsTo(state.StateName.GameOver, updatedState);
-    });
-  });
-
-  describe('when in WaitForResignationAcknowledgement', () => {
-    const gameState = state.waitForResignationAcknowledgement({ ...bProps, ...conclude });
-
-    // todo: is this right? seems like it shouldn't handle it
-    // itCanHandleTheOpponentResigning({ gameState, messageState });
-
-    describe('when Conclude arrives', () => {
-      const action = actions.positionReceived(conclude);
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
