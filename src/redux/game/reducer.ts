@@ -182,11 +182,7 @@ function itsMyTurn(gameState: states.PlayingState) {
 
 function resignationReducer(gameState: states.PlayingState, messageState: MessageState): JointState {
   if (itsMyTurn(gameState)) {
-    // transition to WaitForResignationAcknowledgement
     messageState = { ...messageState, walletOutbox: 'CONCLUDE_REQUESTED' };
-  } else {
-    // transition to WaitToResign
-    gameState = states.waitForResignationAcknowledgement(gameState);
   }
 
   return { gameState, messageState };

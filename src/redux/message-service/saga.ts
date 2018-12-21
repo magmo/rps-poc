@@ -152,7 +152,7 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       const opponentBalance = hexToBN(balances[1 - myIndex]);
 
       yield put(toWalletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
-      const action = yield take([fromWalletActions.FUNDING_SUCCESS, fromWalletActions.FUNDING_FAILURE]);
+      const action = yield take([fromWalletActions.FUNDING_SUCCESS, fromWalletActions.FUNDING_FAILURE, gameActions.RESIGN]);
       switch (action.type) {
         case fromWalletActions.FUNDING_SUCCESS:
           yield put(gameActions.messageSent());
@@ -162,8 +162,11 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
         case fromWalletActions.FUNDING_FAILURE:
           yield put(gameActions.fundingFailure());
           break;
+        case gameActions.RESIGN:
+          yield put(toWalletActions.closeChannelRequest());
+          break;
         default:
-          throw new Error("Expected FUNDING_SUCCESS or FUNDING_FAILURE");
+          throw new Error("Expected FUNDING_SUCCESS or FUNDING_FAILURE or RESIGN");
       }
       break;
     case "WITHDRAWAL_REQUESTED":

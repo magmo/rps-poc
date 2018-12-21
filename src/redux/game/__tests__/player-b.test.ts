@@ -25,7 +25,6 @@ const {
 } = scenarios.aResignsAfterOneRound;
 
 const {
-  conclude: concludeResign,
 } = scenarios.bResignsAfterOneRound;
 
 const {
