@@ -22,6 +22,9 @@ import {
   B_WAIT_FOR_DEPLOY_ADDRESS,
   WAIT_FOR_DEPLOY_CONFIRMATION,
   CLOSED,
+  APPROVE_CONCLUDE,
+  WAIT_FOR_OPPONENT_CONCLUDE,
+  ACKNOWLEDGE_CONCLUDE_SUCCESS,
 } from '../../states';
 
 import { initializingReducer } from './initializing';
@@ -85,6 +88,9 @@ const ourValidConclusionRequest = (state: WalletState, action: WalletAction): Ap
     case A_SUBMIT_DEPLOY_IN_METAMASK:
     case B_WAIT_FOR_DEPLOY_ADDRESS:
     case WAIT_FOR_DEPLOY_CONFIRMATION:
+    case APPROVE_CONCLUDE:
+    case WAIT_FOR_OPPONENT_CONCLUDE:
+    case ACKNOWLEDGE_CONCLUDE_SUCCESS:
     case CLOSED:
       return null;
     default:
@@ -109,6 +115,9 @@ const opponentConclussionReceived = (state: WalletState, action: WalletAction): 
     case A_SUBMIT_DEPLOY_IN_METAMASK:
     case B_WAIT_FOR_DEPLOY_ADDRESS:
     case WAIT_FOR_DEPLOY_CONFIRMATION:
+    case APPROVE_CONCLUDE:
+    case WAIT_FOR_OPPONENT_CONCLUDE:
+    case ACKNOWLEDGE_CONCLUDE_SUCCESS:
     case CLOSED:
       return null;
     default:
