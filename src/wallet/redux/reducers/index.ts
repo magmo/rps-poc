@@ -77,48 +77,32 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
 };
 
 const ourValidConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
+  if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
+  if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
   switch (state.type) {
-    case WAIT_FOR_LOGIN:
-    case WAIT_FOR_ADDRESS:
-    case WAIT_FOR_CHANNEL:
-    case WAIT_FOR_PRE_FUND_SETUP:
     case WAIT_FOR_FUNDING_REQUEST:
     case APPROVE_FUNDING:
     case A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
     case A_SUBMIT_DEPLOY_IN_METAMASK:
     case B_WAIT_FOR_DEPLOY_ADDRESS:
     case WAIT_FOR_DEPLOY_CONFIRMATION:
-    case APPROVE_CONCLUDE:
-    case WAIT_FOR_OPPONENT_CONCLUDE:
-    case ACKNOWLEDGE_CONCLUDE_SUCCESS:
-    case CLOSED:
       return null;
     default:
-      if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
       return approveConclude(state);
   }
 };
 
 const opponentConclussionReceived = (state: WalletState, action: WalletAction): ApproveConclude | null => {
-  if (action.type !== MESSAGE_RECEIVED) {
-    return null;
-  }
+  if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
+  if (action.type !== MESSAGE_RECEIVED) { return null; }
 
   switch (state.type) {
-    case WAIT_FOR_LOGIN:
-    case WAIT_FOR_ADDRESS:
-    case WAIT_FOR_CHANNEL:
-    case WAIT_FOR_PRE_FUND_SETUP:
     case WAIT_FOR_FUNDING_REQUEST:
     case APPROVE_FUNDING:
     case A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
     case A_SUBMIT_DEPLOY_IN_METAMASK:
     case B_WAIT_FOR_DEPLOY_ADDRESS:
     case WAIT_FOR_DEPLOY_CONFIRMATION:
-    case APPROVE_CONCLUDE:
-    case WAIT_FOR_OPPONENT_CONCLUDE:
-    case ACKNOWLEDGE_CONCLUDE_SUCCESS:
-    case CLOSED:
       return null;
     default:
       const position = decode(action.data);
