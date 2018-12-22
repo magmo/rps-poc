@@ -10,10 +10,6 @@ import {
   CLOSING,
   waitForLogin,
   approveConclude,
-  WAIT_FOR_LOGIN,
-  WAIT_FOR_ADDRESS,
-  WAIT_FOR_CHANNEL,
-  WAIT_FOR_PRE_FUND_SETUP,
   ApproveConclude,
   WAIT_FOR_FUNDING_REQUEST,
   APPROVE_FUNDING,
@@ -21,10 +17,6 @@ import {
   A_SUBMIT_DEPLOY_IN_METAMASK,
   B_WAIT_FOR_DEPLOY_ADDRESS,
   WAIT_FOR_DEPLOY_CONFIRMATION,
-  CLOSED,
-  APPROVE_CONCLUDE,
-  WAIT_FOR_OPPONENT_CONCLUDE,
-  ACKNOWLEDGE_CONCLUDE_SUCCESS,
 } from '../../states';
 
 import { initializingReducer } from './initializing';

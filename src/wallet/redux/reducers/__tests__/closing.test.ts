@@ -2,15 +2,16 @@ import { walletReducer } from '..';
 
 import * as states from '../../../states';
 import * as actions from '../../actions';
-
+import * as outgoing from '../../../interface/outgoing';
 
 import { scenarios } from '../../../../core';
 import { itTransitionsToStateType } from './helpers';
 
-
 const {
   asAddress,
   asPrivateKey,
+  bsAddress,
+  bsPrivateKey,
   channelId,
   channelNonce,
   libraryAddress,
@@ -19,12 +20,10 @@ const {
   acceptHex,
 } = scenarios.standard;
 
-const {
-  concludeHex,
-} = scenarios.bResignsAfterOneRound;
+const aResignsAfterOneRound = scenarios.aResignsAfterOneRound;
+const bResignsAfterOneRound = scenarios.bResignsAfterOneRound;
 
 const defaults = {
-  address: asAddress,
   adjudicator: 'adj-address',
   channelId,
   channelNonce,
@@ -37,6 +36,7 @@ const defaults = {
 const defaultsA = {
   ...defaults,
   ourIndex: 0,
+  address: asAddress,
   privateKey: asPrivateKey,
 };
 
@@ -58,13 +58,45 @@ describe('start in ApproveConclude', () => {
     const state = states.approveConclude({
       ...defaultsA,
       penultimatePosition: { data: proposeHex, signature: 'sig' },
-      lastPosition: { data: concludeHex, signature: 'sig' },
+      lastPosition: { data: bResignsAfterOneRound.concludeHex, signature: 'sig' },
       turnNum: 1,
     });
 
     const action = actions.concludeApproved();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.ACKNOWLEDGE_CONCLUDE_SUCCESS, updatedState);
+    expect((updatedState.messageOutbox!).type).toEqual(outgoing.SEND_MESSAGE);
   });
 
+});
+
+describe('start in WaitForOpponentConclude', () => {
+  describe('action taken: messageReceived', () => {
+    const state = states.waitForOpponentConclude({
+      ...defaultsA,
+      penultimatePosition: { data: aResignsAfterOneRound.restingHex, signature: 'sig' },
+      lastPosition: { data: aResignsAfterOneRound.concludeHex, signature: 'sig' },
+      turnNum: 8,
+    });
+
+    const action = actions.messageReceived(aResignsAfterOneRound.conclude2Hex, aResignsAfterOneRound.conclude2Sig);
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.ACKNOWLEDGE_CONCLUDE_SUCCESS, updatedState);
+  });
+});
+
+describe('start in AcknowledgConcludeSuccess', () => {
+  describe('action taken: conclude success acknowledged', () => {
+    const state = states.acknowledgeConcludeSuccess({
+      ...defaultsA,
+      penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: 'sig' },
+      lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: 'sig' },
+      turnNum: 9,
+    });
+
+    const action = actions.concludeSuccessAcknowledged();
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+    expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
+  });
 });
