@@ -17,7 +17,7 @@ export const closingReducer = (state: ClosingState, action: WalletAction): Walle
       return waitForOpponentConclude(state, action);
     case states.ACKNOWLEDGE_CONCLUDE_SUCCESS:
       return acknowledgeConcludeSuccessReducer(state, action);
-    case states.CLOSED:
+    case states.ACKNOWLEDGE_CLOSE_SUCCESS:
       return state;
     case states.CLOSED_ON_CHAIN:
       return state;
@@ -80,10 +80,15 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
 const acknowledgeConcludeSuccessReducer = (state: states.AcknowledgeConcludeSuccess, action: WalletAction) => {
   switch (action.type) {
     case actions.CONCLUDE_SUCCESS_ACKNOWLEDGED:
-      return states.approveWithdrawal({
-        ...state,
-        messageOutbox: concludeSuccess(state.address),
-      });
+      if (state.adjudicator) {
+        return states.approveWithdrawal({
+          ...state,
+          adjudicator: state.adjudicator,
+          messageOutbox: concludeSuccess(state.address),
+        });
+      } else {
+        return states.acknowledgeCloseSuccess(state);
+      }
     default:
       return state;
   }

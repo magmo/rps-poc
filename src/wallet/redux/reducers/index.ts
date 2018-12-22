@@ -11,12 +11,6 @@ import {
   waitForLogin,
   approveConclude,
   ApproveConclude,
-  WAIT_FOR_FUNDING_REQUEST,
-  APPROVE_FUNDING,
-  A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK,
-  A_SUBMIT_DEPLOY_IN_METAMASK,
-  B_WAIT_FOR_DEPLOY_ADDRESS,
-  WAIT_FOR_DEPLOY_CONFIRMATION,
 } from '../../states';
 
 import { initializingReducer } from './initializing';
@@ -71,47 +65,34 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
 const ourValidConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
-  switch (state.type) {
-    case WAIT_FOR_FUNDING_REQUEST:
-    case APPROVE_FUNDING:
-    case A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
-    case A_SUBMIT_DEPLOY_IN_METAMASK:
-    case B_WAIT_FOR_DEPLOY_ADDRESS:
-    case WAIT_FOR_DEPLOY_CONFIRMATION:
-      return null;
-    default:
-      return approveConclude(state);
-  }
+  return approveConclude(state);
 };
 
 const opponentConclussionReceived = (state: WalletState, action: WalletAction): ApproveConclude | null => {
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== MESSAGE_RECEIVED) { return null; }
 
-  switch (state.type) {
-    case WAIT_FOR_FUNDING_REQUEST:
-    case APPROVE_FUNDING:
-    case A_WAIT_FOR_DEPLOY_TO_BE_SENT_TO_METAMASK:
-    case A_SUBMIT_DEPLOY_IN_METAMASK:
-    case B_WAIT_FOR_DEPLOY_ADDRESS:
-    case WAIT_FOR_DEPLOY_CONFIRMATION:
-      return null;
-    default:
-      const position = decode(action.data);
-      if (position.stateType !== State.StateType.Conclude) {
-        return null;
-      }
-      // check signature
-      const opponentAddress = state.participants[1 - state.ourIndex];
-      if (!action.signature) { return null; }
-      if (!validSignature(action.data, action.signature, opponentAddress)) { return null; }
-      if (!validTransition(state, position)) { return null; }
-
-      return approveConclude({
-        ...state,
-        turnNum: position.turnNum,
-        lastPosition: { data: action.data, signature: action.signature },
-        penultimatePosition: state.lastPosition,
-      });
+  let position;
+  try {
+    position = decode(action.data);
+  } catch (error) {
+    return null;
   }
+
+  if (position.stateType !== State.StateType.Conclude) {
+    return null;
+  }
+  // check signature
+  const opponentAddress = state.participants[1 - state.ourIndex];
+  if (!action.signature) { return null; }
+  if (!validSignature(action.data, action.signature, opponentAddress)) { return null; }
+  if (!validTransition(state, position)) { return null; }
+
+  return approveConclude({
+    ...state,
+    turnNum: position.turnNum,
+    lastPosition: { data: action.data, signature: action.signature },
+    penultimatePosition: state.lastPosition,
+  });
+
 };

@@ -53,7 +53,7 @@ describe('when in ApproveWithdrawal', () => {
     const action = actions.withdrawalRejected();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.CLOSED, updatedState);
+    itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
   });
 });
 

@@ -15,6 +15,7 @@ interface Props {
   concludeApproved: () => void;
   concludeRejected: () => void;
   concludeSuccessAcknowledged: () => void;
+  closeSuccessAcknowledged: () => void;
 }
 
 class ClosingContainer extends PureComponent<Props> {
@@ -24,6 +25,7 @@ class ClosingContainer extends PureComponent<Props> {
       concludeApproved,
       concludeRejected,
       concludeSuccessAcknowledged,
+      closeSuccessAcknowledged,
     } = this.props;
 
     switch (state.type) {
@@ -47,7 +49,15 @@ class ClosingContainer extends PureComponent<Props> {
             actionTitle="Proceed to withdraw"
           />
         );
-      case states.CLOSED:
+      case states.ACKNOWLEDGE_CLOSE_SUCCESS:
+        return (
+          <AcknowledgeX
+            title="Channel closed!"
+            action={closeSuccessAcknowledged}
+            description="You have successfully closed your channel"
+            actionTitle="Return to lobby"
+          />
+        );
       case states.CLOSED_ON_CHAIN:
         return null;
       default:
@@ -60,6 +70,7 @@ const mapDispatchToProps = {
   concludeApproved: actions.concludeApproved,
   concludeRejected: actions.concludeRejected,
   concludeSuccessAcknowledged: actions.concludeSuccessAcknowledged,
+  closeSuccessAcknowledged: actions.closeSuccessAcknowledged,
 };
 
 export default connect(

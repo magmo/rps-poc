@@ -310,6 +310,12 @@ export const concludeSuccessAcknowledged = () => ({
 });
 export type ConcludeSuccessAcknowledged = ReturnType<typeof concludeSuccessAcknowledged>;
 
+export const CLOSE_SUCCESS_ACKNOWLEDGED = 'WALLET.CLOSE_SUCCESS_ACKNOWLEDGED';
+export const closeSuccessAcknowledged = () => ({
+  type: CLOSE_SUCCESS_ACKNOWLEDGED as typeof CLOSE_SUCCESS_ACKNOWLEDGED,
+});
+export type CloseSuccessAcknowledged = ReturnType<typeof closeSuccessAcknowledged>;
+
 
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
@@ -353,4 +359,5 @@ export type WalletAction = (
   | ConcludeRequested
   | ConcludeApproved
   | ConcludeSuccessAcknowledged
+  | CloseSuccessAcknowledged
 );
