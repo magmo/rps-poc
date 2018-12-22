@@ -3,7 +3,6 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import decode from '../../domain/decode';
 
-import { State } from 'fmg-core';
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { validationSuccess, signatureSuccess } from '../../interface/outgoing';

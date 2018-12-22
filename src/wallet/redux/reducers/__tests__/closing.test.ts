@@ -10,8 +10,6 @@ import { itTransitionsToStateType } from './helpers';
 const {
   asAddress,
   asPrivateKey,
-  bsAddress,
-  bsPrivateKey,
   channelId,
   channelNonce,
   libraryAddress,
