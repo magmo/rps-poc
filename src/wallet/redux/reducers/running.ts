@@ -30,27 +30,15 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
 
       const signature = signPositionHex(data, state.privateKey);
 
-      // if conclude => concluding
-      if (position.stateType === State.StateType.Conclude) {
-        return states.approveConclude({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data, signature },
-          penultimatePosition: state.lastPosition,
-        });
-      } else {
-        // else => running
-        return states.waitForUpdate({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data, signature },
-          penultimatePosition: state.lastPosition,
-          messageOutbox: signatureSuccess(signature),
-        });
-      }
+      return states.waitForUpdate({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data, signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: signatureSuccess(signature),
+      });
 
     case actions.OPPONENT_POSITION_RECEIVED:
-    case actions.MESSAGE_RECEIVED:
       if (ourTurn(state)) { return state; }
 
       const position1 = decode(action.data);
@@ -62,28 +50,14 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       // check transition
       if (!validTransition(state, position1)) { return state; }
 
-      // if conclude => concluding
-      if (position1.stateType === State.StateType.Conclude) {
-        return states.approveConclude({
-          ...state,
-          turnNum: position1.turnNum,
-          lastPosition: { data: action.data, signature: messageSignature },
-          penultimatePosition: state.lastPosition,
+      return states.waitForUpdate({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data: action.data, signature: messageSignature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess(),
+      });
 
-        });
-      } else {
-        // else => running
-        return states.waitForUpdate({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data: action.data, signature: messageSignature },
-          penultimatePosition: state.lastPosition,
-          messageOutbox: validationSuccess(),
-        });
-      }
-
-    case actions.CONCLUDE_REQUESTED:
-      return states.approveConclude(state);
     case actions.OPPONENT_CHALLENGE_DETECTED:
       // transition to responding
       return states.acknowledgeChallenge(state);
