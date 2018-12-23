@@ -155,13 +155,13 @@ const aWaitForDepositReducer = (state: states.AWaitForDeposit, action: actions.W
 const aWaitForPostFundSetupReducer = (state: states.AWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      if (!validPostFundState(state, action)) { return state; }
+      if (!validTransitionToPostFundState(state, action.data, action.signature)) { return state; }
 
       const postFundPosition = decode(action.data);
       return states.acknowledgeFundingSuccess({
         ...state,
         turnNum: postFundPosition.turnNum,
-        lastPosition: { data: action.data, signature: action.signature as string },
+        lastPosition: { data: action.data, signature: action.signature! },
         penultimatePosition: state.lastPosition,
       });
     default:
@@ -198,11 +198,10 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
     // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
     // All of the above happens before B receives transaction submitted
     case actions.MESSAGE_RECEIVED:
+      if (!action.signature) { return state; }
       return states.bSubmitDepositInMetaMask({
         ...state,
-        turnNum: decode(action.data).turnNum,
-        penultimatePosition: state.lastPosition,
-        lastPosition: { data: action.data, signature: action.signature as string },
+        unvalidatedNewPosition: { data: action.data, signature: action.signature },
       });
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDepositConfirmation(state);
@@ -219,36 +218,39 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
 const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
+      if (!action.signature) { return state; }
       return states.waitForDepositConfirmation({
         ...state,
-        turnNum: decode(action.data).turnNum,
-        penultimatePosition: state.lastPosition,
-        lastPosition: { data: action.data, signature: action.signature as string },
+        unvalidatedNewPosition: { data: action.data, signature: action.signature },
       });
     case actions.TRANSACTION_CONFIRMED:
-      const lastPositionState = decode(state.lastPosition.data);
+      let haveValidPostFundA = false;
+      if (state.unvalidatedNewPosition) {
+        haveValidPostFundA = validTransitionToPostFundState(state, state.unvalidatedNewPosition.data, state.unvalidatedNewPosition.signature);
+      }
       // Player B already received PostFund state from A
-      if (lastPositionState.stateType === 1) {
+      if (haveValidPostFundA) {
         const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
         return states.acknowledgeFundingSuccess({
           ...state,
           turnNum: decode(positionData).turnNum,
           lastPosition: { data: positionData, signature: positionSignature },
           penultimatePosition: state.lastPosition,
+          unvalidatedNewPosition: undefined,
           messageOutbox: sendMessageAction,
         });
       }
 
       return states.bWaitForPostFundSetup(state);
     case actions.MESSAGE_RECEIVED:
-      if (!validPostFundState(state, action)) {
+      if (!validTransitionToPostFundState(state, action.data, action.signature)) {
         return state;
       }
       const postFundPosition = decode(action.data);
       return states.waitForDepositConfirmation({
         ...state,
         turnNum: postFundPosition.turnNum,
-        lastPosition: { data: action.data, signature: action.signature as string },
+        lastPosition: { data: action.data, signature: action.signature! },
         penultimatePosition: state.lastPosition,
       });
     default:
@@ -259,7 +261,7 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
 const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.MESSAGE_RECEIVED:
-      if (!validPostFundState(state, action)) {
+      if (!validTransitionToPostFundState(state, action.data, action.signature)) {
         return state;
       }
 
@@ -270,7 +272,7 @@ const bWaitForPostFundSetupReducer = (state: states.BWaitForPostFundSetup, actio
         ...newState,
         turnNum: postFundPosition.turnNum,
         lastPosition: { data: positionData, signature: positionSignature },
-        penultimatePosition: { data: action.data, signature: action.signature as string },
+        penultimatePosition: { data: action.data, signature: action.signature! },
         messageOutbox: sendMessageAction,
       });
     default:
@@ -290,15 +292,15 @@ const acknowledgeFundingSuccessReducer = (state: states.AcknowledgeFundingSucces
   }
 };
 
-const validPostFundState = (state: states.FundingState, action: actions.MessageReceived) => {
-  if (!action.signature) { return false; }
-  const postFundPosition = decode(action.data);
+const validTransitionToPostFundState = (state: states.FundingState, data: string, signature: string | undefined) => {
+  if (!signature) { return false; }
+  const postFundPosition = decode(data);
   const opponentAddress = state.participants[1 - state.ourIndex];
 
-  if (!validSignature(action.data, action.signature, opponentAddress)) { return false; }
+  if (!validSignature(data, signature, opponentAddress)) { return false; }
   // check transition
   if (!validTransition(state, postFundPosition)) { return false; }
-
+  if (postFundPosition.stateType !== 1) { return false; }
   return true;
 };
 
