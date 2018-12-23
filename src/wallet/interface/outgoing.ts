@@ -131,6 +131,13 @@ export const concludeFailure = (message: string) => ({
 });
 
 export type ConcludeSuccess = ReturnType<typeof concludeSuccess>;
+export type ConcludeFailure = ReturnType<typeof concludeFailure>;
+
+export const CLOSE_SUCCESS = 'WALLET.CLOSE.SUCCESS';
+export const closeSuccess = () => ({
+  type: CLOSE_SUCCESS as typeof CLOSE_SUCCESS,
+});
+export type CloseSuccess = ReturnType<typeof closeSuccess>;
 
 
 // MESSAGING
@@ -159,6 +166,7 @@ export type MessageReceived = ReturnType<typeof messageReceived>;
 export type ResponseAction =
   InitializationSuccess |
   ConcludeSuccess |
+  CloseSuccess |
   ValidationSuccess |
   FundingSuccess |
   FundingFailure |

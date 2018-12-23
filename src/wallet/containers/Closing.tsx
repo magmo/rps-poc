@@ -55,7 +55,7 @@ class ClosingContainer extends PureComponent<Props> {
             title="Channel closed!"
             action={closeSuccessAcknowledged}
             description="You have successfully closed your channel"
-            actionTitle="Return to lobby"
+            actionTitle="Ok!"
           />
         );
       case states.CLOSED_ON_CHAIN:

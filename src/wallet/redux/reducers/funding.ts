@@ -69,8 +69,8 @@ const approveFundingReducer = (state: states.ApproveFunding, action: actions.Wal
         const fundingAmount = getFundingAmount(state, state.ourIndex);
         return states.bWaitForDepositToBeSentToMetaMask({
           ...state,
-          adjudicator: state.adjudicator as string,
-          transactionOutbox: createDepositTransaction(state.adjudicator as string, fundingAmount),
+          adjudicator: state.adjudicator,
+          transactionOutbox: createDepositTransaction(state.adjudicator, fundingAmount),
         });
       }
     case actions.FUNDING_REJECTED:
@@ -118,10 +118,11 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-      const sendAdjudicatorAddressAction = sendMessage(state.participants[1 - state.ourIndex], action.contractAddress as string, "");
+      if (!action.contractAddress) { return state; }
+      const sendAdjudicatorAddressAction = sendMessage(state.participants[1 - state.ourIndex], action.contractAddress, "");
       return states.aWaitForDeposit({
         ...state,
-        adjudicator: action.contractAddress as string,
+        adjudicator: action.contractAddress,
         messageOutbox: sendAdjudicatorAddressAction,
       });
     default:

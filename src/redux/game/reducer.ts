@@ -10,7 +10,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-import { INITIALIZATION_SUCCESS, InitializationSuccess } from '../../wallet/interface/outgoing';
+import { INITIALIZATION_SUCCESS, InitializationSuccess, CLOSE_SUCCESS, CloseSuccess } from '../../wallet/interface/outgoing';
 import { PostFundSetupB, POST_FUND_SETUP_B } from '../../core/positions';
 
 export interface JointState {
@@ -20,7 +20,8 @@ export interface JointState {
 
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState,
+  action: actions.GameAction | LoginSuccess | InitializationSuccess | CloseSuccess) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
@@ -42,6 +43,16 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
     const { messageState, gameState } = state;
     const { address: myAddress } = action;
     return { gameState: { ...gameState, myAddress, }, messageState };
+  }
+  if (action.type === CLOSE_SUCCESS) {
+    const { messageState, gameState } = state;
+    if ('participants' in gameState) {
+      const { myName, libraryAddress, twitterHandle } = gameState;
+      const myAddress = gameState.participants[gameState.player];
+      const newGameState = states.lobby({ myName, myAddress, libraryAddress, twitterHandle });
+      return { gameState: newGameState, messageState };
+    }
+    return state;
   }
 
   // apply the current action to the state

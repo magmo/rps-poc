@@ -186,7 +186,7 @@ describe('start in WaitForDeployConfirmation', () => {
   describe('incoming action: transaction confirmed', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
-    const action = actions.transactionConfirmed();
+    const action = actions.transactionConfirmed('1234');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT, updatedState);
