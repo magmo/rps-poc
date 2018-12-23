@@ -7,7 +7,7 @@ import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils
 import { State, Channel } from 'fmg-core';
 import decode from '../../domain/decode';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
-import { sendMessage, closeSuccess } from '../../interface/outgoing';
+import { sendMessage, closeSuccess, concludeSuccess } from '../../interface/outgoing';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -84,9 +84,13 @@ const acknowledgeConcludeSuccessReducer = (state: states.AcknowledgeConcludeSucc
         return states.approveWithdrawal({
           ...state,
           adjudicator: state.adjudicator,
+          messageOutbox: concludeSuccess(),
         });
       } else {
-        return states.acknowledgeCloseSuccess(state);
+        return states.acknowledgeCloseSuccess({
+          ...state,
+          messageOutbox: concludeSuccess(),
+        });
       }
     default:
       return state;

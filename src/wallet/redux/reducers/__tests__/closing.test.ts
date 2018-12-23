@@ -95,9 +95,10 @@ describe('start in AcknowledgConcludeSuccess', () => {
     const action = actions.concludeSuccessAcknowledged();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+    expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
   });
 
-  describe('action taken: conclude success acknowledged', () => {
+  describe('action taken: conclude success acknowledged, adjudicator does not exist', () => {
     const state = states.acknowledgeConcludeSuccess({
       ...defaultsA,
       penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: 'sig' },
@@ -109,6 +110,7 @@ describe('start in AcknowledgConcludeSuccess', () => {
     const action = actions.concludeSuccessAcknowledged();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
+    expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
   });
 
 });

@@ -120,9 +120,8 @@ export type InitializationSuccess = ReturnType<typeof initializationSuccess>;
 export const CONCLUDE_SUCCESS = 'WALLET.CONCLUDE.SUCCESS';
 export const CONCLUDE_FAILURE = 'WALLET.CONCLUDE.FAILURE';
 
-export const concludeSuccess = address => ({
+export const concludeSuccess = () => ({
   type: CONCLUDE_SUCCESS as typeof CONCLUDE_SUCCESS,
-  address,
 });
 
 export const concludeFailure = (message: string) => ({
