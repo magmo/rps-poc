@@ -11,6 +11,8 @@ import {
   waitForLogin,
   approveConclude,
   ApproveConclude,
+  acknowlegeClosedOnChain,
+  AcknowledgeClosedOnChain,
 } from '../../states';
 
 import { initializingReducer } from './initializing';
@@ -21,7 +23,7 @@ import { challengingReducer } from './challenging';
 import { respondingReducer } from './responding';
 import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
-import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED } from '../actions';
+import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, GAME_CONCLUDED_EVENT } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import decode from '../../domain/decode';
 import { validSignature } from '../../utils/signing-utils';
@@ -30,15 +32,14 @@ import { State } from 'fmg-core';
 const initialState = waitForLogin();
 
 export const walletReducer = (state: WalletState = initialState, action: WalletAction): WalletState => {
-  const ourConclusionState = ourValidConclusionRequest(state, action);
-  if (ourConclusionState) {
-    return ourConclusionState;
-  }
+  const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
+  if (conclusionStateFromOwnRequest) { return conclusionStateFromOwnRequest; }
 
-  const conclusionState = opponentConclussionReceived(state, action);
-  if (conclusionState) {
-    return conclusionState;
-  }
+  const conclusionStateFromOpponentRequest = receivedValidOpponentConclusionRequest(state, action);
+  if (conclusionStateFromOpponentRequest) { return conclusionStateFromOpponentRequest; }
+
+  const closedOnChainState = receivedValidOpponentClosedOnChain(state, action);
+  if (closedOnChainState) { return closedOnChainState; }
 
   switch (state.stage) {
     case INITIALIZING:
@@ -62,13 +63,13 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
   }
 };
 
-const ourValidConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
+const receivedValidOwnConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
   return approveConclude(state);
 };
 
-const opponentConclussionReceived = (state: WalletState, action: WalletAction): ApproveConclude | null => {
+const receivedValidOpponentConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
   if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== MESSAGE_RECEIVED) { return null; }
 
@@ -94,5 +95,14 @@ const opponentConclussionReceived = (state: WalletState, action: WalletAction): 
     lastPosition: { data: action.data, signature: action.signature },
     penultimatePosition: state.lastPosition,
   });
+};
 
+const receivedValidOpponentClosedOnChain = (state: WalletState, action: WalletAction): AcknowledgeClosedOnChain | null => {
+  if (state.stage !== FUNDING && state.stage !== RUNNING && state.stage !== CLOSING) { return null; }
+  if (action.type !== GAME_CONCLUDED_EVENT) { return null; }
+
+  if ('adjudicator' in state && state.adjudicator) {
+    return acknowlegeClosedOnChain({ ...state, adjudicator: state.adjudicator });
+  }
+  return null;
 };

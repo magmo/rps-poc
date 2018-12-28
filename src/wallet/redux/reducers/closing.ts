@@ -19,8 +19,8 @@ export const closingReducer = (state: ClosingState, action: WalletAction): Walle
       return acknowledgeConcludeSuccessReducer(state, action);
     case states.ACKNOWLEDGE_CLOSE_SUCCESS:
       return acknowledgeCloseSuccessReducer(state, action);
-    case states.CLOSED_ON_CHAIN:
-      return state;
+    case states.ACKNOWLEDGE_CLOSED_ON_CHAIN:
+      return acknowledgeClosedOnChainReducer(state, action);
     default:
       return unreachable(state);
   }
@@ -100,6 +100,18 @@ const acknowledgeConcludeSuccessReducer = (state: states.AcknowledgeConcludeSucc
 const acknowledgeCloseSuccessReducer = (state: states.AcknowledgeCloseSuccess, action: WalletAction) => {
   switch (action.type) {
     case actions.CLOSE_SUCCESS_ACKNOWLEDGED:
+      return states.waitForChannel({
+        ...state,
+        messageOutbox: closeSuccess(),
+      });
+    default:
+      return state;
+  }
+};
+
+const acknowledgeClosedOnChainReducer = (state: states.AcknowledgeClosedOnChain, action: WalletAction) => {
+  switch (action.type) {
+    case actions.CLOSED_ON_CHAIN_ACKNOWLEDGED:
       return states.waitForChannel({
         ...state,
         messageOutbox: closeSuccess(),
