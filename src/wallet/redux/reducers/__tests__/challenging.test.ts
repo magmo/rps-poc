@@ -121,6 +121,6 @@ describe('when in ACKNOWLEDGE_TIMEOUT', () => {
   const action = actions.challengedTimedOutAcknowledged();
   const updatedState = walletReducer(state, action);
 
-  itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+  itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
 
 });
