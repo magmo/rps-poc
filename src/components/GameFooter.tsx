@@ -18,8 +18,8 @@ export default class GameFooter extends React.PureComponent<Props> {
           <Button className="footer-resign" outline={true} onClick={resign} disabled={isNotOurTurn}>
             {isNotOurTurn ? "Can't Resign" : "Resign"}
           </Button>
-          <Button className="footer-challenge" outline={true} onClick={createBlockchainChallenge}>
-            Challenge on-chain
+          <Button className="footer-challenge" outline={true} onClick={createBlockchainChallenge} disabled={isNotOurTurn}>
+            {isNotOurTurn ? "Can't challenge" : "Challenge on-chain"}
           </Button>
           <div className="ml-auto">
             <div className="footer-logo-container">
