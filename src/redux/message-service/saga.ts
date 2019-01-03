@@ -219,15 +219,21 @@ function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
   yield put(toWalletActions.validationRequest(requestId, data, signature));
   const actionFilter = [fromWalletActions.VALIDATION_SUCCESS, fromWalletActions.VALIDATION_FAILURE];
-  const action: fromWalletActions.ValidationResponse = yield take(actionFilter);
-  // while (action.requestId !== requestId) {
-  //   action = yield take(actionFilter);
-  // }
+  let action: fromWalletActions.ValidationResponse = yield take(actionFilter);
   if (action.type === fromWalletActions.VALIDATION_SUCCESS) {
     return true;
   } else {
-    // TODO: Properly handle this.
-    throw new Error("Signature Validation error");
+    if (action.reason === "WalletBusy") {
+      yield take(fromWalletActions.CHALLENGE_COMPLETE);
+      yield put(toWalletActions.validationRequest(requestId, data, signature));
+      action = yield take(actionFilter);
+      if (action.type === fromWalletActions.VALIDATION_SUCCESS) {
+        return true;
+      }
+    }
+
+    throw new Error(`Signature Validation error ${action.reason}}`);
+
   }
 }
 
@@ -236,10 +242,21 @@ function* signMessage(data) {
 
   yield put(toWalletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
-  const actionFilter = fromWalletActions.SIGNATURE_SUCCESS;
-  const signatureResponse: fromWalletActions.SignatureSuccess = yield take(actionFilter);
-  // while (signatureResponse.requestId !== requestId) {
-  //   signatureResponse = yield take(actionFilter);
-  // }
-  return signatureResponse.signature;
+  const actionFilter = [fromWalletActions.SIGNATURE_SUCCESS, fromWalletActions.SIGNATURE_FAILURE];
+  let action: fromWalletActions.SignatureResponse = yield take(actionFilter);
+  if (action.type === fromWalletActions.SIGNATURE_SUCCESS) {
+    return action.signature;
+  } else {
+    if (action.reason === "WalletBusy") {
+      yield take(fromWalletActions.CHALLENGE_COMPLETE);
+      yield put(toWalletActions.signatureRequest(requestId, data));
+      action = yield take(actionFilter);
+      if (action.type === fromWalletActions.SIGNATURE_SUCCESS) {
+        return action.signature;
+      }
+    }
+
+    throw new Error(`Signing error ${action.reason}}`);
+
+  }
 }

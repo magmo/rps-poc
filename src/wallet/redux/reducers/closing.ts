@@ -8,8 +8,13 @@ import { State, Channel } from 'fmg-core';
 import decode from '../../domain/decode';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { sendMessage, closeSuccess, concludeSuccess } from '../../interface/outgoing';
+import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
+  // Handle any signature/validation request centrally to avoid duplicating code for each state
+  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+    return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
+  }
   switch (state.type) {
     case states.APPROVE_CONCLUDE:
       return approveConcludeReducer(state, action);

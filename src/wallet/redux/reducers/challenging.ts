@@ -4,13 +4,16 @@ import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
 import * as actions from '../actions';
 import { WalletAction } from '../actions';
-import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
+import { unreachable } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
-import { challengePositionReceived, signatureSuccess, validationSuccess } from '../../interface/outgoing';
-import decode from '../../domain/decode';
-import { signPositionHex, validSignature } from '../../utils/signing-utils';
+import { challengePositionReceived, challengeComplete } from '../../interface/outgoing';
+import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
+  // Handle any signature/validation request centrally to avoid duplicating code for each state
+  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+    return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
+  }
   switch (state.type) {
     case states.APPROVE_CHALLENGE:
       return approveChallengeReducer(state, action);
@@ -91,27 +94,6 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
         messageOutbox: message,
       });
 
-    case actions.OWN_POSITION_RECEIVED:
-      const { data } = action;
-      const signature = signPositionHex(data, state.privateKey);
-      return states.waitForResponseOrTimeout({
-        ...state,
-        turnNum: state.turnNum + 1,
-        lastPosition: { data, signature },
-        penultimatePosition: state.lastPosition,
-        messageOutbox: signatureSuccess(signature),
-      });
-
-    case actions.OPPONENT_POSITION_RECEIVED:
-      const opponentAddress = state.participants[1 - state.ourIndex];
-      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
-      return states.waitForResponseOrTimeout({
-        ...state,
-        turnNum: state.turnNum + 1,
-        lastPosition: { data: action.data, signature: action.signature },
-        penultimatePosition: state.lastPosition,
-        messageOutbox: validationSuccess(),
-      });
 
     case actions.CHALLENGE_TIMED_OUT:
       return states.acknowledgeChallengeTimeout({ ...state });
@@ -122,46 +104,8 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
 
 const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeResponse, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.OWN_POSITION_RECEIVED:
-      const data = action.data;
-      const position = decode(data);
-      // check it's our turn
-      if (!ourTurn(state)) {
-        return state;
-      }
-
-      // check transition
-      if (!validTransition(state, position)) {
-        return state;
-      }
-
-      const signature = signPositionHex(data, state.privateKey);
-      return states.acknowledgeChallengeResponse({
-        ...state,
-        turnNum: state.turnNum + 1,
-        lastPosition: { data, signature },
-        penultimatePosition: state.lastPosition,
-        messageOutbox: signatureSuccess(signature),
-      });
-
-    case actions.OPPONENT_POSITION_RECEIVED:
-      if (ourTurn(state)) { return state; }
-
-      const position1 = decode(action.data);
-      // check signature
-      const opponentAddress = state.participants[1 - state.ourIndex];
-      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
-      // check transition
-      if (!validTransition(state, position1)) { return state; }
-      return states.acknowledgeChallengeResponse({
-        ...state,
-        turnNum: state.turnNum + 1,
-        lastPosition: { data: action.data, signature: action.signature },
-        penultimatePosition: state.lastPosition,
-        messageOutbox: validationSuccess(),
-      });
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
-      return runningStates.waitForUpdate({ ...state });
+      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete() });
     default:
       return state;
   }
@@ -170,7 +114,7 @@ const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeR
 const acknowledgeChallengeTimeoutReducer = (state: states.AcknowledgeChallengeTimeout, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
-      return runningStates.waitForUpdate({ ...state });
+      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete() });
     default:
       return state;
   }

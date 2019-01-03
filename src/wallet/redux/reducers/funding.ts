@@ -9,9 +9,14 @@ import { validSignature, signPositionHex } from '../../utils/signing-utils';
 
 import BN from 'bn.js';
 import { State, Channel } from 'fmg-core';
+import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 
 export const fundingReducer = (state: states.FundingState, action: actions.WalletAction): states.WalletState => {
+  // Handle any signature/validation request centrally to avoid duplicating code for each state
+  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+    return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
+  }
   switch (state.type) {
     case states.WAIT_FOR_FUNDING_REQUEST:
       return waitForFundingRequestReducer(state, action);

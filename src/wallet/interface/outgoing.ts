@@ -40,6 +40,7 @@ export type ChannelClosed = ReturnType<typeof channelClosed>;
 
 // VALIDATION
 // ==========
+export const enum ValidationFailureReasons { WalletBusy = "WalletBusy", InvalidSignature = "InvalidSignature", Other = "Other" }
 
 export const VALIDATION_SUCCESS = 'WALLET.VALIDATION.SUCCESS';
 export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
@@ -47,9 +48,10 @@ export const VALIDATION_FAILURE = 'WALLET.VALIDATION.FAILURE';
 export const validationSuccess = () => ({
   type: VALIDATION_SUCCESS as typeof VALIDATION_SUCCESS,
 });
-export const validationFailure = (reason: string) => ({
+export const validationFailure = (reason: ValidationFailureReasons, error?: string) => ({
   type: VALIDATION_FAILURE as typeof VALIDATION_FAILURE,
   reason,
+  error,
 });
 
 export type ValidationSuccess = ReturnType<typeof validationSuccess>;
@@ -60,6 +62,8 @@ export type ValidationResponse = ValidationSuccess | ValidationFailure;
 // SIGNATURE
 // =========
 
+export const enum SignatureFailureReasons { WalletBusy = "WalletBusy", Other = "Other" }
+
 export const SIGNATURE_SUCCESS = 'WALLET.SIGNATURE.SUCCESS';
 export const SIGNATURE_FAILURE = 'WALLET.SIGNATURE.FAILURE';
 
@@ -67,9 +71,11 @@ export const signatureSuccess = (signature: string) => ({
   type: SIGNATURE_SUCCESS as typeof SIGNATURE_SUCCESS,
   signature,
 });
-export const signatureFailure = (reason: string) => ({
+
+export const signatureFailure = (reason: SignatureFailureReasons, error?: string) => ({
   type: SIGNATURE_FAILURE as typeof SIGNATURE_FAILURE,
   reason,
+  error,
 });
 
 export type SignatureSuccess = ReturnType<typeof signatureSuccess>;
@@ -181,15 +187,24 @@ export const challengeResponseRequested = () => ({
 });
 export type ChallengeResponseRequested = ReturnType<typeof challengeResponseRequested>;
 
+export const CHALLENGE_COMPLETE = 'CHALLENGE_COMPLETE';
+export const challengeComplete = () => ({
+  type: CHALLENGE_COMPLETE as typeof CHALLENGE_COMPLETE,
+});
+export type ChallengeComplete = ReturnType<typeof challengeComplete>;
+
 export type ResponseAction =
   InitializationSuccess |
   ConcludeSuccess |
   CloseSuccess |
   ValidationSuccess |
+  ValidationFailure |
   FundingSuccess |
   FundingFailure |
   SignatureSuccess |
+  SignatureFailure |
   ChallengePositionReceived |
   ChallengeRejected |
   ChallengeResponseRequested |
+  ChallengeComplete |
   SendMessage;

@@ -21,17 +21,26 @@ export const JOIN_CHANNEL_REQUEST = '';
 export const ADDRESS_REQUEST = ''; // provide me with an address
 
 export const OWN_POSITION_RECEIVED = 'WALLET.OWN_POSITION_RECEIVED';
-export const ownPositionReceived = (data: string) => ({
+export const ownPositionReceived = (data: string, decodedData?: any) => ({
   type: OWN_POSITION_RECEIVED as typeof OWN_POSITION_RECEIVED,
   data,
+  decodedData,
 });
 export type OwnPositionReceived = ReturnType<typeof ownPositionReceived>;
 
+export const CHALLENGE_POSITION_RECEIVED = 'CHALLENGE_POSITION_RECEIVED';
+export const challengePositionReceived = (data: string) => ({
+  type: CHALLENGE_POSITION_RECEIVED as typeof CHALLENGE_POSITION_RECEIVED,
+  data,
+});
+export type ChallengePositionReceived = ReturnType<typeof challengePositionReceived>;
+
 export const OPPONENT_POSITION_RECEIVED = 'WALLET.OPPONENT_POSITION_RECEIVED';
-export const opponentPositionReceived = (data: string, signature: string) => ({
+export const opponentPositionReceived = (data: string, signature: string, decodedData?: any, ) => ({
   type: OPPONENT_POSITION_RECEIVED as typeof OPPONENT_POSITION_RECEIVED,
   data,
   signature,
+  decodedData,
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 
@@ -361,4 +370,5 @@ export type WalletAction = (
   | CloseSuccessAcknowledged
   | ClosedOnChainAcknowledged
   | RespondWithMoveEvent
+  | ChallengePositionReceived
 );
