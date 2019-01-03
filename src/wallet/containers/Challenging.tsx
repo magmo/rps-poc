@@ -15,7 +15,7 @@ import { unreachable } from '../utils/reducer-utils';
 
 interface Props {
   state: states.ChallengingState;
-  withdrawalRequested: () => void;
+  timeoutAcknowledged: () => void;
   challengeResponseAcknowledged: () => void;
   challengeApproved: () => void;
   challengeRejected: () => void;
@@ -25,7 +25,7 @@ class ChallengingContainer extends PureComponent<Props> {
   render() {
     const {
       state,
-      withdrawalRequested,
+      timeoutAcknowledged,
       challengeResponseAcknowledged,
       challengeApproved,
       challengeRejected,
@@ -60,13 +60,13 @@ class ChallengingContainer extends PureComponent<Props> {
         );
       case states.ACKNOWLEDGE_CHALLENGE_TIMEOUT:
 
-        const parsedExpiryDate = new Date(state.challengeExpiry ? state.challengeExpiry : 0 * 1000).toLocaleTimeString();
+        const parsedExpiryDate = new Date(state.challengeExpiry ? state.challengeExpiry * 1000 : 0).toLocaleTimeString();
         const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;
         return (
           <AcknowledgeX
             title="A challenge has expired"
             description={description}
-            action={withdrawalRequested}
+            action={timeoutAcknowledged}
             actionTitle="Withdraw your funds"
           />
         );
@@ -77,7 +77,7 @@ class ChallengingContainer extends PureComponent<Props> {
 }
 
 const mapDispatchToProps = {
-  withdrawalRequested: actions.withdrawalRequested,
+  timeoutAcknowledged: actions.challengedTimedOutAcknowledged,
   challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
   challengeApproved: actions.challengeApproved,
   challengeRejected: actions.challengeRejected,

@@ -2,6 +2,7 @@ import { Signature } from '../../domain';
 import { WalletState } from '../../states';
 import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
+import * as withdrawalStates from '../../states/withdrawing';
 import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
@@ -116,7 +117,7 @@ const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeR
 const acknowledgeChallengeTimeoutReducer = (state: states.AcknowledgeChallengeTimeout, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_TIME_OUT_ACKNOWLEDGED:
-      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete() });
+      return withdrawalStates.approveWithdrawal({ ...state, messageOutbox: challengeComplete() });
     default:
       return state;
   }
