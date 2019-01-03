@@ -24,7 +24,7 @@ const approveWithdrawalReducer = (state: states.ApproveWithdrawal, action: actio
 
       return states.waitForWithdrawalInitiation(state);
     case actions.WITHDRAWAL_REJECTED:
-      return states.closed(state);
+      return states.acknowledgeCloseSuccess(state);
     default:
       return state;
   }

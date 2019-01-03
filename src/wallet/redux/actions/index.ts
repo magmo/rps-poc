@@ -285,6 +285,43 @@ export const respondWithMoveEvent = (responseState) => ({
 });
 export type RespondWithMoveEvent = ReturnType<typeof respondWithMoveEvent>;
 
+export const CONCLUDE_REQUESTED = 'WALLET.CONCLUDE_REQUESTED';
+export const concludeRequested = () => ({
+  type: CONCLUDE_REQUESTED as typeof CONCLUDE_REQUESTED,
+});
+export type ConcludeRequested = ReturnType<typeof concludeRequested>;
+
+export const CONCLUDE_APPROVED = 'WALLET.CONCLUDE_APPROVED';
+export const concludeApproved = () => ({
+  type: CONCLUDE_APPROVED as typeof CONCLUDE_APPROVED,
+});
+export type ConcludeApproved = ReturnType<typeof concludeApproved>;
+
+export const CONCLUDE_REJECTED = 'WALLET.CONCLUDE_REJECTED';
+export const concludeRejected = () => ({
+  type: CONCLUDE_REJECTED as typeof CONCLUDE_REJECTED,
+});
+export type ConcludeRejected = ReturnType<typeof concludeRejected>;
+
+
+export const CONCLUDE_SUCCESS_ACKNOWLEDGED = 'WALLET.CONCLUDE_SUCCESS_ACKNOWLEDGED';
+export const concludeSuccessAcknowledged = () => ({
+  type: CONCLUDE_SUCCESS_ACKNOWLEDGED as typeof CONCLUDE_SUCCESS_ACKNOWLEDGED,
+});
+export type ConcludeSuccessAcknowledged = ReturnType<typeof concludeSuccessAcknowledged>;
+
+export const CLOSE_SUCCESS_ACKNOWLEDGED = 'WALLET.CLOSE_SUCCESS_ACKNOWLEDGED';
+export const closeSuccessAcknowledged = () => ({
+  type: CLOSE_SUCCESS_ACKNOWLEDGED as typeof CLOSE_SUCCESS_ACKNOWLEDGED,
+});
+export type CloseSuccessAcknowledged = ReturnType<typeof closeSuccessAcknowledged>;
+
+export const CLOSED_ON_CHAIN_ACKNOWLEDGED = 'WALLET.CLOSED_ON_CHAIN_ACKNOWLEDGED';
+export const closedOnChainAcknowledged = () => ({
+  type: CLOSED_ON_CHAIN_ACKNOWLEDGED as typeof CLOSED_ON_CHAIN_ACKNOWLEDGED,
+});
+export type ClosedOnChainAcknowledged = ReturnType<typeof closedOnChainAcknowledged>;
+
 
 // TODO: This is getting large, we should probably split this up into seperate types for each stage
 export type WalletAction = (
@@ -323,4 +360,10 @@ export type WalletAction = (
   | TransactionSentToMetamask
   | WithdrawalSuccessAcknowledged
   | MessageReceived
+  | GameConcludedEvent
+  | ConcludeRequested
+  | ConcludeApproved
+  | ConcludeSuccessAcknowledged
+  | CloseSuccessAcknowledged
+  | ClosedOnChainAcknowledged
 );

@@ -34,6 +34,10 @@ export function* messageListener() {
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(actions.messageReceived(action.data, action.signature));
+        break;
+      case incoming.CONCLUDE_CHANNEL_REQUEST:
+        yield put(actions.concludeRequested());
+        break;
       default:
       // do nothing
     }

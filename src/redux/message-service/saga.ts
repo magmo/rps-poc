@@ -152,7 +152,13 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       const opponentBalance = hexToBN(balances[1 - myIndex]);
 
       yield put(toWalletActions.fundingRequest(channelId, myAddress, opponentAddress, myBalance, opponentBalance, myIndex));
-      const action = yield take([fromWalletActions.FUNDING_SUCCESS, fromWalletActions.FUNDING_FAILURE]);
+      const action = yield take([
+        fromWalletActions.FUNDING_SUCCESS,
+        fromWalletActions.FUNDING_FAILURE,
+        fromWalletActions.CONCLUDE_SUCCESS,
+        fromWalletActions.CONCLUDE_FAILURE,
+        gameActions.RESIGN,
+      ]);
       switch (action.type) {
         case fromWalletActions.FUNDING_SUCCESS:
           yield put(gameActions.messageSent());
@@ -160,10 +166,18 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
           yield put(gameActions.fundingSuccess(position));
           break;
         case fromWalletActions.FUNDING_FAILURE:
+          yield put(gameActions.messageSent());
           yield put(gameActions.fundingFailure());
           break;
+        case gameActions.RESIGN:
+          yield put(toWalletActions.closeChannelRequest());
+          break;
+        case fromWalletActions.CONCLUDE_SUCCESS:
+        case fromWalletActions.CONCLUDE_FAILURE:
+          yield put(gameActions.messageSent());
+          break;
         default:
-          throw new Error("Expected FUNDING_SUCCESS or FUNDING_FAILURE");
+          throw new Error("Expected FUNDING_SUCCESS or FUNDING_FAILURE or RESIGN or CONCLUDE_SUCCESS or CONCLUDE_FAILURE");
       }
       break;
     case "WITHDRAWAL_REQUESTED":
@@ -180,7 +194,10 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
       yield put(gameActions.messageSent());
       yield put(gameActions.withdrawalSuccess());
       yield put(toWalletActions.closeChannelRequest());
-
+    case "CONCLUDE_REQUESTED":
+      yield put(toWalletActions.concludeChannelRequest());
+      yield take([fromWalletActions.CONCLUDE_SUCCESS, fromWalletActions.CONCLUDE_FAILURE]);
+      yield put(gameActions.messageSent());
   }
 }
 

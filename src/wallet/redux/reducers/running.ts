@@ -3,7 +3,6 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import decode from '../../domain/decode';
 
-import { State } from 'fmg-core';
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { validationSuccess, signatureSuccess } from '../../interface/outgoing';
@@ -30,24 +29,13 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
 
       const signature = signPositionHex(data, state.privateKey);
 
-      // if conclude => concluding
-      if (position.stateType === State.StateType.Conclude) {
-        return states.concluding({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data, signature },
-          penultimatePosition: state.lastPosition,
-        });
-      } else {
-        // else => running
-        return states.waitForUpdate({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data, signature },
-          penultimatePosition: state.lastPosition,
-          messageOutbox: signatureSuccess(signature),
-        });
-      }
+      return states.waitForUpdate({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data, signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: signatureSuccess(signature),
+      });
 
     case actions.OPPONENT_POSITION_RECEIVED:
       if (ourTurn(state)) { return state; }
@@ -55,29 +43,19 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       const position1 = decode(action.data);
       // check signature
       const opponentAddress = state.participants[1 - state.ourIndex];
-      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
+      if (!action.signature) { return state; }
+      const messageSignature = action.signature as string;
+      if (!validSignature(action.data, messageSignature, opponentAddress)) { return state; }
       // check transition
       if (!validTransition(state, position1)) { return state; }
 
-      // if conclude => concluding
-      if (position1.stateType === State.StateType.Conclude) {
-        return states.concluding({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data: action.data, signature: action.signature },
-          penultimatePosition: state.lastPosition,
-
-        });
-      } else {
-        // else => running
-        return states.waitForUpdate({
-          ...state,
-          turnNum: state.turnNum + 1,
-          lastPosition: { data: action.data, signature: action.signature },
-          penultimatePosition: state.lastPosition,
-          messageOutbox: validationSuccess(),
-        });
-      }
+      return states.waitForUpdate({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data: action.data, signature: messageSignature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess(),
+      });
 
     case actions.OPPONENT_CHALLENGE_DETECTED:
       // transition to responding

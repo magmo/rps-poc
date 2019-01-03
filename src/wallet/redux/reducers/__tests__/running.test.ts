@@ -35,8 +35,7 @@ const defaults = {
 const bParams = { address: bsAddress, ourIndex: 1, privateKey: bsPrivateKey };
 const aParams = { address: asAddress, ourIndex: 0, privateKey: asPrivateKey };
 
-const { restingHex, restingSig, conclude2Hex: aConcludeHex, } = scenarios.aResignsAfterOneRound;
-const { concludeHex: bConcludeHex, concludeSig: bConcludeSig } = scenarios.bResignsAfterOneRound;
+const { restingHex, restingSig } = scenarios.aResignsAfterOneRound;
 
 describe('when in WaitForUpdate on our turn', () => {
   // after the reveal it is B's turn. So we must be B here
@@ -63,15 +62,6 @@ describe('when in WaitForUpdate on our turn', () => {
     const updatedState = walletReducer(state, action);
 
     itDoesntTransition(state, updatedState); // because it's our turn
-  });
-
-  describe('when we send in a conclude state', () => {
-    const waitForUpdateState = states.waitForUpdate({ ...bDefaults, turnNum: 8 });
-    const action = actions.ownPositionReceived(aConcludeHex);
-    const updatedState = walletReducer(waitForUpdateState, action);
-
-    itTransitionsToStateType(states.CONCLUDING, updatedState);
-    itIncreasesTurnNumBy(1, waitForUpdateState, updatedState);
   });
 
   describe('when the wallet detects an opponent challenge', () => {
@@ -125,13 +115,6 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
     itDoesntTransition(state, updatedState);
   });
 
-  describe('when our opponent sends in a conclude state', () => {
-    const action = actions.opponentPositionReceived(bConcludeHex, bConcludeSig);
-    const updatedState = walletReducer(state, action);
-
-    itTransitionsToStateType(states.CONCLUDING, updatedState);
-    itIncreasesTurnNumBy(1, state, updatedState);
-  });
 
   describe('when the wallet detects an opponent challenge', () => {
     const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
