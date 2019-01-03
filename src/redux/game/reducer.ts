@@ -10,7 +10,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested } from '../../wallet/interface/outgoing';
+import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested, CLOSE_SUCCESS, CloseSuccess } from '../../wallet/interface/outgoing';
 import { PostFundSetupB, POST_FUND_SETUP_B } from '../../core/positions';
 
 export interface JointState {
@@ -20,7 +20,8 @@ export interface JointState {
 
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess | ChallengePositionReceived | ChallengeResponseRequested) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState,
+  action: actions.GameAction | LoginSuccess | InitializationSuccess | CloseSuccess | ChallengePositionReceived | ChallengeResponseRequested) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
@@ -54,6 +55,17 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
       return state;
     }
   }
+  if (action.type === CLOSE_SUCCESS) {
+    const { messageState, gameState } = state;
+    if ('participants' in gameState) {
+      const { myName, libraryAddress, twitterHandle } = gameState;
+      const myAddress = gameState.participants[gameState.player];
+      const newGameState = states.lobby({ myName, myAddress, libraryAddress, twitterHandle });
+      return { gameState: newGameState, messageState };
+    }
+    return state;
+  }
+
   // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now
@@ -107,16 +119,10 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return waitForRestingAReducer(gameState, messageState, action);
     case states.StateName.InsufficientFunds:
       return insufficientFundsReducer(gameState, messageState, action);
-    case states.StateName.WaitToResign:
-      return waitToResignReducer(gameState, messageState, action);
-    case states.StateName.WaitForResignationAcknowledgement:
-      return waitForResignationAcknowledgementReducer(gameState, messageState, action);
     case states.StateName.GameOver:
       return gameOverReducer(gameState, messageState, action);
     case states.StateName.WaitForWithdrawal:
       return waitForWithdrawalReducer(gameState, messageState, action);
-    case states.StateName.OpponentResigned:
-      return opponentResignedReducer(gameState, messageState, action);
     case states.StateName.PickChallengeMove:
       return pickChallengeMoveReducer(gameState, messageState, action);
     default:
@@ -198,49 +204,17 @@ function itsMyTurn(gameState: states.PlayingState) {
   return nextTurnNum % 2 === gameState.player;
 }
 
-function receivedConclude(action: actions.GameAction) {
-  return action.type === actions.POSITION_RECEIVED && action.position.name === positions.CONCLUDE;
-}
-
 function resignationReducer(gameState: states.PlayingState, messageState: MessageState): JointState {
   if (itsMyTurn(gameState)) {
-    const { turnNum } = gameState;
-    // transition to WaitForResignationAcknowledgement
-    gameState = states.waitForResignationAcknowledgement({ ...gameState, turnNum: turnNum + 1 });
-
-    // and send the latest state to our opponent
-    const opponentAddress = states.getOpponentAddress(gameState);
-    messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
-  } else {
-    // transition to WaitToResign
-    gameState = states.waitToResign(gameState);
+    messageState = { ...messageState, walletOutbox: { type: 'CONCLUDE_REQUESTED' } };
   }
-
-  return { gameState, messageState };
-}
-
-function opponentResignationReducer(gameState: states.PlayingState, messageState: MessageState, action: actions.GameAction) {
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
-
-  const position = action.position;
-  if (position.name !== positions.CONCLUDE) { return { gameState, messageState }; }
-  // in taking the turnNum from their position, we're trusting the wallet to have caught
-  // the case where they resign when it isn't their turn
-  const { turnNum } = position;
-
-  // transition to OpponentResigned
-  gameState = states.opponentResigned({ ...gameState, turnNum: turnNum + 1 });
-
-  // send Conclude to our opponent
-  const opponentAddress = states.getOpponentAddress(gameState);
-  messageState = sendMessage(positions.conclude(gameState), opponentAddress, messageState);
 
   return { gameState, messageState };
 }
 
 function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmationA, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
+
   // only action we need to handle in this state is to receiving a PreFundSetupB
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
   if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
@@ -256,7 +230,6 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
 
 function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.CONFIRM_GAME && action.type !== actions.DECLINE_GAME) { return { gameState, messageState }; }
 
@@ -289,7 +262,6 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
   }
 
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type === actions.FUNDING_SUCCESS) {
     if (action.position.name !== POST_FUND_SETUP_B) {
@@ -327,7 +299,6 @@ function pickChallengeMoveReducer(gameState: states.PickChallengeMove, messageSt
 }
 function pickMoveReducer(gameState: states.PickMove, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   const turnNum = gameState.turnNum;
 
@@ -368,7 +339,6 @@ function insufficientFunds(balances: [string, string], roundBuyIn: string): bool
 
 function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPickMoveA, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
@@ -402,7 +372,6 @@ function waitForOpponentToPickMoveAReducer(gameState: states.WaitForOpponentToPi
 
 function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPickMoveB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
@@ -427,7 +396,6 @@ function waitForOpponentToPickMoveBReducer(gameState: states.WaitForOpponentToPi
 
 function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
@@ -464,7 +432,6 @@ function waitForRevealBReducer(gameState: states.WaitForRevealB, messageState: M
 
 function playAgainReducer(gameState: states.PlayAgain, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   switch (action.type) {
     // case actions.RESIGN: // handled globally
@@ -505,7 +472,6 @@ function playAgainReducer(gameState: states.PlayAgain, messageState: MessageStat
 
 function waitForRestingAReducer(gameState: states.WaitForRestingA, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
 
   if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
 
@@ -539,38 +505,6 @@ function insufficientFundsReducer(gameState: states.InsufficientFunds, messageSt
     messageState = sendMessage(conclude, opponentAddress, messageState);
   }
 
-  return { gameState: newGameState, messageState };
-}
-
-function waitToResignReducer(gameState: states.WaitToResign, messageState: MessageState, action: actions.GameAction): JointState {
-  if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
-
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
-  const turnNum = action.position.turnNum + 1;
-
-  const newGameState = states.waitForResignationAcknowledgement({ ...gameState, turnNum });
-
-  const newPosition = positions.conclude(newGameState);
-  const opponentAddress = states.getOpponentAddress(gameState);
-  messageState = sendMessage(newPosition, opponentAddress, messageState);
-
-  return { gameState: newGameState, messageState };
-}
-
-function opponentResignedReducer(gameState: states.OpponentResigned, messageState: MessageState, action: actions.GameAction) {
-  if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
-
-  const newGameState = states.waitForWithdrawal(gameState);
-  messageState = { ...messageState, walletOutbox: { type: 'WITHDRAWAL_REQUESTED' } };
-
-  return { gameState: newGameState, messageState };
-}
-
-function waitForResignationAcknowledgementReducer(gameState: states.WaitForResignationAcknowledgement, messageState: MessageState, action: actions.GameAction): JointState {
-  if (action.type !== actions.POSITION_RECEIVED) { return { gameState, messageState }; }
-  if (action.position.name !== positions.CONCLUDE) { return { gameState, messageState }; }
-
-  const newGameState = states.gameOver({ ...gameState, turnNum: gameState.turnNum + 1 });
   return { gameState: newGameState, messageState };
 }
 

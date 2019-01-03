@@ -186,7 +186,7 @@ describe('start in WaitForDeployConfirmation', () => {
   describe('incoming action: transaction confirmed', () => { // player A scenario
     const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB };
     const state = states.waitForDeployConfirmation(testDefaults);
-    const action = actions.transactionConfirmed();
+    const action = actions.transactionConfirmed('1234');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT, updatedState);
@@ -277,8 +277,12 @@ describe('start in WaitForDepositConfirmation', () => {
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
-  describe('incoming action: deposit confirmed', () => { // player B scenario
-    const testDefaults = { ...defaultsB, ...justReceivedPostFundSetupA };
+  describe('incoming action: deposit confirmed, postFundA already received', () => { // player B scenario
+    const testDefaults = {
+      ...defaultsB,
+      ...justReceivedPreFundSetupB,
+      unvalidatedNewPosition: { data: postFundSetupAHex, signature: postFundSetupASig },
+    };
     const state = states.waitForDepositConfirmation(testDefaults);
     const action = actions.transactionConfirmed();
     const updatedState = walletReducer(state, action);
@@ -295,8 +299,8 @@ describe('start in WaitForDepositConfirmation', () => {
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
-    itIncreasesTurnNumBy(1, state, updatedState);
-    expect((updatedState as WaitForDepositConfirmation).lastPosition.data).toEqual(postFundSetupAHex);
+    itIncreasesTurnNumBy(0, state, updatedState);
+    expect((updatedState as WaitForDepositConfirmation).unvalidatedNewPosition!.data).toEqual(postFundSetupAHex);
   });
 });
 

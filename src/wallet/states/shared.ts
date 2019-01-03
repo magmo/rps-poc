@@ -33,6 +33,7 @@ export interface ChannelPartiallyOpen extends AddressExists {
 
 export interface ChannelOpen extends ChannelPartiallyOpen {
   penultimatePosition: SignedPosition;
+  unvalidatedNewPosition?: SignedPosition;
 }
 
 export interface AdjudicatorMightExist extends ChannelOpen {
@@ -68,8 +69,8 @@ export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T):
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  const { penultimatePosition } = params;
-  return { ...channelPartiallyOpen(params), penultimatePosition };
+  const { penultimatePosition, unvalidatedNewPosition } = params;
+  return { ...channelPartiallyOpen(params), penultimatePosition, unvalidatedNewPosition };
 }
 
 export function adjudicatorMightExist<T extends AdjudicatorMightExist>(params: T): AdjudicatorMightExist {

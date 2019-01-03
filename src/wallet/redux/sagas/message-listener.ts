@@ -5,7 +5,6 @@ import { LOGIN_SUCCESS } from "../../../redux/login/actions";
 import * as incoming from '../../interface/incoming';
 
 import * as actions from "../actions";
-import decode from '../../domain/decode';
 
 
 // this is the only thing in the wallet which is allowed to listen for app actions
@@ -31,17 +30,19 @@ export function* messageListener() {
         yield put(actions.loggedIn(action.user.uid));
         break;
       case incoming.SIGNATURE_REQUEST:
-        console.log('OUTGOING POSITION\n', decode(action.data));
         yield put(actions.ownPositionReceived(action.data));
         break;
       case incoming.VALIDATION_REQUEST:
-        console.log('INCOMING POSITION\n', decode(action.data));
         yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(actions.messageReceived(action.data, action.signature));
       case incoming.RESPOND_TO_CHALLENGE:
         yield put(actions.ownPositionReceived(action.position));
+        break;
+      case incoming.CONCLUDE_CHANNEL_REQUEST:
+        yield put(actions.concludeRequested());
+        break;
       default:
       // do nothing
     }

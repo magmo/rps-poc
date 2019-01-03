@@ -8,8 +8,6 @@ import {
   itTransitionsTo,
   itStoresAction,
   itIncreasesTurnNumBy,
-  itHandlesResignLikeItsMyTurn,
-  itHandlesResignLikeItsTheirTurn,
 } from './helpers';
 
 const {
@@ -59,14 +57,12 @@ describe('player A\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       it('requests funding from the wallet', () => {
-        expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'FUNDING_REQUESTED' });
       });
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
     });
-
-    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
   describe('when in waitForFunding', () => {
@@ -79,8 +75,6 @@ describe('player A\'s app', () => {
       itTransitionsTo(state.StateName.PickMove, updatedState);
       itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
     });
-
-    itHandlesResignLikeItsMyTurn(gameState, messageState);
   });
 
   describe('when in PickMove', () => {
@@ -102,8 +96,6 @@ describe('player A\'s app', () => {
       });
 
     });
-
-    itHandlesResignLikeItsMyTurn(gameState, messageState);
   });
 
   describe('when in WaitForOpponentToPickMoveA', () => {
@@ -139,8 +131,6 @@ describe('player A\'s app', () => {
         itTransitionsTo(state.StateName.InsufficientFunds, updatedState);
       });
     });
-
-    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
 
   describe('when in PlayAgain', () => {
@@ -152,14 +142,6 @@ describe('player A\'s app', () => {
 
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.WaitForRestingA, updatedState);
-    });
-
-    describe('if the player decides not to continue', () => {
-      const action = actions.resign();
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itTransitionsTo(state.StateName.WaitToResign, updatedState);
-      itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
     });
 
     describe('if Resting arrives', () => {
@@ -176,15 +158,6 @@ describe('player A\'s app', () => {
         itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState2);
         itTransitionsTo(state.StateName.PickMove, updatedState2);
       });
-
-      describe('if the player decides not to continue', () => {
-        const resignAction = actions.resign();
-        const updatedState2 = gameReducer(updatedState, resignAction);
-
-        itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState2);
-        itSends(conclude, updatedState2);
-        itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState2);
-      });
     });
   });
 
@@ -198,24 +171,7 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.PickMove, updatedState);
     });
-
-    itHandlesResignLikeItsTheirTurn(gameState, messageState);
   });
-
-
-  describe('when in WaitToResign', () => {
-    const gameState = state.waitToResign({ ...aProps, ...reveal });
-
-    describe('when any position arrives', () => {
-      const action = actions.positionReceived(resting);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
-      itSends(conclude, updatedState);
-      itTransitionsTo(state.StateName.WaitForResignationAcknowledgement, updatedState);
-    });
-  });
-
 
   describe('when in InsufficientFunds', () => {
     const gameState = state.insufficientFunds({ ...aProps, ...revealInsufficientFunds });
@@ -226,18 +182,6 @@ describe('player A\'s app', () => {
 
       itIncreasesTurnNumBy(2, { gameState, messageState }, updatedState);
       itSends(concludeInsufficientFunds2, updatedState);
-      itTransitionsTo(state.StateName.GameOver, updatedState);
-    });
-  });
-
-  describe('when in WaitForResignationAcknowledgement', () => {
-    const gameState = state.waitForResignationAcknowledgement({ ...aProps, ...conclude });
-
-    describe('when Conclude arrives', () => {
-      const action = actions.positionReceived(conclude);
-      const updatedState = gameReducer({ messageState, gameState }, action);
-
-      itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
       itTransitionsTo(state.StateName.GameOver, updatedState);
     });
   });
@@ -253,7 +197,7 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
 
       it('requests a withdrawal from the wallet', () => {
-        expect(updatedState.messageState.walletOutbox).toEqual('WITHDRAWAL_REQUESTED');
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'WITHDRAWAL_REQUESTED' });
       });
     });
   });

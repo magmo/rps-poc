@@ -18,6 +18,8 @@ export function* sagaManager(): IterableIterator<any> {
   // always want the message listenter to be running
   yield fork(messageListener);
 
+  yield fork(messageSender);
+
   // todo: restrict just to wallet actions
   const channel = yield actionChannel('*');
 
@@ -50,14 +52,6 @@ export function* sagaManager(): IterableIterator<any> {
         yield cancel(challengeTimeoutProcess);
         challengeTimeoutProcess = undefined;
       }
-    }
-
-    // if we have an outgoing message, make sure that the message-sender runs
-    if (state.messageOutbox) {
-      const messageToSend = state.messageOutbox;
-      state.messageOutbox = undefined;
-      yield messageSender(messageToSend);
-
     }
 
     // if we have an outgoing transaction, make sure that the transaction-sender runs
