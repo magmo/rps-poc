@@ -66,6 +66,7 @@ function RenderGame(props: GameProps) {
     case StateName.ConfirmGameB:
       return <ConfirmGamePage confirmGame={confirmGame} cancelGame={declineGame} stake={state.roundBuyIn} opponentName={state.opponentName} />;
     case StateName.PickMove:
+    case StateName.PickChallengeMove:
       return <SelectMovePage chooseMove={chooseMove} />;
 
     case StateName.WaitForOpponentToPickMoveA:

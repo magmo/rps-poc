@@ -6,9 +6,9 @@ import * as actions from '../actions';
 import { WalletAction } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { createForceMoveTransaction } from '../../utils/transaction-generator';
-import { challengePositionReceived, signatureSuccess } from '../../interface/outgoing';
+import { challengePositionReceived, signatureSuccess, validationSuccess } from '../../interface/outgoing';
 import decode from '../../domain/decode';
-import { signPositionHex } from '../../utils/signing-utils';
+import { signPositionHex, validSignature } from '../../utils/signing-utils';
 
 export const challengingReducer = (state: states.ChallengingState, action: WalletAction): WalletState => {
   switch (state.type) {
@@ -90,6 +90,29 @@ const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout,
         penultimatePosition: state.lastPosition,
         messageOutbox: message,
       });
+
+    case actions.OWN_POSITION_RECEIVED:
+      const { data } = action;
+      const signature = signPositionHex(data, state.privateKey);
+      return states.waitForResponseOrTimeout({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data, signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: signatureSuccess(signature),
+      });
+
+    case actions.OPPONENT_POSITION_RECEIVED:
+      const opponentAddress = state.participants[1 - state.ourIndex];
+      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
+      return states.waitForResponseOrTimeout({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data: action.data, signature: action.signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess(),
+      });
+
     case actions.CHALLENGE_TIMED_OUT:
       return states.acknowledgeChallengeTimeout({ ...state });
     default:
@@ -119,6 +142,23 @@ const acknowledgeChallengeResponseReducer = (state: states.AcknowledgeChallengeR
         lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
         messageOutbox: signatureSuccess(signature),
+      });
+
+    case actions.OPPONENT_POSITION_RECEIVED:
+      if (ourTurn(state)) { return state; }
+
+      const position1 = decode(action.data);
+      // check signature
+      const opponentAddress = state.participants[1 - state.ourIndex];
+      if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
+      // check transition
+      if (!validTransition(state, position1)) { return state; }
+      return states.acknowledgeChallengeResponse({
+        ...state,
+        turnNum: state.turnNum + 1,
+        lastPosition: { data: action.data, signature: action.signature },
+        penultimatePosition: state.lastPosition,
+        messageOutbox: validationSuccess(),
       });
     case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
       return runningStates.waitForUpdate({ ...state });

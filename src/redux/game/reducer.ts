@@ -10,7 +10,7 @@ import { LoginSuccess, LOGIN_SUCCESS } from '../login/actions';
 
 import hexToBN from '../../utils/hexToBN';
 import bnToHex from '../../utils/bnToHex';
-import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived } from '../../wallet/interface/outgoing';
+import { INITIALIZATION_SUCCESS, InitializationSuccess, CHALLENGE_POSITION_RECEIVED, ChallengePositionReceived, CHALLENGE_RESPONSE_REQUESTED, ChallengeResponseRequested } from '../../wallet/interface/outgoing';
 import { PostFundSetupB, POST_FUND_SETUP_B } from '../../core/positions';
 
 export interface JointState {
@@ -20,7 +20,7 @@ export interface JointState {
 
 const emptyJointState: JointState = { messageState: {}, gameState: states.noName({ myAddress: '', libraryAddress: '' }) };
 
-export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess | ChallengePositionReceived) => {
+export const gameReducer: Reducer<JointState> = (state = emptyJointState, action: actions.GameAction | LoginSuccess | InitializationSuccess | ChallengePositionReceived | ChallengeResponseRequested) => {
   if (action.type === actions.EXIT_TO_LOBBY && state.gameState.name !== states.StateName.NoName) {
     const myAddress = ('myAddress' in state.gameState) ? state.gameState.myAddress : "";
     const myName = ('myName' in state.gameState) ? state.gameState.myName : "";
@@ -43,7 +43,17 @@ export const gameReducer: Reducer<JointState> = (state = emptyJointState, action
     const { address: myAddress } = action;
     return { gameState: { ...gameState, myAddress, }, messageState };
   }
-
+  if (action.type === CHALLENGE_RESPONSE_REQUESTED) {
+    if (state.gameState.name === states.StateName.PickMove) {
+      const { messageState, gameState } = state;
+      return {
+        gameState: states.pickChallengeMove(gameState),
+        messageState,
+      };
+    } else {
+      return state;
+    }
+  }
   // apply the current action to the state
   state = singleActionReducer(state, action);
   // if we have saved an action previously, see if that will apply now
@@ -107,6 +117,8 @@ function singleActionReducer(state: JointState, action: actions.GameAction) {
       return waitForWithdrawalReducer(gameState, messageState, action);
     case states.StateName.OpponentResigned:
       return opponentResignedReducer(gameState, messageState, action);
+    case states.StateName.PickChallengeMove:
+      return pickChallengeMoveReducer(gameState, messageState, action);
     default:
       throw new Error("Unreachable code");
   }
@@ -234,7 +246,7 @@ function waitForGameConfirmationAReducer(gameState: states.WaitForGameConfirmati
   if (action.position.name !== positions.PRE_FUND_SETUP_B) { return { gameState, messageState }; }
 
   // request funding
-  messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+  messageState = { ...messageState, walletOutbox: { type: 'FUNDING_REQUESTED' } };
 
   // transition to Wait for Funding
   const newGameState = states.waitForFunding({ ...gameState, turnNum: gameState.turnNum + 1 });
@@ -256,7 +268,7 @@ function confirmGameBReducer(gameState: states.ConfirmGameB, messageState: Messa
 
     const opponentAddress = states.getOpponentAddress(gameState);
     messageState = sendMessage(newPosition, opponentAddress, messageState);
-    messageState = { ...messageState, walletOutbox: 'FUNDING_REQUESTED' };
+    messageState = { ...messageState, walletOutbox: { type: 'FUNDING_REQUESTED' } };
 
     return { gameState: newGameState, messageState };
   } else {
@@ -293,7 +305,26 @@ function waitForFundingReducer(gameState: states.WaitForFunding, messageState: M
 
   return { gameState, messageState };
 }
+function pickChallengeMoveReducer(gameState: states.PickChallengeMove, messageState: MessageState, action: actions.GameAction): JointState {
 
+  const turnNum = gameState.turnNum;
+  if (action.type !== actions.CHOOSE_MOVE) { return { gameState, messageState }; }
+  if (gameState.player === Player.PlayerA) {
+
+    const salt = randomHex(64);
+    const asMove = action.move;
+
+    const propose = positions.proposeFromSalt({ ...gameState, asMove, salt, turnNum: turnNum + 1 });
+
+    const newGameStateA = states.waitForOpponentToPickMoveA({ ...gameState, ...propose, salt, myMove: asMove });
+
+    return { gameState: newGameStateA, messageState: { walletOutbox: { type: "RESPOND_TO_CHALLENGE", data: propose } } };
+  } else {
+    // Player B 
+  }
+
+  return { gameState, messageState };
+}
 function pickMoveReducer(gameState: states.PickMove, messageState: MessageState, action: actions.GameAction): JointState {
   if (action.type === actions.RESIGN) { return resignationReducer(gameState, messageState); }
   if (receivedConclude(action)) { return opponentResignationReducer(gameState, messageState, action); }
@@ -530,7 +561,7 @@ function opponentResignedReducer(gameState: states.OpponentResigned, messageStat
   if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
 
   const newGameState = states.waitForWithdrawal(gameState);
-  messageState = { ...messageState, walletOutbox: 'WITHDRAWAL_REQUESTED' };
+  messageState = { ...messageState, walletOutbox: { type: 'WITHDRAWAL_REQUESTED' } };
 
   return { gameState: newGameState, messageState };
 }
@@ -547,7 +578,7 @@ function gameOverReducer(gameState: states.GameOver, messageState: MessageState,
   if (action.type !== actions.WITHDRAWAL_REQUEST) { return { gameState, messageState }; }
 
   const newGameState = states.waitForWithdrawal(gameState);
-  messageState = { ...messageState, walletOutbox: 'WITHDRAWAL_REQUESTED' };
+  messageState = { ...messageState, walletOutbox: { type: 'WITHDRAWAL_REQUESTED' } };
 
   return { gameState: newGameState, messageState };
 }

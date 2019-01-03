@@ -30,6 +30,8 @@ const defaults = {
   privateKey: asPrivateKey,
   networkId: 2323,
   challengeExpiry: 0,
+  moveSelected: false,
+  challengeOptions: [],
 };
 
 describe('when in ACKNOWLEDGE_CHALLENGE', () => {

@@ -151,6 +151,12 @@ export const challengeRejected = (reason) => ({
 });
 export type ChallengeRejected = ReturnType<typeof challengeRejected>;
 
+export const CHALLENGE_RESPONSE_REQUESTED = 'CHALLENGE_RESPONSE_REQUESTED';
+export const challengeResponseRequested = () => ({
+  type: CHALLENGE_RESPONSE_REQUESTED as typeof CHALLENGE_RESPONSE_REQUESTED,
+});
+export type ChallengeResponseRequested = ReturnType<typeof challengeResponseRequested>;
+
 export type ResponseAction =
   InitializationSuccess |
   ValidationSuccess |
@@ -159,4 +165,5 @@ export type ResponseAction =
   SignatureSuccess |
   ChallengePositionReceived |
   ChallengeRejected |
+  ChallengeResponseRequested |
   SendMessage;

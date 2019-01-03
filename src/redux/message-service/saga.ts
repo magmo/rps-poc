@@ -7,7 +7,7 @@ import * as fromWalletActions from '../../wallet/interface/outgoing';
 import * as toWalletActions from '../../wallet/interface/incoming';
 import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
-import { MessageState } from './state';
+import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
@@ -134,12 +134,17 @@ function* receiveFromFirebaseSaga(address) {
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
 }
-function* handleWalletMessage(type, state: gameStates.PlayingState) {
+function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.PlayingState) {
   const { libraryAddress, channelNonce, player, balances, participants } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
   const channelId = channel.id;
 
-  switch (type) {
+  switch (walletMessage.type) {
+    case "RESPOND_TO_CHALLENGE":
+      if (state.name === gameStates.StateName.WaitForOpponentToPickMoveA || state.name === gameStates.StateName.WaitForOpponentToPickMoveB) {
+        yield put(toWalletActions.respondToChallenge(encode(walletMessage.data)));
+      }
+      break;
     case "FUNDING_REQUESTED":
       // TODO: We need to close the channel at some point
       yield put(toWalletActions.openChannelRequest(channel));

@@ -2,16 +2,22 @@ import React from 'react';
 import Button from 'reactstrap/lib/Button';
 import SidebarLayout from '../SidebarLayout';
 
+export enum ChallengeOptions {
+  RespondWithMove,
+  RespondWithExistingMove,
+}
 
 interface Props {
   expiryTime: number;
   selectRespondWithMove: () => void;
+  selectRespondWithExistingMove: () => void;
+  challengeOptions: ChallengeOptions[];
 }
 
 export default class ChooseResponse extends React.PureComponent<Props> {
 
   render() {
-    const { expiryTime, selectRespondWithMove } = this.props;
+    const { expiryTime, selectRespondWithMove, selectRespondWithExistingMove, challengeOptions } = this.props;
     // TODO: We should add hover text or an icon to these options to fully explain what they mean to the user.
     return (
       <SidebarLayout>
@@ -23,9 +29,14 @@ export default class ChooseResponse extends React.PureComponent<Props> {
           Select how you would like to respond:
       </p>
         <div className="challenge-expired-button-container" >
-          <Button className="challenge-expired-button" onClick={selectRespondWithMove} >
+          {challengeOptions.indexOf(ChallengeOptions.RespondWithMove) > -1 && <Button className="challenge-expired-button" onClick={selectRespondWithMove} >
             Respond with Move
-        </Button>
+        </Button>}
+          {challengeOptions.indexOf(ChallengeOptions.RespondWithExistingMove) > -1 && <Button className="challenge-expired-button" onClick={selectRespondWithExistingMove} >
+            Respond with Existing Move
+        </Button>}
+
+
         </div>
       </SidebarLayout>
     );

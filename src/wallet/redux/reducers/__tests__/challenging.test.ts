@@ -89,7 +89,7 @@ describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
 });
 
 describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
-  const state = states.waitForResponseOrTimeout({ ...defaults, challengeExpiry: 1 });
+  const state = states.waitForResponseOrTimeout({ ...defaults, challengeExpiry: 1, moveSelected: false, });
 
   describe('when the opponent responds', () => {
     const action = actions.respondWithMoveEvent('0xC1');
