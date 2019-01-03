@@ -60,7 +60,7 @@ const initiateChallengeReducer = (state: states.WaitForChallengeInitiation, acti
 const waitForChallengeSubmissionReducer = (state: states.WaitForChallengeSubmission, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.TRANSACTION_SUBMITTED:
-      return states.waitForChallengeConfirmation(state);
+      return states.waitForChallengeConfirmation({ ...state });
     default:
       return state;
   }
@@ -68,10 +68,12 @@ const waitForChallengeSubmissionReducer = (state: states.WaitForChallengeSubmiss
 
 const waitForChallengeConfirmationReducer = (state: states.WaitForChallengeConfirmation, action: WalletAction): WalletState => {
   switch (action.type) {
+    case actions.CHALLENGE_CREATED_EVENT:
+      return states.waitForChallengeConfirmation({ ...state, challengeExpiry: action.expirationTime });
     case actions.TRANSACTION_CONFIRMED:
       // This is a best guess on when the challenge will expire and will be updated by the challenge created event
       // TODO: Mover challenge duration to a shared constant
-      const challengeExpiry = new Date(Date.now() + 2 * 60000).getTime();
+      const challengeExpiry = state.challengeExpiry ? state.challengeExpiry : new Date(Date.now() + 2 * 60000).getTime() / 1000;
       return states.waitForResponseOrTimeout({ ...state, challengeExpiry });
     default:
       return state;
@@ -81,7 +83,7 @@ const waitForChallengeConfirmationReducer = (state: states.WaitForChallengeConfi
 const waitForResponseOrTimeoutReducer = (state: states.WaitForResponseOrTimeout, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.CHALLENGE_CREATED_EVENT:
-      return states.waitForResponseOrTimeout({ ...state, challengeExpiry: action.expirationTime * 1000 });
+      return states.waitForResponseOrTimeout({ ...state, challengeExpiry: action.expirationTime });
     case actions.RESPOND_WITH_MOVE_EVENT:
       const message = challengePositionReceived(action.responseState);
       // TODO: Right now we're just storing a dummy signature since we don't get one 

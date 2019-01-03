@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
-import Todo from '../components/Todo';
 import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import SubmitX from '../components/SubmitX';
@@ -45,14 +44,16 @@ class RespondingContainer extends PureComponent<Props> {
         const moveSelected = ourIndex === 0 ? turnNum % 2 === 0 : turnNum % 2 !== 0;
         let challengeOptions = [ChallengeOptions.RespondWithMove];
         if (moveSelected) {
-          challengeOptions = challengeOptions.concat(ChallengeOptions.RespondWithExistingMove);
+          // TODO: We need to update the game to allow the user to choose a move even after they've selected an existing move.
+          challengeOptions = [ChallengeOptions.RespondWithExistingMove];
         }
-        return <ChooseResponse expiryTime={state.challengeExpiry}
+        return <ChooseResponse expiryTime={state.challengeExpiry ? state.challengeExpiry : 0}
           selectRespondWithMove={selectRespondWithMove}
           selectRespondWithExistingMove={selectRespondWithExistingMove}
           challengeOptions={challengeOptions} />;
       case states.TAKE_MOVE_IN_APP:
-        return <Todo stateType={state.type} />;
+        // The game knows about the challenge so we don't need the wallet to display anything
+        return null;
       case states.WAIT_FOR_RESPONSE_CONFIRMATION:
         return <WaitForXConfirmation name='response' />;
       case states.INITIATE_RESPONSE:

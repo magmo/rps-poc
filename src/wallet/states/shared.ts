@@ -45,7 +45,7 @@ export interface AdjudicatorExists extends ChannelOpen {
 }
 
 export interface ChallengeExists extends AdjudicatorExists {
-  challengeExpiry: number;
+  challengeExpiry?: number;
 }
 
 // creators

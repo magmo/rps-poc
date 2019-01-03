@@ -48,7 +48,7 @@ class ChallengingContainer extends PureComponent<Props> {
       case states.WAIT_FOR_CHALLENGE_CONFIRMATION:
         return <WaitForXConfirmation name="challenge" />;
       case states.WAIT_FOR_RESPONSE_OR_TIMEOUT:
-        return <WaitForResponseOrTimeout expirationTime={state.challengeExpiry} />;
+        return <WaitForResponseOrTimeout expirationTime={state.challengeExpiry ? state.challengeExpiry : 0} />;
       case states.ACKNOWLEDGE_CHALLENGE_RESPONSE:
         return (
           <AcknowledgeX
@@ -59,7 +59,8 @@ class ChallengingContainer extends PureComponent<Props> {
           />
         );
       case states.ACKNOWLEDGE_CHALLENGE_TIMEOUT:
-        const parsedExpiryDate = 'TODO'; // need to add expiration time to the state
+
+        const parsedExpiryDate = new Date(state.challengeExpiry ? state.challengeExpiry : 0 * 1000).toLocaleTimeString();
         const description = `The challenge expired at ${parsedExpiryDate}. You may now withdraw your funds.`;
         return (
           <AcknowledgeX

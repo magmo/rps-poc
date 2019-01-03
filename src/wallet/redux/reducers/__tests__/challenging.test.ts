@@ -32,6 +32,7 @@ const defaults = {
   privateKey: asPrivateKey,
   challengeProof: new ChallengeProof(proposeHex, acceptHex, proposeSig, acceptSig),
   networkId: 2323,
+  challengeExpiry: 12321,
 
 };
 
