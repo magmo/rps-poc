@@ -20,7 +20,7 @@ export const itTransitionsToStateType = (type, state: WalletState) => {
 
 export const itDoesntTransition = (oldState: WalletState, newState: WalletState) => {
   it(`doesn't transition`, () => {
-    expect(newState).toEqual(oldState);
+    expect(newState.type).toEqual(oldState.type);
   });
 };
 

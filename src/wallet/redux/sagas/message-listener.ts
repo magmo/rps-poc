@@ -5,8 +5,6 @@ import { LOGIN_SUCCESS } from "../../../redux/login/actions";
 import * as incoming from '../../interface/incoming';
 
 import * as actions from "../actions";
-import decode from '../../../core/decode';
-
 
 // this is the only thing in the wallet which is allowed to listen for app actions
 // if we move to an iframe, this would be modified to listen to events on a given
@@ -31,10 +29,10 @@ export function* messageListener() {
         yield put(actions.loggedIn(action.user.uid));
         break;
       case incoming.SIGNATURE_REQUEST:
-        yield put(actions.ownPositionReceived(action.data, decode(action.data)));
+        yield put(actions.ownPositionReceived(action.data));
         break;
       case incoming.VALIDATION_REQUEST:
-        yield put(actions.opponentPositionReceived(action.data, action.signature, decode(action.data)));
+        yield put(actions.opponentPositionReceived(action.data, action.signature));
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(actions.messageReceived(action.data, action.signature));

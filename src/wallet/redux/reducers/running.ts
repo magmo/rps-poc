@@ -4,7 +4,7 @@ import * as actions from '../actions';
 import decode from '../../domain/decode';
 
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
-import { signPositionHex } from '../../utils/signing-utils';
+import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { challengeRejected } from '../../interface/outgoing';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
@@ -51,6 +51,8 @@ const waitForUpdateReducer = (state: states.WaitForUpdate, action: actions.Walle
       // check signature
       if (!action.signature) { return { ...state, messageOutbox: validationMessage }; }
       const messageSignature = action.signature as string;
+      const opponentAddress = state.participants[1 - state.ourIndex];
+      if (!validSignature(action.data, messageSignature, opponentAddress)) { return { ...state, messageOutbox: validationMessage }; }
 
       // check transition
       if (!validTransition(state, position1)) { return { ...state, messageOutbox: validationMessage }; }

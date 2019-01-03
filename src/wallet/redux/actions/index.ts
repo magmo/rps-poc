@@ -21,10 +21,9 @@ export const JOIN_CHANNEL_REQUEST = '';
 export const ADDRESS_REQUEST = ''; // provide me with an address
 
 export const OWN_POSITION_RECEIVED = 'WALLET.OWN_POSITION_RECEIVED';
-export const ownPositionReceived = (data: string, decodedData?: any) => ({
+export const ownPositionReceived = (data: string) => ({
   type: OWN_POSITION_RECEIVED as typeof OWN_POSITION_RECEIVED,
   data,
-  decodedData,
 });
 export type OwnPositionReceived = ReturnType<typeof ownPositionReceived>;
 
@@ -36,11 +35,10 @@ export const challengePositionReceived = (data: string) => ({
 export type ChallengePositionReceived = ReturnType<typeof challengePositionReceived>;
 
 export const OPPONENT_POSITION_RECEIVED = 'WALLET.OPPONENT_POSITION_RECEIVED';
-export const opponentPositionReceived = (data: string, signature: string, decodedData?: any, ) => ({
+export const opponentPositionReceived = (data: string, signature: string, ) => ({
   type: OPPONENT_POSITION_RECEIVED as typeof OPPONENT_POSITION_RECEIVED,
   data,
   signature,
-  decodedData,
 });
 export type OpponentPositionReceived = ReturnType<typeof opponentPositionReceived>;
 

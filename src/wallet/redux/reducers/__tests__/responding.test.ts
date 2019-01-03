@@ -75,8 +75,8 @@ describe('when in CHOOSE_RESPONSE', () => {
 describe('when in TAKE_MOVE_IN_APP', () => {
   const state = states.takeMoveInApp(defaults);
 
-  describe('when a move is taken in the application', () => {
-    const action = actions.ownPositionReceived(scenarios.aResignsAfterOneRound.restingHex);
+  describe('when a challenge move is taken in the application', () => {
+    const action = actions.challengePositionReceived(scenarios.aResignsAfterOneRound.restingHex);
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
   });
