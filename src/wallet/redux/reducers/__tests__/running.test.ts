@@ -2,7 +2,7 @@ import { walletReducer } from '..';
 import { scenarios } from '../../../../core';
 import * as states from '../../../states';
 import * as actions from '../../actions';
-import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType } from './helpers';
+import { itDoesntTransition, itIncreasesTurnNumBy, itTransitionsToStateType, itSendsAMessage } from './helpers';
 
 const {
   asAddress,
@@ -65,7 +65,7 @@ describe('when in WaitForUpdate on our turn', () => {
   });
 
   describe('when the wallet detects an opponent challenge', () => {
-    const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
+    const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry, []);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
@@ -76,8 +76,9 @@ describe('when in WaitForUpdate on our turn', () => {
     const action = actions.challengeRequested();
     const updatedState = walletReducer(state, action);
 
-    itTransitionsToStateType(states.APPROVE_CHALLENGE, updatedState);
+    itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
+    itSendsAMessage(updatedState);
   });
 });
 
@@ -117,14 +118,14 @@ describe(`when in WaitForUpdate on our opponent's turn`, () => {
 
 
   describe('when the wallet detects an opponent challenge', () => {
-    const action = actions.opponentChallengeDetected(defaults.challengeExpiry);
+    const action = actions.challengeCreatedEvent(1, '0x0', defaults.challengeExpiry, []);
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
   });
 
-  describe('when we request to launch a challenge', () => {
+  describe('when we request to launch a challenge ', () => {
     const action = actions.challengeRequested();
     const updatedState = walletReducer(state, action);
 

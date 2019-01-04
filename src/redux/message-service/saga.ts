@@ -7,7 +7,7 @@ import * as fromWalletActions from '../../wallet/interface/outgoing';
 import * as toWalletActions from '../../wallet/interface/incoming';
 import { encode, decode, Player, positions } from '../../core';
 import * as gameActions from '../game/actions';
-import { MessageState } from './state';
+import { MessageState, WalletMessage } from './state';
 import * as gameStates from '../game/state';
 import { Channel, State } from 'fmg-core';
 import { getMessageState, getGameState } from '../store';
@@ -23,8 +23,7 @@ export const getWalletAddress = (storeObj: any) => storeObj.wallet.address;
 
 export default function* messageSaga() {
   yield fork(waitForWalletThenReceiveFromFirebaseSaga);
-  // TODO: Implement this when action is defined
-  // yield fork(receiveFromWalletSaga);
+  yield fork(receiveFromWalletSaga);
   yield fork(sendMessagesSaga);
   yield fork(sendWalletMessageSaga);
 }
@@ -135,12 +134,17 @@ function* receiveFromFirebaseSaga(address) {
     yield call(reduxSagaFirebase.database.delete, `/messages/${address}/${key}`);
   }
 }
-function* handleWalletMessage(type, state: gameStates.PlayingState) {
+function* handleWalletMessage(walletMessage: WalletMessage, state: gameStates.PlayingState) {
   const { libraryAddress, channelNonce, player, balances, participants } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
   const channelId = channel.id;
 
-  switch (type) {
+  switch (walletMessage.type) {
+    case "RESPOND_TO_CHALLENGE":
+      if (state.name === gameStates.StateName.WaitForOpponentToPickMoveA || state.name === gameStates.StateName.WaitForOpponentToPickMoveB) {
+        yield put(toWalletActions.respondToChallenge(encode(walletMessage.data)));
+      }
+      break;
     case "FUNDING_REQUESTED":
       // TODO: We need to close the channel at some point
       yield put(toWalletActions.openChannelRequest(channel));
@@ -201,29 +205,35 @@ function* handleWalletMessage(type, state: gameStates.PlayingState) {
   }
 }
 
-// TODO: Implement this when action is defined
-/*
+
 function* receiveFromWalletSaga() {
   while (true) {
-    // const { position } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
-    // yield put(gameActions.positionReceived(position));
+    const { positionData } = yield take(fromWalletActions.CHALLENGE_POSITION_RECEIVED);
+    const position = decode(positionData);
+    yield put(gameActions.positionReceived(position));
   }
 }
-*/
+
 
 function* validateMessage(data, signature) {
   const requestId = hash(data + Date.now());
   yield put(toWalletActions.validationRequest(requestId, data, signature));
   const actionFilter = [fromWalletActions.VALIDATION_SUCCESS, fromWalletActions.VALIDATION_FAILURE];
-  const action: fromWalletActions.ValidationResponse = yield take(actionFilter);
-  // while (action.requestId !== requestId) {
-  //   action = yield take(actionFilter);
-  // }
+  let action: fromWalletActions.ValidationResponse = yield take(actionFilter);
   if (action.type === fromWalletActions.VALIDATION_SUCCESS) {
     return true;
   } else {
-    // TODO: Properly handle this.
-    throw new Error("Signature Validation error");
+    if (action.reason === "WalletBusy") {
+      yield take(fromWalletActions.CHALLENGE_COMPLETE);
+      yield put(toWalletActions.validationRequest(requestId, data, signature));
+      action = yield take(actionFilter);
+      if (action.type === fromWalletActions.VALIDATION_SUCCESS) {
+        return true;
+      }
+    }
+
+    throw new Error(`Signature Validation error ${action.reason}}`);
+
   }
 }
 
@@ -232,10 +242,21 @@ function* signMessage(data) {
 
   yield put(toWalletActions.signatureRequest(requestId, data));
   // TODO: Handle signature failure
-  const actionFilter = fromWalletActions.SIGNATURE_SUCCESS;
-  const signatureResponse: fromWalletActions.SignatureSuccess = yield take(actionFilter);
-  // while (signatureResponse.requestId !== requestId) {
-  //   signatureResponse = yield take(actionFilter);
-  // }
-  return signatureResponse.signature;
+  const actionFilter = [fromWalletActions.SIGNATURE_SUCCESS, fromWalletActions.SIGNATURE_FAILURE];
+  let action: fromWalletActions.SignatureResponse = yield take(actionFilter);
+  if (action.type === fromWalletActions.SIGNATURE_SUCCESS) {
+    return action.signature;
+  } else {
+    if (action.reason === "WalletBusy") {
+      yield take(fromWalletActions.CHALLENGE_COMPLETE);
+      yield put(toWalletActions.signatureRequest(requestId, data));
+      action = yield take(actionFilter);
+      if (action.type === fromWalletActions.SIGNATURE_SUCCESS) {
+        return action.signature;
+      }
+    }
+
+    throw new Error(`Signing error ${action.reason}}`);
+
+  }
 }

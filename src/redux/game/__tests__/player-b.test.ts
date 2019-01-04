@@ -64,7 +64,7 @@ describe('player B\'s app', () => {
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
 
       it('requests funding from the wallet', () => {
-        expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'FUNDING_REQUESTED' });
       });
 
       itTransitionsTo(state.StateName.WaitForFunding, updatedState);
@@ -200,7 +200,7 @@ describe('player B\'s app', () => {
 
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
       it('requests a withdrawal from the wallet', () => {
-        expect(updatedState.messageState.walletOutbox).toEqual('WITHDRAWAL_REQUESTED');
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'WITHDRAWAL_REQUESTED' });
       });
     });
   });

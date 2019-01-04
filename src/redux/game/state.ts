@@ -24,6 +24,7 @@ export enum StateName {
   WaitForResignationAcknowledgement = 'WAIT_FOR_RESIGNATION_ACKNOWLEDGEMENT',
   GameOver = 'GAME_OVER',
   WaitForWithdrawal = 'WAIT_FOR_WITHDRAWAL',
+  PickChallengeMove = 'PICK_CHALLENGE_MOVE',
 }
 
 export interface NoName {
@@ -193,6 +194,14 @@ export function pickMove(state: IncludesBase): PickMove {
   return { ...base(state), name: StateName.PickMove };
 }
 
+export interface PickChallengeMove extends Base {
+  name: StateName.PickChallengeMove;
+  player: Player;
+}
+export function pickChallengeMove(state: IncludesBase): PickChallengeMove {
+  return { ...base(state), name: StateName.PickChallengeMove };
+}
+
 export interface WaitForOpponentToPickMoveA extends Base {
   name: StateName.WaitForOpponentToPickMoveA;
   myMove: Move;
@@ -343,6 +352,7 @@ export type PlayingState = (
   | WaitForResignationAcknowledgement
   | GameOver
   | WaitForWithdrawal
+  | PickChallengeMove
 );
 
 export type GameState = (

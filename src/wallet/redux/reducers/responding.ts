@@ -8,9 +8,18 @@ import { WalletAction } from '../actions';
 import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex } from '../../utils/signing-utils';
+import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
+import { Signature } from '../../domain';
+import { challengeResponseRequested, challengeComplete } from '../../interface/outgoing';
+import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
+  // Handle any signature/validation request centrally to avoid duplicating code for each state
+  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+    return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
+  }
+
   switch (state.type) {
     case states.ACKNOWLEDGE_CHALLENGE:
       return acknowledgeChallengeReducer(state, action);
@@ -34,6 +43,7 @@ export const respondingReducer = (state: RespondingState, action: WalletAction):
 
 export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, action: WalletAction): WalletState => {
   switch (action.type) {
+
     case actions.CHALLENGE_ACKNOWLEDGED:
       return states.chooseResponse(state);
     case actions.CHALLENGE_TIMED_OUT:
@@ -46,7 +56,14 @@ export const acknowledgeChallengeReducer = (state: states.AcknowledgeChallenge, 
 export const chooseResponseReducer = (state: states.ChooseResponse, action: WalletAction): WalletState => {
   switch (action.type) {
     case actions.RESPOND_WITH_MOVE_CHOSEN:
-      return states.takeMoveInApp(state);
+      return states.takeMoveInApp({ ...state, messageOutbox: challengeResponseRequested() });
+    case actions.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
+      const { data, signature } = state.lastPosition;
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, new Signature(signature));
+      return states.initiateResponse({
+        ...state,
+        transactionOutbox: transaction,
+      });
     case actions.RESPOND_WITH_REFUTE_CHOSEN:
       return states.initiateResponse(state);
     case actions.CHALLENGE_TIMED_OUT:
@@ -58,7 +75,7 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
 
 export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.OWN_POSITION_RECEIVED:
+    case actions.CHALLENGE_POSITION_RECEIVED:
       const data = action.data;
       const position = decode(data);
       // check it's our turn
@@ -68,13 +85,15 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
       if (!validTransition(state, position)) { return state; }
 
       const signature = signPositionHex(data, state.privateKey);
-
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, new Signature(signature));
       return states.initiateResponse({
         ...state,
         turnNum: state.turnNum + 1,
         lastPosition: { data, signature },
         penultimatePosition: state.lastPosition,
+        transactionOutbox: transaction,
       });
+
     case actions.CHALLENGE_TIMED_OUT:
       return challengeStates.acknowledgeChallengeTimeout(state);
     default:
@@ -93,6 +112,7 @@ export const initiateResponseReducer = (state: states.InitiateResponse, action: 
 
 export const waitForResponseSubmissionReducer = (state: states.WaitForResponseSubmission, action: WalletAction): WalletState => {
   switch (action.type) {
+
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForResponseConfirmation(state);
     default:
@@ -111,8 +131,8 @@ export const waitForResponseConfirmationReducer = (state: states.WaitForResponse
 
 export const acknowledgeChallengeCompleteReducer = (state: states.AcknowledgeChallengeComplete, action: WalletAction): WalletState => {
   switch (action.type) {
-    case actions.CHALLENGE_COMPLETION_ACKNOWLEDGED:
-      return runningStates.waitForUpdate(state);
+    case actions.CHALLENGE_RESPONSE_ACKNOWLEDGED:
+      return runningStates.waitForUpdate({ ...state, messageOutbox: challengeComplete() });
     default:
       return state;
   }

@@ -57,7 +57,7 @@ describe('player A\'s app', () => {
       const updatedState = gameReducer({ messageState, gameState }, action);
 
       it('requests funding from the wallet', () => {
-        expect(updatedState.messageState.walletOutbox).toEqual('FUNDING_REQUESTED');
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'FUNDING_REQUESTED' });
       });
 
       itIncreasesTurnNumBy(1, { gameState, messageState }, updatedState);
@@ -197,7 +197,7 @@ describe('player A\'s app', () => {
       itIncreasesTurnNumBy(0, { gameState, messageState }, updatedState);
 
       it('requests a withdrawal from the wallet', () => {
-        expect(updatedState.messageState.walletOutbox).toEqual('WITHDRAWAL_REQUESTED');
+        expect(updatedState.messageState.walletOutbox).toEqual({ type: 'WITHDRAWAL_REQUESTED' });
       });
     });
   });

@@ -29,6 +29,9 @@ const defaults = {
   address: 'address',
   privateKey: asPrivateKey,
   networkId: 2323,
+  challengeExpiry: 0,
+  moveSelected: false,
+  challengeOptions: [],
 };
 
 describe('when in ACKNOWLEDGE_CHALLENGE', () => {
@@ -72,8 +75,8 @@ describe('when in CHOOSE_RESPONSE', () => {
 describe('when in TAKE_MOVE_IN_APP', () => {
   const state = states.takeMoveInApp(defaults);
 
-  describe('when a move is taken in the application', () => {
-    const action = actions.ownPositionReceived(scenarios.aResignsAfterOneRound.restingHex);
+  describe('when a challenge move is taken in the application', () => {
+    const action = actions.challengePositionReceived(scenarios.aResignsAfterOneRound.restingHex);
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.INITIATE_RESPONSE, updatedState);
   });
@@ -118,7 +121,7 @@ describe('when in WAIT_FOR_RESPONSE_CONFIRMED', () => {
 describe('when in ACKNOWLEDGE_CHALLENGE_COMPLETE', () => {
   const state = states.acknowledgeChallengeComplete(defaults);
   describe('when the challenge is acknowledged as complete', () => {
-    const action = actions.challengeCompletionAcknowledged();
+    const action = actions.challengeResponseAcknowledged();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
 

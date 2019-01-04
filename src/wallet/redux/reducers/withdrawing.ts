@@ -1,8 +1,13 @@
 import * as states from '../../states';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
+import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
+  // Handle any signature/validation request centrally to avoid duplicating code for each state
+  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
+    return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
+  }
   switch (state.type) {
     case states.APPROVE_WITHDRAWAL:
       return approveWithdrawalReducer(state, action);

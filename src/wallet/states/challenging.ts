@@ -1,5 +1,5 @@
 import {
-  AdjudicatorExists, adjudicatorExists
+  AdjudicatorExists, adjudicatorExists, ChallengeExists, challengeExists
 } from './shared';
 import { TransactionRequest } from 'ethers/providers';
 export const CHALLENGING = 'CHALLENGING';
@@ -52,55 +52,55 @@ export function waitForChallengeSubmission<T extends AdjudicatorExists>(params: 
 }
 
 
-export interface WaitForChallengeConfirmation extends AdjudicatorExists {
+export interface WaitForChallengeConfirmation extends ChallengeExists {
   type: typeof WAIT_FOR_CHALLENGE_CONFIRMATION;
   stage: typeof CHALLENGING;
 }
-export function waitForChallengeConfirmation<T extends AdjudicatorExists>(params: T): WaitForChallengeConfirmation {
+export function waitForChallengeConfirmation<T extends ChallengeExists>(params: T): WaitForChallengeConfirmation {
   return {
     type: WAIT_FOR_CHALLENGE_CONFIRMATION,
     stage: CHALLENGING,
-    ...adjudicatorExists(params),
+    ...challengeExists(params),
   };
 }
 
-export interface WaitForResponseOrTimeout extends AdjudicatorExists {
+export interface WaitForResponseOrTimeout extends ChallengeExists {
   type: typeof WAIT_FOR_RESPONSE_OR_TIMEOUT;
   stage: typeof CHALLENGING;
 }
 
-export function waitForResponseOrTimeout<T extends AdjudicatorExists>(params: T): WaitForResponseOrTimeout {
+export function waitForResponseOrTimeout<T extends ChallengeExists>(params: T): WaitForResponseOrTimeout {
   return {
     type: WAIT_FOR_RESPONSE_OR_TIMEOUT,
     stage: CHALLENGING,
-    ...adjudicatorExists(params),
+    ...challengeExists(params),
   };
 }
 
-export interface AcknowledgeChallengeResponse extends AdjudicatorExists {
+export interface AcknowledgeChallengeResponse extends ChallengeExists {
   type: typeof ACKNOWLEDGE_CHALLENGE_RESPONSE;
   stage: typeof CHALLENGING;
 }
 
 
-export function acknowledgeChallengeResponse<T extends AdjudicatorExists>(params: T): AcknowledgeChallengeResponse {
+export function acknowledgeChallengeResponse<T extends ChallengeExists>(params: T): AcknowledgeChallengeResponse {
   return {
     type: ACKNOWLEDGE_CHALLENGE_RESPONSE,
     stage: CHALLENGING,
-    ...adjudicatorExists(params),
+    ...challengeExists(params),
   };
 }
 
-export interface AcknowledgeChallengeTimeout extends AdjudicatorExists {
+export interface AcknowledgeChallengeTimeout extends ChallengeExists {
   type: typeof ACKNOWLEDGE_CHALLENGE_TIMEOUT;
   stage: typeof CHALLENGING;
 }
 
-export function acknowledgeChallengeTimeout<T extends AdjudicatorExists>(params: T): AcknowledgeChallengeTimeout {
+export function acknowledgeChallengeTimeout<T extends ChallengeExists>(params: T): AcknowledgeChallengeTimeout {
   return {
     type: ACKNOWLEDGE_CHALLENGE_TIMEOUT,
     stage: CHALLENGING,
-    ...adjudicatorExists(params),
+    ...challengeExists(params),
   };
 }
 

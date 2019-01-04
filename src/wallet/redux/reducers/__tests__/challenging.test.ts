@@ -32,6 +32,7 @@ const defaults = {
   privateKey: asPrivateKey,
   challengeProof: new ChallengeProof(proposeHex, acceptHex, proposeSig, acceptSig),
   networkId: 2323,
+  challengeExpiry: 12321,
 
 };
 
@@ -89,10 +90,10 @@ describe('when in WAIT_FOR_CHALLENGE_CONFIRMATION', () => {
 });
 
 describe('when in WAIT_FOR_RESPONSE_OR_TIMEOUT', () => {
-  const state = states.waitForResponseOrTimeout(defaults);
+  const state = states.waitForResponseOrTimeout({ ...defaults, challengeExpiry: 1, moveSelected: false, });
 
   describe('when the opponent responds', () => {
-    const action = actions.challengeResponseReceived('0xC1');
+    const action = actions.respondWithMoveEvent('0xC1');
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_CHALLENGE_RESPONSE, updatedState);
@@ -120,6 +121,6 @@ describe('when in ACKNOWLEDGE_TIMEOUT', () => {
   const action = actions.challengedTimedOutAcknowledged();
   const updatedState = walletReducer(state, action);
 
-  itTransitionsToStateType(states.WAIT_FOR_UPDATE, updatedState);
+  itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
 
 });

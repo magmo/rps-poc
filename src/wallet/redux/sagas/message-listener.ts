@@ -6,7 +6,6 @@ import * as incoming from '../../interface/incoming';
 
 import * as actions from "../actions";
 
-
 // this is the only thing in the wallet which is allowed to listen for app actions
 // if we move to an iframe, this would be modified to listen to events on a given
 // postMessage channel
@@ -20,6 +19,9 @@ export function* messageListener() {
     const action = yield take(channel);
 
     switch (action.type) {
+      case incoming.CREATE_CHALLENGE_REQUEST:
+        yield put(actions.challengeRequested());
+        break;
       case incoming.FUNDING_REQUEST:
         yield put(actions.fundingRequested());
         break;
@@ -34,6 +36,9 @@ export function* messageListener() {
         break;
       case incoming.RECEIVE_MESSAGE:
         yield put(actions.messageReceived(action.data, action.signature));
+        break;
+      case incoming.RESPOND_TO_CHALLENGE:
+        yield put(actions.challengePositionReceived(action.position));
         break;
       case incoming.CONCLUDE_CHANNEL_REQUEST:
         yield put(actions.concludeRequested());

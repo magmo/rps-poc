@@ -5,16 +5,18 @@ import { connect } from 'react-redux';
 import * as states from '../states';
 import * as actions from '../redux/actions';
 
-import Todo from '../components/Todo';
 import AcknowledgeX from '../components/AcknowledgeX';
 import WaitForXConfirmation from '../components/WaitForXConfirmation';
 import SubmitX from '../components/SubmitX';
 import { unreachable } from '../utils/reducer-utils';
+import ChooseResponse, { ChallengeOptions } from '../components/responding/ChooseResponse';
 
 interface Props {
   state: states.RespondingState;
   challengeAcknowledged: () => void;
   challengeResponseAcknowledged: () => void;
+  selectRespondWithMove: () => void;
+  selectRespondWithExistingMove: () => void;
 }
 
 class RespondingContainer extends PureComponent<Props> {
@@ -23,6 +25,8 @@ class RespondingContainer extends PureComponent<Props> {
       state,
       challengeAcknowledged,
       challengeResponseAcknowledged,
+      selectRespondWithMove,
+      selectRespondWithExistingMove,
     } = this.props;
 
     switch (state.type) {
@@ -36,9 +40,20 @@ class RespondingContainer extends PureComponent<Props> {
           />
         );
       case states.CHOOSE_RESPONSE:
-        return <Todo stateType={state.type} />;
+        const { ourIndex, turnNum } = state;
+        const moveSelected = ourIndex === 0 ? turnNum % 2 === 0 : turnNum % 2 !== 0;
+        let challengeOptions = [ChallengeOptions.RespondWithMove];
+        if (moveSelected) {
+          // TODO: We need to update the game to allow the user to choose a move even after they've selected an existing move.
+          challengeOptions = [ChallengeOptions.RespondWithExistingMove];
+        }
+        return <ChooseResponse expiryTime={state.challengeExpiry ? state.challengeExpiry : 0}
+          selectRespondWithMove={selectRespondWithMove}
+          selectRespondWithExistingMove={selectRespondWithExistingMove}
+          challengeOptions={challengeOptions} />;
       case states.TAKE_MOVE_IN_APP:
-        return <Todo stateType={state.type} />;
+        // The game knows about the challenge so we don't need the wallet to display anything
+        return null;
       case states.WAIT_FOR_RESPONSE_CONFIRMATION:
         return <WaitForXConfirmation name='response' />;
       case states.INITIATE_RESPONSE:
@@ -62,6 +77,8 @@ class RespondingContainer extends PureComponent<Props> {
 const mapDispatchToProps = {
   challengeAcknowledged: actions.challengeAcknowledged,
   challengeResponseAcknowledged: actions.challengeResponseAcknowledged,
+  selectRespondWithMove: actions.respondWithMoveChosen,
+  selectRespondWithExistingMove: actions.respondWithExistingMoveChosen,
 };
 
 export default connect(

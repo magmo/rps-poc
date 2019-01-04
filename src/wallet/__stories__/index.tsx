@@ -32,10 +32,12 @@ const defaults = {
   lastPosition: { data: preFundSetupBHex, signature: 'fake-sig' },
   turnNum: 1,
   networkId: 123,
+  challengeExpiry: 0,
 };
 const playerADefaults = {
   ...defaults,
   ourIndex: 0,
+
 };
 const playerBDefaults = {
   ...defaults,
