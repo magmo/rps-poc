@@ -2,6 +2,9 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import { unreachable } from '../../utils/reducer-utils';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
+import { createWithdrawTransaction } from '../../utils/transaction-generator';
+import { signVerificationData } from '../../utils/signing-utils';
+import { Signature } from '../../domain';
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
   // Handle any signature/validation request centrally to avoid duplicating code for each state
@@ -25,9 +28,10 @@ export const withdrawingReducer = (state: states.WithdrawingState, action: actio
 const approveWithdrawalReducer = (state: states.ApproveWithdrawal, action: actions.WalletAction): states.WalletState => {
   switch (action.type) {
     case actions.WITHDRAWAL_APPROVED:
-      // todo: construct withdrawal
-
-      return states.waitForWithdrawalInitiation(state);
+      const myAddress = state.participants[state.ourIndex];
+      const signature = new Signature(signVerificationData(myAddress, myAddress, state.channelId, state.privateKey));
+      const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, myAddress, state.channelId, signature);
+      return states.waitForWithdrawalInitiation({ ...state, transactionOutbox });
     case actions.WITHDRAWAL_REJECTED:
       return states.acknowledgeCloseSuccess(state);
     default:
