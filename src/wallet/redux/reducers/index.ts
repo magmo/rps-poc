@@ -11,7 +11,7 @@ import {
   waitForLogin,
   approveConclude,
   ApproveConclude,
-  acknowlegeClosedOnChain,
+  acknowledgeClosedOnChain,
   AcknowledgeClosedOnChain,
 } from '../../states';
 
@@ -64,13 +64,15 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
 };
 
 const receivedValidOwnConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
-  if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
+  // TODO: Handle conclude if the game isn't funded.
+  if (state.stage !== RUNNING) { return null; }
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
   return approveConclude(state);
 };
 
 const receivedValidOpponentConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
-  if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
+  // TODO: Handle conclude if the game isn't funded.
+  if (state.stage !== RUNNING) { return null; }
   if (action.type !== MESSAGE_RECEIVED) { return null; }
 
   let position;
@@ -102,7 +104,7 @@ const receivedValidOpponentClosedOnChain = (state: WalletState, action: WalletAc
   if (action.type !== GAME_CONCLUDED_EVENT) { return null; }
 
   if ('adjudicator' in state && state.adjudicator) {
-    return acknowlegeClosedOnChain({ ...state, adjudicator: state.adjudicator });
+    return acknowledgeClosedOnChain({ ...state, adjudicator: state.adjudicator });
   }
   return null;
 };

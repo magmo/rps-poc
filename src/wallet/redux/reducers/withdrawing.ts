@@ -20,6 +20,7 @@ export const withdrawingReducer = (state: states.WithdrawingState, action: actio
       return waitForWithdrawalConfirmationReducer(state, action);
     case states.ACKNOWLEDGE_WITHDRAWAL_SUCCESS:
       return acknowledgeWithdrawalSuccessReducer(state, action);
+
     default:
       return unreachable(state);
   }
