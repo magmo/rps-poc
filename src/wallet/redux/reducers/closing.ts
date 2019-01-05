@@ -36,7 +36,7 @@ export const closingReducer = (state: ClosingState, action: WalletAction): Walle
 const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, action: actions.WalletAction) => {
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
-      return states.approveWithdrawal(state);
+      return states.approveWithdrawal({ ...state });
   }
   return state;
 };
