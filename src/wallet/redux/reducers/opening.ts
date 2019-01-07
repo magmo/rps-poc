@@ -4,7 +4,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import { signatureSuccess, validationSuccess } from '../../interface/outgoing';
 
-import decode from '../../domain/decode';
+import decode from '../../utils/decode-utils';
 import { unreachable } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 

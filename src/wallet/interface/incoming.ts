@@ -1,8 +1,11 @@
 import { State, Channel } from 'fmg-core';
 import { SignableData } from '../domain/ChannelWallet';
 import BN from 'bn.js';
-import { PlayerIndex } from '../wallet-engine/wallet-states';
 
+export enum PlayerIndex {
+  'A' = 0,
+  'B' = 1,
+}
 // FUNDING
 // =======
 

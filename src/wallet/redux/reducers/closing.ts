@@ -5,7 +5,7 @@ import { WalletState, ClosingState } from '../../states';
 import { WalletAction } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { State, Channel } from 'fmg-core';
-import decode from '../../domain/decode';
+import decode from '../../utils/decode-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { sendMessage, closeSuccess, concludeSuccess } from '../../interface/outgoing';
 import { Signature } from '../../domain';

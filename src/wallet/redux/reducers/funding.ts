@@ -2,7 +2,7 @@ import * as states from '../../states';
 import * as actions from '../actions';
 import { sendMessage, fundingSuccess, fundingFailure } from '../../interface/outgoing';
 
-import decode, { extractGameAttributes } from '../../domain/decode';
+import decode, { extractGameAttributes } from '../../utils/decode-utils';
 import { unreachable, validTransition } from '../../utils/reducer-utils';
 import { createDeployTransaction, createDepositTransaction } from '../../utils/transaction-generator';
 import { validSignature, signPositionHex } from '../../utils/signing-utils';

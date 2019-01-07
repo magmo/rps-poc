@@ -1,6 +1,6 @@
 import { Channel, State } from 'fmg-core';
 
-import decode, { extractGameAttributes } from '../decode';
+import decode, { extractGameAttributes } from '../decode-utils';
 import BN from 'bn.js';
 
 const gameLibrary = '0x0000000000000000000000000000000000000111';
