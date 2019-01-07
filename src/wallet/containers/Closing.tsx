@@ -16,7 +16,6 @@ interface Props {
   state: states.ClosingState;
   concludeApproved: () => void;
   concludeRejected: () => void;
-  concludeSuccessAcknowledged: () => void;
   closeOnChain: () => void;
   closeSuccessAcknowledged: () => void;
   closedOnChainAcknowledged: () => void;
@@ -37,8 +36,8 @@ class ClosingContainer extends PureComponent<Props> {
       case states.APPROVE_CONCLUDE:
         return (
           <ApproveX
-            title="Conclude the channel!"
-            description="Do you wish to conclude this channel?"
+            title="Conclude the game!"
+            description="Do you wish to conclude this game?"
             approvalAction={concludeApproved}
             rejectionAction={concludeRejected}
           />
@@ -46,11 +45,12 @@ class ClosingContainer extends PureComponent<Props> {
       case states.WAIT_FOR_OPPONENT_CONCLUDE:
         return <WaitForOtherPlayer name="conclude" />;
       case states.APPROVE_CLOSE_ON_CHAIN:
+        // TODO: Add option to reject closing the channel?  
         return (
           <AcknowledgeX
-            title="Game concluded!"
+            title="Close Channel!"
             action={closeOnChain}
-            description="Send close trans"
+            description="The game has been concluded and the channel can now be closed."
             actionTitle="Close channel"
           />
         );
@@ -87,7 +87,6 @@ class ClosingContainer extends PureComponent<Props> {
 const mapDispatchToProps = {
   concludeApproved: actions.concludeApproved,
   concludeRejected: actions.concludeRejected,
-  concludeSuccessAcknowledged: actions.concludeSuccessAcknowledged,
   closeSuccessAcknowledged: actions.closeSuccessAcknowledged,
   closedOnChainAcknowledged: actions.closedOnChainAcknowledged,
   closeOnChain: actions.approveClose,

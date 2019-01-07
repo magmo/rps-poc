@@ -304,13 +304,6 @@ export const concludeRejected = () => ({
 });
 export type ConcludeRejected = ReturnType<typeof concludeRejected>;
 
-
-export const CONCLUDE_SUCCESS_ACKNOWLEDGED = 'WALLET.CONCLUDE_SUCCESS_ACKNOWLEDGED';
-export const concludeSuccessAcknowledged = () => ({
-  type: CONCLUDE_SUCCESS_ACKNOWLEDGED as typeof CONCLUDE_SUCCESS_ACKNOWLEDGED,
-});
-export type ConcludeSuccessAcknowledged = ReturnType<typeof concludeSuccessAcknowledged>;
-
 export const CLOSE_SUCCESS_ACKNOWLEDGED = 'WALLET.CLOSE_SUCCESS_ACKNOWLEDGED';
 export const closeSuccessAcknowledged = () => ({
   type: CLOSE_SUCCESS_ACKNOWLEDGED as typeof CLOSE_SUCCESS_ACKNOWLEDGED,
@@ -369,7 +362,6 @@ export type WalletAction = (
   | GameConcludedEvent
   | ConcludeRequested
   | ConcludeApproved
-  | ConcludeSuccessAcknowledged
   | CloseSuccessAcknowledged
   | ClosedOnChainAcknowledged
   | RespondWithMoveEvent
