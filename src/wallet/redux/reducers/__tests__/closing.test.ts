@@ -61,9 +61,17 @@ describe('start in ApproveConclude', () => {
     });
 
     const action = actions.concludeApproved();
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
-    expect((updatedState.messageOutbox!).type).toEqual(outgoing.SEND_MESSAGE);
+    describe(' where the adjudicator exists', () => {
+      const updatedState = walletReducer(state, action);
+      itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
+      expect((updatedState.messageOutbox!).type).toEqual(outgoing.SEND_MESSAGE);
+    });
+    describe(' where the adjudicator does not exist', () => {
+      state.adjudicator = undefined;
+      const updatedState = walletReducer(state, action);
+      itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
+      expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
+    });
   });
 
 });
@@ -78,9 +86,17 @@ describe('start in WaitForOpponentConclude', () => {
     });
 
     const action = actions.messageReceived(aResignsAfterOneRound.conclude2Hex, aResignsAfterOneRound.conclude2Sig);
-    const updatedState = walletReducer(state, action);
-    itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
-    expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
+    describe(' where the adjudicator exists', () => {
+      const updatedState = walletReducer(state, action);
+      itTransitionsToStateType(states.APPROVE_CLOSE_ON_CHAIN, updatedState);
+      expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
+    });
+    describe(' where the adjudicator does not exist', () => {
+      state.adjudicator = undefined;
+      const updatedState = walletReducer(state, action);
+      itTransitionsToStateType(states.ACKNOWLEDGE_CLOSE_SUCCESS, updatedState);
+      expect((updatedState.messageOutbox!).type).toEqual(outgoing.CONCLUDE_SUCCESS);
+    });
   });
 });
 

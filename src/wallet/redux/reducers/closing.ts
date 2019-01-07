@@ -89,13 +89,21 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
       const { positionData, positionSignature, sendMessageAction } = composeConcludePosition(state);
       const lastState = decode(state.lastPosition.data);
       if (lastState.stateType === State.StateType.Conclude) {
-        return states.approveCloseOnChain({
-          ...state,
-          turnNum: decode(positionData).turnNum,
-          penultimatePosition: state.lastPosition,
-          lastPosition: { data: positionData, signature: positionSignature },
-          messageOutbox: sendMessageAction,
-        });
+        if (state.adjudicator) {
+          return states.approveCloseOnChain({
+            ...state,
+            adjudicator: state.adjudicator,
+            turnNum: decode(positionData).turnNum,
+            penultimatePosition: state.lastPosition,
+            lastPosition: { data: positionData, signature: positionSignature },
+            messageOutbox: sendMessageAction,
+          });
+        } else {
+          return states.acknowledgeCloseSuccess({
+            ...state,
+            messageOutbox: concludeSuccess(),
+          });
+        }
       } else {
         return states.waitForOpponentConclude({
           ...state,
@@ -121,13 +129,22 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
       if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
       // check transition
       if (!validTransition(state, concludePosition)) { return state; }
-      return states.approveCloseOnChain({
-        ...state,
-        turnNum: concludePosition.turnNum,
-        penultimatePosition: state.lastPosition,
-        lastPosition: { data: action.data, signature: action.signature },
-        messageOutbox: concludeSuccess(),
-      });
+      if (state.adjudicator !== undefined) {
+        return states.approveCloseOnChain({
+          ...state,
+          adjudicator: state.adjudicator,
+          turnNum: concludePosition.turnNum,
+          penultimatePosition: state.lastPosition,
+          lastPosition: { data: action.data, signature: action.signature },
+          messageOutbox: concludeSuccess(),
+        });
+      } else {
+        return states.acknowledgeCloseSuccess({
+          ...state,
+          messageOutbox: concludeSuccess(),
+        });
+      }
+
     default:
       return state;
   }

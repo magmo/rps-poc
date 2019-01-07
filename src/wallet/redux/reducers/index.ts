@@ -59,15 +59,13 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
 };
 
 const receivedValidOwnConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
-  // TODO: Handle conclude if the game isn't funded.
-  if (state.stage !== RUNNING) { return null; }
+  if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== CONCLUDE_REQUESTED || !ourTurn(state)) { return null; }
   return approveConclude(state);
 };
 
 const receivedValidOpponentConclusionRequest = (state: WalletState, action: WalletAction): ApproveConclude | null => {
-  // TODO: Handle conclude if the game isn't funded.
-  if (state.stage !== RUNNING) { return null; }
+  if (state.stage !== FUNDING && state.stage !== RUNNING) { return null; }
   if (action.type !== MESSAGE_RECEIVED) { return null; }
 
   let position;

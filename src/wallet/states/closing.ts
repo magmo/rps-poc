@@ -1,4 +1,4 @@
-import { AdjudicatorExists, adjudicatorExists, ChannelOpen, channelOpen, } from './shared';
+import { AdjudicatorExists, adjudicatorExists, ChannelOpen, channelOpen, AdjudicatorMightExist, adjudicatorMightExist, } from './shared';
 
 // stage
 export const CLOSING = 'CLOSING';
@@ -18,12 +18,17 @@ export interface WaitForCloseConfirmed extends AdjudicatorExists {
   stage: typeof CLOSING;
 }
 
-export interface ApproveConclude extends AdjudicatorExists {
+export interface ApproveConclude extends AdjudicatorMightExist {
   type: typeof APPROVE_CONCLUDE;
   stage: typeof CLOSING;
 }
 
-export interface WaitForOpponentConclude extends AdjudicatorExists {
+export interface WaitForOpponentConclude extends AdjudicatorMightExist {
+  type: typeof WAIT_FOR_OPPONENT_CONCLUDE;
+  stage: typeof CLOSING;
+}
+
+export interface AcknowledgeConcludeSuccess extends AdjudicatorMightExist {
   type: typeof WAIT_FOR_OPPONENT_CONCLUDE;
   stage: typeof CLOSING;
 }
@@ -52,15 +57,15 @@ export interface WaitForCloseSubmission extends AdjudicatorExists {
   type: typeof WAIT_FOR_CLOSE_SUBMISSION;
   stage: typeof CLOSING;
 }
-export function approveConclude<T extends AdjudicatorExists>(params: T): ApproveConclude {
-  return { type: APPROVE_CONCLUDE, stage: CLOSING, ...adjudicatorExists(params) };
+export function approveConclude<T extends AdjudicatorMightExist>(params: T): ApproveConclude {
+  return { type: APPROVE_CONCLUDE, stage: CLOSING, ...adjudicatorMightExist(params) };
 }
 export function approveCloseOnChain<T extends AdjudicatorExists>(params: T): ApproveCloseOnChain {
   return { type: APPROVE_CLOSE_ON_CHAIN, stage: CLOSING, ...adjudicatorExists(params) };
 }
 
-export function waitForOpponentConclude<T extends AdjudicatorExists>(params: T): WaitForOpponentConclude {
-  return { type: WAIT_FOR_OPPONENT_CONCLUDE, stage: CLOSING, ...adjudicatorExists(params) };
+export function waitForOpponentConclude<T extends AdjudicatorMightExist>(params: T): WaitForOpponentConclude {
+  return { type: WAIT_FOR_OPPONENT_CONCLUDE, stage: CLOSING, ...adjudicatorMightExist(params) };
 }
 
 export function acknowledgeCloseSuccess<T extends ChannelOpen>(params: T): AcknowledgeCloseSuccess {
