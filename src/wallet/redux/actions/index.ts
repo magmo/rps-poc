@@ -194,7 +194,7 @@ export const transactionSentToMetamask = () => ({
 export type TransactionSentToMetamask = ReturnType<typeof transactionSentToMetamask>;
 
 export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.TRANSACTION_SUBMISSION_FAILED';
-export const transactionSubmissionFailed = (error) => ({
+export const transactionSubmissionFailed = (error: { message?: string, code }) => ({
   error,
   type: TRANSACTION_SUBMISSION_FAILED as typeof TRANSACTION_SUBMISSION_FAILED,
 });

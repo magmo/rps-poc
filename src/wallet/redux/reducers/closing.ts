@@ -37,6 +37,8 @@ const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, actio
   switch (action.type) {
     case actions.TRANSACTION_CONFIRMED:
       return states.approveWithdrawal({ ...state });
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
   }
   return state;
 };
@@ -45,6 +47,8 @@ const waitForCloseInitiatorReducer = (state: states.WaitForCloseInitiation, acti
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.waitForCloseSubmission(state);
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
   }
   return state;
 };
@@ -53,6 +57,8 @@ const waitForCloseSubmissionReducer = (state: states.WaitForCloseSubmission, act
   switch (action.type) {
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForCloseConfirmed(state);
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
   }
   return state;
 };

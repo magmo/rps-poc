@@ -85,62 +85,85 @@ describe('start in WaitForOpponentConclude', () => {
 });
 
 describe('start in ApproveCloseOnChain', () => {
+  const state = states.approveCloseOnChain({
+    ...defaultsA,
+    penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
+    lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
+    turnNum: 9,
+  });
   describe('action taken: approve close on chain', () => {
-
-    const state = states.approveCloseOnChain({
-      ...defaultsA,
-      penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
-      lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
-      turnNum: 9,
-    });
     // TODO: Mock out Signature contructor so we don't have to pass a valid signature string in 
     const createConcludeTxMock = jest.fn();
     Object.defineProperty(TransactionGenerator, 'createConcludeTransaction', { value: createConcludeTxMock });
     const action = actions.approveClose();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_INITIATION, updatedState);
-
   });
+
+  describe('action taken: game concluded event', () => {
+    const action = actions.gameConcludedEvent();
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+  });
+
 });
 
 describe('start in WaitForCloseInitiation', () => {
+  const state = states.waitForCloseInitiation({
+    ...defaultsA,
+    penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
+    lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
+    turnNum: 9,
+  });
   describe('action taken: transaction sent to metamask', () => {
-    const state = states.waitForCloseInitiation({
-      ...defaultsA,
-      penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
-      lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
-      turnNum: 9,
-    });
+
     const action = actions.transactionSentToMetamask();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_SUBMISSION, updatedState);
   });
+  describe('action taken: game concluded event', () => {
+    const action = actions.gameConcludedEvent();
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+  });
 });
 
 describe('start in WaitForCloseSubmission', () => {
+  const state = states.waitForCloseSubmission({
+    ...defaultsA,
+    penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
+    lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
+    turnNum: 9,
+  });
   describe('action taken: transaction submitted', () => {
-    const state = states.waitForCloseSubmission({
-      ...defaultsA,
-      penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
-      lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
-      turnNum: 9,
-    });
+
     const action = actions.transactionSubmitted();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.WAIT_FOR_CLOSE_CONFIRMED, updatedState);
+  });
+  describe('action taken: game concluded event', () => {
+    const action = actions.gameConcludedEvent();
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });
 });
 
 
 describe('start in WaitForCloseConfirmed', () => {
+  const state = states.waitForCloseConfirmed({
+    ...defaultsA,
+    penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
+    lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
+    turnNum: 9,
+  });
   describe('action taken: transaction confirmed', () => {
-    const state = states.waitForCloseConfirmed({
-      ...defaultsA,
-      penultimatePosition: { data: aResignsAfterOneRound.concludeHex, signature: aResignsAfterOneRound.conclude2Sig },
-      lastPosition: { data: aResignsAfterOneRound.conclude2Hex, signature: aResignsAfterOneRound.conclude2Sig },
-      turnNum: 9,
-    });
+
     const action = actions.transactionConfirmed();
+    const updatedState = walletReducer(state, action);
+    itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
+  });
+  describe('action taken: game concluded event', () => {
+    const action = actions.gameConcludedEvent();
     const updatedState = walletReducer(state, action);
     itTransitionsToStateType(states.APPROVE_WITHDRAWAL, updatedState);
   });
