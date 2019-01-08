@@ -302,7 +302,7 @@ const validTransitionToPostFundState = (state: states.FundingState, data: string
   return true;
 };
 
-const composePostFundState = (state: states.AWaitForDeposit | states.WaitForDepositConfirmation | states.BWaitForPostFundSetup) => {
+const composePostFundState = (state: states.AWaitForDeposit | states.BWaitForPostFundSetup) => {
   const lastState = decode(state.lastPosition.data);
   const { libraryAddress, channelNonce, participants, turnNum } = state;
   const channel = new Channel(libraryAddress, channelNonce, participants);
