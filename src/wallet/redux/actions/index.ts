@@ -194,7 +194,7 @@ export const transactionSentToMetamask = () => ({
 export type TransactionSentToMetamask = ReturnType<typeof transactionSentToMetamask>;
 
 export const TRANSACTION_SUBMISSION_FAILED = 'WALLET.TRANSACTION_SUBMISSION_FAILED';
-export const transactionSubmissionFailed = (error) => ({
+export const transactionSubmissionFailed = (error: { message?: string, code }) => ({
   error,
   type: TRANSACTION_SUBMISSION_FAILED as typeof TRANSACTION_SUBMISSION_FAILED,
 });
@@ -304,13 +304,6 @@ export const concludeRejected = () => ({
 });
 export type ConcludeRejected = ReturnType<typeof concludeRejected>;
 
-
-export const CONCLUDE_SUCCESS_ACKNOWLEDGED = 'WALLET.CONCLUDE_SUCCESS_ACKNOWLEDGED';
-export const concludeSuccessAcknowledged = () => ({
-  type: CONCLUDE_SUCCESS_ACKNOWLEDGED as typeof CONCLUDE_SUCCESS_ACKNOWLEDGED,
-});
-export type ConcludeSuccessAcknowledged = ReturnType<typeof concludeSuccessAcknowledged>;
-
 export const CLOSE_SUCCESS_ACKNOWLEDGED = 'WALLET.CLOSE_SUCCESS_ACKNOWLEDGED';
 export const closeSuccessAcknowledged = () => ({
   type: CLOSE_SUCCESS_ACKNOWLEDGED as typeof CLOSE_SUCCESS_ACKNOWLEDGED,
@@ -323,8 +316,13 @@ export const closedOnChainAcknowledged = () => ({
 });
 export type ClosedOnChainAcknowledged = ReturnType<typeof closedOnChainAcknowledged>;
 
+export const APPROVE_CLOSE = 'APPROVE_CLOSE';
+export const approveClose = () => ({
+  type: APPROVE_CLOSE as typeof APPROVE_CLOSE,
+});
+export type ApproveClose = ReturnType<typeof approveClose>;
 
-// TODO: This is getting large, we should probably split this up into seperate types for each stage
+// TODO: This is getting large, we should probably split this up into separate types for each stage
 export type WalletAction = (
   | LoggedIn
   | KeysLoaded
@@ -364,9 +362,9 @@ export type WalletAction = (
   | GameConcludedEvent
   | ConcludeRequested
   | ConcludeApproved
-  | ConcludeSuccessAcknowledged
   | CloseSuccessAcknowledged
   | ClosedOnChainAcknowledged
   | RespondWithMoveEvent
   | ChallengePositionReceived
+  | ApproveClose
 );

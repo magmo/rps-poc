@@ -29,6 +29,7 @@ class WithdrawingContainer extends PureComponent<Props> {
 
     switch (state.type) {
       case states.APPROVE_WITHDRAWAL:
+
         return (
           <ApproveX
             title="Withdraw your funds"

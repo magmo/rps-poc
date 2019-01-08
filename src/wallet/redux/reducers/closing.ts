@@ -8,27 +8,77 @@ import { State, Channel } from 'fmg-core';
 import decode from '../../domain/decode';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { sendMessage, closeSuccess, concludeSuccess } from '../../interface/outgoing';
-import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
+import { Signature } from '../../domain';
+import { createConcludeTransaction } from '../../utils/transaction-generator';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
-  // Handle any signature/validation request centrally to avoid duplicating code for each state
-  if (action.type === actions.OWN_POSITION_RECEIVED || action.type === actions.OPPONENT_POSITION_RECEIVED) {
-    return { ...state, messageOutbox: handleSignatureAndValidationMessages(state, action) };
-  }
   switch (state.type) {
     case states.APPROVE_CONCLUDE:
       return approveConcludeReducer(state, action);
     case states.WAIT_FOR_OPPONENT_CONCLUDE:
       return waitForOpponentConclude(state, action);
-    case states.ACKNOWLEDGE_CONCLUDE_SUCCESS:
-      return acknowledgeConcludeSuccessReducer(state, action);
+    case states.APPROVE_CLOSE_ON_CHAIN:
+      return approveCloseOnChainReducer(state, action);
     case states.ACKNOWLEDGE_CLOSE_SUCCESS:
       return acknowledgeCloseSuccessReducer(state, action);
     case states.ACKNOWLEDGE_CLOSED_ON_CHAIN:
       return acknowledgeClosedOnChainReducer(state, action);
+    case states.WAIT_FOR_CLOSE_INITIATION:
+      return waitForCloseInitiatorReducer(state, action);
+    case states.WAIT_FOR_CLOSE_SUBMISSION:
+      return waitForCloseSubmissionReducer(state, action);
+    case states.WAIT_FOR_CLOSE_CONFIRMED:
+      return waitForCloseConfirmedReducer(state, action);
     default:
       return unreachable(state);
   }
+};
+const waitForCloseConfirmedReducer = (state: states.WaitForCloseConfirmed, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_CONFIRMED:
+      return states.approveWithdrawal({ ...state });
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
+  }
+  return state;
+};
+
+const waitForCloseInitiatorReducer = (state: states.WaitForCloseInitiation, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_SENT_TO_METAMASK:
+      return states.waitForCloseSubmission(state);
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
+  }
+  return state;
+};
+
+const waitForCloseSubmissionReducer = (state: states.WaitForCloseSubmission, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.TRANSACTION_SUBMITTED:
+      return states.waitForCloseConfirmed(state);
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
+  }
+  return state;
+};
+
+const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: actions.WalletAction) => {
+  switch (action.type) {
+    case actions.APPROVE_CLOSE:
+
+      const { penultimatePosition: from, lastPosition: to } = state;
+      const transactionOutbox = createConcludeTransaction(
+        state.adjudicator,
+        from.data,
+        to.data,
+        new Signature(from.signature),
+        new Signature(to.signature));
+      return states.waitForCloseInitiation({ ...state, transactionOutbox });
+    case actions.GAME_CONCLUDED_EVENT:
+      return states.approveWithdrawal(state);
+  }
+  return state;
 };
 
 const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAction) => {
@@ -39,13 +89,21 @@ const approveConcludeReducer = (state: states.ApproveConclude, action: WalletAct
       const { positionData, positionSignature, sendMessageAction } = composeConcludePosition(state);
       const lastState = decode(state.lastPosition.data);
       if (lastState.stateType === State.StateType.Conclude) {
-        return states.acknowledgeConcludeSuccess({
-          ...state,
-          turnNum: decode(positionData).turnNum,
-          penultimatePosition: state.lastPosition,
-          lastPosition: { data: positionData, signature: positionSignature },
-          messageOutbox: sendMessageAction,
-        });
+        if (state.adjudicator) {
+          return states.approveCloseOnChain({
+            ...state,
+            adjudicator: state.adjudicator,
+            turnNum: decode(positionData).turnNum,
+            penultimatePosition: state.lastPosition,
+            lastPosition: { data: positionData, signature: positionSignature },
+            messageOutbox: sendMessageAction,
+          });
+        } else {
+          return states.acknowledgeCloseSuccess({
+            ...state,
+            messageOutbox: concludeSuccess(),
+          });
+        }
       } else {
         return states.waitForOpponentConclude({
           ...state,
@@ -71,24 +129,13 @@ const waitForOpponentConclude = (state: states.WaitForOpponentConclude, action: 
       if (!validSignature(action.data, action.signature, opponentAddress)) { return state; }
       // check transition
       if (!validTransition(state, concludePosition)) { return state; }
-      return states.acknowledgeConcludeSuccess({
-        ...state,
-        turnNum: concludePosition.turnNum,
-        penultimatePosition: state.lastPosition,
-        lastPosition: { data: action.data, signature: action.signature },
-      });
-    default:
-      return state;
-  }
-};
-
-const acknowledgeConcludeSuccessReducer = (state: states.AcknowledgeConcludeSuccess, action: WalletAction) => {
-  switch (action.type) {
-    case actions.CONCLUDE_SUCCESS_ACKNOWLEDGED:
-      if (state.adjudicator) {
-        return states.approveWithdrawal({
+      if (state.adjudicator !== undefined) {
+        return states.approveCloseOnChain({
           ...state,
           adjudicator: state.adjudicator,
+          turnNum: concludePosition.turnNum,
+          penultimatePosition: state.lastPosition,
+          lastPosition: { data: action.data, signature: action.signature },
           messageOutbox: concludeSuccess(),
         });
       } else {
@@ -97,10 +144,13 @@ const acknowledgeConcludeSuccessReducer = (state: states.AcknowledgeConcludeSucc
           messageOutbox: concludeSuccess(),
         });
       }
+
     default:
       return state;
   }
 };
+
+
 
 const acknowledgeCloseSuccessReducer = (state: states.AcknowledgeCloseSuccess, action: WalletAction) => {
   switch (action.type) {

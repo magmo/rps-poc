@@ -1,4 +1,4 @@
-import { AdjudicatorExists, adjudicatorExists } from './shared'; 
+import { AdjudicatorExists, adjudicatorExists } from './shared';
 
 // stage
 export const WITHDRAWING = 'STAGE.WITHDRAWING';
@@ -13,6 +13,8 @@ export interface ApproveWithdrawal extends AdjudicatorExists {
   type: typeof APPROVE_WITHDRAWAL;
   stage: typeof WITHDRAWING;
 }
+
+
 
 export interface WaitForWithdrawalInitiation extends AdjudicatorExists {
   type: typeof WAIT_FOR_WITHDRAWAL_INITIATION;
@@ -44,6 +46,7 @@ export function waitForWithdrawalConfirmation<T extends AdjudicatorExists>(param
 export function acknowledgeWithdrawalSuccess<T extends AdjudicatorExists>(params: T): AcknowledgeWithdrawalSuccess {
   return { ...adjudicatorExists(params), type: ACKNOWLEDGE_WITHDRAWAL_SUCCESS, stage: WITHDRAWING };
 }
+
 
 export type WithdrawingState = (
   | ApproveWithdrawal

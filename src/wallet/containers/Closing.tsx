@@ -9,12 +9,14 @@ import AcknowledgeX from '../components/AcknowledgeX';
 import ApproveX from '../components/ApproveX';
 import { unreachable } from '../utils/reducer-utils';
 import WaitForOtherPlayer from '../components/WaitForOtherPlayer';
+import WaitForXConfirmation from '../components/WaitForXConfirmation';
+import WaitForXInitiation from '../components/WaitForXInitiation';
 
 interface Props {
   state: states.ClosingState;
   concludeApproved: () => void;
   concludeRejected: () => void;
-  concludeSuccessAcknowledged: () => void;
+  closeOnChain: () => void;
   closeSuccessAcknowledged: () => void;
   closedOnChainAcknowledged: () => void;
 }
@@ -25,30 +27,31 @@ class ClosingContainer extends PureComponent<Props> {
       state,
       concludeApproved,
       concludeRejected,
-      concludeSuccessAcknowledged,
       closeSuccessAcknowledged,
       closedOnChainAcknowledged,
+      closeOnChain,
     } = this.props;
 
     switch (state.type) {
       case states.APPROVE_CONCLUDE:
         return (
           <ApproveX
-            title="Conclude the channel!"
-            description="Do you wish to conclude this channel?"
+            title="Conclude the game!"
+            description="Do you wish to conclude this game?"
             approvalAction={concludeApproved}
             rejectionAction={concludeRejected}
           />
         );
       case states.WAIT_FOR_OPPONENT_CONCLUDE:
         return <WaitForOtherPlayer name="conclude" />;
-      case states.ACKNOWLEDGE_CONCLUDE_SUCCESS:
+      case states.APPROVE_CLOSE_ON_CHAIN:
+        // TODO: Add option to reject closing the channel?  
         return (
           <AcknowledgeX
-            title="Conclude successfull!"
-            action={concludeSuccessAcknowledged}
-            description="You have successfully concluded your channel"
-            actionTitle="Proceed to withdraw"
+            title="Close Channel!"
+            action={closeOnChain}
+            description="The game has been concluded and the channel can now be closed."
+            actionTitle="Close channel"
           />
         );
       case states.ACKNOWLEDGE_CLOSE_SUCCESS:
@@ -69,7 +72,12 @@ class ClosingContainer extends PureComponent<Props> {
             actionTitle="Ok!"
           />
         );
-
+      case states.WAIT_FOR_CLOSE_INITIATION:
+        return <WaitForXInitiation name="close" />;
+      case states.WAIT_FOR_CLOSE_SUBMISSION:
+        return <WaitForXConfirmation name="close" />;
+      case states.WAIT_FOR_CLOSE_CONFIRMED:
+        return <WaitForXConfirmation name="close" />;
       default:
         return unreachable(state);
     }
@@ -79,9 +87,9 @@ class ClosingContainer extends PureComponent<Props> {
 const mapDispatchToProps = {
   concludeApproved: actions.concludeApproved,
   concludeRejected: actions.concludeRejected,
-  concludeSuccessAcknowledged: actions.concludeSuccessAcknowledged,
   closeSuccessAcknowledged: actions.closeSuccessAcknowledged,
   closedOnChainAcknowledged: actions.closedOnChainAcknowledged,
+  closeOnChain: actions.approveClose,
 };
 
 export default connect(

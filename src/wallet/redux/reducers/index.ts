@@ -11,8 +11,6 @@ import {
   waitForLogin,
   approveConclude,
   ApproveConclude,
-  acknowlegeClosedOnChain,
-  AcknowledgeClosedOnChain,
 } from '../../states';
 
 import { initializingReducer } from './initializing';
@@ -23,7 +21,7 @@ import { challengingReducer } from './challenging';
 import { respondingReducer } from './responding';
 import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
-import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, GAME_CONCLUDED_EVENT } from '../actions';
+import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import decode from '../../domain/decode';
 import { validSignature } from '../../utils/signing-utils';
@@ -37,9 +35,6 @@ export const walletReducer = (state: WalletState = initialState, action: WalletA
 
   const conclusionStateFromOpponentRequest = receivedValidOpponentConclusionRequest(state, action);
   if (conclusionStateFromOpponentRequest) { return conclusionStateFromOpponentRequest; }
-
-  const closedOnChainState = receivedValidOpponentClosedOnChain(state, action);
-  if (closedOnChainState) { return closedOnChainState; }
 
   switch (state.stage) {
     case INITIALIZING:
@@ -97,12 +92,3 @@ const receivedValidOpponentConclusionRequest = (state: WalletState, action: Wall
   });
 };
 
-const receivedValidOpponentClosedOnChain = (state: WalletState, action: WalletAction): AcknowledgeClosedOnChain | null => {
-  if (state.stage !== FUNDING && state.stage !== RUNNING && state.stage !== CLOSING) { return null; }
-  if (action.type !== GAME_CONCLUDED_EVENT) { return null; }
-
-  if ('adjudicator' in state && state.adjudicator) {
-    return acknowlegeClosedOnChain({ ...state, adjudicator: state.adjudicator });
-  }
-  return null;
-};
