@@ -4,7 +4,7 @@ import SagaTester from 'redux-saga-tester';
 import * as actions from "../redux/actions";
 import { deployContract, depositContract, createChallenge, concludeGame, refuteChallenge, respondWithMove } from './test-utils';
 
-jest.setTimeout(20000);
+jest.setTimeout(45000);
 
 describe('adjudicator listener', () => {
   const provider: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');

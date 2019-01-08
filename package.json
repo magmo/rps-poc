@@ -72,9 +72,10 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "run-s test:truffle 'test:app --all'",
-    "test:ci": "run-s test:truffle 'test:app --all --ci' build",
-    "test:app": "npx ganache-then-jest --runInBand",
+    "test": "run-s test:truffle 'test:app --all' 'test:integration --all'",
+    "test:ci": "run-s test:truffle 'test:app --all --ci' 'test:integration --all --ci' build",
+    "test:app": "npx run-jest -c ./config/jest/jest-unit.config.js",
+    "test:integration": "npx ganache-then-jest -c ./config/jest/jest-integration.config.js --runInBand",
     "test:truffle": "node scripts/test_truffle.js",
     "truffle:migrate": "npx deploy-contracts",
     "ganache:start": "npx start-ganache",
@@ -102,7 +103,7 @@
     "ganache-cli": "^6.1.8",
     "html-webpack-plugin": "4.0.0-beta.5",
     "jest": "^23.5.0",
-    "magmo-devtools": "git+https://github.com/magmo/devtools.git#v0.1.1",
+    "magmo-devtools": "git+https://github.com/magmo/devtools.git#v0.1.2",
     "node-sass": "^4.9.3",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
@@ -131,50 +132,6 @@
     "uglifyjs-webpack-plugin": "^1.1.8",
     "url-loader": "^1.1.2",
     "workbox-webpack-plugin": "3.6.3"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}"
-    ],
-    "setupFiles": [
-      "<rootDir>/config/polyfills.js"
-    ],
-    "setupTestFrameworkScriptFile": "<rootDir>/src/setupTests.ts",
-    "testMatch": [
-      "<rootDir>/src/**/?(*.)(spec|test).(j|t)s?(x)"
-    ],
-    "testEnvironment": "jsdom",
-    "testURL": "http://localhost",
-    "transform": {
-      "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|mjs|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|ts|tsx)$"
-    ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web"
-    },
-    "moduleFileExtensions": [
-      "web.ts",
-      "ts",
-      "web.tsx",
-      "tsx",
-      "web.js",
-      "js",
-      "web.jsx",
-      "jsx",
-      "json",
-      "node",
-      "mjs"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsConfigFile": "./tsconfig.test.json"
-      }
-    }
   },
   "babel": {
     "presets": [
