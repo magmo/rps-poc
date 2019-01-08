@@ -99,6 +99,8 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
   switch (action.type) {
     case actions.TRANSACTION_SENT_TO_METAMASK:
       return states.aSubmitDeployInMetaMask(state);
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.aWaitForDeployToBeSentToMetaMask({ ...state, unhandledAdjudicatorEvent: action });
     default:
       return state;
   }
@@ -106,6 +108,8 @@ const aWaitForDeployToBeSentToMetaMaskReducer = (state: states.AWaitForDeployToB
 
 const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.aSubmitDeployInMetaMask({ ...state, unhandledAction: action });
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDeployConfirmation({
         ...state,
@@ -122,14 +126,24 @@ const aSubmitDeployToMetaMaskReducer = (state: states.ASubmitDeployInMetaMask, a
 
 const waitForDeployConfirmationReducer = (state: states.WaitForDeployConfirmation, action: actions.WalletAction) => {
   switch (action.type) {
+    case actions.FUNDING_RECEIVED_EVENT:
+      return states.aSubmitDeployInMetaMask({ ...state, unhandledAction: action });
     case actions.TRANSACTION_CONFIRMED:
       if (!action.contractAddress) { return state; }
       const sendAdjudicatorAddressAction = sendMessage(state.participants[1 - state.ourIndex], action.contractAddress, "");
-      return states.aWaitForDeposit({
+      const updatedState = states.aWaitForDeposit({
         ...state,
         adjudicator: action.contractAddress,
         messageOutbox: sendAdjudicatorAddressAction,
       });
+      if (state.unhandledAction) {
+        // Now that  we're in a correct state to handle the funding received event 
+        // we recursively call the reducer to handle the funding received event
+        return fundingReducer({ ...updatedState, unhandledAction: undefined }, state.unhandledAction);
+      }
+      else {
+        return updatedState;
+      }
     default:
       return state;
   }
@@ -204,10 +218,9 @@ const bSubmitDepositInMetaMaskReducer = (state: states.BSubmitDepositInMetaMask,
     // B submits deposit transaction, transaction is confirmed, A sends postfundset, B receives postfundsetup
     // All of the above happens before B receives transaction submitted
     case actions.MESSAGE_RECEIVED:
-      if (!action.signature) { return state; }
       return states.bSubmitDepositInMetaMask({
         ...state,
-        unvalidatedNewPosition: { data: action.data, signature: action.signature },
+        unhandledAction: action,
       });
     case actions.TRANSACTION_SUBMITTED:
       return states.waitForDepositConfirmation(state);
@@ -227,38 +240,17 @@ const waitForDepositConfirmationReducer = (state: states.WaitForDepositConfirmat
       if (!action.signature) { return state; }
       return states.waitForDepositConfirmation({
         ...state,
-        unvalidatedNewPosition: { data: action.data, signature: action.signature },
+        unhandledAction: action,
       });
     case actions.TRANSACTION_CONFIRMED:
-      let haveValidPostFundA = false;
-      if (state.unvalidatedNewPosition) {
-        haveValidPostFundA = validTransitionToPostFundState(state, state.unvalidatedNewPosition.data, state.unvalidatedNewPosition.signature);
+      if (state.unhandledAction) {
+        const updatedState = states.bWaitForPostFundSetup({ ...state, unhandledAction: undefined });
+        // Now that  we're in a correct state to handle the message
+        // we recursively call the reducer to handle the message received action
+        return fundingReducer(updatedState, state.unhandledAction);
+      } else {
+        return states.bWaitForPostFundSetup(state);
       }
-      // Player B already received PostFund state from A
-      if (haveValidPostFundA) {
-        const { positionData, positionSignature, sendMessageAction } = composePostFundState(state);
-        return states.acknowledgeFundingSuccess({
-          ...state,
-          turnNum: decode(positionData).turnNum,
-          lastPosition: { data: positionData, signature: positionSignature },
-          penultimatePosition: state.lastPosition,
-          unvalidatedNewPosition: undefined,
-          messageOutbox: sendMessageAction,
-        });
-      }
-
-      return states.bWaitForPostFundSetup(state);
-    case actions.MESSAGE_RECEIVED:
-      if (!validTransitionToPostFundState(state, action.data, action.signature)) {
-        return state;
-      }
-      const postFundPosition = decode(action.data);
-      return states.waitForDepositConfirmation({
-        ...state,
-        turnNum: postFundPosition.turnNum,
-        lastPosition: { data: action.data, signature: action.signature! },
-        penultimatePosition: state.lastPosition,
-      });
     default:
       return state;
   }
