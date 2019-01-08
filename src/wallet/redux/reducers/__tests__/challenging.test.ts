@@ -61,7 +61,6 @@ describe('when in INITIATE_CHALLENGE', () => {
     const action = actions.transactionSentToMetamask();
     const updatedState = walletReducer(state, action);
 
-    itSendsATransaction(updatedState);
     itTransitionsToStateType(states.WAIT_FOR_CHALLENGE_SUBMISSION, updatedState);
   });
 });

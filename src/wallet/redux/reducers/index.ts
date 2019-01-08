@@ -21,7 +21,7 @@ import { challengingReducer } from './challenging';
 import { respondingReducer } from './responding';
 import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
-import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, } from '../actions';
+import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, MESSAGE_SENT, TRANSACTION_SENT_TO_METAMASK } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import decode from '../../domain/decode';
 import { validSignature } from '../../utils/signing-utils';
@@ -30,6 +30,14 @@ import { State } from 'fmg-core';
 const initialState = waitForLogin();
 
 export const walletReducer = (state: WalletState = initialState, action: WalletAction): WalletState => {
+  if (action.type === MESSAGE_SENT) {
+    return { ...state, messageOutbox: undefined };
+  }
+
+  if (action.type === TRANSACTION_SENT_TO_METAMASK) {
+    state = { ...state, transactionOutbox: undefined };
+  }
+
   const conclusionStateFromOwnRequest = receivedValidOwnConclusionRequest(state, action);
   if (conclusionStateFromOwnRequest) { return conclusionStateFromOwnRequest; }
 
