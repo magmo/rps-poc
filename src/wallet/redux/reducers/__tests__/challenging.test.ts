@@ -1,6 +1,5 @@
 import { walletReducer } from '..';
 import { scenarios } from '../../../../core';
-import { ChallengeProof } from '../../../domain/ChallengeProof';
 import * as states from '../../../states';
 import * as actions from '../../actions';
 import { itSendsATransaction, itTransitionsToStateType } from './helpers';
@@ -30,7 +29,6 @@ const defaults = {
   ourIndex: 0,
   address: 'address',
   privateKey: asPrivateKey,
-  challengeProof: new ChallengeProof(proposeHex, acceptHex, proposeSig, acceptSig),
   networkId: 2323,
   challengeExpiry: 12321,
 

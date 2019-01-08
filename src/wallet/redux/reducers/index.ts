@@ -23,7 +23,7 @@ import { withdrawingReducer } from './withdrawing';
 import { closingReducer } from './closing';
 import { WalletAction, CONCLUDE_REQUESTED, MESSAGE_RECEIVED, MESSAGE_SENT, TRANSACTION_SENT_TO_METAMASK } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
-import decode from '../../domain/decode';
+import decode from '../../utils/decode-utils';
 import { validSignature } from '../../utils/signing-utils';
 import { State } from 'fmg-core';
 

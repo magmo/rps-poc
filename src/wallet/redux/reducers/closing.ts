@@ -5,10 +5,9 @@ import { WalletState, ClosingState } from '../../states';
 import { WalletAction } from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { State, Channel } from 'fmg-core';
-import decode from '../../domain/decode';
+import decode from '../../utils/decode-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';
 import { sendMessage, closeSuccess, concludeSuccess } from '../../interface/outgoing';
-import { Signature } from '../../domain';
 import { createConcludeTransaction } from '../../utils/transaction-generator';
 
 export const closingReducer = (state: ClosingState, action: WalletAction): WalletState => {
@@ -72,8 +71,8 @@ const approveCloseOnChainReducer = (state: states.ApproveCloseOnChain, action: a
         state.adjudicator,
         from.data,
         to.data,
-        new Signature(from.signature),
-        new Signature(to.signature));
+        from.signature,
+        to.signature);
       return states.waitForCloseInitiation({ ...state, transactionOutbox });
     case actions.GAME_CONCLUDED_EVENT:
       return states.approveWithdrawal(state);

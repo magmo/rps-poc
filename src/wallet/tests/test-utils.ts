@@ -3,7 +3,6 @@ import { getLibraryAddress } from '../utils/contract-utils';
 import { Channel } from 'fmg-core';
 import { createDeployTransaction, createDepositTransaction, createForceMoveTransaction, createConcludeTransaction, createRefuteTransaction, createRespondWithMoveTransaction, } from '../utils/transaction-generator';
 import { positions, Move, encode } from '../../core';
-import { Signature } from '../domain';
 import { signPositionHex } from '../utils/signing-utils';
 import { randomHex } from '../../utils/randomHex';
 import BN from 'bn.js';
@@ -67,8 +66,8 @@ export async function createChallenge(address, channelNonce, participantA, parti
 
   const fromPosition = encode(positions.proposeFromSalt(proposeArgs));
   const toPosition = encode(positions.accept(acceptArgs));
-  const fromSig = new Signature(signPositionHex(fromPosition, participantB.privateKey));
-  const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
+  const fromSig = signPositionHex(fromPosition, participantB.privateKey);
+  const toSig = signPositionHex(toPosition, participantA.privateKey);
   const challengeTransaction = createForceMoveTransaction(address, fromPosition, toPosition, fromSig, toSig);
   const transactionReceipt = await signer.sendTransaction(challengeTransaction);
   await transactionReceipt.wait();
@@ -93,9 +92,9 @@ export async function concludeGame(address, channelNonce, participantA, particip
 
   };
   const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
-  const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
+  const fromSignature = signPositionHex(fromState, participantA.privateKey);
   const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
-  const toSignature = new Signature(signPositionHex(toState, participantB.privateKey));
+  const toSignature = signPositionHex(toState, participantB.privateKey);
 
   const concludeTransaction = createConcludeTransaction(address, fromState, toState, fromSignature, toSignature);
   const transactionReceipt = await signer.sendTransaction(concludeTransaction);
@@ -123,7 +122,7 @@ export async function respondWithMove(address, channelNonce, participantA, parti
   };
 
   const toPosition = encode(positions.reveal(revealArgs));
-  const toSig = new Signature(signPositionHex(toPosition, participantB.privateKey));
+  const toSig = signPositionHex(toPosition, participantB.privateKey);
 
   const respondWithMoveTransaction = createRespondWithMoveTransaction(address, toPosition, toSig);
   const transactionReceipt = await signer.sendTransaction(respondWithMoveTransaction);
@@ -149,7 +148,7 @@ export async function refuteChallenge(address, channelNonce, participantA, parti
   };
 
   const toPosition = encode(positions.proposeFromSalt(secondProposeArgs));
-  const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
+  const toSig = signPositionHex(toPosition, participantA.privateKey);
   const refuteTransaction = createRefuteTransaction(address, toPosition, toSig);
   const transactionReceipt = await signer.sendTransaction(refuteTransaction);
   await transactionReceipt.wait();

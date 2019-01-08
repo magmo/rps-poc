@@ -5,7 +5,6 @@ import { put } from "redux-saga/effects";
 import { encode, Move, positions } from "../../core";
 import bnToHex from "../../utils/bnToHex";
 import { randomHex } from "../../utils/randomHex";
-import { Signature } from "../domain";
 import { transactionConfirmed, transactionFinalized, transactionSentToMetamask, transactionSubmitted } from '../redux/actions';
 import { transactionSender } from "../redux/sagas/transaction-sender";
 import { signPositionHex, signVerificationData } from '../utils/signing-utils';
@@ -107,8 +106,8 @@ describe('transactions', () => {
     };
     const fromPosition = encode(positions.proposeFromSalt({ libraryAddress, channelNonce, ...proposeArgs }));
     const toPosition = encode(positions.accept({ libraryAddress, channelNonce, ...acceptArgs }));
-    const fromSig = new Signature(signPositionHex(fromPosition, participantB.privateKey));
-    const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
+    const fromSig = signPositionHex(fromPosition, participantB.privateKey);
+    const toSig = signPositionHex(toPosition, participantA.privateKey);
 
     const forceMoveTransaction = createForceMoveTransaction(contractAddress, fromPosition, toPosition, fromSig, toSig);
     await testTransactionSender(forceMoveTransaction);
@@ -135,7 +134,7 @@ describe('transactions', () => {
 
     const toPosition = encode(positions.reveal(revealArgs));
 
-    const toSig = new Signature(signPositionHex(toPosition, participantB.privateKey));
+    const toSig = signPositionHex(toPosition, participantB.privateKey);
 
     const respondWithMoveTransaction = createRespondWithMoveTransaction(contractAddress, toPosition, toSig);
     await testTransactionSender(respondWithMoveTransaction);
@@ -160,7 +159,7 @@ describe('transactions', () => {
     };
 
     const toPosition = encode(positions.proposeFromSalt(secondProposeArgs));
-    const toSig = new Signature(signPositionHex(toPosition, participantA.privateKey));
+    const toSig = signPositionHex(toPosition, participantA.privateKey);
 
     const refuteTransaction = createRefuteTransaction(contractAddress, toPosition, toSig);
     await testTransactionSender(refuteTransaction);
@@ -183,10 +182,10 @@ describe('transactions', () => {
 
     };
     const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
-    const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
+    const fromSignature = signPositionHex(fromState, participantA.privateKey);
     const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
-    const toSignature = new Signature(signPositionHex(toState, participantB.privateKey));
-    const verificationSignature = new Signature(signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey));
+    const toSignature = signPositionHex(toState, participantB.privateKey);
+    const verificationSignature = signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey);
     const concludeAndWithdrawArgs: ConcludeAndWithdrawArgs = {
       contractAddress,
       channelId: channel.id,
@@ -219,9 +218,9 @@ describe('transactions', () => {
 
     };
     const fromState = encode(positions.conclude({ ...concludeArgs, turnNum: 50 }));
-    const fromSignature = new Signature(signPositionHex(fromState, participantA.privateKey));
+    const fromSignature = signPositionHex(fromState, participantA.privateKey);
     const toState = encode(positions.conclude({ ...concludeArgs, turnNum: 51 }));
-    const toSignature = new Signature(signPositionHex(toState, participantB.privateKey));
+    const toSignature = signPositionHex(toState, participantB.privateKey);
 
     const concludeTransaction = createConcludeTransaction(contractAddress, fromState, toState, fromSignature, toSignature);
     await testTransactionSender(concludeTransaction);
@@ -233,7 +232,7 @@ describe('transactions', () => {
     const contractAddress = await deployContract(channelNonce, participantA, participantB) as string;
     await depositContract(contractAddress);
     await concludeGame(contractAddress, channelNonce, participantA, participantB);
-    const verificationSignature = new Signature(signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey));
+    const verificationSignature = signVerificationData(participantA.address, participantA.address, channel.id, participantA.privateKey);
     const withdrawTransaction = createWithdrawTransaction(contractAddress, participantA.address, participantA.address, channel.id, verificationSignature);
     await testTransactionSender(withdrawTransaction);
   });

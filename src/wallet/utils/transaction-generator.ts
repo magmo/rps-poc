@@ -2,13 +2,16 @@
 
 import { TransactionRequest } from "ethers/providers";
 import { getSimpleAdjudicatorInterface, getSimpleAdjudicatorBytecode } from "./contract-utils";
-import { Signature } from "../domain";
+import { splitSignature } from 'ethers/utils';
 
-export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, fromSignature: Signature, toSignature: Signature): TransactionRequest {
+
+export function createForceMoveTransaction(contractAddress: string, fromState: string, toState: string, fromSignature: string, toSignature: string): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const v = [fromSignature.v, toSignature.v];
-  const r = [fromSignature.r, toSignature.r];
-  const s = [fromSignature.s, toSignature.s];
+  const splitFromSignature = splitSignature(fromSignature);
+  const splitToSignature = splitSignature(toSignature);
+  const v = [splitFromSignature.v, splitToSignature.v];
+  const r = [splitFromSignature.r, splitToSignature.r];
+  const s = [splitFromSignature.s, splitToSignature.s];
   const data = adjudicatorInterface.functions.forceMove.encode([fromState, toState, v, r, s]);
 
   return {
@@ -17,9 +20,9 @@ export function createForceMoveTransaction(contractAddress: string, fromState: s
   };
 }
 
-export function createRespondWithMoveTransaction(contractAddress: string, nextState: string, signature: Signature): TransactionRequest {
+export function createRespondWithMoveTransaction(contractAddress: string, nextState: string, signature: string): TransactionRequest {
+  const { v, r, s } = splitSignature(signature);
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const { v, r, s } = signature;
   const data = adjudicatorInterface.functions.respondWithMove.encode([nextState, v, r, s]);
   return {
     to: contractAddress,
@@ -27,9 +30,9 @@ export function createRespondWithMoveTransaction(contractAddress: string, nextSt
   };
 }
 
-export function createRefuteTransaction(contractAddress: string, refuteState: string, signature: Signature): TransactionRequest {
+export function createRefuteTransaction(contractAddress: string, refuteState: string, signature: string): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const { v, r, s } = signature;
+  const { v, r, s } = splitSignature(signature);
   const data = adjudicatorInterface.functions.refute.encode([refuteState, v, r, s]);
   return {
     to: contractAddress,
@@ -44,16 +47,19 @@ export interface ConcludeAndWithdrawArgs {
   participant: string;
   destination: string;
   channelId: string;
-  fromSignature: Signature;
-  toSignature: Signature;
-  verificationSignature: Signature;
+  fromSignature: string;
+  toSignature: string;
+  verificationSignature: string;
 }
 export function createConcludeAndWithdrawTransaction(args: ConcludeAndWithdrawArgs): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
+  const splitFromSignature = splitSignature(args.fromSignature);
+  const splitToSignature = splitSignature(args.toSignature);
+  const splitVerifySignature = splitSignature(args.verificationSignature);
 
-  const v = [args.fromSignature.v, args.toSignature.v, args.verificationSignature.v];
-  const r = [args.fromSignature.r, args.toSignature.r, args.verificationSignature.r];
-  const s = [args.fromSignature.s, args.toSignature.s, args.verificationSignature.s];
+  const v = [splitFromSignature.v, splitToSignature.v, splitVerifySignature.v];
+  const r = [splitFromSignature.r, splitToSignature.r, splitVerifySignature.r];
+  const s = [splitFromSignature.s, splitToSignature.s, splitVerifySignature.s];
   const { fromState, toState, participant, destination, contractAddress, channelId } = args;
   const data = adjudicatorInterface.functions.concludeAndWithdraw.encode([fromState, toState, participant, destination, channelId, v, r, s]);
 
@@ -63,11 +69,13 @@ export function createConcludeAndWithdrawTransaction(args: ConcludeAndWithdrawAr
   };
 }
 
-export function createConcludeTransaction(contractAddress: string, fromState: string, toState: string, fromSignature: Signature, toSignature: Signature): TransactionRequest {
+export function createConcludeTransaction(contractAddress: string, fromState: string, toState: string, fromSignature: string, toSignature: string): TransactionRequest {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const v = [fromSignature.v, toSignature.v];
-  const r = [fromSignature.r, toSignature.r];
-  const s = [fromSignature.s, toSignature.s];
+  const splitFromSignature = splitSignature(fromSignature);
+  const splitToSignature = splitSignature(toSignature);
+  const v = [splitFromSignature.v, splitToSignature.v];
+  const r = [splitFromSignature.r, splitToSignature.r];
+  const s = [splitFromSignature.s, splitToSignature.s];
   const data = adjudicatorInterface.functions.conclude.encode([fromState, toState, v, r, s]);
 
   return {
@@ -76,9 +84,9 @@ export function createConcludeTransaction(contractAddress: string, fromState: st
   };
 }
 
-export function createWithdrawTransaction(contractAddress: string, participant: string, destination: string, channelId: string, verificationSignature: Signature) {
+export function createWithdrawTransaction(contractAddress: string, participant: string, destination: string, channelId: string, verificationSignature: string) {
   const adjudicatorInterface = getSimpleAdjudicatorInterface();
-  const { v, r, s } = verificationSignature;
+  const { v, r, s } = splitSignature(verificationSignature);
   const data = adjudicatorInterface.functions.withdraw.encode([participant, destination, channelId, v, r, s]);
 
   return {

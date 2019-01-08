@@ -1,7 +1,7 @@
 
 import * as states from '../../states';
 import * as actions from '../actions';
-import decode from '../../domain/decode';
+import decode from '../../utils/decode-utils';
 
 import { ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex, validSignature } from '../../utils/signing-utils';

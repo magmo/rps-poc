@@ -1,5 +1,3 @@
-import decode from '../../domain/decode';
-
 import { WalletState, RespondingState } from '../../states';
 import * as states from '../../states/responding';
 import * as challengeStates from '../../states/challenging';
@@ -9,9 +7,9 @@ import * as actions from '../actions';
 import { unreachable, ourTurn, validTransition } from '../../utils/reducer-utils';
 import { signPositionHex } from '../../utils/signing-utils';
 import { createRespondWithMoveTransaction } from '../../utils/transaction-generator';
-import { Signature } from '../../domain';
 import { challengeResponseRequested, challengeComplete } from '../../interface/outgoing';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
+import decode from '../../utils/decode-utils';
 
 
 export const respondingReducer = (state: RespondingState, action: WalletAction): WalletState => {
@@ -59,7 +57,7 @@ export const chooseResponseReducer = (state: states.ChooseResponse, action: Wall
       return states.takeMoveInApp({ ...state, messageOutbox: challengeResponseRequested() });
     case actions.RESPOND_WITH_EXISTING_MOVE_CHOSEN:
       const { data, signature } = state.lastPosition;
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, new Signature(signature));
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, signature);
       return states.initiateResponse({
         ...state,
         transactionOutbox: transaction,
@@ -85,7 +83,7 @@ export const takeMoveInAppReducer = (state: states.TakeMoveInApp, action: Wallet
       if (!validTransition(state, position)) { return state; }
 
       const signature = signPositionHex(data, state.privateKey);
-      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, new Signature(signature));
+      const transaction = createRespondWithMoveTransaction(state.adjudicator, data, signature);
       return states.initiateResponse({
         ...state,
         turnNum: state.turnNum + 1,

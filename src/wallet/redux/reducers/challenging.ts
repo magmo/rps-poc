@@ -1,4 +1,3 @@
-import { Signature } from '../../domain';
 import { WalletState } from '../../states';
 import * as states from '../../states/challenging';
 import * as runningStates from '../../states/running';
@@ -40,7 +39,7 @@ const approveChallengeReducer = (state: states.ApproveChallenge, action: WalletA
     case actions.CHALLENGE_APPROVED:
       const { data: fromPosition, signature: fromSignature } = state.penultimatePosition;
       const { data: toPosition, signature: toSignature } = state.lastPosition;
-      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, new Signature(fromSignature), new Signature(toSignature));
+      const transaction = createForceMoveTransaction(state.adjudicator, fromPosition, toPosition, fromSignature, toSignature);
       return states.waitForChallengeInitiation(transaction, state);
     case actions.CHALLENGE_REJECTED:
       return runningStates.waitForUpdate({ ...state });

@@ -4,7 +4,6 @@ import { unreachable } from '../../utils/reducer-utils';
 import { handleSignatureAndValidationMessages } from '../../utils/state-utils';
 import { createWithdrawTransaction } from '../../utils/transaction-generator';
 import { signVerificationData } from '../../utils/signing-utils';
-import { Signature } from '../../domain';
 import { closeSuccess } from '../../interface/outgoing';
 
 export const withdrawingReducer = (state: states.WithdrawingState, action: actions.WalletAction): states.WalletState => {
@@ -31,7 +30,7 @@ const approveWithdrawalReducer = (state: states.ApproveWithdrawal, action: actio
   switch (action.type) {
     case actions.WITHDRAWAL_APPROVED:
       const myAddress = state.participants[state.ourIndex];
-      const signature = new Signature(signVerificationData(myAddress, myAddress, state.channelId, state.privateKey));
+      const signature = signVerificationData(myAddress, myAddress, state.channelId, state.privateKey);
       const transactionOutbox = createWithdrawTransaction(state.adjudicator, myAddress, myAddress, state.channelId, signature);
       return states.waitForWithdrawalInitiation({ ...state, transactionOutbox });
     case actions.WITHDRAWAL_REJECTED:
