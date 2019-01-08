@@ -4,7 +4,7 @@ require('dotenv').config()
 // We only want this loaded in a test environment 
 // so we can load and parse this file from the app
 if (process.env.NODE_ENV === 'test') {
-  require('ts-node/register'); 
+  require('ts-node/register');
 }
 
 require('babel-register'); // To handle es6 syntax in the tests
@@ -35,6 +35,11 @@ module.exports = {
       network_id: 42,
       gas: process.env.DEFAULT_GAS,
       gasPrice: process.env.DEFAULT_GAS_PRICE,
+    },
+  },
+  compilers: {
+    solc: {
+      version: "0.4.25",
     },
   },
   solc: {
