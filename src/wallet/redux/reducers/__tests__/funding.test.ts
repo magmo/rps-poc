@@ -191,6 +191,17 @@ describe('start in WaitForDeployConfirmation', () => {
 
     itTransitionsToStateType(states.A_WAIT_FOR_DEPOSIT, updatedState);
   });
+  describe('incoming action: transaction confirmed, funding event already received', () => { // player A scenario
+    const unhandledAction = actions.fundingReceivedEvent(1000, bsAddress, '0x0a');
+    const testDefaults = { ...defaultsA, ...justReceivedPreFundSetupB, unhandledAction };
+    const state = states.waitForDeployConfirmation(testDefaults);
+    const action = actions.transactionConfirmed('1234');
+    const updatedState = walletReducer(state, action);
+
+    itTransitionsToStateType(states.A_WAIT_FOR_POST_FUND_SETUP, updatedState);
+    itIncreasesTurnNumBy(1, state, updatedState);
+    expect((updatedState.messageOutbox as outgoing.SendMessage).type).toEqual(outgoing.SEND_MESSAGE);
+  });
 });
 
 describe('start in AWaitForDeposit', () => {
@@ -281,14 +292,14 @@ describe('start in WaitForDepositConfirmation', () => {
     const testDefaults = {
       ...defaultsB,
       ...justReceivedPreFundSetupB,
-      unvalidatedNewPosition: { data: postFundSetupAHex, signature: postFundSetupASig },
+      unhandledAction: actions.messageReceived(postFundSetupAHex, postFundSetupASig),
     };
     const state = states.waitForDepositConfirmation(testDefaults);
     const action = actions.transactionConfirmed();
     const updatedState = walletReducer(state, action);
 
     itTransitionsToStateType(states.ACKNOWLEDGE_FUNDING_SUCCESS, updatedState);
-    itIncreasesTurnNumBy(1, state, updatedState);
+    itIncreasesTurnNumBy(2, state, updatedState);
   });
 
 
@@ -300,7 +311,7 @@ describe('start in WaitForDepositConfirmation', () => {
 
     itTransitionsToStateType(states.WAIT_FOR_DEPOSIT_CONFIRMATION, updatedState);
     itIncreasesTurnNumBy(0, state, updatedState);
-    expect((updatedState as WaitForDepositConfirmation).unvalidatedNewPosition!.data).toEqual(postFundSetupAHex);
+    expect((updatedState as WaitForDepositConfirmation).unhandledAction).toEqual(action);
   });
 });
 

@@ -8,7 +8,6 @@ export async function getProvider(): Promise<ethers.providers.Web3Provider> {
 }
 
 export async function getAdjudicatorContract(contractAddress: string, provider) {
-  console.log(contractAddress);
   return new ethers.Contract(contractAddress, getSimpleAdjudicatorInterface(), provider);
 }
 

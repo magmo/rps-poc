@@ -1,5 +1,6 @@
 import { TransactionRequest } from "ethers/providers";
 import { ResponseAction } from "../interface/outgoing";
+import { Action } from 'redux';
 
 export interface Base {
   messageOutbox?: ResponseAction;
@@ -33,7 +34,7 @@ export interface ChannelPartiallyOpen extends AddressExists {
 
 export interface ChannelOpen extends ChannelPartiallyOpen {
   penultimatePosition: SignedPosition;
-  unvalidatedNewPosition?: SignedPosition;
+  unhandledAction?: Action;
 }
 
 export interface AdjudicatorMightExist extends ChannelOpen {
@@ -69,8 +70,8 @@ export function channelPartiallyOpen<T extends ChannelPartiallyOpen>(params: T):
 }
 
 export function channelOpen<T extends ChannelOpen>(params: T): ChannelOpen {
-  const { penultimatePosition, unvalidatedNewPosition } = params;
-  return { ...channelPartiallyOpen(params), penultimatePosition, unvalidatedNewPosition };
+  const { penultimatePosition, unhandledAction } = params;
+  return { ...channelPartiallyOpen(params), penultimatePosition, unhandledAction };
 }
 
 export function adjudicatorMightExist<T extends AdjudicatorMightExist>(params: T): AdjudicatorMightExist {
