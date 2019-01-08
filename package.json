@@ -102,7 +102,7 @@
     "ganache-cli": "^6.1.8",
     "html-webpack-plugin": "2.29.0",
     "jest": "^23.5.0",
-    "magmo-devtools": "https://github.com/magmo/devtools",
+    "magmo-devtools": "git+https://github.com/magmo/devtools.git#v0.1.1",
     "node-sass": "^4.9.3",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "^3.0.0",
