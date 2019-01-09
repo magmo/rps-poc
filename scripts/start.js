@@ -34,7 +34,7 @@ const {
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
 const paths = require('../config/paths');
-const config = require('../config/webpack.config.dev');
+const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
@@ -72,6 +72,7 @@ choosePort(HOST, DEFAULT_PORT)
       // We have not found a port.
       return;
     }
+    const config = configFactory('development');
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     const appName = require(paths.appPackageJson).name;
     const urls = prepareUrls(protocol, HOST, port);
