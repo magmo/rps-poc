@@ -26,6 +26,7 @@ const env = getClientEnvironment(publicUrl);
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
 module.exports = {
+  mode: 'development',
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
   devtool: 'cheap-module-source-map',
@@ -102,7 +103,9 @@ module.exports = {
       'react-native': 'react-native-web',
     },
     plugins: [
-      new TsconfigPathsPlugin({ configFile: paths.appTsConfig }),
+      new TsconfigPathsPlugin({
+        configFile: paths.appTsConfig
+      }),
     ],
   },
   module: {
@@ -130,8 +133,7 @@ module.exports = {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
         // back to the "file" loader at the end of the loader list.
-        oneOf: [
-          {
+        oneOf: [{
             test: /\.(scss)$/,
             use: [{
               loader: 'style-loader', // inject CSS to page
@@ -176,15 +178,13 @@ module.exports = {
           {
             test: /\.(ts|tsx)$/,
             include: paths.appSrc,
-            use: [
-              {
-                loader: require.resolve('ts-loader'),
-                options: {
-                  // disable type checker - we will use it in fork plugin
-                  transpileOnly: true,
-                },
+            use: [{
+              loader: require.resolve('ts-loader'),
+              options: {
+                // disable type checker - we will use it in fork plugin
+                transpileOnly: true,
               },
-            ],
+            }, ],
           },
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -246,23 +246,28 @@ module.exports = {
     ],
   },
   plugins: [
-// Use pre-built artifacts for non-development networks.
- new webpack.NormalModuleReplacementPlugin(
-  /.*\/contracts\/artifacts\/.*\.json/,
-  function(resource) {
-    if (process.env.TARGET_NETWORK==='development'){
-      resource.request = resource.request.replace(/.*\/contracts\/artifacts/, paths.buildContracts);
-    }
-  }),
-      // Makes some environment variables available in index.html.
-    // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-    // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(env.raw),
+    // Use pre-built artifacts for non-development networks.
+    new webpack.NormalModuleReplacementPlugin(
+      /.*\/contracts\/artifacts\/.*\.json/,
+      function (resource) {
+        if (process.env.TARGET_NETWORK === 'development') {
+          resource.request = resource.request.replace(/.*\/contracts\/artifacts/, paths.buildContracts);
+        }
+      }),
+
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
-      template: paths.appHtml,
+      template: path.resolve('public/index.html'),
+    }),
+    // Makes some environment variables available in index.html.
+    // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+    // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    // In development, this will be an empty string.
+    new InterpolateHtmlPlugin(HtmlWebpackPlugin, {
+      PUBLIC_URL: publicUrl,
+      // You can pass any key-value pairs, this was just an example.
+      // WHATEVER: 42 will replace %WHATEVER% with 42 in index.html.
     }),
     // Add module names to factory functions so they appear in browser profiler.
     new webpack.NamedModulesPlugin(),
@@ -294,10 +299,11 @@ module.exports = {
       tslint: paths.appTsLint,
     }),
     new webpack.EnvironmentPlugin({
-    FIREBASE_PROJECT: 'rock-paper-scissors-dev',
-    FIREBASE_API_KEY: 'AIzaSyAlGe17xjJjfoJ_KDYjCREg7ZL4ns61Chc',
-    TARGET_NETWORK: process.env.TARGET_NETWORK,
-    })],
+      FIREBASE_PROJECT: 'rock-paper-scissors-dev',
+      FIREBASE_API_KEY: 'AIzaSyAlGe17xjJjfoJ_KDYjCREg7ZL4ns61Chc',
+      TARGET_NETWORK: process.env.TARGET_NETWORK,
+    })
+  ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
   node: {
