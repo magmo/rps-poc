@@ -39,6 +39,6 @@ const styles = StyleSheet.create({
     bottom: '5%',
   },
   button: {
-    margin: '10px',
+    margin: '8px',
   },
 });

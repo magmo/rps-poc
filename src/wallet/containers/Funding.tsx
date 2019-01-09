@@ -73,7 +73,7 @@ class FundingContainer extends PureComponent<Props> {
       case states.ACKNOWLEDGE_FUNDING_SUCCESS:
         return (
           <AcknowledgeX
-            title="Funding successful!"
+            title="Funding successful"
             action={fundingSuccessAcknowledged}
             description="You have successfully deposited funds into your channel"
             actionTitle="Return to game"
