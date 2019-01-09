@@ -37,8 +37,8 @@ class FundingContainer extends PureComponent<Props> {
       case states.APPROVE_FUNDING:
         return (
           <ApproveX
-            title="Fund your channel!"
-            description="Do you wish to open this channel?"
+            title="Funding requested"
+            description="Do you wish to open this state channel?"
             approvalAction={fundingApproved}
             rejectionAction={fundingRejected}
           />

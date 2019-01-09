@@ -1,5 +1,5 @@
 import React from 'react';
-import walletIcon from '../../images/wallet_icon.svg';
+// import walletIcon from '../../images/wallet_icon.svg';
 import SidebarLayout from './SidebarLayout';
 import YesOrNo from './YesOrNo';
 
@@ -16,7 +16,7 @@ export default class ApproveX extends React.PureComponent<Props> {
     const { approvalAction, rejectionAction, title, description } = this.props;
     return (
       <SidebarLayout>
-        <img src={walletIcon} />
+        {/* <img src={walletIcon} /> */}
         <div className="challenge-expired-title">{title}</div>
         <p>{description}</p>
 
