@@ -39,6 +39,8 @@ class FundingContainer extends PureComponent<Props> {
           <ApproveX
             title="Funding requested"
             description="Do you wish to open this state channel?"
+            yesMessage="Fund Channel"
+            noMessage="Cancel"
             approvalAction={fundingApproved}
             rejectionAction={fundingRejected}
           />
