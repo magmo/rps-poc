@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { Button } from 'reactstrap';
 import { StyleSheet, css } from 'aphrodite';
 import magmoFireBall from '../../images/fireball.svg';
+
 export interface Props {
   yesMessage: string;
   noMessage: string;
@@ -33,8 +34,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     padding: '5px',
+    position: "absolute",
+    top: 'auto',
+    bottom: '5%',
   },
   button: {
-    margin: '15px',
+    margin: '10px',
   },
 });
